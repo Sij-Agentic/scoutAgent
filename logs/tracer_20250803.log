@@ -1,0 +1,5 @@
+2025-08-03 21:57:31 - tracer - INFO - tracer.py:70 - start_trace() - Started trace: test_trace - test_operation
+2025-08-03 21:57:31 - tracer - INFO - tracer.py:103 - log_event() - Trace test_trace: test_start - {'message': 'Starting test'}
+2025-08-03 21:57:31 - tracer - INFO - tracer.py:103 - log_event() - Trace test_trace: processing - {'step': 1}
+2025-08-03 21:57:31 - tracer - INFO - tracer.py:103 - log_event() - Trace test_trace: processing - {'step': 2}
+2025-08-03 21:57:31 - tracer - INFO - tracer.py:165 - end_trace() - Completed trace: test_trace (0.00s)

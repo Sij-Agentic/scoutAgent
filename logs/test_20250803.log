@@ -1,0 +1,3 @@
+2025-08-03 21:54:13 - test - INFO - <string>:7 - <module>() - Testing basic logging...
+2025-08-03 21:54:13 - test - WARNING - <string>:9 - <module>() - Warning message
+2025-08-03 21:54:13 - test - ERROR - <string>:10 - <module>() - Error message

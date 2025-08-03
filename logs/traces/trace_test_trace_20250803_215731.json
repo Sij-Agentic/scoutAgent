@@ -1,0 +1,61 @@
+{
+  "trace_id": "test_trace",
+  "operation": "test_operation",
+  "start_time": "2025-08-03T20:57:31.963291",
+  "timestamp": 1754254651.963406,
+  "metadata": {
+    "test": true
+  },
+  "events": [
+    {
+      "timestamp": 1754254651.963493,
+      "event_type": "test_start",
+      "level": "info",
+      "data": {
+        "message": "Starting test"
+      },
+      "metadata": {}
+    },
+    {
+      "timestamp": 1754254651.963535,
+      "event_type": "processing",
+      "level": "info",
+      "data": {
+        "step": 1
+      },
+      "metadata": {}
+    },
+    {
+      "timestamp": 1754254651.963562,
+      "event_type": "processing",
+      "level": "info",
+      "data": {
+        "step": 2
+      },
+      "metadata": {}
+    }
+  ],
+  "data_flow": [
+    {
+      "timestamp": 1754254651.963532,
+      "source": "input",
+      "destination": "processor",
+      "data_type": "test_data",
+      "data_size": 1024,
+      "metadata": {}
+    },
+    {
+      "timestamp": 1754254651.963582,
+      "source": "processor",
+      "destination": "output",
+      "data_type": "result",
+      "data_size": 512,
+      "metadata": {}
+    }
+  ],
+  "end_time": "2025-08-03T20:57:31.963586",
+  "duration": 0.00018095970153808594,
+  "result": null,
+  "error": null,
+  "status": "success"
+}
