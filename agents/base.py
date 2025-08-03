@@ -280,7 +280,8 @@ class AgentRegistry:
         self.logger = get_logger("agent_registry")
         self.agents: Dict[str, type] = {}
         self.instances: Dict[str, BaseAgent] = {}
-        self.logger.info("Agent registry initialized")
+        self._message_buses: Dict[str, Any] = {}
+        self.logger.info("AgentRegistry initialized")
     
     def register_agent(self, agent_class: type) -> None:
         """
@@ -366,6 +367,27 @@ class AgentRegistry:
                 if inst.name == agent_name
             ]
         }
+    
+    def get_message_bus(self, context_id: str) -> Any:
+        """Get or create a message bus for a context."""
+        from .communication import MessageBus
+        if context_id not in self._message_buses:
+            self._message_buses[context_id] = MessageBus(context_id)
+        return self._message_buses[context_id]
+    
+    async def start_message_bus(self, context_id: str) -> None:
+        """Start the message bus for a context."""
+        bus = self.get_message_bus(context_id)
+        await bus.start()
+    
+    async def stop_message_bus(self, context_id: str) -> None:
+        """Stop the message bus for a context."""
+        if context_id in self._message_buses:
+            await self._message_buses[context_id].stop()
+    
+    def clear_message_buses(self) -> None:
+        """Clear all message buses."""
+        self._message_buses.clear()
 
 
 # Global registry instance
