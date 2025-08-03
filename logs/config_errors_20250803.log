@@ -1,1 +1,12 @@
 2025-08-03 22:10:59 - config - ERROR - config.py:228 - load_config() - Failed to load configuration: 'dict' object has no attribute 'level'
+2025-08-03 22:53:57 - config - ERROR - base.py:141 - execute() - Agent research failed: 'str' object has no attribute 'get'
+2025-08-03 22:54:59 - config - ERROR - base.py:141 - execute() - Agent code failed: 'str' object has no attribute 'get'
+2025-08-03 22:54:59 - config - ERROR - test_agents.py:172 - run_all_tests() - Test failed
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/test_agents.py", line 156, in run_all_tests
+    results = test_agent_execution()
+              ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/test_agents.py", line 77, in test_agent_execution
+    print(f"   Language detected: {code_result.result.get('language')}")
+                                   ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'get'

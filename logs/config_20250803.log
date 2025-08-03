@@ -16,3 +16,108 @@
 2025-08-03 22:14:19 - config - INFO - config.py:240 - load_config() - Configuration loaded successfully
 2025-08-03 22:14:19 - config - INFO - <string>:12 - <module>() - Testing config-logging integration...
 2025-08-03 22:14:19 - config - WARNING - <string>:14 - <module>() - This warning message should appear
+2025-08-03 22:50:28 - config - INFO - base.py:283 - __init__() - Agent registry initialized
+2025-08-03 22:50:28 - config - INFO - base.py:298 - register() - Registered agent: ResearchAgent
+2025-08-03 22:50:28 - config - INFO - base.py:298 - register() - Registered agent: CodeAgent
+2025-08-03 22:50:28 - config - INFO - base.py:298 - register() - Registered agent: AnalysisAgent
+2025-08-03 22:50:44 - config - INFO - base.py:283 - __init__() - Agent registry initialized
+2025-08-03 22:50:44 - config - INFO - base.py:298 - register() - Registered agent: ResearchAgent
+2025-08-03 22:50:44 - config - INFO - base.py:298 - register() - Registered agent: CodeAgent
+2025-08-03 22:50:44 - config - INFO - base.py:298 - register() - Registered agent: AnalysisAgent
+2025-08-03 22:50:56 - config - INFO - base.py:283 - __init__() - Agent registry initialized
+2025-08-03 22:50:56 - config - INFO - base.py:298 - register() - Registered agent: ResearchAgent
+2025-08-03 22:50:56 - config - INFO - base.py:298 - register() - Registered agent: CodeAgent
+2025-08-03 22:50:56 - config - INFO - base.py:298 - register() - Registered agent: AnalysisAgent
+2025-08-03 22:51:23 - config - INFO - base.py:283 - __init__() - Agent registry initialized
+2025-08-03 22:51:23 - config - INFO - base.py:298 - register() - Registered agent: ResearchAgent
+2025-08-03 22:51:23 - config - INFO - base.py:298 - register() - Registered agent: CodeAgent
+2025-08-03 22:51:23 - config - INFO - base.py:298 - register() - Registered agent: AnalysisAgent
+2025-08-03 22:53:30 - config - INFO - base.py:283 - __init__() - Agent registry initialized
+2025-08-03 22:53:57 - config - INFO - base.py:283 - __init__() - Agent registry initialized
+2025-08-03 22:53:57 - config - INFO - base.py:303 - register_agent() - Registered agent: ResearchAgent
+2025-08-03 22:53:57 - config - INFO - base.py:305 - register_agent() - Registered agent alias: research
+2025-08-03 22:53:57 - config - INFO - base.py:303 - register_agent() - Registered agent: CodeAgent
+2025-08-03 22:53:57 - config - INFO - base.py:305 - register_agent() - Registered agent alias: code
+2025-08-03 22:53:57 - config - INFO - base.py:303 - register_agent() - Registered agent: AnalysisAgent
+2025-08-03 22:53:57 - config - INFO - base.py:305 - register_agent() - Registered agent alias: analysis
+2025-08-03 22:53:57 - config - WARNING - config.py:191 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-03 22:53:57 - config - INFO - config.py:206 - load_config() - Loading ScoutAgent configuration...
+2025-08-03 22:53:57 - config - INFO - config.py:240 - load_config() - Configuration loaded successfully
+2025-08-03 22:53:57 - config - INFO - base.py:89 - __init__() - Initialized agent: research (5509fb34-9b84-4fc6-bbfc-f46323fc9377)
+2025-08-03 22:53:57 - config - INFO - base.py:325 - create_agent() - Created agent instance: research (5509fb34-9b84-4fc6-bbfc-f46323fc9377)
+2025-08-03 22:53:57 - config - INFO - base.py:89 - __init__() - Initialized agent: code (6aae7c29-070b-4228-b1b6-6c657098f78d)
+2025-08-03 22:53:57 - config - INFO - base.py:325 - create_agent() - Created agent instance: code (6aae7c29-070b-4228-b1b6-6c657098f78d)
+2025-08-03 22:53:57 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (ca0adbe4-ed08-4f0c-9280-d395c14bbf98)
+2025-08-03 22:53:57 - config - INFO - base.py:325 - create_agent() - Created agent instance: analysis (ca0adbe4-ed08-4f0c-9280-d395c14bbf98)
+2025-08-03 22:53:57 - config - INFO - base.py:102 - execute() - Starting execution of agent research
+2025-08-03 22:53:57 - config - ERROR - base.py:141 - execute() - Agent research failed: 'str' object has no attribute 'get'
+2025-08-03 22:54:16 - config - INFO - base.py:283 - __init__() - Agent registry initialized
+2025-08-03 22:54:16 - config - INFO - base.py:303 - register_agent() - Registered agent: ResearchAgent
+2025-08-03 22:54:16 - config - INFO - base.py:305 - register_agent() - Registered agent alias: research
+2025-08-03 22:54:16 - config - INFO - base.py:303 - register_agent() - Registered agent: CodeAgent
+2025-08-03 22:54:16 - config - INFO - base.py:305 - register_agent() - Registered agent alias: code
+2025-08-03 22:54:16 - config - INFO - base.py:303 - register_agent() - Registered agent: AnalysisAgent
+2025-08-03 22:54:16 - config - INFO - base.py:305 - register_agent() - Registered agent alias: analysis
+2025-08-03 22:54:16 - config - WARNING - config.py:191 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-03 22:54:16 - config - INFO - config.py:206 - load_config() - Loading ScoutAgent configuration...
+2025-08-03 22:54:16 - config - INFO - config.py:240 - load_config() - Configuration loaded successfully
+2025-08-03 22:54:16 - config - INFO - base.py:89 - __init__() - Initialized agent: research (33b6f4d5-160f-4cb2-87d8-9490415e6545)
+2025-08-03 22:54:16 - config - INFO - base.py:325 - create_agent() - Created agent instance: research (33b6f4d5-160f-4cb2-87d8-9490415e6545)
+2025-08-03 22:54:16 - config - INFO - base.py:89 - __init__() - Initialized agent: code (a41218a2-b37b-4819-9cb0-9b4864b0fcf7)
+2025-08-03 22:54:16 - config - INFO - base.py:325 - create_agent() - Created agent instance: code (a41218a2-b37b-4819-9cb0-9b4864b0fcf7)
+2025-08-03 22:54:16 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (c986fbc0-be41-4bea-ae60-a3719f1619f1)
+2025-08-03 22:54:16 - config - INFO - base.py:325 - create_agent() - Created agent instance: analysis (c986fbc0-be41-4bea-ae60-a3719f1619f1)
+2025-08-03 22:54:16 - config - INFO - base.py:102 - execute() - Starting execution of agent research
+2025-08-03 22:54:16 - config - INFO - base.py:215 - log() - Research plan created for query: test query
+2025-08-03 22:54:16 - config - INFO - base.py:215 - log() - Research analysis complete - query type: general
+2025-08-03 22:54:16 - config - INFO - base.py:215 - log() - Searching: test query
+2025-08-03 22:54:16 - config - WARNING - base.py:215 - log() - requests library not available, using mock results
+2025-08-03 22:54:16 - config - INFO - base.py:215 - log() - Searching: how to test query
+2025-08-03 22:54:16 - config - WARNING - base.py:215 - log() - requests library not available, using mock results
+2025-08-03 22:54:16 - config - INFO - base.py:215 - log() - Searching: what is test query
+2025-08-03 22:54:16 - config - WARNING - base.py:215 - log() - requests library not available, using mock results
+2025-08-03 22:54:16 - config - INFO - base.py:215 - log() - Research completed - found 3 sources
+2025-08-03 22:54:16 - config - INFO - base.py:136 - execute() - Agent research completed successfully in 0.00s
+2025-08-03 22:54:59 - config - INFO - base.py:283 - __init__() - Agent registry initialized
+2025-08-03 22:54:59 - config - INFO - base.py:303 - register_agent() - Registered agent: ResearchAgent
+2025-08-03 22:54:59 - config - INFO - base.py:305 - register_agent() - Registered agent alias: research
+2025-08-03 22:54:59 - config - INFO - base.py:303 - register_agent() - Registered agent: CodeAgent
+2025-08-03 22:54:59 - config - INFO - base.py:305 - register_agent() - Registered agent alias: code
+2025-08-03 22:54:59 - config - INFO - base.py:303 - register_agent() - Registered agent: AnalysisAgent
+2025-08-03 22:54:59 - config - INFO - base.py:305 - register_agent() - Registered agent alias: analysis
+2025-08-03 22:54:59 - config - WARNING - config.py:191 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-03 22:54:59 - config - INFO - config.py:206 - load_config() - Loading ScoutAgent configuration...
+2025-08-03 22:54:59 - config - INFO - config.py:240 - load_config() - Configuration loaded successfully
+2025-08-03 22:54:59 - config - INFO - base.py:89 - __init__() - Initialized agent: research (ce07cf47-f4ca-4b44-8101-d4231712670a)
+2025-08-03 22:54:59 - config - INFO - base.py:325 - create_agent() - Created agent instance: research (ce07cf47-f4ca-4b44-8101-d4231712670a)
+2025-08-03 22:54:59 - config - INFO - base.py:89 - __init__() - Initialized agent: code (0e5c8867-6dc5-4eee-9d00-45a1a95d5f59)
+2025-08-03 22:54:59 - config - INFO - base.py:325 - create_agent() - Created agent instance: code (0e5c8867-6dc5-4eee-9d00-45a1a95d5f59)
+2025-08-03 22:54:59 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (c918c165-c2c7-41b5-938c-071082ba6a69)
+2025-08-03 22:54:59 - config - INFO - base.py:325 - create_agent() - Created agent instance: analysis (c918c165-c2c7-41b5-938c-071082ba6a69)
+2025-08-03 22:54:59 - config - INFO - base.py:89 - __init__() - Initialized agent: research (74b76261-2055-4c26-bee5-85fb6f61ab97)
+2025-08-03 22:54:59 - config - INFO - base.py:325 - create_agent() - Created agent instance: research (74b76261-2055-4c26-bee5-85fb6f61ab97)
+2025-08-03 22:54:59 - config - INFO - base.py:102 - execute() - Starting execution of agent research
+2025-08-03 22:54:59 - config - INFO - base.py:215 - log() - Research plan created for query: Python async programming best practices
+2025-08-03 22:54:59 - config - INFO - base.py:215 - log() - Research analysis complete - query type: general
+2025-08-03 22:54:59 - config - INFO - base.py:215 - log() - Searching: Python async programming best practices
+2025-08-03 22:54:59 - config - WARNING - base.py:215 - log() - requests library not available, using mock results
+2025-08-03 22:54:59 - config - INFO - base.py:215 - log() - Searching: how to Python async programming best practices
+2025-08-03 22:54:59 - config - WARNING - base.py:215 - log() - requests library not available, using mock results
+2025-08-03 22:54:59 - config - INFO - base.py:215 - log() - Searching: what is Python async programming best practices
+2025-08-03 22:54:59 - config - WARNING - base.py:215 - log() - requests library not available, using mock results
+2025-08-03 22:54:59 - config - INFO - base.py:215 - log() - Research completed - found 3 sources
+2025-08-03 22:54:59 - config - INFO - base.py:136 - execute() - Agent research completed successfully in 0.00s
+2025-08-03 22:54:59 - config - INFO - base.py:89 - __init__() - Initialized agent: code (47847e79-e7ca-437b-9224-2cbcba07e773)
+2025-08-03 22:54:59 - config - INFO - base.py:325 - create_agent() - Created agent instance: code (47847e79-e7ca-437b-9224-2cbcba07e773)
+2025-08-03 22:54:59 - config - INFO - base.py:102 - execute() - Starting execution of agent code
+2025-08-03 22:54:59 - config - INFO - base.py:215 - log() - Code plan created for task: analyze
+2025-08-03 22:54:59 - config - ERROR - base.py:141 - execute() - Agent code failed: 'str' object has no attribute 'get'
+2025-08-03 22:54:59 - config - ERROR - test_agents.py:172 - run_all_tests() - Test failed
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/test_agents.py", line 156, in run_all_tests
+    results = test_agent_execution()
+              ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/test_agents.py", line 77, in test_agent_execution
+    print(f"   Language detected: {code_result.result.get('language')}")
+                                   ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'get'
