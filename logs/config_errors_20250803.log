@@ -1,0 +1,1 @@
+2025-08-03 22:10:59 - config - ERROR - config.py:228 - load_config() - Failed to load configuration: 'dict' object has no attribute 'level'
