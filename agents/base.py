@@ -412,6 +412,12 @@ def create_agent(agent_name: str, **kwargs) -> BaseAgent:
     return get_registry().create_agent(agent_name, **kwargs)
 
 
+def get_agent_class(agent_name: str) -> Optional[type]:
+    """Get an agent class by name from the global registry."""
+    registry = get_registry()
+    return registry.agents.get(agent_name)
+
+
 if __name__ == "__main__":
     # Test the base agent system
     print("Testing BaseAgent and AgentRegistry...")

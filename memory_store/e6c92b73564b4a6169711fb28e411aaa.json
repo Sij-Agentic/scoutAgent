@@ -1,0 +1,13 @@
+{
+  "context": {
+    "test_key": {
+      "key": "test_key",
+      "value": "test_value",
+      "source": "test_agent",
+      "timestamp": "2025-08-04T02:04:32.768739",
+      "metadata": {}
+    }
+  },
+  "timestamp": "2025-08-04T02:04:32.768745",
+  "type": "shared_context"
+}

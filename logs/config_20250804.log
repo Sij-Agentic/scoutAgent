@@ -1,0 +1,321 @@
+2025-08-04 01:51:03 - config - INFO - base.py:284 - __init__() - AgentRegistry initialized
+2025-08-04 01:51:03 - config - INFO - base.py:304 - register_agent() - Registered agent: ResearchAgent
+2025-08-04 01:51:03 - config - INFO - base.py:306 - register_agent() - Registered agent alias: research
+2025-08-04 01:51:03 - config - INFO - base.py:304 - register_agent() - Registered agent: CodeAgent
+2025-08-04 01:51:03 - config - INFO - base.py:306 - register_agent() - Registered agent alias: code
+2025-08-04 01:51:03 - config - INFO - base.py:304 - register_agent() - Registered agent: AnalysisAgent
+2025-08-04 01:51:03 - config - INFO - base.py:306 - register_agent() - Registered agent alias: analysis
+2025-08-04 01:52:34 - config - INFO - base.py:284 - __init__() - AgentRegistry initialized
+2025-08-04 01:52:34 - config - INFO - base.py:304 - register_agent() - Registered agent: ResearchAgent
+2025-08-04 01:52:34 - config - INFO - base.py:306 - register_agent() - Registered agent alias: research
+2025-08-04 01:52:34 - config - INFO - base.py:304 - register_agent() - Registered agent: CodeAgent
+2025-08-04 01:52:34 - config - INFO - base.py:306 - register_agent() - Registered agent alias: code
+2025-08-04 01:52:34 - config - INFO - base.py:304 - register_agent() - Registered agent: AnalysisAgent
+2025-08-04 01:52:34 - config - INFO - base.py:306 - register_agent() - Registered agent alias: analysis
+2025-08-04 01:52:34 - config - INFO - config.py:206 - load_config() - Loading ScoutAgent configuration...
+2025-08-04 01:52:34 - config - INFO - config.py:240 - load_config() - Configuration loaded successfully
+2025-08-04 01:52:34 - config - INFO - base.py:89 - __init__() - Initialized agent: None (f1e21e9b-700a-436e-be59-780823532573)
+2025-08-04 01:52:34 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (1074c94e-7d25-4af0-87c7-2426e89057a8)
+2025-08-04 01:52:34 - config - INFO - base.py:89 - __init__() - Initialized agent: research (c545ce27-fd23-49bd-9e63-c05dae03a99c)
+2025-08-04 01:52:34 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-04 01:52:34 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-04 01:52:34 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-04 01:52:34 - config - INFO - base.py:89 - __init__() - Initialized agent: None (cd8a7722-8e94-4ae3-bc3f-216bc65ec595)
+2025-08-04 01:52:34 - config - INFO - base.py:89 - __init__() - Initialized agent: code (d5831065-25be-4321-acd7-99d7338aafec)
+2025-08-04 01:52:34 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (df4e1818-70d9-45f7-a906-c2dd3031e792)
+2025-08-04 01:52:34 - config - INFO - builder.py:100 - plan() - Planning solution building for 1 market gaps
+2025-08-04 01:52:34 - config - INFO - builder.py:125 - think() - Analyzing market gaps for solution design...
+2025-08-04 01:52:34 - config - INFO - base.py:89 - __init__() - Initialized agent: None (e0127037-19d2-421c-9724-f731d097e606)
+2025-08-04 01:52:34 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (4420afaf-cdfd-4f22-8da5-c2903ad5e5ea)
+2025-08-04 01:52:34 - config - INFO - writer.py:89 - plan() - Planning report generation for comprehensive report
+2025-08-04 01:52:34 - config - INFO - writer.py:113 - think() - Analyzing workflow data for report structure...
+2025-08-04 01:52:34 - config - INFO - writer.py:141 - act() - Executing report generation...
+2025-08-04 01:52:34 - config - INFO - base.py:89 - __init__() - Initialized agent: None (4b511235-57ea-426e-a293-02bc6a8c9ce4)
+2025-08-04 01:52:34 - config - INFO - memory_agent.py:121 - act() - Executing memory operation: store
+2025-08-04 01:52:34 - config - INFO - memory_agent.py:121 - act() - Executing memory operation: analyze
+2025-08-04 01:54:53 - config - INFO - base.py:284 - __init__() - AgentRegistry initialized
+2025-08-04 01:54:53 - config - INFO - base.py:304 - register_agent() - Registered agent: ResearchAgent
+2025-08-04 01:54:53 - config - INFO - base.py:306 - register_agent() - Registered agent alias: research
+2025-08-04 01:54:53 - config - INFO - base.py:304 - register_agent() - Registered agent: CodeAgent
+2025-08-04 01:54:53 - config - INFO - base.py:306 - register_agent() - Registered agent alias: code
+2025-08-04 01:54:53 - config - INFO - base.py:304 - register_agent() - Registered agent: AnalysisAgent
+2025-08-04 01:54:53 - config - INFO - base.py:306 - register_agent() - Registered agent alias: analysis
+2025-08-04 01:54:53 - config - INFO - config.py:206 - load_config() - Loading ScoutAgent configuration...
+2025-08-04 01:54:53 - config - INFO - config.py:240 - load_config() - Configuration loaded successfully
+2025-08-04 01:54:53 - config - INFO - base.py:89 - __init__() - Initialized agent: None (ed4bc123-4653-4bdc-8bf4-d399a28629a8)
+2025-08-04 01:54:53 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (6650221a-c03c-4a50-b573-bd24d73d9e04)
+2025-08-04 01:54:53 - config - INFO - base.py:89 - __init__() - Initialized agent: research (d084c8db-a170-4b5a-a706-ada936c377ad)
+2025-08-04 01:54:53 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-04 01:54:53 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-04 01:54:53 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-04 01:54:53 - config - INFO - base.py:89 - __init__() - Initialized agent: None (453f74d6-7173-4654-a37c-638780f40f6b)
+2025-08-04 01:54:53 - config - INFO - base.py:89 - __init__() - Initialized agent: code (bb2dca28-e7e5-4e93-8082-fab8f4a4b426)
+2025-08-04 01:54:53 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (eb02d209-821b-496a-af5a-e264f44e911d)
+2025-08-04 01:54:53 - config - INFO - builder.py:100 - plan() - Planning solution building for 1 market gaps
+2025-08-04 01:54:53 - config - INFO - builder.py:125 - think() - Analyzing market gaps for solution design...
+2025-08-04 01:54:53 - config - INFO - builder.py:155 - act() - Executing solution building...
+2025-08-04 01:54:53 - config - INFO - base.py:89 - __init__() - Initialized agent: None (f6029e5e-e444-4c65-99d0-95355b0d3dd3)
+2025-08-04 01:54:53 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (4d7b6885-579b-4b19-8a8a-e43f7543ffb6)
+2025-08-04 01:54:53 - config - INFO - writer.py:89 - plan() - Planning report generation for comprehensive report
+2025-08-04 01:54:53 - config - INFO - writer.py:113 - think() - Analyzing workflow data for report structure...
+2025-08-04 01:54:53 - config - INFO - writer.py:141 - act() - Executing report generation...
+2025-08-04 01:54:53 - config - INFO - base.py:89 - __init__() - Initialized agent: None (0a4261b4-3605-4870-96ec-2ce7427b66d7)
+2025-08-04 01:54:53 - config - INFO - memory_agent.py:121 - act() - Executing memory operation: store
+2025-08-04 01:55:51 - config - INFO - base.py:284 - __init__() - AgentRegistry initialized
+2025-08-04 01:55:51 - config - INFO - base.py:304 - register_agent() - Registered agent: ResearchAgent
+2025-08-04 01:55:51 - config - INFO - base.py:306 - register_agent() - Registered agent alias: research
+2025-08-04 01:55:51 - config - INFO - base.py:304 - register_agent() - Registered agent: CodeAgent
+2025-08-04 01:55:51 - config - INFO - base.py:306 - register_agent() - Registered agent alias: code
+2025-08-04 01:55:51 - config - INFO - base.py:304 - register_agent() - Registered agent: AnalysisAgent
+2025-08-04 01:55:51 - config - INFO - base.py:306 - register_agent() - Registered agent alias: analysis
+2025-08-04 01:55:51 - config - INFO - base.py:304 - register_agent() - Registered agent: GapFinderAgent
+2025-08-04 01:55:51 - config - INFO - base.py:306 - register_agent() - Registered agent alias: gapfinder
+2025-08-04 01:55:51 - config - INFO - base.py:304 - register_agent() - Registered agent: BuilderAgent
+2025-08-04 01:55:51 - config - INFO - base.py:306 - register_agent() - Registered agent alias: builder
+2025-08-04 01:55:51 - config - INFO - base.py:304 - register_agent() - Registered agent: WriterAgent
+2025-08-04 01:55:51 - config - INFO - base.py:306 - register_agent() - Registered agent alias: writer
+2025-08-04 01:55:51 - config - INFO - base.py:304 - register_agent() - Registered agent: MemoryAgent
+2025-08-04 01:55:51 - config - INFO - base.py:306 - register_agent() - Registered agent alias: memory
+2025-08-04 01:55:51 - config - INFO - config.py:206 - load_config() - Loading ScoutAgent configuration...
+2025-08-04 01:55:51 - config - INFO - config.py:240 - load_config() - Configuration loaded successfully
+2025-08-04 01:55:51 - config - INFO - base.py:89 - __init__() - Initialized agent: None (6689145a-a3e4-44b1-9c8a-2b68478ccd6d)
+2025-08-04 01:55:51 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (bbcc93ee-7a96-4e15-933d-7b7e8b02963b)
+2025-08-04 01:55:51 - config - INFO - base.py:89 - __init__() - Initialized agent: research (37c3f0b4-fe85-42dc-b9f5-77b7e47085b8)
+2025-08-04 01:55:51 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-04 01:55:51 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-04 01:55:51 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-04 01:55:51 - config - INFO - base.py:89 - __init__() - Initialized agent: None (c2f284fd-db99-4d37-a5a4-9a67b398510c)
+2025-08-04 01:55:51 - config - INFO - base.py:89 - __init__() - Initialized agent: code (9e1c7cd9-26d4-4ab5-95fd-4aadba1dc70b)
+2025-08-04 01:55:51 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (984a89cd-178f-48d5-8c62-d6ce73546237)
+2025-08-04 01:55:51 - config - INFO - builder.py:100 - plan() - Planning solution building for 1 market gaps
+2025-08-04 01:55:51 - config - INFO - builder.py:125 - think() - Analyzing market gaps for solution design...
+2025-08-04 01:55:51 - config - INFO - builder.py:155 - act() - Executing solution building...
+2025-08-04 01:55:51 - config - INFO - base.py:89 - __init__() - Initialized agent: None (a8bcc4f9-d440-48c0-bf81-2177044f2036)
+2025-08-04 01:55:51 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (4d40a70e-a833-47a0-a596-4c860ec51cbc)
+2025-08-04 01:55:51 - config - INFO - writer.py:89 - plan() - Planning report generation for comprehensive report
+2025-08-04 01:55:51 - config - INFO - writer.py:113 - think() - Analyzing workflow data for report structure...
+2025-08-04 01:55:51 - config - INFO - writer.py:141 - act() - Executing report generation...
+2025-08-04 01:55:51 - config - INFO - base.py:89 - __init__() - Initialized agent: None (c4edaade-e48a-467c-ba6e-217f8e1541d7)
+2025-08-04 01:55:51 - config - INFO - memory_agent.py:121 - act() - Executing memory operation: store
+2025-08-04 01:57:48 - config - INFO - base.py:284 - __init__() - AgentRegistry initialized
+2025-08-04 01:57:48 - config - INFO - base.py:304 - register_agent() - Registered agent: ResearchAgent
+2025-08-04 01:57:48 - config - INFO - base.py:306 - register_agent() - Registered agent alias: research
+2025-08-04 01:57:48 - config - INFO - base.py:304 - register_agent() - Registered agent: CodeAgent
+2025-08-04 01:57:48 - config - INFO - base.py:306 - register_agent() - Registered agent alias: code
+2025-08-04 01:57:48 - config - INFO - base.py:304 - register_agent() - Registered agent: AnalysisAgent
+2025-08-04 01:57:48 - config - INFO - base.py:306 - register_agent() - Registered agent alias: analysis
+2025-08-04 01:57:48 - config - INFO - base.py:304 - register_agent() - Registered agent: GapFinderAgent
+2025-08-04 01:57:48 - config - INFO - base.py:306 - register_agent() - Registered agent alias: gapfinder
+2025-08-04 01:57:48 - config - INFO - base.py:304 - register_agent() - Registered agent: BuilderAgent
+2025-08-04 01:57:48 - config - INFO - base.py:306 - register_agent() - Registered agent alias: builder
+2025-08-04 01:57:48 - config - INFO - base.py:304 - register_agent() - Registered agent: WriterAgent
+2025-08-04 01:57:48 - config - INFO - base.py:306 - register_agent() - Registered agent alias: writer
+2025-08-04 01:57:48 - config - INFO - base.py:304 - register_agent() - Registered agent: MemoryAgent
+2025-08-04 01:57:48 - config - INFO - base.py:306 - register_agent() - Registered agent alias: memory
+2025-08-04 01:57:48 - config - INFO - config.py:206 - load_config() - Loading ScoutAgent configuration...
+2025-08-04 01:57:48 - config - INFO - config.py:240 - load_config() - Configuration loaded successfully
+2025-08-04 01:57:48 - config - INFO - base.py:89 - __init__() - Initialized agent: None (ef34dfca-d684-4ef2-9a17-e693bcd673bf)
+2025-08-04 01:57:48 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (8ce3dc69-0963-4ffe-a143-3ad1f833672b)
+2025-08-04 01:57:48 - config - INFO - base.py:89 - __init__() - Initialized agent: research (e917b41e-aeb2-404d-a399-abcf97997ba0)
+2025-08-04 01:57:48 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-04 01:57:48 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-04 01:57:48 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-04 01:57:48 - config - INFO - base.py:89 - __init__() - Initialized agent: None (a7003c1c-d7cd-406a-b7f9-ae817a6fd102)
+2025-08-04 01:57:48 - config - INFO - base.py:89 - __init__() - Initialized agent: code (a5fb4903-924b-4f7b-9ee3-dc4b1d21fadc)
+2025-08-04 01:57:48 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (0abc4028-3fd1-4c1e-9d9d-4ff2e59e62e6)
+2025-08-04 01:57:48 - config - INFO - builder.py:101 - plan() - Planning solution building for 1 market gaps
+2025-08-04 01:57:48 - config - INFO - builder.py:126 - think() - Analyzing market gaps for solution design...
+2025-08-04 01:57:48 - config - INFO - builder.py:156 - act() - Executing solution building...
+2025-08-04 01:57:48 - config - INFO - base.py:89 - __init__() - Initialized agent: None (c73b63e3-0f95-4f71-839b-e9b8fa79182a)
+2025-08-04 01:57:48 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (94c92670-9938-4cc4-81b7-7ff825ff8da5)
+2025-08-04 01:57:48 - config - INFO - writer.py:89 - plan() - Planning report generation for comprehensive report
+2025-08-04 01:57:48 - config - INFO - writer.py:113 - think() - Analyzing workflow data for report structure...
+2025-08-04 01:57:48 - config - INFO - writer.py:141 - act() - Executing report generation...
+2025-08-04 01:57:48 - config - INFO - base.py:89 - __init__() - Initialized agent: None (acb43f6b-79fb-46a8-a86f-fefdb27cd27f)
+2025-08-04 01:57:48 - config - INFO - memory_agent.py:121 - act() - Executing memory operation: store
+2025-08-04 01:57:48 - config - INFO - memory_agent.py:121 - act() - Executing memory operation: analyze
+2025-08-04 01:58:59 - config - INFO - base.py:284 - __init__() - AgentRegistry initialized
+2025-08-04 01:58:59 - config - INFO - base.py:304 - register_agent() - Registered agent: ResearchAgent
+2025-08-04 01:58:59 - config - INFO - base.py:306 - register_agent() - Registered agent alias: research
+2025-08-04 01:58:59 - config - INFO - base.py:304 - register_agent() - Registered agent: CodeAgent
+2025-08-04 01:58:59 - config - INFO - base.py:306 - register_agent() - Registered agent alias: code
+2025-08-04 01:58:59 - config - INFO - base.py:304 - register_agent() - Registered agent: AnalysisAgent
+2025-08-04 01:58:59 - config - INFO - base.py:306 - register_agent() - Registered agent alias: analysis
+2025-08-04 01:58:59 - config - INFO - base.py:304 - register_agent() - Registered agent: GapFinderAgent
+2025-08-04 01:58:59 - config - INFO - base.py:306 - register_agent() - Registered agent alias: gapfinder
+2025-08-04 01:58:59 - config - INFO - base.py:304 - register_agent() - Registered agent: BuilderAgent
+2025-08-04 01:58:59 - config - INFO - base.py:306 - register_agent() - Registered agent alias: builder
+2025-08-04 01:58:59 - config - INFO - base.py:304 - register_agent() - Registered agent: WriterAgent
+2025-08-04 01:58:59 - config - INFO - base.py:306 - register_agent() - Registered agent alias: writer
+2025-08-04 01:58:59 - config - INFO - base.py:304 - register_agent() - Registered agent: MemoryAgent
+2025-08-04 01:58:59 - config - INFO - base.py:306 - register_agent() - Registered agent alias: memory
+2025-08-04 01:58:59 - config - INFO - config.py:206 - load_config() - Loading ScoutAgent configuration...
+2025-08-04 01:58:59 - config - INFO - config.py:240 - load_config() - Configuration loaded successfully
+2025-08-04 01:58:59 - config - INFO - base.py:89 - __init__() - Initialized agent: None (57607602-ac81-4c38-92dc-9d6f9bd60337)
+2025-08-04 01:58:59 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (a1a3cbd8-3eb4-4fbd-a76d-e3a205be46ec)
+2025-08-04 01:58:59 - config - INFO - base.py:89 - __init__() - Initialized agent: research (6c451493-df64-42c9-931a-80f7de06d390)
+2025-08-04 01:58:59 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-04 01:58:59 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-04 01:58:59 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-04 01:58:59 - config - INFO - base.py:89 - __init__() - Initialized agent: None (549af54f-64db-42cc-8e4f-224c151beebb)
+2025-08-04 01:58:59 - config - INFO - base.py:89 - __init__() - Initialized agent: code (a3222ffc-7dbd-4620-bb02-000700cbed24)
+2025-08-04 01:58:59 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (59cd05d0-3e1a-437f-a8f2-72b25320e5f2)
+2025-08-04 01:58:59 - config - INFO - builder.py:101 - plan() - Planning solution building for 1 market gaps
+2025-08-04 01:58:59 - config - INFO - builder.py:126 - think() - Analyzing market gaps for solution design...
+2025-08-04 01:58:59 - config - INFO - builder.py:156 - act() - Executing solution building...
+2025-08-04 01:58:59 - config - INFO - base.py:89 - __init__() - Initialized agent: None (b70987f8-efb6-433c-b82f-3382de8e30f1)
+2025-08-04 01:58:59 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (c3dd5f8c-c4e6-472f-aebd-4f64a7478b95)
+2025-08-04 01:58:59 - config - INFO - writer.py:89 - plan() - Planning report generation for comprehensive report
+2025-08-04 01:58:59 - config - INFO - writer.py:113 - think() - Analyzing workflow data for report structure...
+2025-08-04 01:58:59 - config - INFO - writer.py:141 - act() - Executing report generation...
+2025-08-04 01:58:59 - config - INFO - base.py:89 - __init__() - Initialized agent: None (fdc82533-f822-4294-8bed-9d85e2a87cdd)
+2025-08-04 01:58:59 - config - INFO - memory_agent.py:121 - act() - Executing memory operation: store
+2025-08-04 01:58:59 - config - INFO - memory_agent.py:121 - act() - Executing memory operation: analyze
+2025-08-04 01:59:46 - config - INFO - base.py:284 - __init__() - AgentRegistry initialized
+2025-08-04 01:59:46 - config - INFO - base.py:304 - register_agent() - Registered agent: ResearchAgent
+2025-08-04 01:59:46 - config - INFO - base.py:306 - register_agent() - Registered agent alias: research
+2025-08-04 01:59:46 - config - INFO - base.py:304 - register_agent() - Registered agent: CodeAgent
+2025-08-04 01:59:46 - config - INFO - base.py:306 - register_agent() - Registered agent alias: code
+2025-08-04 01:59:46 - config - INFO - base.py:304 - register_agent() - Registered agent: AnalysisAgent
+2025-08-04 01:59:46 - config - INFO - base.py:306 - register_agent() - Registered agent alias: analysis
+2025-08-04 01:59:46 - config - INFO - base.py:304 - register_agent() - Registered agent: GapFinderAgent
+2025-08-04 01:59:46 - config - INFO - base.py:306 - register_agent() - Registered agent alias: gapfinder
+2025-08-04 01:59:46 - config - INFO - base.py:304 - register_agent() - Registered agent: BuilderAgent
+2025-08-04 01:59:46 - config - INFO - base.py:306 - register_agent() - Registered agent alias: builder
+2025-08-04 01:59:46 - config - INFO - base.py:304 - register_agent() - Registered agent: WriterAgent
+2025-08-04 01:59:46 - config - INFO - base.py:306 - register_agent() - Registered agent alias: writer
+2025-08-04 01:59:46 - config - INFO - base.py:304 - register_agent() - Registered agent: MemoryAgent
+2025-08-04 01:59:46 - config - INFO - base.py:306 - register_agent() - Registered agent alias: memory
+2025-08-04 01:59:46 - config - INFO - config.py:206 - load_config() - Loading ScoutAgent configuration...
+2025-08-04 01:59:46 - config - INFO - config.py:240 - load_config() - Configuration loaded successfully
+2025-08-04 01:59:46 - config - INFO - base.py:89 - __init__() - Initialized agent: None (254bea57-a440-492c-a5b7-58ad5b1563e3)
+2025-08-04 01:59:46 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (1b080664-b2be-41c7-b8bb-8053293f0ebc)
+2025-08-04 01:59:46 - config - INFO - base.py:89 - __init__() - Initialized agent: research (28886f81-d7c1-4992-a6b8-2ee164410193)
+2025-08-04 01:59:46 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-04 01:59:46 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-04 01:59:46 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-04 01:59:46 - config - INFO - base.py:89 - __init__() - Initialized agent: None (f40e63e4-cd57-4d0f-859d-daf486265651)
+2025-08-04 01:59:46 - config - INFO - base.py:89 - __init__() - Initialized agent: code (a812f038-9ffc-49c4-a6ec-6af4de10ea86)
+2025-08-04 01:59:46 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (59b106a0-6e02-4c9e-8e93-d129d3631c4d)
+2025-08-04 01:59:46 - config - INFO - builder.py:101 - plan() - Planning solution building for 1 market gaps
+2025-08-04 01:59:46 - config - INFO - builder.py:126 - think() - Analyzing market gaps for solution design...
+2025-08-04 01:59:46 - config - INFO - builder.py:156 - act() - Executing solution building...
+2025-08-04 01:59:46 - config - INFO - base.py:89 - __init__() - Initialized agent: None (ddfaeaad-a810-4c42-bda6-c0bdd7f94d02)
+2025-08-04 01:59:46 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (47d73ce5-a4cd-4274-8502-15f4bd7e03bb)
+2025-08-04 01:59:46 - config - INFO - writer.py:89 - plan() - Planning report generation for comprehensive report
+2025-08-04 01:59:46 - config - INFO - writer.py:113 - think() - Analyzing workflow data for report structure...
+2025-08-04 01:59:46 - config - INFO - writer.py:141 - act() - Executing report generation...
+2025-08-04 01:59:46 - config - INFO - base.py:89 - __init__() - Initialized agent: None (9e5c81e4-e0d7-4535-b953-7f60bf51c972)
+2025-08-04 01:59:46 - config - INFO - memory_agent.py:121 - act() - Executing memory operation: store
+2025-08-04 01:59:46 - config - INFO - memory_agent.py:121 - act() - Executing memory operation: analyze
+2025-08-04 02:00:59 - config - INFO - base.py:284 - __init__() - AgentRegistry initialized
+2025-08-04 02:00:59 - config - INFO - base.py:304 - register_agent() - Registered agent: ResearchAgent
+2025-08-04 02:00:59 - config - INFO - base.py:306 - register_agent() - Registered agent alias: research
+2025-08-04 02:00:59 - config - INFO - base.py:304 - register_agent() - Registered agent: CodeAgent
+2025-08-04 02:00:59 - config - INFO - base.py:306 - register_agent() - Registered agent alias: code
+2025-08-04 02:00:59 - config - INFO - base.py:304 - register_agent() - Registered agent: AnalysisAgent
+2025-08-04 02:00:59 - config - INFO - base.py:306 - register_agent() - Registered agent alias: analysis
+2025-08-04 02:00:59 - config - INFO - base.py:304 - register_agent() - Registered agent: GapFinderAgent
+2025-08-04 02:00:59 - config - INFO - base.py:306 - register_agent() - Registered agent alias: gapfinder
+2025-08-04 02:00:59 - config - INFO - base.py:304 - register_agent() - Registered agent: BuilderAgent
+2025-08-04 02:00:59 - config - INFO - base.py:306 - register_agent() - Registered agent alias: builder
+2025-08-04 02:00:59 - config - INFO - base.py:304 - register_agent() - Registered agent: WriterAgent
+2025-08-04 02:00:59 - config - INFO - base.py:306 - register_agent() - Registered agent alias: writer
+2025-08-04 02:00:59 - config - INFO - base.py:304 - register_agent() - Registered agent: MemoryAgent
+2025-08-04 02:00:59 - config - INFO - base.py:306 - register_agent() - Registered agent alias: memory
+2025-08-04 02:00:59 - config - INFO - config.py:206 - load_config() - Loading ScoutAgent configuration...
+2025-08-04 02:00:59 - config - INFO - config.py:240 - load_config() - Configuration loaded successfully
+2025-08-04 02:00:59 - config - INFO - base.py:89 - __init__() - Initialized agent: None (1d4cf63d-a845-40f4-830a-759b31c52cfc)
+2025-08-04 02:00:59 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (d7370249-0d4e-4923-ba37-5ce7a6e67248)
+2025-08-04 02:00:59 - config - INFO - base.py:89 - __init__() - Initialized agent: research (d365e861-cfd5-4087-ac7f-689858c60558)
+2025-08-04 02:00:59 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-04 02:00:59 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-04 02:00:59 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-04 02:00:59 - config - INFO - base.py:89 - __init__() - Initialized agent: None (a7176993-fc5d-44ae-98d9-7520b0972cc2)
+2025-08-04 02:00:59 - config - INFO - base.py:89 - __init__() - Initialized agent: code (3bcd9d32-ecaf-4f3f-bad0-35733f3baa6b)
+2025-08-04 02:00:59 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (b6f7bc40-5a37-4bd7-9025-93f5640b1153)
+2025-08-04 02:00:59 - config - INFO - builder.py:101 - plan() - Planning solution building for 1 market gaps
+2025-08-04 02:00:59 - config - INFO - builder.py:126 - think() - Analyzing market gaps for solution design...
+2025-08-04 02:00:59 - config - INFO - builder.py:156 - act() - Executing solution building...
+2025-08-04 02:00:59 - config - INFO - base.py:89 - __init__() - Initialized agent: None (7cd25c9f-3660-4286-ae65-666fb7b275b0)
+2025-08-04 02:00:59 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (cdc25201-2aef-412c-b4d4-37e9b01108c5)
+2025-08-04 02:00:59 - config - INFO - writer.py:89 - plan() - Planning report generation for comprehensive report
+2025-08-04 02:00:59 - config - INFO - writer.py:113 - think() - Analyzing workflow data for report structure...
+2025-08-04 02:00:59 - config - INFO - writer.py:141 - act() - Executing report generation...
+2025-08-04 02:00:59 - config - INFO - base.py:89 - __init__() - Initialized agent: None (e04838d7-f566-4d6c-bfdd-191e6d63abdc)
+2025-08-04 02:00:59 - config - INFO - memory_agent.py:121 - act() - Executing memory operation: store
+2025-08-04 02:00:59 - config - INFO - memory_agent.py:121 - act() - Executing memory operation: analyze
+2025-08-04 02:02:30 - config - INFO - base.py:284 - __init__() - AgentRegistry initialized
+2025-08-04 02:02:30 - config - INFO - base.py:304 - register_agent() - Registered agent: ResearchAgent
+2025-08-04 02:02:30 - config - INFO - base.py:306 - register_agent() - Registered agent alias: research
+2025-08-04 02:02:30 - config - INFO - base.py:304 - register_agent() - Registered agent: CodeAgent
+2025-08-04 02:02:30 - config - INFO - base.py:306 - register_agent() - Registered agent alias: code
+2025-08-04 02:02:30 - config - INFO - base.py:304 - register_agent() - Registered agent: AnalysisAgent
+2025-08-04 02:02:30 - config - INFO - base.py:306 - register_agent() - Registered agent alias: analysis
+2025-08-04 02:02:30 - config - INFO - base.py:304 - register_agent() - Registered agent: GapFinderAgent
+2025-08-04 02:02:30 - config - INFO - base.py:306 - register_agent() - Registered agent alias: gapfinder
+2025-08-04 02:02:30 - config - INFO - base.py:304 - register_agent() - Registered agent: BuilderAgent
+2025-08-04 02:02:30 - config - INFO - base.py:306 - register_agent() - Registered agent alias: builder
+2025-08-04 02:02:30 - config - INFO - base.py:304 - register_agent() - Registered agent: WriterAgent
+2025-08-04 02:02:30 - config - INFO - base.py:306 - register_agent() - Registered agent alias: writer
+2025-08-04 02:02:30 - config - INFO - base.py:304 - register_agent() - Registered agent: MemoryAgent
+2025-08-04 02:02:30 - config - INFO - base.py:306 - register_agent() - Registered agent alias: memory
+2025-08-04 02:02:30 - config - INFO - config.py:206 - load_config() - Loading ScoutAgent configuration...
+2025-08-04 02:02:30 - config - INFO - config.py:240 - load_config() - Configuration loaded successfully
+2025-08-04 02:02:30 - config - INFO - base.py:89 - __init__() - Initialized agent: None (91c1cdb7-8f60-44c3-9387-63d899e7d24d)
+2025-08-04 02:02:30 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (e5cc5c84-c8f8-4b71-9949-90d5eff25278)
+2025-08-04 02:02:30 - config - INFO - base.py:89 - __init__() - Initialized agent: research (67a56fd2-9fca-408d-9ff9-f9c07ea13a93)
+2025-08-04 02:02:30 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-04 02:02:30 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-04 02:02:30 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-04 02:02:30 - config - INFO - base.py:89 - __init__() - Initialized agent: None (904430ed-b441-4f45-918e-bd0d68270705)
+2025-08-04 02:02:30 - config - INFO - base.py:89 - __init__() - Initialized agent: code (9d248a12-ea49-4ba5-a1be-0d2c3ab1398b)
+2025-08-04 02:02:30 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (128bd72c-8003-42de-86b9-bf431e1fbebb)
+2025-08-04 02:02:30 - config - INFO - builder.py:102 - plan() - Planning solution building for 1 market gaps
+2025-08-04 02:02:30 - config - INFO - builder.py:127 - think() - Analyzing market gaps for solution design...
+2025-08-04 02:02:30 - config - INFO - builder.py:157 - act() - Executing solution building...
+2025-08-04 02:02:30 - config - INFO - base.py:89 - __init__() - Initialized agent: None (40abb2d0-984f-4854-a6da-5e9d022b4a7c)
+2025-08-04 02:02:30 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (db3fab7a-a070-4023-a2eb-05818aca9654)
+2025-08-04 02:02:30 - config - INFO - writer.py:89 - plan() - Planning report generation for comprehensive report
+2025-08-04 02:02:30 - config - INFO - writer.py:113 - think() - Analyzing workflow data for report structure...
+2025-08-04 02:02:30 - config - INFO - writer.py:141 - act() - Executing report generation...
+2025-08-04 02:02:30 - config - INFO - base.py:89 - __init__() - Initialized agent: None (1c1e741f-81d2-4a98-8a9a-1e0f9feb1581)
+2025-08-04 02:02:30 - config - INFO - memory_agent.py:121 - act() - Executing memory operation: store
+2025-08-04 02:02:30 - config - INFO - memory_agent.py:121 - act() - Executing memory operation: analyze
+2025-08-04 02:03:05 - config - INFO - base.py:284 - __init__() - AgentRegistry initialized
+2025-08-04 02:03:05 - config - INFO - base.py:304 - register_agent() - Registered agent: ResearchAgent
+2025-08-04 02:03:05 - config - INFO - base.py:306 - register_agent() - Registered agent alias: research
+2025-08-04 02:03:05 - config - INFO - base.py:304 - register_agent() - Registered agent: CodeAgent
+2025-08-04 02:03:05 - config - INFO - base.py:306 - register_agent() - Registered agent alias: code
+2025-08-04 02:03:05 - config - INFO - base.py:304 - register_agent() - Registered agent: AnalysisAgent
+2025-08-04 02:03:05 - config - INFO - base.py:306 - register_agent() - Registered agent alias: analysis
+2025-08-04 02:03:05 - config - INFO - base.py:304 - register_agent() - Registered agent: GapFinderAgent
+2025-08-04 02:03:05 - config - INFO - base.py:306 - register_agent() - Registered agent alias: gapfinder
+2025-08-04 02:03:05 - config - INFO - base.py:304 - register_agent() - Registered agent: BuilderAgent
+2025-08-04 02:03:05 - config - INFO - base.py:306 - register_agent() - Registered agent alias: builder
+2025-08-04 02:03:05 - config - INFO - base.py:304 - register_agent() - Registered agent: WriterAgent
+2025-08-04 02:03:05 - config - INFO - base.py:306 - register_agent() - Registered agent alias: writer
+2025-08-04 02:03:05 - config - INFO - base.py:304 - register_agent() - Registered agent: MemoryAgent
+2025-08-04 02:03:05 - config - INFO - base.py:306 - register_agent() - Registered agent alias: memory
+2025-08-04 02:03:05 - config - INFO - config.py:206 - load_config() - Loading ScoutAgent configuration...
+2025-08-04 02:03:05 - config - INFO - config.py:240 - load_config() - Configuration loaded successfully
+2025-08-04 02:03:05 - config - INFO - base.py:89 - __init__() - Initialized agent: None (34492bc0-b53c-41ed-9a5f-32469f35e6aa)
+2025-08-04 02:03:05 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (0f9112fc-0a10-475e-b0de-e7f65c10d1d6)
+2025-08-04 02:03:05 - config - INFO - base.py:89 - __init__() - Initialized agent: research (f5fbc8cb-a099-4d2a-b165-e2e490d38a92)
+2025-08-04 02:03:05 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-04 02:03:05 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-04 02:03:05 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-04 02:03:05 - config - INFO - base.py:89 - __init__() - Initialized agent: None (c4f251c4-ea8f-4732-8048-a48a2aee8170)
+2025-08-04 02:03:05 - config - INFO - base.py:89 - __init__() - Initialized agent: code (0236a40e-d31b-4612-9aab-8f9615413e2e)
+2025-08-04 02:03:05 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (930e369d-db68-4aa2-9400-7693509460ce)
+2025-08-04 02:03:05 - config - INFO - builder.py:102 - plan() - Planning solution building for 1 market gaps
+2025-08-04 02:03:05 - config - INFO - builder.py:127 - think() - Analyzing market gaps for solution design...
+2025-08-04 02:03:05 - config - INFO - builder.py:157 - act() - Executing solution building...
+2025-08-04 02:03:05 - config - INFO - base.py:89 - __init__() - Initialized agent: None (32d57d5c-ebbe-4033-8954-bde757db371e)
+2025-08-04 02:03:05 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (17c0ee82-3f07-4a93-893f-b5f90780e8a8)
+2025-08-04 02:03:05 - config - INFO - writer.py:89 - plan() - Planning report generation for comprehensive report
+2025-08-04 02:03:05 - config - INFO - writer.py:113 - think() - Analyzing workflow data for report structure...
+2025-08-04 02:03:05 - config - INFO - writer.py:141 - act() - Executing report generation...
+2025-08-04 02:03:05 - config - INFO - base.py:89 - __init__() - Initialized agent: None (b5090fd5-e3b0-4cf4-924e-d7875b5abfda)
+2025-08-04 02:03:05 - config - INFO - memory_agent.py:121 - act() - Executing memory operation: store
+2025-08-04 02:03:05 - config - INFO - memory_agent.py:121 - act() - Executing memory operation: analyze

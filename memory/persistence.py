@@ -12,7 +12,7 @@ from typing import Any, Dict, List, Optional, Union
 from datetime import datetime
 import hashlib
 
-from ..custom_logging.logger import get_logger
+from custom_logging.logger import get_logger
 
 
 class MemoryStore:

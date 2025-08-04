@@ -1,0 +1,12 @@
+{
+  "state": {
+    "workflow": "test",
+    "data": [
+      1,
+      2,
+      3
+    ]
+  },
+  "timestamp": "2025-08-04T02:04:32.768489",
+  "type": "workflow_state"
+}

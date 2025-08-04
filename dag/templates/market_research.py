@@ -8,8 +8,8 @@ research → analysis → validation → report
 from typing import List, Dict, Any, Optional
 from datetime import datetime
 
-from ..node import DAGNode, NodeType, NodeConfig
-from ..engine import DAGEngine
+from dag.node import DAGNode, NodeType, NodeConfig
+from dag.engine import DAGEngine
 
 
 def create_market_research_workflow(

@@ -11,8 +11,8 @@ from datetime import datetime
 import threading
 from contextlib import contextmanager
 
-from .persistence import get_memory_manager
-from ..custom_logging.logger import get_logger
+from memory.persistence import get_memory_manager
+from custom_logging.logger import get_logger
 
 
 @dataclass

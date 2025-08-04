@@ -8,10 +8,10 @@ scout → screener → validator → gap_finder
 from typing import List, Dict, Any
 from datetime import datetime
 
-from ..node import DAGNode, NodeType, NodeConfig
-from ..engine import DAGEngine
-from ...memory.context import get_context_manager
-from ...memory.checkpoints import get_checkpoint_manager
+from dag.node import DAGNode, NodeType, NodeConfig
+from dag.engine import DAGEngine
+from memory.context import get_context_manager
+from memory.checkpoints import get_checkpoint_manager
 
 
 def create_pain_point_discovery_workflow(
