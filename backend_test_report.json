@@ -1,5 +1,5 @@
 {
-  "timestamp": 1754408081.556911,
+  "timestamp": 1754409327.65126,
   "test_summary": {
     "total_backends": 3,
     "successful_backends": 3,
@@ -16,44 +16,44 @@
       "success_rate": 1.0,
       "performance_metrics": {
         "avg_response_time": 0.0,
-        "basic_generation_time": 4.429235935211182,
-        "basic_generation_tokens": 96,
-        "streaming_time": 2.9213829040527344,
+        "basic_generation_time": 5.208939075469971,
+        "basic_generation_tokens": 102,
+        "streaming_time": 3.2390549182891846,
         "streaming_chunks": 51
       },
       "errors": [
-        "agent_integration: 'EnhancedGapFinderAgent' object has no attribute 'initialize_llm'"
+        "agent_integration: Agent execution failed: None"
       ],
       "responses": {
         "basic_generation": {
-          "content": "Artificial Intelligence (AI) refers to the simulation of human intelligence processes by machines, especially computer systems. These processes include learning (the acquisition of information and rul...",
-          "response_time": 4.429235935211182,
-          "length": 514
+          "content": "Artificial Intelligence (AI) refers to the simulation of human intelligence in machines that are programmed to think like humans and mimic their actions. The term may also be applied to any machine th...",
+          "response_time": 5.208939075469971,
+          "length": 505
         },
         "streaming_generation": {
-          "content": "Once upon a time, in a bustling city filled with towering sky-scrapers and vibrant technology, a unique robot named Arte was created. Arte was not designed for routine tasks or complicated calculation...",
-          "response_time": 2.9213829040527344,
-          "length": 266
+          "content": "Once upon a time in the futuristic city of Cyberton, there lived an advanced robot named ArtBot 3000, created by Dr. Frederick, a renowned scientist and art enthusiast. The robot was dazzling and agil...",
+          "response_time": 3.2390549182891846,
+          "length": 252
         },
         "prompt_creative": {
-          "content": "Once upon a time, in the advanced city of Tachyon, where technology ruled, there lived a robot named Arti. Arti was a service robot, designed to assist humans in their daily chores. However, Arti was ...",
-          "response_time": 8.660658121109009,
-          "length": 976
+          "content": "Once upon a time, in a future world where humans and robots lived together, a robot named Arti was created. Unlike his mechanical counterparts designed for practical tasks, Arti was built to understan...",
+          "response_time": 8.759639978408813,
+          "length": 975
         },
         "prompt_analytical": {
-          "content": "Pros of Remote Work for Software Development Teams:\n\n1. Flexibility: Remote work allows developers to work when they are most productive. Some people work better at night, others in the early morning....",
-          "response_time": 8.192375898361206,
-          "length": 1066
+          "content": "Pros of Remote Work for Software Development Teams:\n\n1. Increased Flexibility: Remote work allows developers to create their own schedules and work when they are most productive.\n2. Reduced Commute Ti...",
+          "response_time": 7.996667861938477,
+          "length": 1087
         },
         "prompt_technical": {
-          "content": "Machine learning is a type of artificial intelligence (AI) that allows computer systems to learn from experience, adjust to new inputs and perform tasks without being explicitly programed. It's like w...",
-          "response_time": 4.871930122375488,
-          "length": 613
+          "content": "Machine learning is a type of artificial intelligence (AI) where a computer system is programmed to learn and improve from experience, without being explicitly programmed. It involves the creation of ...",
+          "response_time": 4.71209192276001,
+          "length": 675
         },
         "prompt_complex": {
-          "content": "Designing a system architecture for a scalable e-commerce platform that can handle millions of users requires consideration of several factors including the application's user interface, the database ...",
-          "response_time": 7.224264144897461,
-          "length": 1005
+          "content": "System Architecture for a Scalable E-commerce Platform\n\n1. Front-end Layer: \n   This is the layer that users interact with. It includes a Web Application for desktop users and a Mobile Application for...",
+          "response_time": 6.644258975982666,
+          "length": 1091
         }
       }
     },
@@ -67,44 +67,44 @@
       "success_rate": 1.0,
       "performance_metrics": {
         "avg_response_time": 0.0,
-        "basic_generation_time": 8.926176071166992,
+        "basic_generation_time": 9.048095941543579,
         "basic_generation_tokens": 108,
-        "streaming_time": 7.518062114715576,
+        "streaming_time": 6.345423221588135,
         "streaming_chunks": 51
       },
       "errors": [
-        "agent_integration: 'EnhancedGapFinderAgent' object has no attribute 'initialize_llm'"
+        "agent_integration: Agent execution failed: None"
       ],
       "responses": {
         "basic_generation": {
-          "content": "**Artificial Intelligence (AI)** refers to the simulation of human intelligence in machines, enabling them to perform tasks that typically require human cognition. These tasks include learning, reason...",
-          "response_time": 8.926176071166992,
-          "length": 518
+          "content": "Artificial Intelligence (AI) refers to the simulation of human intelligence in machines that are programmed to perform tasks typically requiring human cognition, such as learning, reasoning, problem-s...",
+          "response_time": 9.048095941543579,
+          "length": 547
         },
         "streaming_generation": {
-          "content": "**The Painter in the Machine**  \n\nIn a quiet corner of an artist\u2019s studio, a small robot named PX-7 whirred to life. Its purpose? To assist with mixing paints and cleaning brushes. But PX-7",
-          "response_time": 7.518062114715576,
-          "length": 189
+          "content": "**\"The Brush of a Machine\"**  \n\nIn a quiet corner of an artist\u2019s cluttered studio, a small robot named PX-7 whirred to life, its optical sensors adjusting to the soft morning light. Its creator, an",
+          "response_time": 6.345423221588135,
+          "length": 197
         },
         "prompt_creative": {
-          "content": "**The Painter\u2019s Code**  \n\nIn a quiet corner of an old repair shop, a decommissioned service bot named **CR-7N** (pronounced \"Crayon\") powered on for the first time in years. Its new owner, an elderly ...",
-          "response_time": 15.620488166809082,
-          "length": 784
+          "content": "**The Painter\u2019s Code**  \n\nIn a quiet corner of an old workshop, a small robot named **P1X3L** powered on for the first time. Its creator, an aging artist named Elias, had built it to assist with mixin...",
+          "response_time": 14.919140100479126,
+          "length": 836
         },
         "prompt_analytical": {
-          "content": "Remote work has become increasingly common in software development, offering both advantages and challenges. Below is a balanced analysis of its pros and cons:\n\n### **Pros of Remote Work for Software ...",
-          "response_time": 15.30978274345398,
-          "length": 984
+          "content": "Remote work has become increasingly common in software development, offering both advantages and challenges. Here\u2019s a balanced analysis of its pros and cons:\n\n### **Pros of Remote Work for Software De...",
+          "response_time": 14.758281946182251,
+          "length": 953
         },
         "prompt_technical": {
-          "content": "Sure! Here's a simple explanation of **machine learning (ML)**:\n\n**Machine learning is a way for computers to learn from data and make decisions or predictions without being explicitly programmed for ...",
-          "response_time": 18.776556730270386,
-          "length": 917
+          "content": "Sure! Here's a simple explanation of **machine learning (ML)**:\n\n### **Machine Learning in Simple Terms**  \nMachine learning is a way for computers to **learn from data** and make decisions or predict...",
+          "response_time": 14.44129490852356,
+          "length": 870
         },
         "prompt_complex": {
-          "content": "Designing a scalable e-commerce platform capable of handling millions of users requires a robust, distributed, and fault-tolerant architecture. Below is a high-level system architecture that leverages...",
-          "response_time": 13.180421113967896,
-          "length": 919
+          "content": "# Scalable E-Commerce Platform Architecture\n\n## Overview\nThis architecture is designed to handle millions of users with high availability, performance, and scalability while maintaining security and r...",
+          "response_time": 14.7273268699646,
+          "length": 862
         }
       }
     },
@@ -118,44 +118,44 @@
       "success_rate": 1.0,
       "performance_metrics": {
         "avg_response_time": 0.0,
-        "basic_generation_time": 17.497816801071167,
-        "basic_generation_tokens": 112,
-        "streaming_time": 1.28529691696167,
+        "basic_generation_time": 4.606870174407959,
+        "basic_generation_tokens": 79,
+        "streaming_time": 1.324185848236084,
         "streaming_chunks": 51
       },
       "errors": [
-        "agent_integration: 'EnhancedGapFinderAgent' object has no attribute 'initialize_llm'"
+        "agent_integration: Agent execution failed: None"
       ],
       "responses": {
         "basic_generation": {
-          "content": "Artificial Intelligence, or AI for short, refers to the simulation of human intelligence processes by machines. These systems are designed and trained using machine learning algorithms that allow them...",
-          "response_time": 17.497816801071167,
-          "length": 562
+          "content": "Artificial Intelligence (AI) refers to the simulation of human intelligence in machines that are designed to think and act like humans. These systems can perform tasks such as learning, reasoning, pro...",
+          "response_time": 4.606870174407959,
+          "length": 380
         },
         "streaming_generation": {
-          "content": "In the bustling city of Technopolis, there stood an art studio with windows that gleamed like jewels amidst steel skyscrapers. Inside this haven for creativity was ARIA-21X \u2013 not your ordinary artist ...",
-          "response_time": 1.28529691696167,
-          "length": 257
+          "content": "In the sprawling metropolis of Neo-Tokyo, amidst the humdrum life led by humans and androids alike lay an unassuming workshop. Within its cluttered walls was R-17X9, known affectionately as Rex among ...",
+          "response_time": 1.324185848236084,
+          "length": 215
         },
         "prompt_creative": {
-          "content": "Once upon a time, in the bustling city of Circuitville lived an inquisitive android named Pixel. Unlike his fellow robots who were busy with their tasks or playing chess at RoboPark, Pixel had one pec...",
-          "response_time": 4.862172365188599,
-          "length": 1039
+          "content": "In the bustling city of Mechano, there was an ordinary-looking service bot named Pixel. Designed for household chores and errands around Metropolis Central Station (MCS), he had never encountered anyt...",
+          "response_time": 4.9852800369262695,
+          "length": 1044
         },
         "prompt_analytical": {
-          "content": "Pros:\n\n1. Flexibility \u2013 Remote workers can often set their own schedules, which may lead to increased productivity as they are able to manage personal responsibilities alongside professional ones.\n2. ...",
-          "response_time": 4.879674911499023,
-          "length": 1197
+          "content": "Pros:\n\n1. Flexibility - Remote working allows developers to create their own schedules, which can lead to increased productivity as they are able to balance personal life with professional responsibil...",
+          "response_time": 5.032138109207153,
+          "length": 1254
         },
         "prompt_technical": {
-          "content": "Machine Learning is like teaching a computer to learn from experience. Imagine you have lots of pictures, and your job is sorting them into groups based on what they contain\u2014like cats or dogs\u2014but inst...",
-          "response_time": 4.833567380905151,
-          "length": 1028
+          "content": "Machine Learning is like teaching a computer to learn from experiences. Imagine you have lots and lots of pictures with cats, dogs, birds\u2014you show these images repeatedly\u2014and over time your brain star...",
+          "response_time": 4.977818012237549,
+          "length": 1140
         },
         "prompt_complex": {
-          "content": "Designing an efficient and robust System Architecture (SA) is crucial to ensure seamless operations, high performance under pressure while scaling up. A good starting point would be adopting the Micro...",
-          "response_time": 5.324643135070801,
-          "length": 1168
+          "content": "System Architecture for Scalable E-Commerce Platform:\n\n1. Frontend layer:\n- Web application framework (React, Angular, or Vue.js) to create user interfaces.\n- Microservices-based approach using contai...",
+          "response_time": 4.961140155792236,
+          "length": 996
         }
       }
     }
