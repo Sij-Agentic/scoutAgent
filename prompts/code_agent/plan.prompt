@@ -1,0 +1,8 @@
+Given the following request, create a detailed plan to write the code. The plan should outline the necessary functions, classes, and modules. Structure the plan in a clear, step-by-step format.
+
+Request:
+---
+{input_data}
+---
+
+Your plan should be comprehensive enough for another developer to understand and implement.

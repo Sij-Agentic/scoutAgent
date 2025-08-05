@@ -1,0 +1,13 @@
+Based on the following plan and request, elaborate on the implementation details. Discuss data structures, algorithms, potential edge cases, and any libraries or frameworks that should be used.
+
+Plan:
+---
+{plan}
+---
+
+Request:
+---
+{input_data}
+---
+
+Provide your thoughts on the optimal implementation strategy.

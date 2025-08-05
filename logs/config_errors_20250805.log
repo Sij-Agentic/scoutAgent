@@ -25,3 +25,143 @@
 2025-08-05 16:53:30 - config - ERROR - manager.py:179 - generate() - Error generating response with deepseek: DeepSeek generation failed: Failed to deserialize the JSON body into the target type: max_tokens: invalid value: integer `-1`, expected u32 at line 1 column 94
 2025-08-05 16:54:47 - config - ERROR - gap_finder_enhanced.py:75 - execute() - Agent EnhancedGapFinderAgent failed: 'EnhancedGapFinderAgent' object has no attribute 'llm_logger'
 2025-08-05 16:55:26 - config - ERROR - gap_finder_enhanced.py:75 - execute() - Agent EnhancedGapFinderAgent failed: 'EnhancedGapFinderAgent' object has no attribute 'llm_logger'
+2025-08-05 17:33:50 - config - ERROR - base.py:140 - execute() - Agent analysis failed: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/plan.prompt
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/analysis_agent.py", line 51, in plan
+    prompt = load_prompt_template(
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/utils.py", line 546, in load_prompt_template
+    raise FileNotFoundError(f"Prompt template not found: {prompt_path}")
+FileNotFoundError: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/plan.prompt
+2025-08-05 17:34:06 - config - ERROR - base.py:140 - execute() - Agent analysis failed: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/plan.prompt
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/analysis_agent.py", line 51, in plan
+    prompt = load_prompt_template(
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/utils.py", line 546, in load_prompt_template
+    raise FileNotFoundError(f"Prompt template not found: {prompt_path}")
+FileNotFoundError: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/plan.prompt
+2025-08-05 17:35:01 - config - ERROR - base.py:140 - execute() - Agent analysis failed: 'input_data'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/analysis_agent.py", line 51, in plan
+    prompt = load_prompt_template(
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/utils.py", line 552, in load_prompt_template
+    return template_content.format(**substitutions)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'input_data'
+2025-08-05 17:35:50 - config - ERROR - base.py:140 - execute() - Agent analysis failed: 'AnalysisAgent' object has no attribute '_llm_manager'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/analysis_agent.py", line 61, in plan
+    response_str = await self.llm_generate(prompt)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/utils.py", line 163, in llm_generate
+    await self._ensure_llm_initialized()
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/utils.py", line 135, in _ensure_llm_initialized
+    if self._llm_manager is None:
+       ^^^^^^^^^^^^^^^^^
+AttributeError: 'AnalysisAgent' object has no attribute '_llm_manager'
+2025-08-05 17:36:16 - config - ERROR - utils.py:196 - llm_generate() - Error in LLM generation: Backend not available: openai
+2025-08-05 17:36:16 - config - ERROR - base.py:140 - execute() - Agent analysis failed: Backend not available: openai
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/analysis_agent.py", line 62, in plan
+    response_str = await self.llm_generate(prompt)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/utils.py", line 186, in llm_generate
+    response = await self._llm_manager.generate(request, backend_type)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/manager.py", line 147, in generate
+    raise LLMError(f"Backend not available: {target_backend}")
+llm.base.LLMError: Backend not available: openai
+2025-08-05 17:37:59 - config - ERROR - base.py:212 - log() - Failed to parse LLM response as JSON.
+2025-08-05 17:37:59 - config - ERROR - base.py:140 - execute() - Agent analysis failed: 'input_data'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 112, in execute
+    thoughts = await self.think(agent_input, plan)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/analysis_agent.py", line 88, in think
+    prompt = load_prompt_template(
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/utils.py", line 558, in load_prompt_template
+    return template_content.format(**substitutions)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'input_data'
+2025-08-05 17:38:45 - config - ERROR - base.py:212 - log() - Failed to parse LLM response as JSON.
+2025-08-05 17:39:03 - config - ERROR - base.py:212 - log() - Failed to parse LLM response as JSON.
+2025-08-05 17:39:03 - config - ERROR - base.py:140 - execute() - Agent analysis failed: 'data_type'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 117, in execute
+    result = await self.act(agent_input, plan, thoughts)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/analysis_agent.py", line 121, in act
+    data_type = plan['data_type']
+                ~~~~^^^^^^^^^^^^^
+KeyError: 'data_type'
+2025-08-05 17:47:19 - config - ERROR - base.py:212 - log() - Failed to parse LLM response as JSON.
+2025-08-05 17:47:19 - config - ERROR - base.py:140 - execute() - Agent analysis failed: 'analysis_type'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 117, in execute
+    result = await self.act(agent_input, plan, thoughts)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/analysis_agent.py", line 144, in act
+    analysis_type = plan['analysis_type']
+                    ~~~~^^^^^^^^^^^^^^^^^
+KeyError: 'analysis_type'
+2025-08-05 17:48:23 - config - ERROR - base.py:212 - log() - Failed to parse LLM response as JSON.
+2025-08-05 17:48:23 - config - ERROR - base.py:140 - execute() - Agent analysis failed: name 'time' is not defined
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 117, in execute
+    result = await self.act(agent_input, plan, thoughts)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/analysis_agent.py", line 178, in act
+    'processing_time': time.time() - self.state.start_time,
+                       ^^^^
+NameError: name 'time' is not defined. Did you forget to import 'time'
+2025-08-05 17:49:52 - config - ERROR - base.py:212 - log() - Failed to parse LLM response as JSON.
+2025-08-05 17:49:52 - config - ERROR - base.py:140 - execute() - Agent analysis failed: 'quality_assessment'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 117, in execute
+    result = await self.act(agent_input, plan, thoughts)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/analysis_agent.py", line 180, in act
+    'quality_score': thoughts['quality_assessment']['overall_score']
+                     ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'quality_assessment'
+2025-08-05 17:51:21 - config - ERROR - base.py:212 - log() - Failed to parse LLM response as JSON.
+2025-08-05 17:52:05 - config - ERROR - base.py:212 - log() - Failed to parse LLM response as JSON.
+2025-08-05 17:52:09 - config - ERROR - base.py:140 - execute() - Agent analysis failed: 'analysis_type'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 117, in execute
+    result = await self.act(agent_input, plan, thoughts)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/analysis_agent.py", line 145, in act
+    analysis_type = plan['analysis_type']
+                    ~~~~^^^^^^^^^^^^^^^^^
+KeyError: 'analysis_type'
+2025-08-05 17:58:23 - config - ERROR - base.py:140 - execute() - Agent analysis failed: '\n  "analysis_type"'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/analysis_agent.py", line 74, in plan
+    prompt = load_prompt_template(
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/utils.py", line 558, in load_prompt_template
+    return template_content.format(**substitutions)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: '\n  "analysis_type"'

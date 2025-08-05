@@ -1,0 +1,47 @@
+You are a meticulous planning agent. Your task is to create a detailed, step-by-step analysis plan in JSON format.
+
+### Instructions
+1.  Analyze the data type and sample provided.
+2.  Generate a JSON object that outlines a clear plan for analysis.
+3.  The JSON object must conform to the structure specified in the Output Format section.
+
+### Input
+Data Type: {data_type}
+Data Sample:
+---
+{data_sample}
+---
+
+### Output Format
+Your output MUST be a single JSON object with the following keys:
+- "analysis_type": A string categorizing the primary analysis (e.g., 'statistical_summary', 'trend_analysis').
+- "methodology": A string describing the overall approach.
+- "steps": A list of strings outlining each analysis step.
+- "expected_outputs": A list of strings describing the expected deliverables.
+- "validation_criteria": A list of strings for how to validate the results.
+
+### Example
+Here is an example for a 'numerical' data type:
+```json
+{{
+  "analysis_type": "statistical_summary",
+  "methodology": "Perform descriptive statistical analysis to summarize the central tendency, dispersion, and shape of the dataset's distribution. Identify outliers using the IQR method.",
+  "steps": [
+    "Calculate descriptive statistics (mean, median, mode, std dev, min, max).",
+    "Analyze data distribution (skewness, kurtosis).",
+    "Identify and list potential outliers.",
+    "Visualize the data distribution with a histogram and box plot."
+  ],
+  "expected_outputs": [
+    "A summary of descriptive statistics.",
+    "A report on the data distribution shape.",
+    "A list of identified outliers.",
+    "A histogram and a box plot."
+  ],
+  "validation_criteria": [
+    "Statistical calculations are accurate.",
+    "Visualizations correctly represent the data.",
+    "Outlier identification is consistent with the IQR method."
+  ]
+}}
+```

@@ -3,6 +3,7 @@ Utility functions for LLM integration with ScoutAgent.
 """
 
 import asyncio
+from pathlib import Path
 from typing import Dict, List, Any, Optional, Union
 from dataclasses import dataclass
 
@@ -43,24 +44,30 @@ class AgentPrompt:
 
 class LLMAgentMixin:
     """
-    Mixin class to add LLM capabilities to agents.
+    Mixin class to provide agents with LLM capabilities.
     
     This can be mixed into any BaseAgent subclass to provide LLM functionality.
     """
     
-    def __init__(self, *args, **kwargs):
+    def __init__(self, preferred_backend: Optional[str] = None, *args, **kwargs):
         """Initialize LLM capabilities."""
         super().__init__(*args, **kwargs)
-        self.llm_logger = get_logger(f"llm.agent.{getattr(self, 'name', 'unknown')}")
         self._llm_manager = None
+        # Set a default backend if none is provided, otherwise use the preferred one
+        self.llm_backend_preferences = [preferred_backend or LLMBackendType.OPENAI, LLMBackendType.CLAUDE, LLMBackendType.GEMINI]
+        self.llm_logger = get_logger(f"llm.agent.{getattr(self, 'name', 'unknown')}")
         
         # Agent-specific LLM preferences
-        self.preferred_backend = None
+        self.preferred_backend = preferred_backend
         self.task_backend_preferences = {}
         self._setup_agent_llm_preferences()
     
     def _setup_agent_llm_preferences(self):
-        """Setup agent-specific LLM backend preferences based on agent type."""
+        """Setup agent-specific LLM backend preferences based on agent type if not already set."""
+        # If a backend is already set, don't override it.
+        if self.preferred_backend:
+            return
+
         agent_name = getattr(self, 'name', '').lower()
         
         # Set agent-specific preferences based on agent name
@@ -517,3 +524,37 @@ The report should be professional, comprehensive, and tailored for {audience}.""
             system_prompt=system_prompt,
             user_prompt=user_prompt
         )
+
+
+def load_prompt_template(template_name: str, agent_name: Optional[str] = None, substitutions: Optional[Dict[str, Any]] = None) -> str:
+    """
+    Load and format a prompt template from the prompts directory.
+
+    Args:
+        template_name: The name of the template file (e.g., "plan.prompt").
+        agent_name: The name of the agent to load the template for. If None, looks in "common".
+        substitutions: A dictionary of values to substitute into the template.
+
+    Returns:
+        The formatted content of the prompt template.
+    """
+    base_path = Path(__file__).resolve().parent.parent / "prompts"
+    
+    if agent_name:
+        prompt_path = base_path / agent_name.lower() / template_name
+        if not prompt_path.exists():
+            # Fallback to common if agent-specific prompt doesn't exist
+            prompt_path = base_path / "common" / template_name
+    else:
+        prompt_path = base_path / "common" / template_name
+
+    if not prompt_path.exists():
+        raise FileNotFoundError(f"Prompt template not found: {prompt_path}")
+
+    with open(prompt_path, "r", encoding="utf-8") as f:
+        template_content = f.read()
+
+    if substitutions:
+        return template_content.format(**substitutions)
+    
+    return template_content
