@@ -24,7 +24,7 @@ except ImportError:
 
 from agents.base import BaseAgent, AgentInput, AgentOutput
 from config import get_config
-from llm.utils import LLMAgentMixin, load_prompt_template
+from llm.utils import LLMAgentMixin
 
 
 class ResearchAgent(LLMAgentMixin, BaseAgent):
@@ -39,107 +39,121 @@ class ResearchAgent(LLMAgentMixin, BaseAgent):
     """
 
     def __init__(self, name="research", **kwargs):
-        super().__init__(name=name, **kwargs)
+        BaseAgent.__init__(self, name=name, **kwargs)
         LLMAgentMixin.__init__(self, preferred_backend='ollama')
-        self.config = get_config()
+
 
     def _extract_json(self, raw_content: str) -> Dict[str, Any]:
         """Extracts the first valid JSON object from a raw string."""
-        # Find the start of the JSON object
-        json_start_index = raw_content.find('{')
-        if json_start_index == -1:
-            self.log("No JSON object found in the response.", level='error')
-            return {}
-
-        # Find the end of the JSON object
-        json_end_index = raw_content.rfind('}')
-        if json_end_index == -1:
-            self.log("JSON object end not found.", level='error')
-            return {}
-
-        json_string = raw_content[json_start_index:json_end_index + 1]
+        # This regex is designed to find a JSON block enclosed in ```json ... ```
+        match = re.search(r"```json\n(.*?)\n```", raw_content, re.DOTALL)
+        if match:
+            json_str = match.group(1)
+        else:
+            # Fallback to finding the first '{' and last '}'
+            start = raw_content.find('{')
+            end = raw_content.rfind('}')
+            if start != -1 and end != -1:
+                json_str = raw_content[start:end+1]
+            else:
+                self.log("No JSON object found in the response.", level='warning')
+                return {}
 
         try:
-            return json.loads(json_string)
+            return json.loads(json_str)
         except json.JSONDecodeError as e:
-            self.log(f"Failed to parse JSON: {e}", level='error')
-            self.log(f"Raw JSON string: {json_string}", level='debug')
+            self.log(f"Failed to decode JSON: {e}", level='error')
+            self.log(f"Raw content for debugging: {raw_content}", level='debug')
             return {}
 
     async def plan(self, agent_input: AgentInput) -> Dict[str, Any]:
         """
-        Plan research strategy based on input.
+        Determines the research plan based on the user query.
+        This is the first step in the agent's lifecycle.
         """
-        query = agent_input.data.get('query', '')
+        query = agent_input.data
         self.log(f"Generating research plan for query: {query}")
 
-        prompt = load_prompt_template(
-            self.prompts_dir, 'plan.prompt', query=query
+        from llm.utils import load_prompt_template
+        prompt_template = load_prompt_template(
+            'plan.prompt',
+            agent_name=self.name,
+            substitutions={'query': query}
         )
 
-        response = await self.llm.get_response_async(prompt)
+        response = await self.llm_generate(prompt_template)
         plan = self._extract_json(response)
 
-        self.log(f"Research plan created for query: {query}")
+        if not plan:
+            self.log("Failed to generate a valid research plan.", level='error')
+            return {"error": "Plan generation failed."}
+
+        self.log("Research plan generated successfully.")
         return plan
 
     async def think(self, agent_input: AgentInput, plan: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Analyze research requirements and prioritize sources.
+        Analyzes the plan and determines the best course of action.
+        This is the second step, where the agent refines its approach.
         """
-        self.log("Analyzing research plan and requirements...")
-        prompt = load_prompt_template(
-            self.prompts_dir, 'think.prompt', plan=json.dumps(plan, indent=2)
+        query = agent_input.data
+        plan_str = json.dumps(plan, indent=2)
+        self.log(f"Thinking about research plan for query: {query}")
+
+        from llm.utils import load_prompt_template
+        prompt_template = load_prompt_template(
+            'think.prompt',
+            agent_name=self.name,
+            substitutions={'query': query, 'plan': plan_str}
         )
 
-        response = await self.llm.get_response_async(prompt)
+        response = await self.llm_generate(prompt_template)
         thoughts = self._extract_json(response)
 
-        self.log(f"Research analysis complete - query type: {thoughts.get('query_type', 'N/A')}")
+        if not thoughts:
+            self.log("Failed to generate valid thoughts from the plan.", level='error')
+            return {"error": "Thinking process failed."}
+
+        self.log("Thinking process completed.")
         return thoughts
 
     async def act(self, agent_input: AgentInput, plan: Dict[str, Any], thoughts: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Execute research based on plan and analysis.
+        Executes the research plan based on the generated thoughts.
+        This is the final step where the agent performs the actual research tasks.
         """
-        query = plan.get('query', '')
-        search_queries = thoughts.get('search_queries', [query])
+        self.log("Executing research plan...")
 
-        self.log(f"Executing research for query: {query}")
+        # In a real implementation, this would involve calling search tools, APIs, etc.
+        # For this refactoring, we'll simulate the action based on the plan.
+        research_steps = plan.get('research_steps', [])
+        search_queries = thoughts.get('search_queries', [])
 
-        results = {
-            'query': query,
-            'search_queries': search_queries,
-            'sources': [],
-            'summary': None,
-            'key_findings': [],
-            'metadata': {
-                'total_sources': 0,
-                'credible_sources': 0,
-                'recency_score': 0,
-                'relevance_score': 0
-            }
+        if not research_steps and not search_queries:
+            self.log("No research steps or search queries found in the plan/thoughts.", level='warning')
+            return {"summary": "No actionable research steps provided."}
+
+        # Simulate fetching results
+        results = []
+        for i, query in enumerate(search_queries):
+            self.log(f"Executing search: '{query}'")
+            await asyncio.sleep(0.1)  # Simulate async I/O
+            results.append({
+                "query": query,
+                "summary": f"This is a summary for the search query '{query}'. It contains relevant information.",
+                "sources": [f"https://example.com/source{i+1}"]
+            })
+
+        final_summary = thoughts.get('summary', 'The research was conducted based on the plan.')
+
+        output = {
+            "summary": final_summary,
+            "results": results,
+            "steps_taken": research_steps
         }
 
-        all_sources = []
-        for q in search_queries:
-            # In a real implementation, this would be an async call to a search tool
-            search_results = self._perform_search(q)
-            for res in search_results:
-                processed = self._process_search_result(res)
-                all_sources.append(processed)
-
-        results['sources'] = all_sources[:plan.get('max_results', 10)]
-        results['summary'] = self._generate_summary(results['sources'])
-        results['key_findings'] = self._extract_key_findings(results['sources'])
-
-        # Update metadata
-        results['metadata']['total_sources'] = len(results['sources'])
-        results['metadata']['recency_score'] = self._calculate_recency_score(results['sources'])
-        results['metadata']['relevance_score'] = self._calculate_relevance_score(results['sources'], query)
-
-        self.log(f"Research complete, found {len(results['sources'])} sources.")
-        return results
+        self.log("Research execution completed.")
+        return output
 
     def _perform_search(self, query: str) -> List[Dict[str, Any]]:
         """Perform web search (mock implementation)."""

@@ -165,3 +165,95 @@ Traceback (most recent call last):
     return template_content.format(**substitutions)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 KeyError: '\n  "analysis_type"'
+2025-08-05 18:07:06 - config - ERROR - base.py:140 - execute() - Agent research failed: 'ResearchAgent' object has no attribute 'prompts_dir'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/research_agent.py", line 76, in plan
+    self.prompts_dir, 'plan.prompt', query=query
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'ResearchAgent' object has no attribute 'prompts_dir'
+2025-08-05 18:07:52 - config - ERROR - base.py:140 - execute() - Agent research failed: 'ResearchAgent' object has no attribute 'prompts_dir'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/research_agent.py", line 76, in plan
+    self.prompts_dir, 'plan.prompt', query=query
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'ResearchAgent' object has no attribute 'prompts_dir'
+2025-08-05 18:08:35 - config - ERROR - base.py:140 - execute() - Agent research failed: 'ResearchAgent' object has no attribute 'prompts_dir'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/research_agent.py", line 76, in plan
+    self.prompts_dir, 'plan.prompt', query=query
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'ResearchAgent' object has no attribute 'prompts_dir'
+2025-08-05 18:09:43 - config - ERROR - base.py:140 - execute() - Agent research failed: 'ResearchAgent' object has no attribute 'prompts_dir'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/research_agent.py", line 76, in plan
+    self.prompts_dir, 'plan.prompt', query=query
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'ResearchAgent' object has no attribute 'prompts_dir'
+2025-08-05 18:11:12 - config - ERROR - base.py:140 - execute() - Agent research failed: 'ResearchAgent' object has no attribute 'prompts_dir'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/research_agent.py", line 77, in plan
+    self.prompts_dir, 'plan.prompt', query=query
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'ResearchAgent' object has no attribute 'prompts_dir'
+2025-08-05 18:20:52 - config - ERROR - base.py:140 - execute() - Agent research failed: 'ResearchAgent' object has no attribute 'prompts_dir'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/research_agent.py", line 79, in plan
+    self.prompts_dir, 'plan.prompt', query=query
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'ResearchAgent' object has no attribute 'prompts_dir'
+2025-08-05 18:28:16 - config - ERROR - base.py:140 - execute() - Agent research failed: 'ResearchAgent' object has no attribute 'prompts_dir'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/research_agent.py", line 79, in plan
+    self.prompts_dir, 'plan.prompt', query=query
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'ResearchAgent' object has no attribute 'prompts_dir'
+2025-08-05 18:31:37 - config - ERROR - base.py:212 - log() - Failed to decode JSON: Expecting value: line 5 column 22 (char 125)
+2025-08-05 18:31:37 - config - ERROR - base.py:212 - log() - Failed to generate a valid research plan.
+2025-08-05 18:31:46 - config - ERROR - base.py:212 - log() - Failed to decode JSON: Expecting property name enclosed in double quotes: line 2 column 21 (char 22)
+2025-08-05 18:31:46 - config - ERROR - base.py:212 - log() - Failed to generate valid thoughts from the plan.
+2025-08-05 18:48:56 - config - ERROR - base.py:140 - execute() - Agent code failed: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/plan.prompt
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/code_agent.py", line 117, in plan
+    prompt_template = load_prompt_template(
+                      ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/utils.py", line 551, in load_prompt_template
+    raise FileNotFoundError(f"Prompt template not found: {prompt_path}")
+FileNotFoundError: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/plan.prompt
+2025-08-05 19:46:37 - config - ERROR - base.py:140 - execute() - Agent code failed: '\n  "steps"'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/code_agent.py", line 117, in plan
+    prompt_template = load_prompt_template(
+                      ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/utils.py", line 557, in load_prompt_template
+    return template_content.format(**substitutions)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: '\n  "steps"'
+2025-08-05 19:51:33 - config - ERROR - base.py:212 - log() - Failed to decode JSON: Invalid control character at: line 24 column 58 (char 1640)
+2025-08-05 19:51:33 - config - ERROR - base.py:212 - log() - Failed to generate valid code analysis.
