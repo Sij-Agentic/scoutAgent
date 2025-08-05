@@ -206,3 +206,541 @@
 2025-08-05 16:55:18 - config - INFO - gap_finder_enhanced.py:131 - think() - Starting enhanced LLM-powered analysis...
 2025-08-05 16:55:26 - config - ERROR - gap_finder_enhanced.py:75 - execute() - Agent EnhancedGapFinderAgent failed: 'EnhancedGapFinderAgent' object has no attribute 'llm_logger'
 2025-08-05 16:55:27 - config - INFO - manager.py:309 - _stop_health_monitoring() - Stopped LLM backend health monitoring
+2025-08-05 17:33:50 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 17:33:50 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 17:33:50 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 17:33:50 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 17:33:50 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 17:33:50 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 17:33:50 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 17:33:50 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 17:33:50 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 17:33:50 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 17:33:50 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 17:33:50 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 17:33:50 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 17:33:50 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 17:33:50 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 17:33:50 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-05 17:33:50 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 17:33:50 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 17:33:50 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (2f30ac9a-0e57-4683-8d8a-d7af94a5360e)
+2025-08-05 17:33:50 - config - INFO - base.py:102 - execute() - Starting execution of agent analysis
+2025-08-05 17:33:50 - config - ERROR - base.py:140 - execute() - Agent analysis failed: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/plan.prompt
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/analysis_agent.py", line 51, in plan
+    prompt = load_prompt_template(
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/utils.py", line 546, in load_prompt_template
+    raise FileNotFoundError(f"Prompt template not found: {prompt_path}")
+FileNotFoundError: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/plan.prompt
+2025-08-05 17:34:06 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 17:34:06 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 17:34:06 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 17:34:06 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 17:34:06 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 17:34:06 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 17:34:06 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 17:34:06 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 17:34:06 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 17:34:06 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 17:34:06 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 17:34:06 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 17:34:06 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 17:34:06 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 17:34:06 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 17:34:06 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-05 17:34:06 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 17:34:06 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 17:34:06 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (534db576-30dc-4f4b-bbb1-c29c727701d3)
+2025-08-05 17:34:06 - config - INFO - base.py:102 - execute() - Starting execution of agent analysis
+2025-08-05 17:34:06 - config - ERROR - base.py:140 - execute() - Agent analysis failed: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/plan.prompt
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/analysis_agent.py", line 51, in plan
+    prompt = load_prompt_template(
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/utils.py", line 546, in load_prompt_template
+    raise FileNotFoundError(f"Prompt template not found: {prompt_path}")
+FileNotFoundError: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/plan.prompt
+2025-08-05 17:35:01 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 17:35:01 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 17:35:01 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 17:35:01 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 17:35:01 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 17:35:01 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 17:35:01 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 17:35:01 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 17:35:01 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 17:35:01 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 17:35:01 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 17:35:01 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 17:35:01 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 17:35:01 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 17:35:01 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 17:35:01 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-05 17:35:01 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 17:35:01 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 17:35:01 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (dfe91d36-71f1-47a3-8b46-a157b4373c3a)
+2025-08-05 17:35:01 - config - INFO - base.py:102 - execute() - Starting execution of agent analysis
+2025-08-05 17:35:01 - config - ERROR - base.py:140 - execute() - Agent analysis failed: 'input_data'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/analysis_agent.py", line 51, in plan
+    prompt = load_prompt_template(
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/utils.py", line 552, in load_prompt_template
+    return template_content.format(**substitutions)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'input_data'
+2025-08-05 17:35:50 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 17:35:50 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 17:35:50 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 17:35:50 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 17:35:50 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 17:35:50 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 17:35:50 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 17:35:50 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 17:35:50 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 17:35:50 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 17:35:50 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 17:35:50 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 17:35:50 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 17:35:50 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 17:35:50 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 17:35:50 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-05 17:35:50 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 17:35:50 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 17:35:50 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (f5ed0ae2-9673-45d7-84b0-13b406a96aa7)
+2025-08-05 17:35:50 - config - INFO - base.py:102 - execute() - Starting execution of agent analysis
+2025-08-05 17:35:50 - config - INFO - base.py:212 - log() - Generating analysis plan with LLM...
+2025-08-05 17:35:50 - config - ERROR - base.py:140 - execute() - Agent analysis failed: 'AnalysisAgent' object has no attribute '_llm_manager'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/analysis_agent.py", line 61, in plan
+    response_str = await self.llm_generate(prompt)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/utils.py", line 163, in llm_generate
+    await self._ensure_llm_initialized()
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/utils.py", line 135, in _ensure_llm_initialized
+    if self._llm_manager is None:
+       ^^^^^^^^^^^^^^^^^
+AttributeError: 'AnalysisAgent' object has no attribute '_llm_manager'
+2025-08-05 17:36:16 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 17:36:16 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 17:36:16 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 17:36:16 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 17:36:16 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 17:36:16 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 17:36:16 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 17:36:16 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 17:36:16 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 17:36:16 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 17:36:16 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 17:36:16 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 17:36:16 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 17:36:16 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 17:36:16 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 17:36:16 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-05 17:36:16 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 17:36:16 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 17:36:16 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (d226a1d0-2cc3-4b2c-a352-cd599aea0bd9)
+2025-08-05 17:36:16 - config - INFO - base.py:102 - execute() - Starting execution of agent analysis
+2025-08-05 17:36:16 - config - INFO - base.py:212 - log() - Generating analysis plan with LLM...
+2025-08-05 17:36:16 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: phi4-mini:latest
+2025-08-05 17:36:16 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-05 17:36:16 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-05 17:36:16 - config - INFO - manager.py:442 - initialize_llm_backends() - Initialized Ollama backend
+2025-08-05 17:36:16 - config - INFO - manager.py:450 - initialize_llm_backends() - LLM initialization complete. Available backends: ['ollama']
+2025-08-05 17:36:16 - config - INFO - manager.py:451 - initialize_llm_backends() - Default backend: ollama
+2025-08-05 17:36:16 - config - ERROR - utils.py:196 - llm_generate() - Error in LLM generation: Backend not available: openai
+2025-08-05 17:36:16 - config - ERROR - base.py:140 - execute() - Agent analysis failed: Backend not available: openai
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/analysis_agent.py", line 62, in plan
+    response_str = await self.llm_generate(prompt)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/utils.py", line 186, in llm_generate
+    response = await self._llm_manager.generate(request, backend_type)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/manager.py", line 147, in generate
+    raise LLMError(f"Backend not available: {target_backend}")
+llm.base.LLMError: Backend not available: openai
+2025-08-05 17:37:49 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 17:37:49 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 17:37:49 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 17:37:49 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 17:37:49 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 17:37:49 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 17:37:49 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 17:37:49 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 17:37:49 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 17:37:49 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 17:37:49 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 17:37:49 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 17:37:49 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 17:37:49 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 17:37:49 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 17:37:49 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-05 17:37:49 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 17:37:49 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 17:37:49 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (d4489696-4cba-426e-a01e-d787be665746)
+2025-08-05 17:37:49 - config - INFO - base.py:102 - execute() - Starting execution of agent analysis
+2025-08-05 17:37:49 - config - INFO - base.py:212 - log() - Generating analysis plan with LLM...
+2025-08-05 17:37:49 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: phi4-mini:latest
+2025-08-05 17:37:49 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-05 17:37:49 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-05 17:37:49 - config - INFO - manager.py:442 - initialize_llm_backends() - Initialized Ollama backend
+2025-08-05 17:37:49 - config - INFO - manager.py:450 - initialize_llm_backends() - LLM initialization complete. Available backends: ['ollama']
+2025-08-05 17:37:49 - config - INFO - manager.py:451 - initialize_llm_backends() - Default backend: ollama
+2025-08-05 17:37:59 - config - ERROR - base.py:212 - log() - Failed to parse LLM response as JSON.
+2025-08-05 17:37:59 - config - ERROR - base.py:140 - execute() - Agent analysis failed: 'input_data'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 112, in execute
+    thoughts = await self.think(agent_input, plan)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/analysis_agent.py", line 88, in think
+    prompt = load_prompt_template(
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/utils.py", line 558, in load_prompt_template
+    return template_content.format(**substitutions)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'input_data'
+2025-08-05 17:38:35 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 17:38:35 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 17:38:35 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 17:38:35 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 17:38:35 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 17:38:35 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 17:38:35 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 17:38:35 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 17:38:35 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 17:38:35 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 17:38:35 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 17:38:35 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 17:38:35 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 17:38:35 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 17:38:35 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 17:38:35 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-05 17:38:35 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 17:38:35 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 17:38:35 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (a007a26f-608f-48f6-adf3-4a36f34e35c3)
+2025-08-05 17:38:35 - config - INFO - base.py:102 - execute() - Starting execution of agent analysis
+2025-08-05 17:38:35 - config - INFO - base.py:212 - log() - Generating analysis plan with LLM...
+2025-08-05 17:38:35 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: phi4-mini:latest
+2025-08-05 17:38:35 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-05 17:38:35 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-05 17:38:35 - config - INFO - manager.py:442 - initialize_llm_backends() - Initialized Ollama backend
+2025-08-05 17:38:35 - config - INFO - manager.py:450 - initialize_llm_backends() - LLM initialization complete. Available backends: ['ollama']
+2025-08-05 17:38:35 - config - INFO - manager.py:451 - initialize_llm_backends() - Default backend: ollama
+2025-08-05 17:38:45 - config - ERROR - base.py:212 - log() - Failed to parse LLM response as JSON.
+2025-08-05 17:38:45 - config - INFO - base.py:212 - log() - Generating data insights with LLM...
+2025-08-05 17:39:03 - config - ERROR - base.py:212 - log() - Failed to parse LLM response as JSON.
+2025-08-05 17:39:03 - config - ERROR - base.py:140 - execute() - Agent analysis failed: 'data_type'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 117, in execute
+    result = await self.act(agent_input, plan, thoughts)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/analysis_agent.py", line 121, in act
+    data_type = plan['data_type']
+                ~~~~^^^^^^^^^^^^^
+KeyError: 'data_type'
+2025-08-05 17:46:44 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 17:46:44 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 17:46:44 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 17:46:44 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 17:46:44 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 17:46:44 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 17:46:44 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 17:46:44 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 17:46:44 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 17:46:44 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 17:46:44 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 17:46:44 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 17:46:44 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 17:46:44 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 17:46:44 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 17:46:44 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-05 17:46:44 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 17:46:44 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 17:46:44 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (80b82c2b-574a-443c-a350-8a48135265c2)
+2025-08-05 17:46:44 - config - INFO - base.py:102 - execute() - Starting execution of agent analysis
+2025-08-05 17:46:44 - config - INFO - base.py:212 - log() - Generating analysis plan with LLM...
+2025-08-05 17:46:44 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: phi4-mini:latest
+2025-08-05 17:46:44 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-05 17:46:44 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-05 17:46:44 - config - INFO - manager.py:442 - initialize_llm_backends() - Initialized Ollama backend
+2025-08-05 17:46:44 - config - INFO - manager.py:450 - initialize_llm_backends() - LLM initialization complete. Available backends: ['ollama']
+2025-08-05 17:46:44 - config - INFO - manager.py:451 - initialize_llm_backends() - Default backend: ollama
+2025-08-05 17:47:00 - config - INFO - base.py:212 - log() - Analysis plan created for numerical data
+2025-08-05 17:47:00 - config - INFO - base.py:212 - log() - Generating data insights with LLM...
+2025-08-05 17:47:19 - config - ERROR - base.py:212 - log() - Failed to parse LLM response as JSON.
+2025-08-05 17:47:19 - config - INFO - base.py:212 - log() - Data analysis insights generated.
+2025-08-05 17:47:19 - config - ERROR - base.py:140 - execute() - Agent analysis failed: 'analysis_type'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 117, in execute
+    result = await self.act(agent_input, plan, thoughts)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/analysis_agent.py", line 144, in act
+    analysis_type = plan['analysis_type']
+                    ~~~~^^^^^^^^^^^^^^^^^
+KeyError: 'analysis_type'
+2025-08-05 17:47:49 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 17:47:49 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 17:47:49 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 17:47:49 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 17:47:49 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 17:47:49 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 17:47:49 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 17:47:49 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 17:47:49 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 17:47:49 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 17:47:49 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 17:47:49 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 17:47:49 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 17:47:49 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 17:47:49 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 17:47:49 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-05 17:47:49 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 17:47:49 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 17:47:49 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (a8b426a7-5aa3-43e9-a472-48e25e5c9546)
+2025-08-05 17:47:49 - config - INFO - base.py:102 - execute() - Starting execution of agent analysis
+2025-08-05 17:47:49 - config - INFO - base.py:212 - log() - Generating analysis plan with LLM...
+2025-08-05 17:47:49 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: phi4-mini:latest
+2025-08-05 17:47:49 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-05 17:47:49 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-05 17:47:49 - config - INFO - manager.py:442 - initialize_llm_backends() - Initialized Ollama backend
+2025-08-05 17:47:49 - config - INFO - manager.py:450 - initialize_llm_backends() - LLM initialization complete. Available backends: ['ollama']
+2025-08-05 17:47:49 - config - INFO - manager.py:451 - initialize_llm_backends() - Default backend: ollama
+2025-08-05 17:47:58 - config - INFO - base.py:212 - log() - Analysis plan created for numerical data
+2025-08-05 17:47:58 - config - INFO - base.py:212 - log() - Generating data insights with LLM...
+2025-08-05 17:48:23 - config - ERROR - base.py:212 - log() - Failed to parse LLM response as JSON.
+2025-08-05 17:48:23 - config - INFO - base.py:212 - log() - Data analysis insights generated.
+2025-08-05 17:48:23 - config - ERROR - base.py:140 - execute() - Agent analysis failed: name 'time' is not defined
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 117, in execute
+    result = await self.act(agent_input, plan, thoughts)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/analysis_agent.py", line 178, in act
+    'processing_time': time.time() - self.state.start_time,
+                       ^^^^
+NameError: name 'time' is not defined. Did you forget to import 'time'
+2025-08-05 17:49:21 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 17:49:21 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 17:49:21 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 17:49:21 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 17:49:21 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 17:49:21 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 17:49:21 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 17:49:21 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 17:49:21 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 17:49:21 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 17:49:21 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 17:49:21 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 17:49:21 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 17:49:21 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 17:49:21 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 17:49:21 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-05 17:49:21 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 17:49:21 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 17:49:21 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (f3d8a6d4-5712-40d4-91f8-544db7544186)
+2025-08-05 17:49:21 - config - INFO - base.py:102 - execute() - Starting execution of agent analysis
+2025-08-05 17:49:21 - config - INFO - base.py:212 - log() - Generating analysis plan with LLM...
+2025-08-05 17:49:21 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: phi4-mini:latest
+2025-08-05 17:49:21 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-05 17:49:21 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-05 17:49:21 - config - INFO - manager.py:442 - initialize_llm_backends() - Initialized Ollama backend
+2025-08-05 17:49:21 - config - INFO - manager.py:450 - initialize_llm_backends() - LLM initialization complete. Available backends: ['ollama']
+2025-08-05 17:49:21 - config - INFO - manager.py:451 - initialize_llm_backends() - Default backend: ollama
+2025-08-05 17:49:30 - config - INFO - base.py:212 - log() - Analysis plan created for numerical data
+2025-08-05 17:49:30 - config - INFO - base.py:212 - log() - Generating data insights with LLM...
+2025-08-05 17:49:52 - config - ERROR - base.py:212 - log() - Failed to parse LLM response as JSON.
+2025-08-05 17:49:52 - config - INFO - base.py:212 - log() - Data analysis insights generated.
+2025-08-05 17:49:52 - config - ERROR - base.py:140 - execute() - Agent analysis failed: 'quality_assessment'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 117, in execute
+    result = await self.act(agent_input, plan, thoughts)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/analysis_agent.py", line 180, in act
+    'quality_score': thoughts['quality_assessment']['overall_score']
+                     ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'quality_assessment'
+2025-08-05 17:50:57 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 17:50:57 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 17:50:57 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 17:50:57 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 17:50:57 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 17:50:57 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 17:50:57 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 17:50:57 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 17:50:57 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 17:50:57 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 17:50:57 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 17:50:57 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 17:50:57 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 17:50:57 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 17:50:57 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 17:50:57 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-05 17:50:57 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 17:50:57 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 17:50:57 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (b64db029-d5b4-447b-af9c-50fe52232d47)
+2025-08-05 17:50:57 - config - INFO - base.py:102 - execute() - Starting execution of agent analysis
+2025-08-05 17:50:57 - config - INFO - base.py:212 - log() - Generating analysis plan with LLM...
+2025-08-05 17:50:57 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: phi4-mini:latest
+2025-08-05 17:50:57 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-05 17:50:57 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-05 17:50:57 - config - INFO - manager.py:442 - initialize_llm_backends() - Initialized Ollama backend
+2025-08-05 17:50:57 - config - INFO - manager.py:450 - initialize_llm_backends() - LLM initialization complete. Available backends: ['ollama']
+2025-08-05 17:50:57 - config - INFO - manager.py:451 - initialize_llm_backends() - Default backend: ollama
+2025-08-05 17:51:09 - config - INFO - base.py:212 - log() - Analysis plan created for numerical data
+2025-08-05 17:51:09 - config - INFO - base.py:212 - log() - Generating data insights with LLM...
+2025-08-05 17:51:21 - config - ERROR - base.py:212 - log() - Failed to parse LLM response as JSON.
+2025-08-05 17:51:21 - config - INFO - base.py:212 - log() - Data analysis insights generated.
+2025-08-05 17:51:21 - config - INFO - base.py:212 - log() - Analysis completed - generated 0 insights
+2025-08-05 17:51:21 - config - INFO - base.py:136 - execute() - Agent analysis completed successfully in 24.04s
+2025-08-05 17:51:56 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 17:51:56 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 17:51:56 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 17:51:56 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 17:51:56 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 17:51:56 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 17:51:56 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 17:51:56 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 17:51:56 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 17:51:56 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 17:51:56 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 17:51:56 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 17:51:56 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 17:51:56 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 17:51:56 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 17:51:56 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-05 17:51:56 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 17:51:56 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 17:51:56 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (05a9846a-2a5b-40d6-a1d5-7064c681c7ae)
+2025-08-05 17:51:56 - config - INFO - base.py:102 - execute() - Starting execution of agent analysis
+2025-08-05 17:51:56 - config - INFO - base.py:212 - log() - Generating analysis plan with LLM...
+2025-08-05 17:51:56 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: phi4-mini:latest
+2025-08-05 17:51:56 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-05 17:51:56 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-05 17:51:56 - config - INFO - manager.py:442 - initialize_llm_backends() - Initialized Ollama backend
+2025-08-05 17:51:56 - config - INFO - manager.py:450 - initialize_llm_backends() - LLM initialization complete. Available backends: ['ollama']
+2025-08-05 17:51:56 - config - INFO - manager.py:451 - initialize_llm_backends() - Default backend: ollama
+2025-08-05 17:52:05 - config - ERROR - base.py:212 - log() - Failed to parse LLM response as JSON.
+2025-08-05 17:52:05 - config - INFO - base.py:212 - log() - Generating data insights with LLM...
+2025-08-05 17:52:09 - config - INFO - base.py:212 - log() - Data analysis insights generated.
+2025-08-05 17:52:09 - config - ERROR - base.py:140 - execute() - Agent analysis failed: 'analysis_type'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 117, in execute
+    result = await self.act(agent_input, plan, thoughts)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/analysis_agent.py", line 145, in act
+    analysis_type = plan['analysis_type']
+                    ~~~~^^^^^^^^^^^^^^^^^
+KeyError: 'analysis_type'
+2025-08-05 17:53:16 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 17:53:16 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 17:53:16 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 17:53:16 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 17:53:16 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 17:53:16 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 17:53:16 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 17:53:16 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 17:53:16 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 17:53:16 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 17:53:16 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 17:53:16 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 17:53:16 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 17:53:16 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 17:53:16 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 17:53:16 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-05 17:53:16 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 17:53:16 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 17:53:16 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (43be2fcd-2b0c-4a44-8833-39d61e0207e8)
+2025-08-05 17:53:16 - config - INFO - base.py:102 - execute() - Starting execution of agent analysis
+2025-08-05 17:53:16 - config - INFO - base.py:212 - log() - Generating analysis plan with LLM...
+2025-08-05 17:53:16 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: phi4-mini:latest
+2025-08-05 17:53:16 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-05 17:53:16 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-05 17:53:16 - config - INFO - manager.py:442 - initialize_llm_backends() - Initialized Ollama backend
+2025-08-05 17:53:16 - config - INFO - manager.py:450 - initialize_llm_backends() - LLM initialization complete. Available backends: ['ollama']
+2025-08-05 17:53:16 - config - INFO - manager.py:451 - initialize_llm_backends() - Default backend: ollama
+2025-08-05 17:53:26 - config - INFO - base.py:212 - log() - Analysis plan created for numerical data
+2025-08-05 17:53:26 - config - INFO - base.py:212 - log() - Generating data insights with LLM...
+2025-08-05 17:53:48 - config - INFO - base.py:212 - log() - Data analysis insights generated.
+2025-08-05 17:53:48 - config - INFO - base.py:212 - log() - Analysis completed - generated 0 insights
+2025-08-05 17:53:48 - config - INFO - base.py:136 - execute() - Agent analysis completed successfully in 32.21s
+2025-08-05 17:58:23 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 17:58:23 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 17:58:23 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 17:58:23 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 17:58:23 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 17:58:23 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 17:58:23 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 17:58:23 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 17:58:23 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 17:58:23 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 17:58:23 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 17:58:23 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 17:58:23 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 17:58:23 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 17:58:23 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 17:58:23 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-05 17:58:23 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 17:58:23 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 17:58:23 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (352b454e-e60b-4b4e-9a7a-e8eb00a59795)
+2025-08-05 17:58:23 - config - INFO - base.py:102 - execute() - Starting execution of agent analysis
+2025-08-05 17:58:23 - config - ERROR - base.py:140 - execute() - Agent analysis failed: '\n  "analysis_type"'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/analysis_agent.py", line 74, in plan
+    prompt = load_prompt_template(
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/utils.py", line 558, in load_prompt_template
+    return template_content.format(**substitutions)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: '\n  "analysis_type"'
+2025-08-05 18:01:41 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 18:01:41 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 18:01:41 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 18:01:41 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 18:01:41 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 18:01:41 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 18:01:41 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 18:01:41 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 18:01:41 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 18:01:41 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 18:01:41 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 18:01:41 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 18:01:41 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 18:01:41 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 18:01:41 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 18:01:41 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-05 18:01:41 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 18:01:41 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 18:01:41 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (c79327f7-f819-4953-9fcd-342ca2bca231)
+2025-08-05 18:01:41 - config - INFO - base.py:102 - execute() - Starting execution of agent analysis
+2025-08-05 18:01:41 - config - INFO - base.py:212 - log() - Generating analysis plan with LLM...
+2025-08-05 18:01:41 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: phi4-mini:latest
+2025-08-05 18:01:41 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-05 18:01:41 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-05 18:01:41 - config - INFO - manager.py:442 - initialize_llm_backends() - Initialized Ollama backend
+2025-08-05 18:01:41 - config - INFO - manager.py:450 - initialize_llm_backends() - LLM initialization complete. Available backends: ['ollama']
+2025-08-05 18:01:41 - config - INFO - manager.py:451 - initialize_llm_backends() - Default backend: ollama
+2025-08-05 18:01:55 - config - INFO - base.py:212 - log() - Analysis plan created for numerical data
+2025-08-05 18:01:55 - config - INFO - base.py:212 - log() - Generating data insights with LLM...
+2025-08-05 18:02:01 - config - INFO - base.py:212 - log() - Data analysis insights generated.
+2025-08-05 18:02:01 - config - INFO - base.py:212 - log() - Analysis completed - generated 0 insights
+2025-08-05 18:02:01 - config - INFO - base.py:136 - execute() - Agent analysis completed successfully in 19.86s

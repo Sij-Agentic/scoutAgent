@@ -8,15 +8,39 @@ from typing import Dict, Any, List, Optional, Union
 import json
 import statistics
 import re
+import time
 from collections import Counter, defaultdict
 from datetime import datetime
 import math
 
+import asyncio
 from agents.base import BaseAgent, AgentInput, AgentOutput
 from config import get_config
+from llm.utils import LLMAgentMixin, load_prompt_template
+
+def _extract_json(text: str) -> Optional[Dict[str, Any]]:
+    """Extracts the first valid JSON object from a string."""
+    # Look for a JSON block enclosed in ```json ... ```
+    match = re.search(r"```json\n(.*?)\n```", text, re.DOTALL)
+    if match:
+        text = match.group(1)
+    
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        # Fallback for cases where the JSON is not perfectly formed
+        start = text.find('{')
+        end = text.rfind('}')
+        if start != -1 and end != -1:
+            try:
+                return json.loads(text[start:end+1])
+            except json.JSONDecodeError:
+                return None
+    return None
 
 
-class AnalysisAgent(BaseAgent):
+
+class AnalysisAgent(BaseAgent, LLMAgentMixin):
     """
     Analysis agent for data processing, pattern recognition, and insights.
     
@@ -30,11 +54,12 @@ class AnalysisAgent(BaseAgent):
     
     def __init__(self, name="analysis", **kwargs):
         super().__init__(name=name, **kwargs)
+        LLMAgentMixin.__init__(self, preferred_backend='ollama')
         self.config = get_config()
     
-    def plan(self, agent_input: AgentInput) -> Dict[str, Any]:
+    async def plan(self, agent_input: AgentInput) -> Dict[str, Any]:
         """
-        Plan analysis strategy based on input data.
+        Plan analysis strategy based on input data using an LLM.
         
         Args:
             agent_input: Contains data and analysis parameters
@@ -44,22 +69,34 @@ class AnalysisAgent(BaseAgent):
         """
         data = agent_input.data
         data_type = self._determine_data_type(data)
-        
-        plan = {
-            'data_type': data_type,
-            'analysis_type': agent_input.metadata.get('analysis_type', 'exploratory'),
-            'methodology': self._select_methodology(data_type),
-            'steps': self._create_analysis_steps(data_type),
-            'expected_outputs': self._define_outputs(data_type),
-            'validation_criteria': self._define_validation_criteria(data_type)
-        }
-        
-        self.log(f"Analysis plan created for {data_type} data")
+        data_sample = str(data)[:500]  # Provide a sample of the data
+
+        prompt = load_prompt_template(
+            "plan.prompt", 
+            agent_name=self.name,
+            substitutions={
+                'data_type': data_type,
+                'data_sample': data_sample
+            }
+        )
+
+        self.log("Generating analysis plan with LLM...")
+        response_str = await self.llm_generate(prompt)
+        plan = _extract_json(response_str)
+
+        if plan:
+            self.log(f"Analysis plan created for {data_type} data")
+            # Ensure data_type is in the plan for the act method
+            plan['data_type'] = data_type
+        else:
+            self.log("Failed to parse LLM response as JSON.", level='error')
+            plan = {"error": "Failed to generate a valid plan.", "data_type": data_type}
+
         return plan
     
-    def think(self, agent_input: AgentInput, plan: Dict[str, Any]) -> Dict[str, Any]:
+    async def think(self, agent_input: AgentInput, plan: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Analyze data characteristics and determine approach.
+        Analyze data characteristics and determine approach using an LLM.
         
         Args:
             agent_input: Original input
@@ -69,21 +106,29 @@ class AnalysisAgent(BaseAgent):
             Data insights and approach recommendations
         """
         data = agent_input.data
-        data_type = plan['data_type']
-        
-        insights = {
-            'data_characteristics': self._analyze_data_characteristics(data, data_type),
-            'quality_assessment': self._assess_data_quality(data, data_type),
-            'patterns_detected': self._detect_patterns(data, data_type),
-            'anomalies': self._detect_anomalies(data, data_type),
-            'approach_recommendations': self._recommend_approach(data, data_type),
-            'complexity': self._assess_complexity(data, data_type)
-        }
-        
-        self.log(f"Data analysis complete - complexity: {insights['complexity']}")
+        data_sample = str(data)[:1000]
+        plan_str = json.dumps(plan, indent=2)
+
+        prompt = load_prompt_template(
+            "think.prompt",
+            agent_name=self.name,
+            substitutions={
+                'data_sample': data_sample,
+                'plan': plan_str
+            }
+        )
+
+        self.log("Generating data insights with LLM...")
+        response_str = await self.llm_generate(prompt)
+        insights = _extract_json(response_str)
+        if not insights:
+            self.log("Failed to parse LLM response as JSON.", level='error')
+            insights = {}
+
+        self.log(f"Data analysis insights generated.")
         return insights
     
-    def act(self, agent_input: AgentInput, plan: Dict[str, Any], thoughts: Dict[str, Any]) -> Dict[str, Any]:
+    async def act(self, agent_input: AgentInput, plan: Dict[str, Any], thoughts: Dict[str, Any]) -> Dict[str, Any]:
         """
         Execute analysis based on plan and insights.
         
@@ -128,11 +173,15 @@ class AnalysisAgent(BaseAgent):
         results['recommendations'] = self._generate_recommendations(results['findings'])
         
         # Add metadata
+        quality_assessment = thoughts.get('quality_assessment', {})
         results['metadata'] = {
             'analysis_timestamp': datetime.now().isoformat(),
             'data_size': len(data) if hasattr(data, '__len__') else str(data).__len__(),
             'processing_time': time.time() - self.state.start_time,
-            'quality_score': thoughts['quality_assessment']['overall_score']
+            'quality_score': quality_assessment.get('overall_score', 0.0),
+            'quality_comments': quality_assessment.get('comments', 'N/A'),
+            'reasoning': thoughts.get('reasoning', 'N/A'),
+            'challenges': thoughts.get('challenges', [])
         }
         
         self.log(f"Analysis completed - generated {len(results['insights'])} insights")
@@ -759,16 +808,19 @@ class AnalysisAgent(BaseAgent):
 
 if __name__ == "__main__":
     # Test the analysis agent
-    agent = AnalysisAgent()
-    
-    test_data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25]
-    test_input = AgentInput(
-        data=test_data,
-        metadata={'analysis_type': 'exploratory'}
-    )
-    
-    result = agent.execute(test_input)
-    print(f"Analysis completed: {result.success}")
-    print(f"Data type: {result.result.get('data_type')}")
-    print(f"Insights: {len(result.result.get('insights', []))}")
-    print(f"Key findings: {result.result.get('findings', {}).keys()}")
+    async def main():
+        agent = AnalysisAgent()
+        
+        test_data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25]
+        test_input = AgentInput(
+            data=test_data,
+            metadata={'analysis_type': 'exploratory'}
+        )
+        
+        result = await agent.execute(test_input)
+        print(f"Analysis completed: {result.success}")
+        # The structure of the result will now depend on the LLM's output
+        # so we print it directly to inspect.
+        print(json.dumps(result.result, indent=2))
+
+    asyncio.run(main())

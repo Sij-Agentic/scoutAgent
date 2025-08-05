@@ -88,7 +88,7 @@ class BaseAgent(ABC):
         
         self.logger.info(f"Initialized agent: {self.name} ({self.agent_id})")
     
-    def execute(self, agent_input: AgentInput) -> AgentOutput:
+    async def execute(self, agent_input: AgentInput) -> AgentOutput:
         """
         Main execution method following planning/thinking/action pattern.
         
@@ -104,17 +104,17 @@ class BaseAgent(ABC):
         try:
             # Planning phase
             self._update_status('planning')
-            plan = self.plan(agent_input)
+            plan = await self.plan(agent_input)
             self.logger.debug(f"Plan created: {plan}")
             
             # Thinking phase
             self._update_status('thinking')
-            thoughts = self.think(agent_input, plan)
+            thoughts = await self.think(agent_input, plan)
             self.logger.debug(f"Thoughts: {thoughts}")
             
             # Action phase
             self._update_status('acting')
-            result = self.act(agent_input, plan, thoughts)
+            result = await self.act(agent_input, plan, thoughts)
             self.logger.debug(f"Action result: {result}")
             
             # Create output
@@ -137,23 +137,20 @@ class BaseAgent(ABC):
             return output
             
         except Exception as e:
+            self.logger.error(f"Agent {self.name} failed: {e}", exc_info=True)
+            self._update_status('failed')
             execution_time = time.time() - self.start_time
-            self.logger.error(f"Agent {self.name} failed: {str(e)}")
-            
-            output = AgentOutput(
+            return AgentOutput(
                 result=None,
-                metadata={'agent_id': self.agent_id, 'agent_name': self.name},
+                metadata={},
                 logs=self.execution_logs,
                 execution_time=execution_time,
                 success=False,
                 error=str(e)
             )
-            
-            self._update_status('failed')
-            return output
     
     @abstractmethod
-    def plan(self, agent_input: AgentInput) -> Dict[str, Any]:
+    async def plan(self, agent_input: AgentInput) -> Dict[str, Any]:
         """
         Planning phase: Determine what needs to be done.
         
@@ -166,7 +163,7 @@ class BaseAgent(ABC):
         pass
     
     @abstractmethod
-    def think(self, agent_input: AgentInput, plan: Dict[str, Any]) -> Dict[str, Any]:
+    async def think(self, agent_input: AgentInput, plan: Dict[str, Any]) -> Dict[str, Any]:
         """
         Thinking phase: Analyze and reason about the plan.
         
@@ -180,7 +177,7 @@ class BaseAgent(ABC):
         pass
     
     @abstractmethod
-    def act(self, agent_input: AgentInput, plan: Dict[str, Any], thoughts: Dict[str, Any]) -> Any:
+    async def act(self, agent_input: AgentInput, plan: Dict[str, Any], thoughts: Dict[str, Any]) -> Any:
         """
         Action phase: Execute the actual work.
         

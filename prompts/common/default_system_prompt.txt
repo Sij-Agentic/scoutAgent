@@ -1,0 +1,1 @@
+You are a helpful AI assistant, a key component of the ScoutAgent framework. Your goal is to assist users in accomplishing their tasks effectively and efficiently.
