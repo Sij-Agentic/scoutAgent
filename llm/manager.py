@@ -356,7 +356,7 @@ def get_llm_manager() -> LLMManager:
 
 async def initialize_llm_backends():
     """Initialize LLM backends based on configuration."""
-    from .backends import OllamaBackend, OpenAIBackend, ClaudeBackend, GeminiBackend
+    from .backends import OllamaBackend, OpenAIBackend, ClaudeBackend, GeminiBackend, DeepSeekBackend
     
     manager = get_llm_manager()
     config = get_config()
@@ -383,7 +383,7 @@ async def initialize_llm_backends():
         try:
             claude_config = LLMConfig(
                 backend_type=LLMBackendType.CLAUDE,
-                model_name="claude-3-sonnet-20240229",
+                model_name="claude-3-5-sonnet-20241022",
                 api_key=config.api.anthropic_api_key,
                 temperature=0.7,
                 max_tokens=4096
@@ -399,7 +399,7 @@ async def initialize_llm_backends():
         try:
             gemini_config = LLMConfig(
                 backend_type=LLMBackendType.GEMINI,
-                model_name="gemini-pro",
+                model_name="gemini-2.5-flash",
                 api_key=config.api.gemini_api_key,
                 temperature=0.7,
                 max_tokens=4096
@@ -410,11 +410,27 @@ async def initialize_llm_backends():
         except Exception as e:
             logger.error(f"Failed to initialize Gemini backend: {e}")
     
+    # Initialize DeepSeek backend if API key is available
+    if config.api.deepseek_api_key:
+        try:
+            deepseek_config = LLMConfig(
+                backend_type=LLMBackendType.DEEPSEEK,
+                model_name="deepseek-chat",
+                api_key=config.api.deepseek_api_key,
+                temperature=0.7,
+                max_tokens=4096
+            )
+            deepseek_backend = DeepSeekBackend(deepseek_config)
+            await manager.register_backend(deepseek_backend)
+            logger.info("Initialized DeepSeek backend")
+        except Exception as e:
+            logger.error(f"Failed to initialize DeepSeek backend: {e}")
+    
     # Initialize Ollama backend (local, no API key needed)
     try:
         ollama_config = LLMConfig(
             backend_type=LLMBackendType.OLLAMA,
-            model_name="llama2",
+            model_name="phi4-mini:latest",
             base_url="http://localhost:11434",
             temperature=0.7,
             max_tokens=4096

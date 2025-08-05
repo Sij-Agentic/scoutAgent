@@ -2,6 +2,7 @@
 Base classes and interfaces for the LLM abstraction layer.
 """
 
+import asyncio
 import time
 from abc import ABC, abstractmethod
 from typing import Dict, Any, Optional, List, Union
@@ -17,6 +18,7 @@ class LLMBackendType(Enum):
     OPENAI = "openai"
     CLAUDE = "claude"
     GEMINI = "gemini"
+    DEEPSEEK = "deepseek"
 
 
 @dataclass

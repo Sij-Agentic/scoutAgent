@@ -86,6 +86,7 @@ class APIConfig:
     serpapi_key: Optional[str] = None
     bing_api_key: Optional[str] = None
     gemini_api_key: Optional[str] = None
+    deepseek_api_key: Optional[str] = None
     huggingface_token: Optional[str] = None
 
 
@@ -294,6 +295,7 @@ class ConfigManager:
             f"{prefix}SERPAPI_KEY": ["api", "serpapi_key"],
             f"{prefix}BING_API_KEY": ["api", "bing_api_key"],
             f"{prefix}GEMINI_API_KEY": ["api", "gemini_api_key"],
+            f"{prefix}DEEPSEEK_API_KEY": ["api", "deepseek_api_key"],
             f"{prefix}HUGGINGFACE_TOKEN": ["api", "huggingface_token"],
         }
         
@@ -358,75 +360,6 @@ class ConfigManager:
             json.dump(config_dict, f, indent=2)
         
         self.logger.info("Configuration saved successfully")
-    
-    def create_env_template(self, template_file: str = ".env.template"):
-        """Create a template .env file."""
-        template_content = """# ScoutAgent Configuration Template
-# Copy this file to .env and fill in your values
-
-# Core Settings
-SCOUT_PROJECT_NAME=scout_agent
-SCOUT_ENVIRONMENT=development
-SCOUT_DEBUG=false
-
-# Logging
-SCOUT_LOG_LEVEL=INFO
-SCOUT_LOG_DIR=./logs
-SCOUT_MAX_FILE_SIZE=10485760
-SCOUT_BACKUP_COUNT=5
-SCOUT_ENABLE_TRACING=true
-SCOUT_TRACE_DIR=./logs/traces
-
-# DAG Settings
-SCOUT_DAG_MAX_DEPTH=10
-SCOUT_DAG_MAX_AGENTS=50
-SCOUT_DAG_TIMEOUT=300
-SCOUT_ENABLE_PARALLEL=true
-SCOUT_MAX_CONCURRENT=5
-SCOUT_RETRY_ATTEMPTS=3
-SCOUT_RETRY_DELAY=1
-
-# Agent Settings
-SCOUT_AGENT_MAX_ITERATIONS=10
-SCOUT_AGENT_TIMEOUT=60
-SCOUT_MEMORY_LIMIT_MB=512
-SCOUT_ENABLE_CACHING=true
-SCOUT_CACHE_TTL=3600
-
-# Search Settings
-SCOUT_SEARCH_MAX_RESULTS=100
-SCOUT_RATE_LIMIT_DELAY=1.0
-SCOUT_USER_AGENT=ScoutAgent/1.0
-SCOUT_SEARCH_TIMEOUT=30
-SCOUT_MAX_RETRIES=3
-SCOUT_BACKOFF_FACTOR=0.3
-
-# Memory Settings
-SCOUT_MEMORY_BACKEND=local
-SCOUT_MEMORY_STORAGE_DIR=./memory
-SCOUT_MAX_ENTRIES=10000
-SCOUT_EMBEDDING_MODEL=all-MiniLM-L6-v2
-SCOUT_CHUNK_SIZE=512
-SCOUT_CHUNK_OVERLAP=50
-
-# API Keys (required for external services)
-SCOUT_OPENAI_API_KEY=
-SCOUT_ANTHROPIC_API_KEY=
-SCOUT_SERPAPI_KEY=
-SCOUT_BING_API_KEY=
-SCOUT_GEMINI_API_KEY=
-SCOUT_HUGGINGFACE_TOKEN=
-
-# Directories
-SCOUT_PROMPTS_DIR=./prompts
-SCOUT_DATA_DIR=./data
-SCOUT_OUTPUT_DIR=./output
-"""
-        
-        with open(template_file, 'w') as f:
-            f.write(template_content)
-        
-        self.logger.info(f"Environment template created: {template_file}")
 
 
 # Global configuration instance

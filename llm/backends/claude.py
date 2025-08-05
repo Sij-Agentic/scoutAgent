@@ -230,12 +230,13 @@ class ClaudeBackend(LLMBackend):
     def get_available_models(self) -> List[str]:
         """Get list of available Claude models."""
         return [
-            "claude-3-opus-20240229",
-            "claude-3-sonnet-20240229",
             "claude-3-haiku-20240307",
-            "claude-2.1",
-            "claude-2.0",
-            "claude-instant-1.2"
+            "claude-3-5-sonnet-20240620",
+            "claude-3-5-haiku-20241022",
+            "claude-3-5-sonnet-20241022",
+            "claude-3-7-sonnet-20250219",
+            "claude-sonnet-4-2025051",
+            "claude-opus-4-20250514"
         ]
     
     async def cleanup(self):

@@ -212,8 +212,9 @@ class GeminiBackend(LLMBackend):
     def get_available_models(self) -> List[str]:
         """Get list of available Gemini models."""
         return [
-            "gemini-pro",
-            "gemini-pro-vision",
+            "gemini-2.5-flash",
+            "gemini-2.5-pro", 
+            "gemini-2.5-flash-lite",
             "gemini-1.5-pro",
             "gemini-1.5-flash"
         ]

@@ -1,0 +1,136 @@
+2025-08-05 16:05:36 - config - INFO - base.py:284 - __init__() - AgentRegistry initialized
+2025-08-05 16:05:36 - config - INFO - base.py:304 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 16:05:36 - config - INFO - base.py:306 - register_agent() - Registered agent alias: research
+2025-08-05 16:05:36 - config - INFO - base.py:304 - register_agent() - Registered agent: CodeAgent
+2025-08-05 16:05:36 - config - INFO - base.py:306 - register_agent() - Registered agent alias: code
+2025-08-05 16:05:36 - config - INFO - base.py:304 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 16:05:36 - config - INFO - base.py:306 - register_agent() - Registered agent alias: analysis
+2025-08-05 16:05:36 - config - INFO - base.py:304 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 16:05:36 - config - INFO - base.py:306 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 16:05:36 - config - INFO - base.py:304 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 16:05:36 - config - INFO - base.py:306 - register_agent() - Registered agent alias: builder
+2025-08-05 16:05:36 - config - INFO - base.py:304 - register_agent() - Registered agent: WriterAgent
+2025-08-05 16:05:36 - config - INFO - base.py:306 - register_agent() - Registered agent alias: writer
+2025-08-05 16:05:36 - config - INFO - base.py:304 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 16:05:36 - config - INFO - base.py:306 - register_agent() - Registered agent alias: memory
+2025-08-05 16:05:36 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 16:05:36 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 16:05:38 - config - INFO - openai.py:48 - initialize() - OpenAI backend initialized with model: gpt-4
+2025-08-05 16:05:38 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: openai
+2025-08-05 16:05:38 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-05 16:05:38 - config - INFO - manager.py:377 - initialize_llm_backends() - Initialized OpenAI backend
+2025-08-05 16:05:39 - config - ERROR - claude.py:52 - initialize() - Failed to initialize Claude backend: Model claude-3-sonnet-20240229 not found
+2025-08-05 16:05:39 - config - ERROR - manager.py:58 - register_backend() - Failed to initialize backend: claude
+2025-08-05 16:05:39 - config - INFO - manager.py:393 - initialize_llm_backends() - Initialized Claude backend
+2025-08-05 16:05:40 - config - ERROR - gemini.py:68 - initialize() - Failed to initialize Gemini backend: Model gemini-pro not found
+2025-08-05 16:05:40 - config - ERROR - manager.py:58 - register_backend() - Failed to initialize backend: gemini
+2025-08-05 16:05:40 - config - INFO - manager.py:409 - initialize_llm_backends() - Initialized Gemini backend
+2025-08-05 16:05:45 - config - INFO - deepseek.py:50 - initialize() - DeepSeek backend initialized with model: deepseek-chat
+2025-08-05 16:05:45 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: deepseek
+2025-08-05 16:05:45 - config - INFO - manager.py:425 - initialize_llm_backends() - Initialized DeepSeek backend
+2025-08-05 16:05:45 - config - INFO - manager.py:444 - initialize_llm_backends() - Ollama not available, skipping registration
+2025-08-05 16:05:45 - config - INFO - manager.py:450 - initialize_llm_backends() - LLM initialization complete. Available backends: ['openai', 'deepseek']
+2025-08-05 16:05:45 - config - INFO - manager.py:451 - initialize_llm_backends() - Default backend: openai
+2025-08-05 16:05:54 - config - WARNING - base.py:157 - _retry_with_backoff() - Attempt 1 failed, retrying in 1.0s: Error code: 400 - {'error': {'message': "Invalid 'max_tokens': integer below minimum value. Expected a value >= 1, but got -1 instead.", 'type': 'invalid_request_error', 'param': 'max_tokens', 'code': 'integer_below_min_value'}}
+2025-08-05 16:05:54 - config - ERROR - openai.py:140 - generate() - Error generating response: name 'asyncio' is not defined
+2025-08-05 16:05:54 - config - ERROR - manager.py:179 - generate() - Error generating response with openai: OpenAI generation failed: name 'asyncio' is not defined
+2025-08-05 16:06:28 - config - INFO - base.py:89 - __init__() - Initialized agent: enhanced_gap_finder (ad5e23f1-5388-4041-bad3-34b93cd6ffb1)
+2025-08-05 16:06:28 - config - INFO - base.py:102 - execute() - Starting execution of agent enhanced_gap_finder
+2025-08-05 16:06:28 - config - INFO - base.py:136 - execute() - Agent enhanced_gap_finder completed successfully in 0.00s
+2025-08-05 16:06:46 - config - WARNING - base.py:157 - _retry_with_backoff() - Attempt 1 failed, retrying in 1.0s: Failed to deserialize the JSON body into the target type: max_tokens: invalid value: integer `-1`, expected u32 at line 1 column 86
+2025-08-05 16:06:46 - config - ERROR - deepseek.py:142 - generate() - Error generating response: name 'asyncio' is not defined
+2025-08-05 16:06:46 - config - ERROR - manager.py:179 - generate() - Error generating response with deepseek: DeepSeek generation failed: name 'asyncio' is not defined
+2025-08-05 16:07:45 - config - INFO - base.py:89 - __init__() - Initialized agent: enhanced_gap_finder (aa92153c-c7aa-49e9-94b2-10160c469e69)
+2025-08-05 16:07:45 - config - INFO - base.py:102 - execute() - Starting execution of agent enhanced_gap_finder
+2025-08-05 16:07:45 - config - INFO - base.py:136 - execute() - Agent enhanced_gap_finder completed successfully in 0.00s
+2025-08-05 16:07:46 - config - INFO - manager.py:309 - _stop_health_monitoring() - Stopped LLM backend health monitoring
+2025-08-05 16:24:08 - config - INFO - base.py:284 - __init__() - AgentRegistry initialized
+2025-08-05 16:24:08 - config - INFO - base.py:304 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 16:24:08 - config - INFO - base.py:306 - register_agent() - Registered agent alias: research
+2025-08-05 16:24:08 - config - INFO - base.py:304 - register_agent() - Registered agent: CodeAgent
+2025-08-05 16:24:08 - config - INFO - base.py:306 - register_agent() - Registered agent alias: code
+2025-08-05 16:24:08 - config - INFO - base.py:304 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 16:24:08 - config - INFO - base.py:306 - register_agent() - Registered agent alias: analysis
+2025-08-05 16:24:08 - config - INFO - base.py:304 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 16:24:08 - config - INFO - base.py:306 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 16:24:08 - config - INFO - base.py:304 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 16:24:08 - config - INFO - base.py:306 - register_agent() - Registered agent alias: builder
+2025-08-05 16:24:08 - config - INFO - base.py:304 - register_agent() - Registered agent: WriterAgent
+2025-08-05 16:24:08 - config - INFO - base.py:306 - register_agent() - Registered agent alias: writer
+2025-08-05 16:24:08 - config - INFO - base.py:304 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 16:24:08 - config - INFO - base.py:306 - register_agent() - Registered agent alias: memory
+2025-08-05 16:30:44 - config - INFO - base.py:284 - __init__() - AgentRegistry initialized
+2025-08-05 16:30:44 - config - INFO - base.py:304 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 16:30:44 - config - INFO - base.py:306 - register_agent() - Registered agent alias: research
+2025-08-05 16:30:44 - config - INFO - base.py:304 - register_agent() - Registered agent: CodeAgent
+2025-08-05 16:30:44 - config - INFO - base.py:306 - register_agent() - Registered agent alias: code
+2025-08-05 16:30:44 - config - INFO - base.py:304 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 16:30:44 - config - INFO - base.py:306 - register_agent() - Registered agent alias: analysis
+2025-08-05 16:30:44 - config - INFO - base.py:304 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 16:30:44 - config - INFO - base.py:306 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 16:30:44 - config - INFO - base.py:304 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 16:30:44 - config - INFO - base.py:306 - register_agent() - Registered agent alias: builder
+2025-08-05 16:30:44 - config - INFO - base.py:304 - register_agent() - Registered agent: WriterAgent
+2025-08-05 16:30:44 - config - INFO - base.py:306 - register_agent() - Registered agent alias: writer
+2025-08-05 16:30:44 - config - INFO - base.py:304 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 16:30:44 - config - INFO - base.py:306 - register_agent() - Registered agent alias: memory
+2025-08-05 16:31:05 - config - INFO - base.py:284 - __init__() - AgentRegistry initialized
+2025-08-05 16:31:05 - config - INFO - base.py:304 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 16:31:05 - config - INFO - base.py:306 - register_agent() - Registered agent alias: research
+2025-08-05 16:31:05 - config - INFO - base.py:304 - register_agent() - Registered agent: CodeAgent
+2025-08-05 16:31:05 - config - INFO - base.py:306 - register_agent() - Registered agent alias: code
+2025-08-05 16:31:05 - config - INFO - base.py:304 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 16:31:05 - config - INFO - base.py:306 - register_agent() - Registered agent alias: analysis
+2025-08-05 16:31:05 - config - INFO - base.py:304 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 16:31:05 - config - INFO - base.py:306 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 16:31:05 - config - INFO - base.py:304 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 16:31:05 - config - INFO - base.py:306 - register_agent() - Registered agent alias: builder
+2025-08-05 16:31:05 - config - INFO - base.py:304 - register_agent() - Registered agent: WriterAgent
+2025-08-05 16:31:05 - config - INFO - base.py:306 - register_agent() - Registered agent alias: writer
+2025-08-05 16:31:05 - config - INFO - base.py:304 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 16:31:05 - config - INFO - base.py:306 - register_agent() - Registered agent alias: memory
+2025-08-05 16:31:44 - config - INFO - base.py:284 - __init__() - AgentRegistry initialized
+2025-08-05 16:31:44 - config - INFO - base.py:304 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 16:31:44 - config - INFO - base.py:306 - register_agent() - Registered agent alias: research
+2025-08-05 16:31:44 - config - INFO - base.py:304 - register_agent() - Registered agent: CodeAgent
+2025-08-05 16:31:44 - config - INFO - base.py:306 - register_agent() - Registered agent alias: code
+2025-08-05 16:31:44 - config - INFO - base.py:304 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 16:31:44 - config - INFO - base.py:306 - register_agent() - Registered agent alias: analysis
+2025-08-05 16:31:44 - config - INFO - base.py:304 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 16:31:44 - config - INFO - base.py:306 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 16:31:44 - config - INFO - base.py:304 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 16:31:44 - config - INFO - base.py:306 - register_agent() - Registered agent alias: builder
+2025-08-05 16:31:44 - config - INFO - base.py:304 - register_agent() - Registered agent: WriterAgent
+2025-08-05 16:31:44 - config - INFO - base.py:306 - register_agent() - Registered agent alias: writer
+2025-08-05 16:31:44 - config - INFO - base.py:304 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 16:31:44 - config - INFO - base.py:306 - register_agent() - Registered agent alias: memory
+2025-08-05 16:31:44 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 16:31:44 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 16:31:46 - config - INFO - openai.py:48 - initialize() - OpenAI backend initialized with model: gpt-4
+2025-08-05 16:31:46 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: openai
+2025-08-05 16:31:46 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-05 16:31:46 - config - INFO - manager.py:377 - initialize_llm_backends() - Initialized OpenAI backend
+2025-08-05 16:31:46 - config - ERROR - manager.py:395 - initialize_llm_backends() - Failed to initialize Claude backend: Anthropic library not available. Install with: pip install anthropic
+2025-08-05 16:31:46 - config - ERROR - manager.py:411 - initialize_llm_backends() - Failed to initialize Gemini backend: Google GenerativeAI library not available. Install with: pip install google-generativeai
+2025-08-05 16:31:50 - config - INFO - deepseek.py:50 - initialize() - DeepSeek backend initialized with model: deepseek-chat
+2025-08-05 16:31:50 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: deepseek
+2025-08-05 16:31:50 - config - INFO - manager.py:425 - initialize_llm_backends() - Initialized DeepSeek backend
+2025-08-05 16:31:50 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: phi4-mini:latest
+2025-08-05 16:31:50 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-05 16:31:50 - config - INFO - manager.py:442 - initialize_llm_backends() - Initialized Ollama backend
+2025-08-05 16:31:50 - config - INFO - manager.py:450 - initialize_llm_backends() - LLM initialization complete. Available backends: ['openai', 'deepseek', 'ollama']
+2025-08-05 16:31:50 - config - INFO - manager.py:451 - initialize_llm_backends() - Default backend: openai
+2025-08-05 16:31:58 - config - WARNING - base.py:158 - _retry_with_backoff() - Attempt 1 failed, retrying in 1.0s: Error code: 400 - {'error': {'message': "Invalid 'max_tokens': integer below minimum value. Expected a value >= 1, but got -1 instead.", 'type': 'invalid_request_error', 'param': 'max_tokens', 'code': 'integer_below_min_value'}}
+2025-08-05 16:32:00 - config - WARNING - base.py:158 - _retry_with_backoff() - Attempt 2 failed, retrying in 2.0s: Error code: 400 - {'error': {'message': "Invalid 'max_tokens': integer below minimum value. Expected a value >= 1, but got -1 instead.", 'type': 'invalid_request_error', 'param': 'max_tokens', 'code': 'integer_below_min_value'}}
+2025-08-05 16:32:03 - config - ERROR - base.py:161 - _retry_with_backoff() - All 3 attempts failed
+2025-08-05 16:32:03 - config - ERROR - openai.py:140 - generate() - Error generating response: Error code: 400 - {'error': {'message': "Invalid 'max_tokens': integer below minimum value. Expected a value >= 1, but got -1 instead.", 'type': 'invalid_request_error', 'param': 'max_tokens', 'code': 'integer_below_min_value'}}
+2025-08-05 16:32:03 - config - ERROR - manager.py:179 - generate() - Error generating response with openai: OpenAI generation failed: Error code: 400 - {'error': {'message': "Invalid 'max_tokens': integer below minimum value. Expected a value >= 1, but got -1 instead.", 'type': 'invalid_request_error', 'param': 'max_tokens', 'code': 'integer_below_min_value'}}
+2025-08-05 16:32:31 - config - INFO - base.py:89 - __init__() - Initialized agent: EnhancedGapFinderAgent (ea9fb529-9704-474a-9c9a-627d25835b87)
+2025-08-05 16:32:50 - config - WARNING - base.py:158 - _retry_with_backoff() - Attempt 1 failed, retrying in 1.0s: Failed to deserialize the JSON body into the target type: max_tokens: invalid value: integer `-1`, expected u32 at line 1 column 94
+2025-08-05 16:32:52 - config - WARNING - base.py:158 - _retry_with_backoff() - Attempt 2 failed, retrying in 2.0s: Failed to deserialize the JSON body into the target type: max_tokens: invalid value: integer `-1`, expected u32 at line 1 column 94
+2025-08-05 16:32:55 - config - ERROR - base.py:161 - _retry_with_backoff() - All 3 attempts failed
+2025-08-05 16:32:55 - config - ERROR - deepseek.py:142 - generate() - Error generating response: Failed to deserialize the JSON body into the target type: max_tokens: invalid value: integer `-1`, expected u32 at line 1 column 94
+2025-08-05 16:32:55 - config - ERROR - manager.py:179 - generate() - Error generating response with deepseek: DeepSeek generation failed: Failed to deserialize the JSON body into the target type: max_tokens: invalid value: integer `-1`, expected u32 at line 1 column 94
+2025-08-05 16:33:58 - config - INFO - base.py:89 - __init__() - Initialized agent: EnhancedGapFinderAgent (aa13ca92-cd0d-46f7-a58a-decdf5485fe8)
+2025-08-05 16:34:40 - config - INFO - base.py:89 - __init__() - Initialized agent: EnhancedGapFinderAgent (6436fcac-2721-4f90-b0c3-7df9afe8aa86)
+2025-08-05 16:34:41 - config - INFO - manager.py:309 - _stop_health_monitoring() - Stopped LLM backend health monitoring
