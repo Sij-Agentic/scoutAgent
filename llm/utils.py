@@ -54,6 +54,12 @@ class LLMAgentMixin:
         self.llm_logger = get_logger(f"llm.agent.{getattr(self, 'name', 'unknown')}")
         self._llm_manager = None
     
+    def initialize_llm(self):
+        """Initialize LLM capabilities synchronously."""
+        # This method is called during agent construction
+        # Actual LLM manager initialization happens lazily in _ensure_llm_initialized
+        pass
+    
     async def _ensure_llm_initialized(self):
         """Ensure LLM manager is initialized."""
         if self._llm_manager is None:

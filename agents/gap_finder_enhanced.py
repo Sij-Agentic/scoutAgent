@@ -28,10 +28,71 @@ class EnhancedGapFinderAgent(BaseAgent, LLMAgentMixin):
     - Assess market opportunities with AI-powered analysis
     """
     
-    def __init__(self, agent_id: str = None):
+    async def execute(self, agent_input: AgentInput) -> AgentOutput:
+        """Async execute method to handle async plan/think/act methods."""
+        import time
+        self.start_time = time.time()
+        self.logger.info(f"Starting execution of agent {self.name}")
+        
+        try:
+            # Planning phase
+            self._update_status('planning')
+            plan = await self.plan(agent_input)
+            self.logger.debug(f"Plan created: {plan}")
+            
+            # Thinking phase
+            self._update_status('thinking')
+            thoughts = await self.think(agent_input, plan)
+            self.logger.debug(f"Thoughts: {thoughts}")
+            
+            # Action phase
+            self._update_status('acting')
+            result = await self.act(agent_input, plan, thoughts)
+            self.logger.debug(f"Action result: {result}")
+            
+            # Create output
+            execution_time = time.time() - self.start_time
+            output = AgentOutput(
+                result=result,
+                metadata={
+                    'agent_id': self.agent_id,
+                    'agent_name': self.name,
+                    'plan': plan,
+                    'thoughts': thoughts
+                },
+                logs=self.execution_logs,
+                execution_time=execution_time,
+                success=True
+            )
+            
+            self._update_status('completed')
+            self.logger.info(f"Agent {self.name} completed successfully in {execution_time:.2f}s")
+            return output
+            
+        except Exception as e:
+            execution_time = time.time() - self.start_time
+            error_msg = f"Agent {self.name} failed: {str(e)}"
+            self.logger.error(error_msg)
+            self._update_status('failed')
+            
+            output = AgentOutput(
+                result=None,
+                metadata={
+                    'agent_id': self.agent_id,
+                    'agent_name': self.name,
+                    'error': str(e)
+                },
+                logs=self.execution_logs,
+                execution_time=execution_time,
+                success=False
+            )
+            return output
+    
+    def __init__(self, config: Optional[Any] = None):
         """Initialize the enhanced gap finder agent."""
-        super().__init__(name="enhanced_gap_finder", agent_id=agent_id)
-        self.config = get_config()
+        super().__init__(name="EnhancedGapFinderAgent", config=config)
+        self.description = "AI-powered market gap analysis with LLM insights"
+        self.initialize_llm()
     
     async def plan(self, agent_input: AgentInput) -> Dict[str, Any]:
         """Plan the enhanced market gap analysis process."""

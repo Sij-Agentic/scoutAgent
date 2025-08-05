@@ -7,7 +7,7 @@ including Ollama, OpenAI, Claude (Anthropic), and Gemini.
 
 from .base import LLMBackend, LLMRequest, LLMResponse, LLMConfig
 from .manager import LLMManager
-from .backends import OllamaBackend, OpenAIBackend, ClaudeBackend, GeminiBackend
+from .backends import OllamaBackend, OpenAIBackend, ClaudeBackend, GeminiBackend, DeepSeekBackend
 
 __all__ = [
     'LLMBackend',
@@ -18,5 +18,6 @@ __all__ = [
     'OllamaBackend',
     'OpenAIBackend', 
     'ClaudeBackend',
-    'GeminiBackend'
+    'GeminiBackend',
+    'DeepSeekBackend'
 ]

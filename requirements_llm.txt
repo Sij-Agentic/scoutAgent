@@ -2,28 +2,28 @@
 # Install with: pip install -r requirements_llm.txt
 
 # Core async HTTP client for Ollama backend
-aiohttp>=3.8.0
+aiohttp
 
 # OpenAI backend
-openai>=1.0.0
+openai
 
 # Anthropic Claude backend  
-anthropic>=0.7.0
+anthropic
 
 # Google Gemini backend
-google-generativeai>=0.3.0
+google-generativeai
 
-# Optional: Enhanced JSON parsing and validation
-pydantic>=2.0.0
+# Enhanced JSON parsing and validation
+pydantic
 
-# Optional: Better async utilities
-asyncio-throttle>=1.0.0
+# Better async utilities
+asyncio-throttle
 
-# Optional: Rate limiting
-aiolimiter>=1.1.0
+# Rate limiting
+aiolimiter
 
-# Optional: Retry utilities with exponential backoff
-tenacity>=8.0.0
+# Retry utilities with exponential backoff
+tenacity
 
-# Optional: Better logging for LLM operations
-structlog>=23.0.0
+# Better logging for LLM operations
+structlog

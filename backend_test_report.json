@@ -1,0 +1,171 @@
+{
+  "timestamp": 1754408081.556911,
+  "test_summary": {
+    "total_backends": 3,
+    "successful_backends": 3,
+    "overall_success_rate": 1.0
+  },
+  "backend_results": {
+    "openai": {
+      "backend_name": "openai",
+      "initialization_success": true,
+      "health_check_success": true,
+      "basic_generation_success": true,
+      "streaming_success": true,
+      "error_handling_success": true,
+      "success_rate": 1.0,
+      "performance_metrics": {
+        "avg_response_time": 0.0,
+        "basic_generation_time": 4.429235935211182,
+        "basic_generation_tokens": 96,
+        "streaming_time": 2.9213829040527344,
+        "streaming_chunks": 51
+      },
+      "errors": [
+        "agent_integration: 'EnhancedGapFinderAgent' object has no attribute 'initialize_llm'"
+      ],
+      "responses": {
+        "basic_generation": {
+          "content": "Artificial Intelligence (AI) refers to the simulation of human intelligence processes by machines, especially computer systems. These processes include learning (the acquisition of information and rul...",
+          "response_time": 4.429235935211182,
+          "length": 514
+        },
+        "streaming_generation": {
+          "content": "Once upon a time, in a bustling city filled with towering sky-scrapers and vibrant technology, a unique robot named Arte was created. Arte was not designed for routine tasks or complicated calculation...",
+          "response_time": 2.9213829040527344,
+          "length": 266
+        },
+        "prompt_creative": {
+          "content": "Once upon a time, in the advanced city of Tachyon, where technology ruled, there lived a robot named Arti. Arti was a service robot, designed to assist humans in their daily chores. However, Arti was ...",
+          "response_time": 8.660658121109009,
+          "length": 976
+        },
+        "prompt_analytical": {
+          "content": "Pros of Remote Work for Software Development Teams:\n\n1. Flexibility: Remote work allows developers to work when they are most productive. Some people work better at night, others in the early morning....",
+          "response_time": 8.192375898361206,
+          "length": 1066
+        },
+        "prompt_technical": {
+          "content": "Machine learning is a type of artificial intelligence (AI) that allows computer systems to learn from experience, adjust to new inputs and perform tasks without being explicitly programed. It's like w...",
+          "response_time": 4.871930122375488,
+          "length": 613
+        },
+        "prompt_complex": {
+          "content": "Designing a system architecture for a scalable e-commerce platform that can handle millions of users requires consideration of several factors including the application's user interface, the database ...",
+          "response_time": 7.224264144897461,
+          "length": 1005
+        }
+      }
+    },
+    "deepseek": {
+      "backend_name": "deepseek",
+      "initialization_success": true,
+      "health_check_success": true,
+      "basic_generation_success": true,
+      "streaming_success": true,
+      "error_handling_success": true,
+      "success_rate": 1.0,
+      "performance_metrics": {
+        "avg_response_time": 0.0,
+        "basic_generation_time": 8.926176071166992,
+        "basic_generation_tokens": 108,
+        "streaming_time": 7.518062114715576,
+        "streaming_chunks": 51
+      },
+      "errors": [
+        "agent_integration: 'EnhancedGapFinderAgent' object has no attribute 'initialize_llm'"
+      ],
+      "responses": {
+        "basic_generation": {
+          "content": "**Artificial Intelligence (AI)** refers to the simulation of human intelligence in machines, enabling them to perform tasks that typically require human cognition. These tasks include learning, reason...",
+          "response_time": 8.926176071166992,
+          "length": 518
+        },
+        "streaming_generation": {
+          "content": "**The Painter in the Machine**  \n\nIn a quiet corner of an artist\u2019s studio, a small robot named PX-7 whirred to life. Its purpose? To assist with mixing paints and cleaning brushes. But PX-7",
+          "response_time": 7.518062114715576,
+          "length": 189
+        },
+        "prompt_creative": {
+          "content": "**The Painter\u2019s Code**  \n\nIn a quiet corner of an old repair shop, a decommissioned service bot named **CR-7N** (pronounced \"Crayon\") powered on for the first time in years. Its new owner, an elderly ...",
+          "response_time": 15.620488166809082,
+          "length": 784
+        },
+        "prompt_analytical": {
+          "content": "Remote work has become increasingly common in software development, offering both advantages and challenges. Below is a balanced analysis of its pros and cons:\n\n### **Pros of Remote Work for Software ...",
+          "response_time": 15.30978274345398,
+          "length": 984
+        },
+        "prompt_technical": {
+          "content": "Sure! Here's a simple explanation of **machine learning (ML)**:\n\n**Machine learning is a way for computers to learn from data and make decisions or predictions without being explicitly programmed for ...",
+          "response_time": 18.776556730270386,
+          "length": 917
+        },
+        "prompt_complex": {
+          "content": "Designing a scalable e-commerce platform capable of handling millions of users requires a robust, distributed, and fault-tolerant architecture. Below is a high-level system architecture that leverages...",
+          "response_time": 13.180421113967896,
+          "length": 919
+        }
+      }
+    },
+    "ollama": {
+      "backend_name": "ollama",
+      "initialization_success": true,
+      "health_check_success": true,
+      "basic_generation_success": true,
+      "streaming_success": true,
+      "error_handling_success": true,
+      "success_rate": 1.0,
+      "performance_metrics": {
+        "avg_response_time": 0.0,
+        "basic_generation_time": 17.497816801071167,
+        "basic_generation_tokens": 112,
+        "streaming_time": 1.28529691696167,
+        "streaming_chunks": 51
+      },
+      "errors": [
+        "agent_integration: 'EnhancedGapFinderAgent' object has no attribute 'initialize_llm'"
+      ],
+      "responses": {
+        "basic_generation": {
+          "content": "Artificial Intelligence, or AI for short, refers to the simulation of human intelligence processes by machines. These systems are designed and trained using machine learning algorithms that allow them...",
+          "response_time": 17.497816801071167,
+          "length": 562
+        },
+        "streaming_generation": {
+          "content": "In the bustling city of Technopolis, there stood an art studio with windows that gleamed like jewels amidst steel skyscrapers. Inside this haven for creativity was ARIA-21X \u2013 not your ordinary artist ...",
+          "response_time": 1.28529691696167,
+          "length": 257
+        },
+        "prompt_creative": {
+          "content": "Once upon a time, in the bustling city of Circuitville lived an inquisitive android named Pixel. Unlike his fellow robots who were busy with their tasks or playing chess at RoboPark, Pixel had one pec...",
+          "response_time": 4.862172365188599,
+          "length": 1039
+        },
+        "prompt_analytical": {
+          "content": "Pros:\n\n1. Flexibility \u2013 Remote workers can often set their own schedules, which may lead to increased productivity as they are able to manage personal responsibilities alongside professional ones.\n2. ...",
+          "response_time": 4.879674911499023,
+          "length": 1197
+        },
+        "prompt_technical": {
+          "content": "Machine Learning is like teaching a computer to learn from experience. Imagine you have lots of pictures, and your job is sorting them into groups based on what they contain\u2014like cats or dogs\u2014but inst...",
+          "response_time": 4.833567380905151,
+          "length": 1028
+        },
+        "prompt_complex": {
+          "content": "Designing an efficient and robust System Architecture (SA) is crucial to ensure seamless operations, high performance under pressure while scaling up. A good starting point would be adopting the Micro...",
+          "response_time": 5.324643135070801,
+          "length": 1168
+        }
+      }
+    }
+  },
+  "configuration": {
+    "available_backends": [
+      "openai",
+      "deepseek",
+      "ollama"
+    ],
+    "default_backend": "openai"
+  }
+}
