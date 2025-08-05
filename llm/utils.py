@@ -53,7 +53,76 @@ class LLMAgentMixin:
         super().__init__(*args, **kwargs)
         self.llm_logger = get_logger(f"llm.agent.{getattr(self, 'name', 'unknown')}")
         self._llm_manager = None
+        
+        # Agent-specific LLM preferences
+        self.preferred_backend = None
+        self.task_backend_preferences = {}
+        self._setup_agent_llm_preferences()
     
+    def _setup_agent_llm_preferences(self):
+        """Setup agent-specific LLM backend preferences based on agent type."""
+        agent_name = getattr(self, 'name', '').lower()
+        
+        # Set agent-specific preferences based on agent name
+        if 'code' in agent_name or 'builder' in agent_name:
+            self.preferred_backend = 'deepseek'
+            self.task_backend_preferences = {
+                'code_generation': 'deepseek',
+                'code_review': 'deepseek',
+                'debugging': 'deepseek',
+                'technical_analysis': 'deepseek'
+            }
+        elif 'writer' in agent_name or 'content' in agent_name:
+            self.preferred_backend = 'claude'
+            self.task_backend_preferences = {
+                'creative_writing': 'claude',
+                'content_creation': 'claude',
+                'storytelling': 'claude',
+                'editing': 'claude'
+            }
+        elif 'analysis' in agent_name or 'research' in agent_name:
+            self.preferred_backend = 'openai'
+            self.task_backend_preferences = {
+                'data_analysis': 'openai',
+                'research': 'openai',
+                'reasoning': 'openai',
+                'planning': 'openai'
+            }
+        elif 'gap' in agent_name or 'finder' in agent_name:
+            self.preferred_backend = 'claude'  # Good for market analysis
+            self.task_backend_preferences = {
+                'market_analysis': 'claude',
+                'competitive_analysis': 'openai',
+                'trend_analysis': 'gemini',
+                'quick_insights': 'gemini'
+            }
+        else:
+            # Default to most reliable backend
+            self.preferred_backend = 'openai'
+    
+    def set_preferred_backend(self, backend_type: str):
+        """Set the preferred backend for this agent."""
+        self.preferred_backend = backend_type
+        self.llm_logger.info(f"Agent {getattr(self, 'name', 'unknown')} preferred backend set to: {backend_type}")
+    
+    def set_task_backend(self, task_type: str, backend_type: str):
+        """Set preferred backend for specific task types."""
+        self.task_backend_preferences[task_type] = backend_type
+        self.llm_logger.info(f"Agent {getattr(self, 'name', 'unknown')} task '{task_type}' backend set to: {backend_type}")
+    
+    def get_optimal_backend(self, task_type: Optional[str] = None) -> Optional[str]:
+        """Get the optimal backend for a given task type."""
+        # 1. Check task-specific preference
+        if task_type and task_type in self.task_backend_preferences:
+            return self.task_backend_preferences[task_type]
+        
+        # 2. Check agent's preferred backend
+        if self.preferred_backend:
+            return self.preferred_backend
+        
+        # 3. Let manager decide
+        return None
+
     def initialize_llm(self):
         """Initialize LLM capabilities synchronously."""
         # This method is called during agent construction
@@ -72,23 +141,29 @@ class LLMAgentMixin:
     async def llm_generate(self, 
                           prompt: Union[str, AgentPrompt],
                           backend_type: Optional[str] = None,
+                          task_type: Optional[str] = None,
                           temperature: Optional[float] = None,
                           max_tokens: Optional[int] = None,
                           **kwargs) -> str:
         """
-        Generate text using LLM.
+        Generate text using LLM with intelligent backend selection.
         
         Args:
-            prompt: Text prompt or structured AgentPrompt
-            backend_type: Specific backend to use (optional)
-            temperature: Temperature override
-            max_tokens: Max tokens override
+            prompt: Text prompt or AgentPrompt object
+            backend_type: Specific backend to use (overrides all preferences)
+            task_type: Type of task for optimal backend selection
+            temperature: Sampling temperature
+            max_tokens: Maximum tokens to generate
             **kwargs: Additional parameters
             
         Returns:
             Generated text content
         """
         await self._ensure_llm_initialized()
+        
+        # Intelligent backend selection
+        if backend_type is None:
+            backend_type = self.get_optimal_backend(task_type)
         
         # Convert prompt to messages
         if isinstance(prompt, str):
@@ -110,7 +185,7 @@ class LLMAgentMixin:
             response = await self._llm_manager.generate(request, backend_type)
             
             if response.success:
-                self.llm_logger.debug(f"LLM generation successful: {len(response.content)} chars in {response.response_time:.2f}s")
+                self.llm_logger.debug(f"LLM generation successful with {backend_type or 'auto'}: {len(response.content)} chars in {response.response_time:.2f}s")
                 return response.content
             else:
                 self.llm_logger.error(f"LLM generation failed: {response.error}")
@@ -123,23 +198,29 @@ class LLMAgentMixin:
     async def llm_stream_generate(self,
                                  prompt: Union[str, AgentPrompt],
                                  backend_type: Optional[str] = None,
+                                 task_type: Optional[str] = None,
                                  temperature: Optional[float] = None,
                                  max_tokens: Optional[int] = None,
                                  **kwargs):
         """
-        Generate streaming text using LLM.
+        Generate streaming text using LLM with intelligent backend selection.
         
         Args:
-            prompt: Text prompt or structured AgentPrompt
-            backend_type: Specific backend to use (optional)
-            temperature: Temperature override
-            max_tokens: Max tokens override
+            prompt: Text prompt or AgentPrompt object
+            backend_type: Specific backend to use (overrides all preferences)
+            task_type: Type of task for optimal backend selection
+            temperature: Sampling temperature
+            max_tokens: Maximum tokens to generate
             **kwargs: Additional parameters
             
         Yields:
             Text chunks as they are generated
         """
         await self._ensure_llm_initialized()
+        
+        # Intelligent backend selection
+        if backend_type is None:
+            backend_type = self.get_optimal_backend(task_type)
         
         # Convert prompt to messages
         if isinstance(prompt, str):

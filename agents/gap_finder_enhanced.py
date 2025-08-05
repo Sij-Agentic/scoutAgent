@@ -92,6 +92,8 @@ class EnhancedGapFinderAgent(BaseAgent, LLMAgentMixin):
         """Initialize the enhanced gap finder agent."""
         super().__init__(name="EnhancedGapFinderAgent", config=config)
         self.description = "AI-powered market gap analysis with LLM insights"
+        # Initialize LLM capabilities after base initialization
+        LLMAgentMixin.__init__(self)
         self.initialize_llm()
     
     async def plan(self, agent_input: AgentInput) -> Dict[str, Any]:
