@@ -1,8 +1,28 @@
-Given the following request, create a detailed plan to write the code. The plan should outline the necessary functions, classes, and modules. Structure the plan in a clear, step-by-step format.
+You are a code agent tasked with analyzing, generating, debugging, or refactoring code. Given the following code and task type, create a detailed plan for how to approach this task.
 
-Request:
----
-{input_data}
----
+Code:
+```
+{code}
+```
 
-Your plan should be comprehensive enough for another developer to understand and implement.
+Task Type: {task_type}
+Language: {language}
+
+Create a detailed plan that outlines your approach to this {task_type} task. Consider the language-specific requirements, best practices, and potential challenges.
+
+Respond with a JSON object that includes the following fields:
+- "steps": An array of steps to complete the task
+- "focus_areas": Key aspects of the code to focus on
+- "tools_needed": Any tools or libraries that would be helpful
+- "expected_outcome": What the final result should look like
+
+Your response must be valid JSON. Format your response like this:
+
+```json
+{{
+  "steps": ["Step 1", "Step 2", ...],
+  "focus_areas": ["Area 1", "Area 2", ...],
+  "tools_needed": ["Tool 1", "Tool 2", ...],
+  "expected_outcome": "Description of expected outcome"
+}}
+```

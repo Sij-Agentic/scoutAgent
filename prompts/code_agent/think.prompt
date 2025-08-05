@@ -1,13 +1,42 @@
-Based on the following plan and request, elaborate on the implementation details. Discuss data structures, algorithms, potential edge cases, and any libraries or frameworks that should be used.
+You are a code agent tasked with analyzing code. Given the following code, task type, and plan, analyze the code and provide detailed thoughts about how to approach the task.
+
+Code:
+```
+{code}
+```
+
+Task Type: {task_type}
+Language: {language}
 
 Plan:
----
+```
 {plan}
----
+```
 
-Request:
----
-{input_data}
----
+Analyze the code and provide detailed insights. Consider:
+- Code structure and organization
+- Potential issues or bugs
+- Performance considerations
+- Best practices for the given language
+- Security concerns
+- Readability and maintainability
 
-Provide your thoughts on the optimal implementation strategy.
+Respond with a JSON object that includes the following fields:
+- "analysis": Detailed analysis of the code
+- "issues": Array of identified issues (each with "type", "description", and "severity")
+- "recommendations": Array of recommendations for improvement
+- "approach": Suggested approach for completing the task
+
+Your response must be valid JSON. Format your response like this:
+
+```json
+{{
+  "analysis": "Detailed analysis of the code...",
+  "issues": [
+    {{"type": "issue_type", "description": "Issue description", "severity": "high/medium/low"}},
+    ...
+  ],
+  "recommendations": ["Recommendation 1", "Recommendation 2", ...],
+  "approach": "Detailed approach description"
+}}
+```

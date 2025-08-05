@@ -1,0 +1,62 @@
+You are a code agent tasked with executing a code task. Given the following code, task type, plan, and analysis, execute the task and provide the results.
+
+Code:
+```
+{code}
+```
+
+Task Type: {task_type}
+Language: {language}
+
+Plan:
+```
+{plan}
+```
+
+Analysis:
+```
+{thoughts}
+```
+
+Based on the code, plan, and analysis, execute the {task_type} task. Your response should depend on the task type:
+
+For "analyze" tasks:
+- Provide a comprehensive analysis of the code
+- Highlight key issues and their solutions
+- Include code quality metrics
+
+For "generate" tasks:
+- Create the requested code according to requirements
+- Include comments explaining the implementation
+- Ensure the code follows best practices
+
+For "debug" tasks:
+- Identify and fix bugs in the code
+- Explain the root causes of the issues
+- Provide the corrected code
+
+For "refactor" tasks:
+- Improve the code structure and readability
+- Apply design patterns where appropriate
+- Optimize performance where possible
+
+Respond with a JSON object that includes the following fields:
+- "result": The main result of the task (analysis, generated code, debugged code, or refactored code)
+- "explanation": Detailed explanation of what was done
+- "improvements": Array of improvements made or suggested
+- "metrics": Any relevant metrics about the code (complexity, performance, etc.)
+
+Your response must be valid JSON. Format your response like this:
+
+```json
+{{
+  "result": "The main result of the task...",
+  "explanation": "Detailed explanation of what was done...",
+  "improvements": ["Improvement 1", "Improvement 2", ...],
+  "metrics": {{
+    "metric1": "value1",
+    "metric2": "value2",
+    ...
+  }}
+}}
+```

@@ -744,3 +744,615 @@ KeyError: '\n  "analysis_type"'
 2025-08-05 18:02:01 - config - INFO - base.py:212 - log() - Data analysis insights generated.
 2025-08-05 18:02:01 - config - INFO - base.py:212 - log() - Analysis completed - generated 0 insights
 2025-08-05 18:02:01 - config - INFO - base.py:136 - execute() - Agent analysis completed successfully in 19.86s
+2025-08-05 18:04:59 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 18:04:59 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 18:04:59 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 18:04:59 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 18:04:59 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 18:04:59 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 18:04:59 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 18:04:59 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 18:04:59 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 18:04:59 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 18:04:59 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 18:04:59 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 18:04:59 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 18:04:59 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 18:04:59 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 18:04:59 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-05 18:04:59 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 18:04:59 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 18:04:59 - config - INFO - base.py:89 - __init__() - Initialized agent: research (56d51d78-60e6-41cc-9a4c-1227948c1641)
+2025-08-05 18:06:09 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 18:06:09 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 18:06:09 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 18:06:09 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 18:06:09 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 18:06:09 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 18:06:09 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 18:06:09 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 18:06:09 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 18:06:09 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 18:06:09 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 18:06:09 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 18:06:09 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 18:06:09 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 18:06:09 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 18:06:09 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-05 18:06:09 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 18:06:09 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 18:06:16 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 18:06:16 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 18:06:16 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 18:06:16 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 18:06:16 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 18:06:16 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 18:06:16 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 18:06:16 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 18:06:16 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 18:06:16 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 18:06:16 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 18:06:16 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 18:06:16 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 18:06:16 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 18:06:16 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 18:06:16 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-05 18:06:16 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 18:06:16 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 18:06:16 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (f1bb5330-c8ec-4bbd-ba33-f6c05b4f8505)
+2025-08-05 18:06:16 - config - INFO - base.py:102 - execute() - Starting execution of agent analysis
+2025-08-05 18:06:16 - config - INFO - base.py:212 - log() - Generating analysis plan with LLM...
+2025-08-05 18:06:16 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: phi4-mini:latest
+2025-08-05 18:06:16 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-05 18:06:16 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-05 18:06:16 - config - INFO - manager.py:442 - initialize_llm_backends() - Initialized Ollama backend
+2025-08-05 18:06:16 - config - INFO - manager.py:450 - initialize_llm_backends() - LLM initialization complete. Available backends: ['ollama']
+2025-08-05 18:06:16 - config - INFO - manager.py:451 - initialize_llm_backends() - Default backend: ollama
+2025-08-05 18:06:23 - config - INFO - base.py:212 - log() - Analysis plan created for numerical data
+2025-08-05 18:06:23 - config - INFO - base.py:212 - log() - Generating data insights with LLM...
+2025-08-05 18:06:32 - config - INFO - base.py:212 - log() - Data analysis insights generated.
+2025-08-05 18:06:32 - config - INFO - base.py:212 - log() - Analysis completed - generated 0 insights
+2025-08-05 18:06:32 - config - INFO - base.py:136 - execute() - Agent analysis completed successfully in 15.63s
+2025-08-05 18:07:06 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 18:07:06 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 18:07:06 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 18:07:06 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 18:07:06 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 18:07:06 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 18:07:06 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 18:07:06 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 18:07:06 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 18:07:06 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 18:07:06 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 18:07:06 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 18:07:06 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 18:07:06 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 18:07:06 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 18:07:06 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-05 18:07:06 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 18:07:06 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 18:07:06 - config - INFO - base.py:89 - __init__() - Initialized agent: research (f82649bf-cd31-4d23-b8eb-4c21f28d0d6d)
+2025-08-05 18:07:06 - config - INFO - base.py:102 - execute() - Starting execution of agent research
+2025-08-05 18:07:06 - config - INFO - base.py:212 - log() - Generating research plan for query: Python async programming best practices
+2025-08-05 18:07:06 - config - ERROR - base.py:140 - execute() - Agent research failed: 'ResearchAgent' object has no attribute 'prompts_dir'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/research_agent.py", line 76, in plan
+    self.prompts_dir, 'plan.prompt', query=query
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'ResearchAgent' object has no attribute 'prompts_dir'
+2025-08-05 18:07:52 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 18:07:52 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 18:07:52 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 18:07:52 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 18:07:52 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 18:07:52 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 18:07:52 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 18:07:52 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 18:07:52 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 18:07:52 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 18:07:52 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 18:07:52 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 18:07:52 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 18:07:52 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 18:07:52 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 18:07:52 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-05 18:07:52 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 18:07:52 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 18:07:52 - config - INFO - base.py:89 - __init__() - Initialized agent: research (3fe7e0d4-b694-4027-b037-7011798c52b9)
+2025-08-05 18:07:52 - config - INFO - base.py:102 - execute() - Starting execution of agent research
+2025-08-05 18:07:52 - config - INFO - base.py:212 - log() - Generating research plan for query: Python async programming best practices
+2025-08-05 18:07:52 - config - ERROR - base.py:140 - execute() - Agent research failed: 'ResearchAgent' object has no attribute 'prompts_dir'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/research_agent.py", line 76, in plan
+    self.prompts_dir, 'plan.prompt', query=query
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'ResearchAgent' object has no attribute 'prompts_dir'
+2025-08-05 18:08:35 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 18:08:35 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 18:08:35 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 18:08:35 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 18:08:35 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 18:08:35 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 18:08:35 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 18:08:35 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 18:08:35 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 18:08:35 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 18:08:35 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 18:08:35 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 18:08:35 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 18:08:35 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 18:08:35 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 18:08:35 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-05 18:08:35 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 18:08:35 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 18:08:35 - config - INFO - base.py:89 - __init__() - Initialized agent: research (3cf20712-88ee-4fd6-8ca3-c877265caa6a)
+2025-08-05 18:08:35 - config - INFO - base.py:102 - execute() - Starting execution of agent research
+2025-08-05 18:08:35 - config - INFO - base.py:212 - log() - Generating research plan for query: Python async programming best practices
+2025-08-05 18:08:35 - config - ERROR - base.py:140 - execute() - Agent research failed: 'ResearchAgent' object has no attribute 'prompts_dir'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/research_agent.py", line 76, in plan
+    self.prompts_dir, 'plan.prompt', query=query
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'ResearchAgent' object has no attribute 'prompts_dir'
+2025-08-05 18:09:43 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 18:09:43 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 18:09:43 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 18:09:43 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 18:09:43 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 18:09:43 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 18:09:43 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 18:09:43 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 18:09:43 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 18:09:43 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 18:09:43 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 18:09:43 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 18:09:43 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 18:09:43 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 18:09:43 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 18:09:43 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-05 18:09:43 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 18:09:43 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 18:09:43 - config - INFO - base.py:89 - __init__() - Initialized agent: research (5938df0c-4ab4-4312-934e-e2a34f4d71f4)
+2025-08-05 18:09:43 - config - INFO - base.py:102 - execute() - Starting execution of agent research
+2025-08-05 18:09:43 - config - INFO - base.py:212 - log() - Generating research plan for query: Python async programming best practices
+2025-08-05 18:09:43 - config - ERROR - base.py:140 - execute() - Agent research failed: 'ResearchAgent' object has no attribute 'prompts_dir'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/research_agent.py", line 76, in plan
+    self.prompts_dir, 'plan.prompt', query=query
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'ResearchAgent' object has no attribute 'prompts_dir'
+2025-08-05 18:10:12 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 18:10:12 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 18:10:12 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 18:10:12 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 18:10:12 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 18:10:12 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 18:10:12 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 18:10:12 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 18:10:12 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 18:10:12 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 18:10:12 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 18:10:12 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 18:10:12 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 18:10:12 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 18:10:12 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 18:10:12 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-05 18:10:12 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 18:10:12 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 18:10:12 - config - INFO - base.py:89 - __init__() - Initialized agent: research (979e7e0a-ea4f-4d17-aeed-12fb2af4bbb1)
+2025-08-05 18:11:12 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 18:11:12 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 18:11:12 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 18:11:12 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 18:11:12 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 18:11:12 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 18:11:12 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 18:11:12 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 18:11:12 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 18:11:12 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 18:11:12 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 18:11:12 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 18:11:12 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 18:11:12 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 18:11:12 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 18:11:12 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-05 18:11:12 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 18:11:12 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 18:11:12 - config - INFO - base.py:89 - __init__() - Initialized agent: research (b37ef0cb-5802-43c2-b0a4-25c91b0a54f0)
+2025-08-05 18:11:12 - config - INFO - base.py:102 - execute() - Starting execution of agent research
+2025-08-05 18:11:12 - config - INFO - base.py:212 - log() - Generating research plan for query: Python async programming best practices
+2025-08-05 18:11:12 - config - ERROR - base.py:140 - execute() - Agent research failed: 'ResearchAgent' object has no attribute 'prompts_dir'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/research_agent.py", line 77, in plan
+    self.prompts_dir, 'plan.prompt', query=query
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'ResearchAgent' object has no attribute 'prompts_dir'
+2025-08-05 18:13:49 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 18:13:49 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 18:13:49 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 18:13:49 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 18:13:49 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 18:13:49 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 18:13:49 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 18:13:49 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 18:13:49 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 18:13:49 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 18:13:49 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 18:13:49 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 18:13:49 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 18:13:49 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 18:13:49 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 18:13:49 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-05 18:13:49 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 18:13:49 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 18:14:43 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 18:14:43 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 18:14:43 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 18:14:43 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 18:14:43 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 18:14:43 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 18:14:43 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 18:14:43 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 18:14:43 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 18:14:43 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 18:14:43 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 18:14:43 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 18:14:43 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 18:14:43 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 18:14:43 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 18:14:43 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-05 18:14:43 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 18:14:43 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 18:16:45 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 18:16:45 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 18:16:45 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 18:16:45 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 18:16:45 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 18:16:45 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 18:16:45 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 18:16:45 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 18:16:45 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 18:16:45 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 18:16:45 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 18:16:45 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 18:16:45 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 18:16:45 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 18:16:45 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 18:16:45 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-05 18:16:45 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 18:16:45 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 18:18:54 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 18:18:54 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 18:18:54 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 18:18:54 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 18:18:54 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 18:18:54 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 18:18:54 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 18:18:54 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 18:18:54 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 18:18:54 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 18:18:54 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 18:18:54 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 18:18:54 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 18:18:54 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 18:18:54 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 18:20:13 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 18:20:13 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 18:20:13 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 18:20:13 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 18:20:13 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 18:20:13 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 18:20:13 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 18:20:13 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 18:20:13 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 18:20:13 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 18:20:13 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 18:20:13 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 18:20:13 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 18:20:13 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 18:20:13 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 18:20:13 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-05 18:20:13 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 18:20:13 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 18:20:52 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 18:20:52 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 18:20:52 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 18:20:52 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 18:20:52 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 18:20:52 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 18:20:52 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 18:20:52 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 18:20:52 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 18:20:52 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 18:20:52 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 18:20:52 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 18:20:52 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 18:20:52 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 18:20:52 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 18:20:52 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-05 18:20:52 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 18:20:52 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 18:20:52 - config - INFO - base.py:89 - __init__() - Initialized agent: research (cbe3bb62-b8a7-4292-b736-e9b8c2980402)
+2025-08-05 18:20:52 - config - INFO - base.py:102 - execute() - Starting execution of agent research
+2025-08-05 18:20:52 - config - INFO - base.py:212 - log() - Generating research plan for query: {'query': 'Python async programming best practices'}
+2025-08-05 18:20:52 - config - ERROR - base.py:140 - execute() - Agent research failed: 'ResearchAgent' object has no attribute 'prompts_dir'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/research_agent.py", line 79, in plan
+    self.prompts_dir, 'plan.prompt', query=query
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'ResearchAgent' object has no attribute 'prompts_dir'
+2025-08-05 18:28:16 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 18:28:16 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 18:28:16 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 18:28:16 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 18:28:16 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 18:28:16 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 18:28:16 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 18:28:16 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 18:28:16 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 18:28:16 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 18:28:16 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 18:28:16 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 18:28:16 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 18:28:16 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 18:28:16 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 18:28:16 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-05 18:28:16 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 18:28:16 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 18:28:16 - config - INFO - base.py:89 - __init__() - Initialized agent: research (fc6cecc0-c77f-4eb3-98f4-46390d926a4a)
+2025-08-05 18:28:16 - config - INFO - base.py:102 - execute() - Starting execution of agent research
+2025-08-05 18:28:16 - config - INFO - base.py:212 - log() - Generating research plan for query: {'query': 'Python async programming best practices'}
+2025-08-05 18:28:16 - config - ERROR - base.py:140 - execute() - Agent research failed: 'ResearchAgent' object has no attribute 'prompts_dir'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/research_agent.py", line 79, in plan
+    self.prompts_dir, 'plan.prompt', query=query
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'ResearchAgent' object has no attribute 'prompts_dir'
+2025-08-05 18:30:38 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 18:30:38 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 18:30:38 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 18:30:38 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 18:30:38 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 18:30:38 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 18:30:38 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 18:30:38 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 18:30:38 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 18:30:38 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 18:30:38 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 18:30:38 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 18:30:38 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 18:30:38 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 18:30:38 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 18:30:38 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-05 18:30:38 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 18:30:38 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 18:30:38 - config - INFO - base.py:89 - __init__() - Initialized agent: research (9e37caef-fed1-46d4-abaa-dc881d22b0e8)
+2025-08-05 18:30:38 - config - INFO - base.py:102 - execute() - Starting execution of agent research
+2025-08-05 18:30:38 - config - INFO - base.py:212 - log() - Generating research plan for query: {'query': 'Python async programming best practices'}
+2025-08-05 18:30:38 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: phi4-mini:latest
+2025-08-05 18:30:38 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-05 18:30:38 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-05 18:30:38 - config - INFO - manager.py:442 - initialize_llm_backends() - Initialized Ollama backend
+2025-08-05 18:30:38 - config - INFO - manager.py:450 - initialize_llm_backends() - LLM initialization complete. Available backends: ['ollama']
+2025-08-05 18:30:38 - config - INFO - manager.py:451 - initialize_llm_backends() - Default backend: ollama
+2025-08-05 18:30:43 - config - INFO - base.py:212 - log() - Research plan generated successfully.
+2025-08-05 18:30:43 - config - INFO - base.py:212 - log() - Thinking about research plan for query: {'query': 'Python async programming best practices'}
+2025-08-05 18:30:48 - config - INFO - base.py:212 - log() - Thinking process completed.
+2025-08-05 18:30:48 - config - INFO - base.py:212 - log() - Executing research plan...
+2025-08-05 18:30:48 - config - INFO - base.py:212 - log() - Executing search: 'python asyncio best practices official documentation'
+2025-08-05 18:30:48 - config - INFO - base.py:212 - log() - Executing search: 'latest python async programming guidelines on technical blogs'
+2025-08-05 18:30:48 - config - INFO - base.py:212 - log() - Executing search: 'how to effectively use asyncio in Python - coding examples and tips'
+2025-08-05 18:30:48 - config - INFO - base.py:212 - log() - Executing search: 'comparison of asynchronous code vs synchronous code performance in Python'
+2025-08-05 18:30:48 - config - INFO - base.py:212 - log() - Research execution completed.
+2025-08-05 18:30:48 - config - INFO - base.py:136 - execute() - Agent research completed successfully in 10.89s
+2025-08-05 18:31:29 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 18:31:29 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 18:31:29 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 18:31:29 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 18:31:29 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 18:31:29 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 18:31:29 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 18:31:29 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 18:31:29 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 18:31:29 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 18:31:29 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 18:31:29 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 18:31:29 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 18:31:29 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 18:31:29 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 18:31:29 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-05 18:31:29 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 18:31:29 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 18:31:29 - config - INFO - base.py:89 - __init__() - Initialized agent: research (f36faf09-69ef-48e1-8238-2e5e69b788e1)
+2025-08-05 18:31:29 - config - INFO - base.py:102 - execute() - Starting execution of agent research
+2025-08-05 18:31:29 - config - INFO - base.py:212 - log() - Generating research plan for query: {'query': 'Python async programming best practices'}
+2025-08-05 18:31:29 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: phi4-mini:latest
+2025-08-05 18:31:29 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-05 18:31:29 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-05 18:31:29 - config - INFO - manager.py:442 - initialize_llm_backends() - Initialized Ollama backend
+2025-08-05 18:31:29 - config - INFO - manager.py:450 - initialize_llm_backends() - LLM initialization complete. Available backends: ['ollama']
+2025-08-05 18:31:29 - config - INFO - manager.py:451 - initialize_llm_backends() - Default backend: ollama
+2025-08-05 18:31:37 - config - ERROR - base.py:212 - log() - Failed to decode JSON: Expecting value: line 5 column 22 (char 125)
+2025-08-05 18:31:37 - config - ERROR - base.py:212 - log() - Failed to generate a valid research plan.
+2025-08-05 18:31:37 - config - INFO - base.py:212 - log() - Thinking about research plan for query: {'query': 'Python async programming best practices'}
+2025-08-05 18:31:46 - config - ERROR - base.py:212 - log() - Failed to decode JSON: Expecting property name enclosed in double quotes: line 2 column 21 (char 22)
+2025-08-05 18:31:46 - config - ERROR - base.py:212 - log() - Failed to generate valid thoughts from the plan.
+2025-08-05 18:31:46 - config - INFO - base.py:212 - log() - Executing research plan...
+2025-08-05 18:31:46 - config - WARNING - base.py:212 - log() - No research steps or search queries found in the plan/thoughts.
+2025-08-05 18:31:46 - config - INFO - base.py:136 - execute() - Agent research completed successfully in 17.56s
+2025-08-05 18:38:39 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 18:38:39 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 18:38:39 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 18:38:39 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 18:38:39 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 18:38:39 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 18:38:39 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 18:38:39 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 18:38:39 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 18:38:39 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 18:38:39 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 18:38:39 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 18:38:39 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 18:38:39 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 18:38:39 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 18:38:39 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-05 18:38:39 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 18:38:39 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 18:38:39 - config - INFO - base.py:89 - __init__() - Initialized agent: research (8ce49ac2-ccbd-470f-8ad1-aef20bd998fa)
+2025-08-05 18:38:39 - config - INFO - base.py:102 - execute() - Starting execution of agent research
+2025-08-05 18:38:39 - config - INFO - base.py:212 - log() - Generating research plan for query: {'query': 'Python async programming best practices'}
+2025-08-05 18:38:39 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: phi4-mini:latest
+2025-08-05 18:38:39 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-05 18:38:39 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-05 18:38:39 - config - INFO - manager.py:442 - initialize_llm_backends() - Initialized Ollama backend
+2025-08-05 18:38:39 - config - INFO - manager.py:450 - initialize_llm_backends() - LLM initialization complete. Available backends: ['ollama']
+2025-08-05 18:38:39 - config - INFO - manager.py:451 - initialize_llm_backends() - Default backend: ollama
+2025-08-05 18:38:45 - config - INFO - base.py:212 - log() - Research plan generated successfully.
+2025-08-05 18:38:45 - config - INFO - base.py:212 - log() - Thinking about research plan for query: {'query': 'Python async programming best practices'}
+2025-08-05 18:38:49 - config - INFO - base.py:212 - log() - Thinking process completed.
+2025-08-05 18:38:49 - config - INFO - base.py:212 - log() - Executing research plan...
+2025-08-05 18:38:49 - config - INFO - base.py:212 - log() - Executing search: 'python async best practices official documentation 2024'
+2025-08-05 18:38:50 - config - INFO - base.py:212 - log() - Executing search: 'top python asyncio tips and tricks blog posts'
+2025-08-05 18:38:50 - config - INFO - base.py:212 - log() - Executing search: 'academic insights on asynchronous Python coding strategies'
+2025-08-05 18:38:50 - config - INFO - base.py:212 - log() - Executing search: 'effective performance optimization in Python's async features - web search results'
+2025-08-05 18:38:50 - config - INFO - base.py:212 - log() - Research execution completed.
+2025-08-05 18:38:50 - config - INFO - base.py:136 - execute() - Agent research completed successfully in 10.75s
+2025-08-05 18:47:07 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 18:47:07 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 18:47:07 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 18:47:07 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 18:47:07 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 18:47:07 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 18:47:07 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 18:47:07 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 18:47:07 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 18:47:07 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 18:47:07 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 18:47:07 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 18:47:07 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 18:47:07 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 18:47:07 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 18:47:07 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-05 18:47:07 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 18:47:07 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 18:47:07 - config - INFO - base.py:89 - __init__() - Initialized agent: code (ec5c3cb1-47ae-4bc4-a6d3-5d3d14122dc2)
+2025-08-05 18:48:56 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 18:48:56 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 18:48:56 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 18:48:56 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 18:48:56 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 18:48:56 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 18:48:56 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 18:48:56 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 18:48:56 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 18:48:56 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 18:48:56 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 18:48:56 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 18:48:56 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 18:48:56 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 18:48:56 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 18:48:56 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-05 18:48:56 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 18:48:56 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 18:48:56 - config - INFO - base.py:89 - __init__() - Initialized agent: code (83f8d69b-fee2-477b-8ad3-d4896f185680)
+2025-08-05 18:48:56 - config - INFO - base.py:102 - execute() - Starting execution of agent code
+2025-08-05 18:48:56 - config - INFO - base.py:212 - log() - Generating code plan for task: analyze, language: python
+2025-08-05 18:48:56 - config - ERROR - base.py:140 - execute() - Agent code failed: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/plan.prompt
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/code_agent.py", line 117, in plan
+    prompt_template = load_prompt_template(
+                      ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/utils.py", line 551, in load_prompt_template
+    raise FileNotFoundError(f"Prompt template not found: {prompt_path}")
+FileNotFoundError: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/plan.prompt
+2025-08-05 19:46:37 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 19:46:37 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 19:46:37 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 19:46:37 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 19:46:37 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 19:46:37 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 19:46:37 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 19:46:37 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 19:46:37 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 19:46:37 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 19:46:37 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 19:46:37 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 19:46:37 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 19:46:37 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 19:46:37 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 19:46:37 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-05 19:46:37 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 19:46:37 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 19:46:37 - config - INFO - base.py:89 - __init__() - Initialized agent: code (47f671a1-144c-4737-b19f-261694c1641f)
+2025-08-05 19:46:37 - config - INFO - base.py:102 - execute() - Starting execution of agent code
+2025-08-05 19:46:37 - config - INFO - base.py:212 - log() - Generating code plan for task: analyze, language: python
+2025-08-05 19:46:37 - config - ERROR - base.py:140 - execute() - Agent code failed: '\n  "steps"'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/code_agent.py", line 117, in plan
+    prompt_template = load_prompt_template(
+                      ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/utils.py", line 557, in load_prompt_template
+    return template_content.format(**substitutions)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: '\n  "steps"'
+2025-08-05 19:51:13 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-05 19:51:13 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-05 19:51:13 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-05 19:51:13 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-05 19:51:13 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-05 19:51:13 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-05 19:51:13 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-05 19:51:13 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-05 19:51:13 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-05 19:51:13 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-05 19:51:13 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-05 19:51:13 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-05 19:51:13 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-05 19:51:13 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-05 19:51:13 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-05 19:51:13 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-05 19:51:13 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-05 19:51:13 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-05 19:51:13 - config - INFO - base.py:89 - __init__() - Initialized agent: code (7be5015a-438e-4792-b939-f45a33d88fe2)
+2025-08-05 19:51:13 - config - INFO - base.py:102 - execute() - Starting execution of agent code
+2025-08-05 19:51:13 - config - INFO - base.py:212 - log() - Generating code plan for task: analyze, language: python
+2025-08-05 19:51:13 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: phi4-mini:latest
+2025-08-05 19:51:13 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-05 19:51:13 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-05 19:51:13 - config - INFO - manager.py:442 - initialize_llm_backends() - Initialized Ollama backend
+2025-08-05 19:51:13 - config - INFO - manager.py:450 - initialize_llm_backends() - LLM initialization complete. Available backends: ['ollama']
+2025-08-05 19:51:13 - config - INFO - manager.py:451 - initialize_llm_backends() - Default backend: ollama
+2025-08-05 19:51:22 - config - INFO - base.py:212 - log() - Code plan created for task: analyze
+2025-08-05 19:51:22 - config - INFO - base.py:212 - log() - Analyzing code for analyze task in python
+2025-08-05 19:51:33 - config - ERROR - base.py:212 - log() - Failed to decode JSON: Invalid control character at: line 24 column 58 (char 1640)
+2025-08-05 19:51:33 - config - ERROR - base.py:212 - log() - Failed to generate valid code analysis.
+2025-08-05 19:51:33 - config - INFO - base.py:212 - log() - Executing analyze task for python code
+2025-08-05 19:51:39 - config - INFO - base.py:212 - log() - Code analyze task completed successfully
+2025-08-05 19:51:39 - config - INFO - base.py:136 - execute() - Agent code completed successfully in 25.86s

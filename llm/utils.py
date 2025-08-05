@@ -49,20 +49,19 @@ class LLMAgentMixin:
     This can be mixed into any BaseAgent subclass to provide LLM functionality.
     """
     
-    def __init__(self, preferred_backend: Optional[str] = None, *args, **kwargs):
+    def __init__(self, preferred_backend: Optional[str] = None, **kwargs):
         """Initialize LLM capabilities."""
-        super().__init__(*args, **kwargs)
         self._llm_manager = None
         # Set a default backend if none is provided, otherwise use the preferred one
         self.llm_backend_preferences = [preferred_backend or LLMBackendType.OPENAI, LLMBackendType.CLAUDE, LLMBackendType.GEMINI]
         self.llm_logger = get_logger(f"llm.agent.{getattr(self, 'name', 'unknown')}")
-        
+
         # Agent-specific LLM preferences
         self.preferred_backend = preferred_backend
         self.task_backend_preferences = {}
-        self._setup_agent_llm_preferences()
+        self._setup_agent_llm_preferences(preferred_backend)
     
-    def _setup_agent_llm_preferences(self):
+    def _setup_agent_llm_preferences(self, preferred_backend: Optional[str] = None):
         """Setup agent-specific LLM backend preferences based on agent type if not already set."""
         # If a backend is already set, don't override it.
         if self.preferred_backend:

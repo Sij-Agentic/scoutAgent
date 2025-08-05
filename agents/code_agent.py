@@ -12,11 +12,15 @@ import os
 import re
 from pathlib import Path
 
+import json
+import re
+
 from agents.base import BaseAgent, AgentInput, AgentOutput
 from config import get_config
+from llm.utils import LLMAgentMixin
 
 
-class CodeAgent(BaseAgent):
+class CodeAgent(BaseAgent, LLMAgentMixin):
     """
     Code agent for analysis, generation, and debugging of code.
     
@@ -29,8 +33,8 @@ class CodeAgent(BaseAgent):
     """
     
     def __init__(self, name="code", **kwargs):
-        super().__init__(name=name, **kwargs)
-        self.config = get_config()
+        BaseAgent.__init__(self, name=name, **kwargs)
+        LLMAgentMixin.__init__(self, preferred_backend='ollama')
         self.supported_languages = {
             'python': {
                 'extensions': ['.py', '.pyw'],
@@ -70,9 +74,32 @@ class CodeAgent(BaseAgent):
             }
         }
     
-    def plan(self, agent_input: AgentInput) -> Dict[str, Any]:
+    def _extract_json(self, raw_content: str) -> Dict[str, Any]:
+        """Extracts the first valid JSON object from a raw string."""
+        # This regex is designed to find a JSON block enclosed in ```json ... ```
+        match = re.search(r"```json\n(.*?)\n```", raw_content, re.DOTALL)
+        if match:
+            json_str = match.group(1)
+        else:
+            # Fallback to finding the first '{' and last '}'
+            start = raw_content.find('{')
+            end = raw_content.rfind('}')
+            if start != -1 and end != -1:
+                json_str = raw_content[start:end+1]
+            else:
+                self.log("No JSON object found in the response.", level='warning')
+                return {}
+
+        try:
+            return json.loads(json_str)
+        except json.JSONDecodeError as e:
+            self.log(f"Failed to decode JSON: {e}", level='error')
+            self.log(f"Raw content for debugging: {raw_content}", level='debug')
+            return {}
+
+    async def plan(self, agent_input: AgentInput) -> Dict[str, Any]:
         """
-        Plan code analysis or generation strategy.
+        Plan code analysis or generation strategy using LLM.
         
         Args:
             agent_input: Contains code, task type, and parameters
@@ -80,25 +107,40 @@ class CodeAgent(BaseAgent):
         Returns:
             Code processing plan
         """
+        code = agent_input.data.get('code', str(agent_input.data))
         task_type = agent_input.metadata.get('task_type', 'analyze')
+        language = self._detect_language(code)
         
-        if task_type == 'analyze':
-            plan = self._plan_analysis(agent_input)
-        elif task_type == 'generate':
-            plan = self._plan_generation(agent_input)
-        elif task_type == 'debug':
-            plan = self._plan_debugging(agent_input)
-        elif task_type == 'refactor':
-            plan = self._plan_refactoring(agent_input)
-        else:
-            plan = self._plan_general(agent_input)
+        self.log(f"Generating code plan for task: {task_type}, language: {language}")
+        
+        from llm.utils import load_prompt_template
+        prompt_template = load_prompt_template(
+            'plan.prompt',
+            agent_name='code_agent',  # Use directory name instead of agent name
+            substitutions={
+                'code': code[:1000],  # Limit code size for prompt
+                'task_type': task_type,
+                'language': language
+            }
+        )
+        
+        response = await self.llm_generate(prompt_template)
+        plan = self._extract_json(response)
+        
+        if not plan:
+            self.log("Failed to generate a valid code plan.", level='error')
+            return {"error": "Plan generation failed.", "task_type": task_type, "language": language}
+        
+        # Ensure these fields are present
+        plan['task_type'] = task_type
+        plan['language'] = language
         
         self.log(f"Code plan created for task: {task_type}")
         return plan
     
-    def think(self, agent_input: AgentInput, plan: Dict[str, Any]) -> Dict[str, Any]:
+    async def think(self, agent_input: AgentInput, plan: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Analyze code and determine approach.
+        Analyze code and determine approach using LLM.
         
         Args:
             agent_input: Original input
@@ -109,34 +151,39 @@ class CodeAgent(BaseAgent):
         """
         code = agent_input.data.get('code', str(agent_input.data))
         task_type = plan['task_type']
+        language = plan['language']
+        plan_str = json.dumps(plan, indent=2)
         
-        analysis = {
-            'language': self._detect_language(code),
-            'complexity': self._analyze_complexity(code),
-            'issues': [],
-            'recommendations': [],
-            'approach': 'standard'
-        }
+        self.log(f"Analyzing code for {task_type} task in {language}")
         
-        # Language-specific analysis
-        if analysis['language'] in self.supported_languages:
-            lang_analysis = self._analyze_language_specific(code, analysis['language'])
-            analysis.update(lang_analysis)
+        from llm.utils import load_prompt_template
+        prompt_template = load_prompt_template(
+            'think.prompt',
+            agent_name='code_agent',  # Use directory name instead of agent name
+            substitutions={
+                'code': code[:2000],  # Limit code size for prompt
+                'plan': plan_str,
+                'task_type': task_type,
+                'language': language
+            }
+        )
         
-        # Task-specific analysis
-        if task_type == 'analyze':
-            analysis['issues'] = self._find_issues(code, analysis['language'])
-        elif task_type == 'debug':
-            analysis['issues'] = self._find_bugs(code, analysis['language'])
-        elif task_type == 'refactor':
-            analysis['recommendations'] = self._suggest_refactoring(code, analysis['language'])
+        response = await self.llm_generate(prompt_template)
+        analysis = self._extract_json(response)
         
-        self.log(f"Code analysis complete - language: {analysis['language']}")
+        if not analysis:
+            self.log("Failed to generate valid code analysis.", level='error')
+            return {"error": "Analysis generation failed.", "language": language}
+        
+        # Ensure language is included
+        analysis['language'] = language
+        
+        self.log(f"Code analysis completed for {task_type} task")
         return analysis
     
-    def act(self, agent_input: AgentInput, plan: Dict[str, Any], thoughts: Dict[str, Any]) -> Dict[str, Any]:
+    async def act(self, agent_input: AgentInput, plan: Dict[str, Any], thoughts: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Execute code processing based on plan and analysis.
+        Execute code processing based on plan and analysis using LLM.
         
         Args:
             agent_input: Original input
@@ -146,40 +193,41 @@ class CodeAgent(BaseAgent):
         Returns:
             Processing results
         """
-        code = str(agent_input.data)
-        language = agent_input.metadata.get('language', thoughts['language'])
+        code = agent_input.data.get('code', str(agent_input.data))
+        task_type = plan['task_type']
+        language = thoughts['language']
+        plan_str = json.dumps(plan, indent=2)
+        thoughts_str = json.dumps(thoughts, indent=2)
         
-        results = {
-            'original_code': code,
-            'language': language,
-            'task_type': plan['task_type'],
-            'processed': None,
-            'issues': thoughts['issues'],
-            'recommendations': thoughts['recommendations'],
-            'metadata': {}
-        }
+        self.log(f"Executing {task_type} task for {language} code")
         
-        # Execute task
-        if task_type == 'analyze':
-            results['processed'] = self._analyze_code(code, language)
-        elif task_type == 'generate':
-            requirements = agent_input.data.get('requirements', '')
-            results['processed'] = self._generate_code(requirements, language)
-        elif task_type == 'debug':
-            results['processed'] = self._debug_code(code, language)
-        elif task_type == 'refactor':
-            results['processed'] = self._refactor_code(code, language)
+        from llm.utils import load_prompt_template
+        prompt_template = load_prompt_template(
+            'act.prompt',
+            agent_name='code_agent',  # Use directory name instead of agent name
+            substitutions={
+                'code': code[:3000],  # Limit code size for prompt
+                'plan': plan_str,
+                'thoughts': thoughts_str,
+                'task_type': task_type,
+                'language': language
+            }
+        )
         
-        # Add metadata
-        results['metadata'] = {
-            'lines_of_code': len(code.splitlines()),
-            'file_size': len(code),
-            'execution_time': time.time() - self.state.start_time,
-            'language_confidence': 0.9  # Mock confidence
-        }
+        response = await self.llm_generate(prompt_template)
+        result = self._extract_json(response)
         
-        self.log(f"Code processing completed for {task_type}")
-        return results
+        if not result:
+            self.log("Failed to generate valid code processing result.", level='error')
+            return {"error": "Code processing failed.", "language": language, "task_type": task_type}
+        
+        # Add original code and metadata to result
+        result['original_code'] = code
+        result['language'] = language
+        result['task_type'] = task_type
+        
+        self.log(f"Code {task_type} task completed successfully")
+        return result
     
     def _plan_analysis(self, agent_input: AgentInput) -> Dict[str, Any]:
         """Plan code analysis task."""
@@ -557,9 +605,12 @@ if __name__ == "__main__":
 
 if __name__ == "__main__":
     # Test the code agent
-    agent = CodeAgent()
+    import asyncio
     
-    test_code = """
+    async def test_agent():
+        agent = CodeAgent()
+        
+        test_code = """
 def calculate_sum(a, b):
     return a + b
 
@@ -567,13 +618,16 @@ if __name__ == "__main__":
     result = calculate_sum(5, 3)
     print("Sum is: " + str(result))
 """
+        
+        test_input = AgentInput(
+            data={'code': test_code},
+            metadata={'task_type': 'analyze', 'language': 'python', 'focus_areas': ['style', 'complexity']}
+        )
+        
+        result = await agent.execute(test_input)
+        print(f"Code analysis completed: {result.success}")
+        print(f"Language detected: {result.result.get('language')}")
+        print(f"Issues found: {len(result.result.get('issues', []))}")
     
-    test_input = AgentInput(
-        data={'code': test_code, 'task_type': 'analyze'},
-        metadata={'language': 'python', 'focus_areas': ['style', 'complexity']}
-    )
-    
-    result = agent.execute(test_input)
-    print(f"Code analysis completed: {result.success}")
-    print(f"Language detected: {result.result.get('language')}")
-    print(f"Issues found: {len(result.result.get('issues', []))}")
+    # Run the async test function
+    asyncio.run(test_agent())
