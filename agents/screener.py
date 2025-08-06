@@ -7,13 +7,16 @@ based on severity, market relevance, and business potential.
 
 import asyncio
 import json
+import time
 from typing import Dict, List, Any, Optional
 from datetime import datetime
 from dataclasses import dataclass, asdict
 
 from .base import BaseAgent, AgentInput, AgentOutput, AgentState
 from .analysis_agent import AnalysisAgent
-from ..config import get_config
+from config import get_config
+from llm.utils import LLMAgentMixin, load_prompt_template
+from llm.base import LLMBackendType
 
 
 @dataclass
@@ -36,27 +39,49 @@ class ScreeningCriteria:
 @dataclass
 class ScreenerInput(AgentInput):
     """Input for ScreenerAgent."""
-    pain_points: List[Dict[str, Any]]  # From ScoutAgent
-    criteria: ScreeningCriteria = None
+    # AgentInput already has data, metadata, and context fields
+    # Custom fields for ScreenerInput
     market_focus: str = ""
+    criteria: ScreeningCriteria = None
     
     def __post_init__(self):
+        super().__post_init__() if hasattr(AgentInput, "__post_init__") else None
         if self.criteria is None:
             self.criteria = ScreeningCriteria()
+        # Extract pain points from data field
+        self.pain_points = self.data
 
 
 @dataclass
-class ScreenerOutput(AgentOutput):
+class ScreenerOutput:
     """Output from ScreenerAgent."""
+    # Using composition instead of inheritance to avoid dataclass field order issues
+    result: Any
+    metadata: Dict[str, Any]
+    logs: List[str]
+    execution_time: float
     filtered_pain_points: List[Dict[str, Any]]
     rejected_pain_points: List[Dict[str, Any]]
     categorization: Dict[str, List[str]]
     summary: str
     filtering_stats: Dict[str, int]
     confidence_score: float
+    success: bool = True
+    error: Optional[str] = None
+    
+    def to_agent_output(self) -> AgentOutput:
+        """Convert to standard AgentOutput for compatibility."""
+        return AgentOutput(
+            result=self.result,
+            metadata=self.metadata,
+            logs=self.logs,
+            execution_time=self.execution_time,
+            success=self.success,
+            error=self.error
+        )
 
 
-class ScreenerAgent(BaseAgent):
+class ScreenerAgent(BaseAgent, LLMAgentMixin):
     """
     ScreenerAgent for filtering and categorizing pain points.
     
@@ -65,98 +90,300 @@ class ScreenerAgent(BaseAgent):
     """
     
     def __init__(self, agent_id: str = None):
-        super().__init__(agent_id)
+        BaseAgent.__init__(self, agent_id)
+        LLMAgentMixin.__init__(self)
         self.analysis_agent = AnalysisAgent()
         self.config = get_config()
+        self.name = "screener_agent"
+        self.start_time = time.time()
+        
+        # Set backend preferences for this agent
+        self.task_backend_preferences = {
+            "default": LLMBackendType.OLLAMA
+        }
+    
+    def extract_json_from_markdown(self, text):
+        """Extract JSON from markdown code blocks or plain text with robust error handling."""
+        import re
+        import json
+
+        # Default fallback result if parsing fails
+        default_result = {
+            "status": "fallback",
+            "message": "Failed to parse JSON from response"
+        }
+
+        if not text or not text.strip():
+            self.logger.warning("Empty text provided to extract_json_from_markdown")
+            return json.dumps(default_result)
+
+        # First try to find JSON in markdown code blocks
+        code_block_patterns = [
+            r'```(?:json)?\s*(.+?)\s*```',  # Standard code block
+            r'`(.+?)`',                       # Inline code
+            r'\{\s*"(.+?)"\s*\}',         # Just look for JSON-like content
+        ]
+        
+        json_str = text
+        for pattern in code_block_patterns:
+            matches = re.search(pattern, text, re.DOTALL)
+            if matches:
+                json_str = matches.group(1)
+                break
+            
+        # Clean the JSON string
+        # Remove trailing commas before closing brackets or braces
+        json_str = re.sub(r',\s*([\]\}])', r'\1', json_str)
+        
+        # Attempt to fix common JSON formatting issues
+        json_str = json_str.replace("'", '"')   # Replace single quotes with double quotes
+        json_str = re.sub(r'([\{\[,:]\s*)([a-zA-Z_][a-zA-Z0-9_]*)\s*:', r'\1"\2":', json_str)  # Add quotes to unquoted keys
+        
+        # Try to parse the JSON to validate it
+        try:
+            json.loads(json_str)
+            return json_str
+        except json.JSONDecodeError as e:
+            self.logger.warning(f"JSON decode error: {str(e)}. Attempting further cleanup...")
+            
+            # Additional cleanup attempts
+            # Remove all non-ASCII characters
+            json_str = re.sub(r'[^\x00-\x7F]+', '', json_str)
+            
+            # Try to extract valid JSON subset if there's extra text
+            json_subset_pattern = r'\{.*\}'  # Find the first full JSON object
+            subset_match = re.search(json_subset_pattern, json_str, re.DOTALL)
+            if subset_match:
+                json_str = subset_match.group(0)
+            
+            try:
+                json.loads(json_str)
+                return json_str
+            except json.JSONDecodeError:
+                # Last resort: return the default fallback
+                self.logger.error(f"Failed to extract valid JSON from LLM response")
+                return json.dumps(default_result)
     
     async def plan(self, input_data: ScreenerInput) -> Dict[str, Any]:
-        """Plan the screening process."""
+        """Plan the screening process using LLM."""
         self.logger.info(f"Planning screening for {len(input_data.pain_points)} pain points")
         
-        plan = {
-            "phases": [
-                "initial_filtering",
-                "severity_assessment",
-                "categorization",
-                "business_potential_check",
-                "final_ranking"
-            ],
-            "criteria": asdict(input_data.criteria),
-            "expected_duration": 120,  # 2 minutes
-            "input_count": len(input_data.pain_points)
-        }
-        
-        self.state.plan = plan
-        return plan
+        try:
+            # Load prompt template
+            prompt = load_prompt_template(
+                template_name="plan.prompt",
+                agent_name=self.name,
+                substitutions={
+                    "pain_points_count": len(input_data.pain_points),
+                    "criteria_min_severity": input_data.criteria.min_severity,
+                    "criteria_min_impact_score": input_data.criteria.min_impact_score,
+                    "criteria_min_frequency": input_data.criteria.min_frequency,
+                    "criteria_max_age_days": input_data.criteria.max_age_days,
+                    "criteria_required_tags": input_data.criteria.required_tags,
+                    "criteria_excluded_tags": input_data.criteria.excluded_tags,
+                    "market_focus": input_data.market_focus
+                }
+            )
+            
+            # Generate plan using LLM with Ollama backend
+            response = await self.llm_generate(prompt, backend_type="ollama")
+            
+            # Extract JSON from response
+            plan = json.loads(self.extract_json_from_markdown(response))
+            
+            self.logger.info(f"Generated plan with {len(plan.get('phases', []))} phases")
+            self.state.plan = plan
+            return plan
+            
+        except Exception as e:
+            self.logger.error(f"Error in ScreenerAgent plan: {str(e)}")
+            # Fallback plan
+            fallback_plan = {
+                "phases": [
+                    "initial_filtering",
+                    "severity_assessment",
+                    "categorization",
+                    "business_potential_check",
+                    "final_ranking"
+                ],
+                "criteria": asdict(input_data.criteria),
+                "expected_duration": 120,  # 2 minutes
+                "input_count": len(input_data.pain_points)
+            }
+            
+            self.state.plan = fallback_plan
+            return fallback_plan
     
     async def think(self, input_data: ScreenerInput) -> Dict[str, Any]:
-        """Analyze pain points for screening decisions."""
+        """Analyze pain points for screening decisions using LLM."""
         self.logger.info("Analyzing pain points for screening...")
         
-        # Analyze patterns
-        analysis_input = {
-            "data": input_data.pain_points,
-            "analysis_type": "categorization",
-            "dimensions": ["severity", "impact", "frequency", "business_potential"]
-        }
-        
-        analysis_results = await self.analysis_agent.execute(analysis_input)
-        
-        # Calculate screening metrics
-        screening_analysis = {
-            "total_points": len(input_data.pain_points),
-            "severity_distribution": self._get_severity_distribution(input_data.pain_points),
-            "impact_score_range": self._get_impact_range(input_data.pain_points),
-            "frequency_distribution": self._get_frequency_distribution(input_data.pain_points),
-            "categorization_potential": len(analysis_results.get("categories", [])),
-            "filtering_strategy": self._determine_filtering_strategy(input_data.criteria)
-        }
-        
-        return screening_analysis
+        try:
+            # Ensure we have a plan
+            plan = self.state.plan
+            if not plan:
+                plan = await self.plan(input_data)
+            
+            # Load prompt template
+            prompt = load_prompt_template(
+                template_name="think.prompt",
+                agent_name=self.name,
+                substitutions={
+                    "pain_points": json.dumps(input_data.pain_points, indent=2),
+                    "criteria": json.dumps(asdict(input_data.criteria), indent=2),
+                    "plan": json.dumps(plan, indent=2),
+                    "market_focus": input_data.market_focus
+                }
+            )
+            
+            # Generate analysis using LLM with Ollama backend
+            response = await self.llm_generate(prompt, backend_type="ollama")
+            
+            # Extract JSON from response
+            analysis = json.loads(self.extract_json_from_markdown(response))
+            
+            self.logger.info(f"Generated screening analysis with strategy: {analysis.get('filtering_strategy', 'unknown')}")
+            return analysis
+            
+        except Exception as e:
+            self.logger.error(f"Error in ScreenerAgent think: {str(e)}")
+            # Fallback analysis using helper methods
+            analysis_input = {
+                "data": input_data.pain_points,
+                "analysis_type": "categorization",
+                "dimensions": ["severity", "impact", "frequency", "business_potential"]
+            }
+            
+            try:
+                analysis_results = await self.analysis_agent.execute(analysis_input)
+            except Exception:
+                analysis_results = {"categories": []}
+                
+            # Calculate screening metrics as fallback
+            fallback_analysis = {
+                "total_points": len(input_data.pain_points),
+                "severity_distribution": self._get_severity_distribution(input_data.pain_points),
+                "impact_score_range": self._get_impact_range(input_data.pain_points),
+                "frequency_distribution": self._get_frequency_distribution(input_data.pain_points),
+                "categorization_potential": len(analysis_results.get("categories", [])),
+                "filtering_strategy": self._determine_filtering_strategy(input_data.criteria)
+            }
+            
+            return fallback_analysis
     
     async def act(self, input_data: ScreenerInput) -> ScreenerOutput:
-        """Execute screening and return filtered results."""
+        """Execute screening and return filtered results using LLM."""
         self.logger.info("Executing pain point screening...")
         
-        # Apply filtering criteria
-        filtered_points, rejected_points = self._apply_filtering(
-            input_data.pain_points,
-            input_data.criteria
-        )
-        
-        # Categorize filtered points
-        categorization = self._categorize_pain_points(filtered_points)
-        
-        # Generate summary
-        summary = self._generate_screening_summary(
-            filtered_points,
-            rejected_points,
-            input_data.market_focus
-        )
-        
-        # Calculate filtering stats
-        filtering_stats = {
-            "total_input": len(input_data.pain_points),
-            "accepted": len(filtered_points),
-            "rejected": len(rejected_points),
-            "acceptance_rate": len(filtered_points) / len(input_data.pain_points) if input_data.pain_points else 0
-        }
-        
-        # Calculate confidence score
-        confidence_score = self._calculate_confidence_score(
-            filtered_points,
-            rejected_points,
-            input_data.criteria
-        )
-        
-        return ScreenerOutput(
-            filtered_pain_points=filtered_points,
-            rejected_pain_points=rejected_points,
-            categorization=categorization,
-            summary=summary,
-            filtering_stats=filtering_stats,
-            confidence_score=confidence_score
-        )
+        try:
+            # Get the analysis results from think phase
+            analysis = getattr(self.state, "think_result", None)
+            if not analysis:
+                analysis = await self.think(input_data)
+                
+            # Load prompt template
+            prompt = load_prompt_template(
+                template_name="act.prompt",
+                agent_name=self.name,
+                substitutions={
+                    "pain_points": json.dumps(input_data.pain_points, indent=2),
+                    "criteria": json.dumps(asdict(input_data.criteria), indent=2),
+                    "analysis": json.dumps(analysis, indent=2),
+                    "market_focus": input_data.market_focus
+                }
+            )
+            
+            # Generate screening results using LLM with Ollama backend
+            response = await self.llm_generate(prompt, backend_type="ollama")
+            
+            # Extract JSON from response
+            results = json.loads(self.extract_json_from_markdown(response))
+            
+            self.logger.info(f"Generated screening results with {len(results.get('filtered_pain_points', []))} accepted pain points")
+            
+            # Create ScreenerOutput with the results
+            return ScreenerOutput(
+                result=results,
+                metadata={
+                    "agent_id": self.agent_id,
+                    "agent_name": self.name,
+                    "plan": self.state.plan,
+                    "thoughts": analysis
+                },
+                logs=self.execution_logs,
+                execution_time=time.time() - self.start_time,
+                filtered_pain_points=results.get("filtered_pain_points", []),
+                rejected_pain_points=results.get("rejected_pain_points", []),
+                categorization=results.get("categorization", {}),
+                summary=results.get("summary", ""),
+                filtering_stats=results.get("filtering_stats", {"total": 0, "accepted": 0, "rejected": 0}),
+                confidence_score=results.get("confidence_score", 0.0),
+                success=True,
+                error=None
+            )
+        except Exception as e:
+            self.logger.error(f"Error in ScreenerAgent act: {str(e)}")
+            # First attempt simple JSON handling fallback
+            try:
+                error_message = f"Error in screening execution: {str(e)}"
+                return ScreenerOutput(
+                    result={},
+                    metadata={
+                        "agent_id": self.agent_id,
+                        "agent_name": self.name,
+                        "error": error_message
+                    },
+                    logs=self.execution_logs,
+                    execution_time=time.time() - self.start_time,
+                    filtered_pain_points=[],
+                    rejected_pain_points=[],
+                    categorization={},
+                    summary="Error in screening execution",
+                    filtering_stats={"total": 0, "accepted": 0, "rejected": 0},
+                    confidence_score=0.0,
+                    success=False,
+                    error=error_message
+                )
+            except:
+                self.logger.error(f"Error in ScreenerAgent fallback handling, using helper methods")
+                # Final fallback using helper methods
+                # Apply filtering
+                accepted_points = self._apply_filtering(input_data.pain_points, input_data.criteria)
+                rejected_points = [p for p in input_data.pain_points if p not in accepted_points]
+                
+                # Categorize filtered points
+                categories = self._categorize_pain_points(accepted_points)
+                
+                # Generate summary
+                summary = self._generate_screening_summary(
+                    accepted_points, 
+                    rejected_points,
+                input_data.market_focus
+            )
+            
+            # Calculate filtering stats
+            filtering_stats = {
+                "total": len(input_data.pain_points),
+                "accepted": len(accepted_points),
+                "rejected": len(rejected_points),
+                "by_severity": self._get_severity_distribution(accepted_points)
+            }
+            
+            # Calculate confidence score
+            confidence = self._calculate_confidence_score(
+                accepted_points,
+                rejected_points,
+                input_data.criteria
+            )
+            
+            return ScreenerOutput(
+                filtered_pain_points=accepted_points,
+                rejected_pain_points=rejected_points,
+                categorization=categories,
+                summary=summary,
+                filtering_stats=filtering_stats,
+                confidence_score=confidence
+            )
     
     def _apply_filtering(self, pain_points: List[Dict[str, Any]], criteria: ScreeningCriteria) -> tuple:
         """Apply filtering criteria to pain points."""
@@ -229,13 +456,24 @@ class ScreenerAgent(BaseAgent):
         }
         
         for point in pain_points:
-            tags = point.get("tags", [])
-            description = point.get("description", "").lower()
+            # Handle both dict and list format pain points
+            if isinstance(point, dict):
+                tags = point.get("tags", [])
+                description = point.get("description", "").lower()
+            else:
+                # Handle case where point might be a list or other type
+                tags = []
+                description = str(point).lower()
             
             # Categorize based on tags and description
             for category in categories:
                 if category in tags or category in description:
-                    categories[category].append(point.get("description", ""))
+                    # Handle different point types when appending to categories
+                    if isinstance(point, dict):
+                        categories[category].append(point.get("description", ""))
+                    else:
+                        # If point is not a dict, append the string representation
+                        categories[category].append(str(point))
         
         # Remove empty categories
         return {k: v for k, v in categories.items() if v}
@@ -320,4 +558,4 @@ Pain Point Screening Summary for {market}:
 
 # Register the agent
 from .base import register_agent
-register_agent("screener", ScreenerAgent)
+register_agent(ScreenerAgent)
