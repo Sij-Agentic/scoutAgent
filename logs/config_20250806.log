@@ -1,0 +1,53 @@
+2025-08-06 01:31:03 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 01:31:03 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 01:31:03 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 01:31:03 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-06 01:31:03 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-06 01:31:03 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 01:31:03 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 01:31:03 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 01:31:03 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 01:31:03 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 01:31:03 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 01:31:03 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 01:31:03 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 01:31:03 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-06 01:31:03 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-06 01:31:03 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-06 01:31:03 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 01:31:03 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 01:31:03 - config - INFO - base.py:89 - __init__() - Initialized agent: memory (f95c5af6-1a6b-4be0-bec9-e1ddf1a3e084)
+2025-08-06 01:31:03 - config - INFO - memory_agent.py:113 - plan() - Planning memory operation: store
+2025-08-06 01:33:09 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 01:33:09 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 01:33:09 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 01:33:09 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-06 01:33:09 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-06 01:33:09 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 01:33:09 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 01:33:09 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 01:33:09 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 01:33:09 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 01:33:09 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 01:33:09 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 01:33:09 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 01:33:09 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-06 01:33:09 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-06 01:33:09 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-06 01:33:09 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 01:33:09 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 01:33:09 - config - INFO - base.py:89 - __init__() - Initialized agent: memory (29b09548-3aaf-4220-a4a7-7d2e5fd57fb3)
+2025-08-06 01:33:09 - config - INFO - memory_agent.py:113 - plan() - Planning memory operation: store
+2025-08-06 01:33:09 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: phi4-mini:latest
+2025-08-06 01:33:09 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-06 01:33:09 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-06 01:33:09 - config - INFO - manager.py:442 - initialize_llm_backends() - Initialized Ollama backend
+2025-08-06 01:33:09 - config - INFO - manager.py:450 - initialize_llm_backends() - LLM initialization complete. Available backends: ['ollama']
+2025-08-06 01:33:09 - config - INFO - manager.py:451 - initialize_llm_backends() - Default backend: ollama
+2025-08-06 01:33:15 - config - INFO - memory_agent.py:147 - plan() - Memory plan created for operation: store
+2025-08-06 01:33:15 - config - INFO - memory_agent.py:153 - think() - Analyzing memory operation requirements...
+2025-08-06 01:33:18 - config - INFO - memory_agent.py:190 - think() - Memory operation requirements analyzed
+2025-08-06 01:33:18 - config - INFO - memory_agent.py:196 - act() - Executing memory operation: store
+2025-08-06 01:33:41 - config - ERROR - memory_agent.py:105 - _extract_json() - Failed to decode JSON: Expecting property name enclosed in double quotes: line 68 column 30 (char 1999)
+2025-08-06 01:33:41 - config - ERROR - memory_agent.py:227 - act() - Failed to parse memory execution results from LLM response
+2025-08-06 01:33:41 - config - INFO - memory_agent.py:230 - act() - Falling back to traditional execution methods

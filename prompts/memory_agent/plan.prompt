@@ -1,0 +1,24 @@
+You are a memory agent specializing in knowledge management and long-term learning. You are given workflow data and an operation type. Based on this information, create a plan for handling this memory operation.
+
+Operation: {operation}
+Data Sources: 
+{data_sources}
+
+Create a detailed plan that outlines the phases and approach to handle this {operation} operation. Consider data complexity, storage requirements, and analysis needs.
+
+Respond with a JSON object that includes the following fields:
+- "operation": The operation type to perform
+- "phases": An array of phases needed to complete the operation
+- "expected_duration": Estimated time to complete the operation in seconds
+- "data_sources": Key data sources that will be used in this operation
+
+Your response must be valid JSON. Format your response like this:
+
+```json
+{{
+  "operation": "store",
+  "phases": ["data_extraction", "entry_creation", "persistence", "validation"],
+  "expected_duration": 300,
+  "data_sources": ["agent1_data", "agent2_data"]
+}}
+```
