@@ -1,0 +1,17 @@
+2025-08-06 20:20:58 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: config
+2025-08-06 20:25:44 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: config
+2025-08-06 21:00:51 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: config
+2025-08-06 21:00:51 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: logging
+2025-08-06 21:00:51 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: test_service
+2025-08-06 21:01:59 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: config
+2025-08-06 21:01:59 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: logging
+2025-08-06 21:01:59 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: test_service
+2025-08-06 21:01:59 - service_lifecycle - INFO - lifecycle.py:196 - initialize_all() - Initializing all services in dependency order
+2025-08-06 21:01:59 - service_lifecycle - INFO - lifecycle.py:250 - start_all() - Starting all initialized services in dependency order
+2025-08-06 21:02:38 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: config
+2025-08-06 21:02:38 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: logging
+2025-08-06 21:02:38 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: test_service
+2025-08-06 21:02:38 - service_lifecycle - INFO - lifecycle.py:196 - initialize_all() - Initializing all services in dependency order
+2025-08-06 21:02:38 - service_lifecycle - INFO - lifecycle.py:250 - start_all() - Starting all initialized services in dependency order
+2025-08-06 21:02:38 - service_lifecycle - INFO - test_service_registry.py:105 - main() - Test script is running with initialized services
+2025-08-06 21:02:38 - service_lifecycle - INFO - lifecycle.py:282 - shutdown_all() - Shutting down all services in reverse dependency order
