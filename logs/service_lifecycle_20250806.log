@@ -15,3 +15,199 @@
 2025-08-06 21:02:38 - service_lifecycle - INFO - lifecycle.py:250 - start_all() - Starting all initialized services in dependency order
 2025-08-06 21:02:38 - service_lifecycle - INFO - test_service_registry.py:105 - main() - Test script is running with initialized services
 2025-08-06 21:02:38 - service_lifecycle - INFO - lifecycle.py:282 - shutdown_all() - Shutting down all services in reverse dependency order
+2025-08-06 21:29:54 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: config
+2025-08-06 21:29:54 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: logging
+2025-08-06 21:29:54 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-06 21:29:54 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-06 21:29:54 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: test_agent_service
+2025-08-06 21:31:39 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: config
+2025-08-06 21:31:39 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: logging
+2025-08-06 21:31:39 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-06 21:31:39 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-06 21:31:39 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: test_agent_service
+2025-08-06 21:33:07 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: config
+2025-08-06 21:33:07 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: logging
+2025-08-06 21:33:07 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-06 21:33:07 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-06 21:33:07 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: test_agent_service
+2025-08-06 21:33:07 - service_lifecycle - INFO - lifecycle.py:196 - initialize_all() - Initializing all services in dependency order
+2025-08-06 21:33:07 - service_lifecycle - INFO - lifecycle.py:250 - start_all() - Starting all initialized services in dependency order
+2025-08-06 21:34:12 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: config
+2025-08-06 21:34:12 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: logging
+2025-08-06 21:34:12 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-06 21:34:12 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-06 21:34:12 - service_lifecycle - INFO - lifecycle.py:196 - initialize_all() - Initializing all services in dependency order
+2025-08-06 21:34:12 - service_lifecycle - INFO - lifecycle.py:250 - start_all() - Starting all initialized services in dependency order
+2025-08-06 21:34:12 - service_lifecycle - INFO - lifecycle.py:193 - initialize_all() - Services already initialized
+2025-08-06 21:34:12 - service_lifecycle - INFO - lifecycle.py:250 - start_all() - Starting all initialized services in dependency order
+2025-08-06 21:36:17 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: config
+2025-08-06 21:36:17 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: logging
+2025-08-06 21:36:17 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-06 21:36:17 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-06 21:36:17 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: test_agent_service
+2025-08-06 21:36:17 - service_lifecycle - INFO - lifecycle.py:196 - initialize_all() - Initializing all services in dependency order
+2025-08-06 21:36:17 - service_lifecycle - INFO - lifecycle.py:250 - start_all() - Starting all initialized services in dependency order
+2025-08-06 21:36:17 - service_lifecycle - INFO - lifecycle.py:193 - initialize_all() - Services already initialized
+2025-08-06 21:36:17 - service_lifecycle - INFO - lifecycle.py:250 - start_all() - Starting all initialized services in dependency order
+2025-08-06 21:37:33 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: config
+2025-08-06 21:37:33 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: logging
+2025-08-06 21:37:33 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-06 21:37:33 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-06 21:37:33 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: test_agent_service
+2025-08-06 21:37:33 - service_lifecycle - INFO - lifecycle.py:196 - initialize_all() - Initializing all services in dependency order
+2025-08-06 21:37:33 - service_lifecycle - INFO - lifecycle.py:250 - start_all() - Starting all initialized services in dependency order
+2025-08-06 21:38:58 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: config
+2025-08-06 21:38:58 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: logging
+2025-08-06 21:38:58 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-06 21:38:58 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-06 21:38:58 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: test_agent_service
+2025-08-06 21:38:58 - service_lifecycle - INFO - base.py:118 - initialize() - Initializing service: config
+2025-08-06 21:38:58 - service_lifecycle - INFO - service.py:57 - _initialize() - Initializing configuration service
+2025-08-06 21:38:58 - service_lifecycle - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 21:38:58 - service_lifecycle - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 21:38:58 - service_lifecycle - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 21:38:58 - service_lifecycle - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 21:38:58 - service_lifecycle - INFO - service.py:66 - _initialize() - Configuration initialized successfully
+2025-08-06 21:38:58 - service_lifecycle - INFO - base.py:125 - initialize() - Service config initialized successfully
+2025-08-06 21:38:58 - service_lifecycle - INFO - base.py:118 - initialize() - Initializing service: logging
+2025-08-06 21:38:58 - service_lifecycle - INFO - service.py:52 - _initialize() - Initializing logging service
+2025-08-06 21:38:58 - service_lifecycle - ERROR - service.py:76 - _initialize() - Failed to initialize logging: No instances of service 'config' found
+2025-08-06 21:38:58 - service_lifecycle - ERROR - base.py:128 - initialize() - Service logging initialization failed
+2025-08-06 21:38:58 - service_lifecycle - INFO - base.py:118 - initialize() - Initializing service: code_execution
+2025-08-06 21:38:58 - service_lifecycle - INFO - service.py:129 - _initialize() - Initializing code execution service
+2025-08-06 21:38:58 - service_lifecycle - ERROR - service.py:153 - _initialize() - Failed to initialize code execution service: No instances of service 'config' found
+2025-08-06 21:38:58 - service_lifecycle - ERROR - base.py:128 - initialize() - Service code_execution initialization failed
+2025-08-06 21:38:58 - service_lifecycle - INFO - base.py:118 - initialize() - Initializing service: memory
+2025-08-06 21:38:58 - service_lifecycle - INFO - service.py:434 - _initialize() - Initializing memory service
+2025-08-06 21:38:58 - service_lifecycle - ERROR - service.py:493 - _initialize() - Failed to initialize memory service: No instances of service 'config' found
+2025-08-06 21:38:58 - service_lifecycle - ERROR - base.py:128 - initialize() - Service memory initialization failed
+2025-08-06 21:38:58 - service_lifecycle - INFO - base.py:165 - start() - Starting service: config
+2025-08-06 21:38:58 - service_lifecycle - INFO - service.py:82 - _start() - Starting configuration service
+2025-08-06 21:38:58 - service_lifecycle - INFO - base.py:171 - start() - Service config started successfully
+2025-08-06 21:38:58 - service_lifecycle - ERROR - base.py:160 - start() - Cannot start uninitialized service: logging
+2025-08-06 21:38:58 - service_lifecycle - ERROR - base.py:160 - start() - Cannot start uninitialized service: code_execution
+2025-08-06 21:38:58 - service_lifecycle - ERROR - base.py:160 - start() - Cannot start uninitialized service: memory
+2025-08-06 21:41:16 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: config
+2025-08-06 21:41:16 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: logging
+2025-08-06 21:41:16 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-06 21:41:16 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-06 21:41:16 - service_lifecycle - INFO - service.py:57 - _initialize() - Initializing configuration service
+2025-08-06 21:41:16 - service_lifecycle - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 21:41:16 - service_lifecycle - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 21:41:16 - service_lifecycle - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 21:41:16 - service_lifecycle - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 21:41:16 - service_lifecycle - INFO - service.py:66 - _initialize() - Configuration initialized successfully
+2025-08-06 21:41:16 - service_lifecycle - INFO - service.py:82 - _start() - Starting configuration service
+2025-08-06 21:41:16 - service_lifecycle - INFO - service.py:52 - _initialize() - Initializing logging service
+2025-08-06 21:41:16 - service_lifecycle - ERROR - service.py:76 - _initialize() - Failed to initialize logging: 'NoneType' object has no attribute 'get_service'
+2025-08-06 21:41:16 - service_lifecycle - INFO - service.py:88 - _start() - Starting logging service
+2025-08-06 21:41:16 - service_lifecycle - ERROR - service.py:99 - _start() - Failed to start logging service: unsupported operand type(s) for /: 'NoneType' and 'str'
+2025-08-06 21:41:16 - service_lifecycle - INFO - service.py:129 - _initialize() - Initializing code execution service
+2025-08-06 21:41:16 - service_lifecycle - ERROR - service.py:153 - _initialize() - Failed to initialize code execution service: 'NoneType' object has no attribute 'get_service'
+2025-08-06 21:41:16 - service_lifecycle - INFO - service.py:165 - _start() - Starting code execution service
+2025-08-06 21:41:16 - service_lifecycle - INFO - service.py:174 - _start() - Language python supported with python
+2025-08-06 21:41:16 - service_lifecycle - INFO - service.py:174 - _start() - Language javascript supported with node
+2025-08-06 21:41:16 - service_lifecycle - INFO - service.py:174 - _start() - Language bash supported with bash
+2025-08-06 21:41:16 - service_lifecycle - ERROR - service.py:185 - _start() - Failed to start code execution service: unsupported operand type(s) for /: 'NoneType' and 'str'
+2025-08-06 21:41:16 - service_lifecycle - INFO - service.py:434 - _initialize() - Initializing memory service
+2025-08-06 21:41:16 - service_lifecycle - ERROR - service.py:493 - _initialize() - Failed to initialize memory service: 'NoneType' object has no attribute 'get_service'
+2025-08-06 21:41:16 - service_lifecycle - INFO - service.py:498 - _start() - Starting memory service
+2025-08-06 21:41:16 - service_lifecycle - INFO - direct_test_agent_services.py:26 - test_memory_service() - Testing memory service...
+2025-08-06 21:41:16 - service_lifecycle - ERROR - service.py:554 - create_memory() - Failed to create memory: 'NoneType' object has no attribute 'store'
+2025-08-06 21:41:16 - service_lifecycle - INFO - direct_test_agent_services.py:36 - test_memory_service() - Created memory with ID: None
+2025-08-06 21:41:16 - service_lifecycle - ERROR - service.py:574 - get_memory() - Failed to retrieve memory None: 'NoneType' object has no attribute 'retrieve'
+2025-08-06 21:53:58 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: config
+2025-08-06 21:53:58 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: logging
+2025-08-06 21:53:58 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-06 21:53:58 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-06 21:53:58 - service_lifecycle - INFO - service.py:57 - _initialize() - Initializing configuration service
+2025-08-06 21:53:58 - service_lifecycle - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 21:53:58 - service_lifecycle - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 21:53:58 - service_lifecycle - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 21:53:58 - service_lifecycle - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 21:53:58 - service_lifecycle - INFO - service.py:66 - _initialize() - Configuration initialized successfully
+2025-08-06 21:53:58 - service_lifecycle - INFO - service.py:82 - _start() - Starting configuration service
+2025-08-06 21:53:58 - service_lifecycle - INFO - service.py:52 - _initialize() - Initializing logging service
+2025-08-06 21:53:58 - service_lifecycle - ERROR - service.py:76 - _initialize() - Failed to initialize logging: 'NoneType' object has no attribute 'get_service'
+2025-08-06 21:53:58 - service_lifecycle - INFO - service.py:88 - _start() - Starting logging service
+2025-08-06 21:53:58 - service_lifecycle - ERROR - service.py:99 - _start() - Failed to start logging service: unsupported operand type(s) for /: 'NoneType' and 'str'
+2025-08-06 21:53:58 - service_lifecycle - INFO - service.py:129 - _initialize() - Initializing code execution service
+2025-08-06 21:53:58 - service_lifecycle - ERROR - service.py:153 - _initialize() - Failed to initialize code execution service: 'NoneType' object has no attribute 'get_service'
+2025-08-06 21:53:58 - service_lifecycle - INFO - service.py:165 - _start() - Starting code execution service
+2025-08-06 21:53:58 - service_lifecycle - INFO - service.py:174 - _start() - Language python supported with python
+2025-08-06 21:53:58 - service_lifecycle - INFO - service.py:174 - _start() - Language javascript supported with node
+2025-08-06 21:53:58 - service_lifecycle - INFO - service.py:174 - _start() - Language bash supported with bash
+2025-08-06 21:53:58 - service_lifecycle - ERROR - service.py:185 - _start() - Failed to start code execution service: unsupported operand type(s) for /: 'NoneType' and 'str'
+2025-08-06 21:53:58 - service_lifecycle - INFO - service.py:455 - _initialize() - Initializing memory service
+2025-08-06 21:53:58 - service_lifecycle - INFO - service.py:460 - _initialize() - Initializing memory service directly (no registry)
+2025-08-06 21:53:58 - service_lifecycle - INFO - service.py:193 - initialize() - Initialized file system backend with 0 memories
+2025-08-06 21:53:58 - service_lifecycle - INFO - service.py:554 - _start() - Starting memory service
+2025-08-06 21:53:58 - service_lifecycle - INFO - direct_test_agent_services.py:26 - test_memory_service() - Testing memory service...
+2025-08-06 21:53:58 - service_lifecycle - INFO - direct_test_agent_services.py:36 - test_memory_service() - Created memory with ID: 9c5b199a-47d7-4332-a78b-2bf77943d5ef
+2025-08-06 21:53:58 - service_lifecycle - INFO - direct_test_agent_services.py:40 - test_memory_service() - Retrieved memory: This is a test memory for direct testing
+2025-08-06 21:53:58 - service_lifecycle - INFO - direct_test_agent_services.py:50 - test_memory_service() - Search found 1 results
+2025-08-06 21:53:58 - service_lifecycle - INFO - direct_test_agent_services.py:56 - test_memory_service() - Found 1 memories with 'test' tag
+2025-08-06 21:53:58 - service_lifecycle - INFO - direct_test_agent_services.py:63 - test_memory_service() - Created memory DAG task: memory_search_56d9b841
+2025-08-06 21:53:58 - service_lifecycle - INFO - direct_test_agent_services.py:69 - test_code_execution() - Testing code execution service...
+2025-08-06 21:53:58 - service_lifecycle - INFO - direct_test_agent_services.py:78 - test_code_execution() - Executing Python code...
+2025-08-06 21:53:58 - service_lifecycle - INFO - service.py:316 - execute_code() - Executing python code [id: 87f941c8-17b7-4cc0-a480-dcf7ff1db8df]
+2025-08-06 21:53:58 - service_lifecycle - INFO - direct_test_agent_services.py:86 - test_code_execution() - Execution success: True
+2025-08-06 21:53:58 - service_lifecycle - INFO - direct_test_agent_services.py:87 - test_code_execution() - Execution output: Hello from Python direct test!
+The answer is 42
+
+2025-08-06 21:53:58 - service_lifecycle - INFO - direct_test_agent_services.py:90 - test_code_execution() - Testing code generation...
+2025-08-06 21:53:58 - service_lifecycle - INFO - service.py:222 - generate_code() - Generating python code from prompt
+2025-08-06 21:53:58 - service_lifecycle - INFO - direct_test_agent_services.py:97 - test_code_execution() - Generated code sample:
+2025-08-06 21:53:58 - service_lifecycle - INFO - direct_test_agent_services.py:98 - test_code_execution() - # Generated python code based on prompt: Write a function to calculate factorial
+def main():
+    pri...
+2025-08-06 21:53:58 - service_lifecycle - INFO - service.py:253 - validate_code() - Validating python code
+2025-08-06 21:53:58 - service_lifecycle - ERROR - service.py:287 - validate_code() - Code validation failed: [Errno 2] No such file or directory: 'pylint'
+2025-08-06 21:53:58 - service_lifecycle - INFO - direct_test_agent_services.py:105 - test_code_execution() - Code validation result: False
+2025-08-06 21:53:58 - service_lifecycle - INFO - direct_test_agent_services.py:112 - test_code_execution() - Created code execution DAG task: code_exec_9fbde9a4
+2025-08-06 21:53:58 - service_lifecycle - INFO - direct_test_agent_services.py:118 - test_service_integration() - Testing service integration...
+2025-08-06 21:53:58 - service_lifecycle - INFO - service.py:222 - generate_code() - Generating python code from prompt
+2025-08-06 21:53:58 - service_lifecycle - INFO - direct_test_agent_services.py:139 - test_service_integration() - Stored generated code in memory with ID: 3b9ab10b-e377-4968-8f39-f71e27178c6a
+2025-08-06 21:53:58 - service_lifecycle - INFO - service.py:316 - execute_code() - Executing python code [id: c38ec57a-b724-4b97-bd9d-a943688e663d]
+2025-08-06 21:53:58 - service_lifecycle - INFO - direct_test_agent_services.py:149 - test_service_integration() - Executed code from memory, success: True
+2025-08-06 21:53:58 - service_lifecycle - INFO - direct_test_agent_services.py:157 - test_service_integration() - Updated memory with execution results
+2025-08-06 21:53:58 - service_lifecycle - INFO - service.py:569 - _stop() - Stopping memory service
+2025-08-06 21:53:58 - service_lifecycle - INFO - service.py:197 - _stop() - Stopping code execution service
+2025-08-06 21:53:58 - service_lifecycle - INFO - service.py:111 - _stop() - Stopping logging service
+2025-08-06 21:53:58 - service_lifecycle - INFO - service.py:98 - _stop() - Stopping configuration service
+2025-08-06 21:54:12 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: config
+2025-08-06 21:54:12 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: logging
+2025-08-06 21:54:12 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-06 21:54:12 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-06 21:54:12 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: test_agent_service
+2025-08-06 21:54:12 - service_lifecycle - INFO - base.py:118 - initialize() - Initializing service: config
+2025-08-06 21:54:12 - service_lifecycle - INFO - service.py:57 - _initialize() - Initializing configuration service
+2025-08-06 21:54:12 - service_lifecycle - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 21:54:12 - service_lifecycle - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 21:54:12 - service_lifecycle - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 21:54:12 - service_lifecycle - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 21:54:12 - service_lifecycle - INFO - service.py:66 - _initialize() - Configuration initialized successfully
+2025-08-06 21:54:12 - service_lifecycle - INFO - base.py:125 - initialize() - Service config initialized successfully
+2025-08-06 21:54:12 - service_lifecycle - INFO - base.py:118 - initialize() - Initializing service: logging
+2025-08-06 21:54:12 - service_lifecycle - INFO - service.py:52 - _initialize() - Initializing logging service
+2025-08-06 21:54:12 - service_lifecycle - ERROR - service.py:76 - _initialize() - Failed to initialize logging: No instances of service 'config' found
+2025-08-06 21:54:12 - service_lifecycle - ERROR - base.py:128 - initialize() - Service logging initialization failed
+2025-08-06 21:54:12 - service_lifecycle - INFO - base.py:118 - initialize() - Initializing service: code_execution
+2025-08-06 21:54:12 - service_lifecycle - INFO - service.py:129 - _initialize() - Initializing code execution service
+2025-08-06 21:54:12 - service_lifecycle - ERROR - service.py:153 - _initialize() - Failed to initialize code execution service: No instances of service 'config' found
+2025-08-06 21:54:12 - service_lifecycle - ERROR - base.py:128 - initialize() - Service code_execution initialization failed
+2025-08-06 21:54:12 - service_lifecycle - INFO - base.py:118 - initialize() - Initializing service: memory
+2025-08-06 21:54:12 - service_lifecycle - INFO - service.py:455 - _initialize() - Initializing memory service
+2025-08-06 21:54:12 - service_lifecycle - WARNING - service.py:475 - _initialize() - Could not get config service: No instances of service 'config' found. Using default configuration.
+2025-08-06 21:54:12 - service_lifecycle - WARNING - service.py:490 - _initialize() - Could not get logging service: No instances of service 'logging' found. Using default logger.
+2025-08-06 21:54:12 - service_lifecycle - INFO - service.py:193 - initialize() - Initialized file system backend with 2 memories
+2025-08-06 21:54:12 - service_lifecycle - INFO - service.py:543 - _initialize() - Memory service initialized with file_system backend
+2025-08-06 21:54:12 - service_lifecycle - INFO - base.py:125 - initialize() - Service memory initialized successfully
+2025-08-06 21:54:12 - service_lifecycle - INFO - base.py:165 - start() - Starting service: config
+2025-08-06 21:54:12 - service_lifecycle - INFO - service.py:82 - _start() - Starting configuration service
+2025-08-06 21:54:12 - service_lifecycle - INFO - base.py:171 - start() - Service config started successfully
+2025-08-06 21:54:12 - service_lifecycle - ERROR - base.py:160 - start() - Cannot start uninitialized service: logging
+2025-08-06 21:54:12 - service_lifecycle - ERROR - base.py:160 - start() - Cannot start uninitialized service: code_execution
+2025-08-06 21:54:12 - service_lifecycle - INFO - base.py:165 - start() - Starting service: memory
+2025-08-06 21:54:12 - service_lifecycle - INFO - service.py:554 - _start() - Starting memory service
+2025-08-06 21:54:12 - service_lifecycle - INFO - base.py:171 - start() - Service memory started successfully

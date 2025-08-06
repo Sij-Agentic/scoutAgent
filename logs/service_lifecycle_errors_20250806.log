@@ -1,0 +1,27 @@
+2025-08-06 21:38:58 - service_lifecycle - ERROR - service.py:76 - _initialize() - Failed to initialize logging: No instances of service 'config' found
+2025-08-06 21:38:58 - service_lifecycle - ERROR - base.py:128 - initialize() - Service logging initialization failed
+2025-08-06 21:38:58 - service_lifecycle - ERROR - service.py:153 - _initialize() - Failed to initialize code execution service: No instances of service 'config' found
+2025-08-06 21:38:58 - service_lifecycle - ERROR - base.py:128 - initialize() - Service code_execution initialization failed
+2025-08-06 21:38:58 - service_lifecycle - ERROR - service.py:493 - _initialize() - Failed to initialize memory service: No instances of service 'config' found
+2025-08-06 21:38:58 - service_lifecycle - ERROR - base.py:128 - initialize() - Service memory initialization failed
+2025-08-06 21:38:58 - service_lifecycle - ERROR - base.py:160 - start() - Cannot start uninitialized service: logging
+2025-08-06 21:38:58 - service_lifecycle - ERROR - base.py:160 - start() - Cannot start uninitialized service: code_execution
+2025-08-06 21:38:58 - service_lifecycle - ERROR - base.py:160 - start() - Cannot start uninitialized service: memory
+2025-08-06 21:41:16 - service_lifecycle - ERROR - service.py:76 - _initialize() - Failed to initialize logging: 'NoneType' object has no attribute 'get_service'
+2025-08-06 21:41:16 - service_lifecycle - ERROR - service.py:99 - _start() - Failed to start logging service: unsupported operand type(s) for /: 'NoneType' and 'str'
+2025-08-06 21:41:16 - service_lifecycle - ERROR - service.py:153 - _initialize() - Failed to initialize code execution service: 'NoneType' object has no attribute 'get_service'
+2025-08-06 21:41:16 - service_lifecycle - ERROR - service.py:185 - _start() - Failed to start code execution service: unsupported operand type(s) for /: 'NoneType' and 'str'
+2025-08-06 21:41:16 - service_lifecycle - ERROR - service.py:493 - _initialize() - Failed to initialize memory service: 'NoneType' object has no attribute 'get_service'
+2025-08-06 21:41:16 - service_lifecycle - ERROR - service.py:554 - create_memory() - Failed to create memory: 'NoneType' object has no attribute 'store'
+2025-08-06 21:41:16 - service_lifecycle - ERROR - service.py:574 - get_memory() - Failed to retrieve memory None: 'NoneType' object has no attribute 'retrieve'
+2025-08-06 21:53:58 - service_lifecycle - ERROR - service.py:76 - _initialize() - Failed to initialize logging: 'NoneType' object has no attribute 'get_service'
+2025-08-06 21:53:58 - service_lifecycle - ERROR - service.py:99 - _start() - Failed to start logging service: unsupported operand type(s) for /: 'NoneType' and 'str'
+2025-08-06 21:53:58 - service_lifecycle - ERROR - service.py:153 - _initialize() - Failed to initialize code execution service: 'NoneType' object has no attribute 'get_service'
+2025-08-06 21:53:58 - service_lifecycle - ERROR - service.py:185 - _start() - Failed to start code execution service: unsupported operand type(s) for /: 'NoneType' and 'str'
+2025-08-06 21:53:58 - service_lifecycle - ERROR - service.py:287 - validate_code() - Code validation failed: [Errno 2] No such file or directory: 'pylint'
+2025-08-06 21:54:12 - service_lifecycle - ERROR - service.py:76 - _initialize() - Failed to initialize logging: No instances of service 'config' found
+2025-08-06 21:54:12 - service_lifecycle - ERROR - base.py:128 - initialize() - Service logging initialization failed
+2025-08-06 21:54:12 - service_lifecycle - ERROR - service.py:153 - _initialize() - Failed to initialize code execution service: No instances of service 'config' found
+2025-08-06 21:54:12 - service_lifecycle - ERROR - base.py:128 - initialize() - Service code_execution initialization failed
+2025-08-06 21:54:12 - service_lifecycle - ERROR - base.py:160 - start() - Cannot start uninitialized service: logging
+2025-08-06 21:54:12 - service_lifecycle - ERROR - base.py:160 - start() - Cannot start uninitialized service: code_execution
