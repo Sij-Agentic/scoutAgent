@@ -1,0 +1,15 @@
+{
+  "memory_id": "9c5b199a-47d7-4332-a78b-2bf77943d5ef",
+  "content": "Updated direct test memory content",
+  "memory_type": "text",
+  "metadata": {
+    "source": "direct_test"
+  },
+  "tags": [
+    "test",
+    "direct",
+    "memory"
+  ],
+  "timestamp": 1754513638.799087,
+  "embedding": null
+}
