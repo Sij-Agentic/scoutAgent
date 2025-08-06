@@ -25,3 +25,6 @@
 2025-08-06 21:54:12 - service_lifecycle - ERROR - base.py:128 - initialize() - Service code_execution initialization failed
 2025-08-06 21:54:12 - service_lifecycle - ERROR - base.py:160 - start() - Cannot start uninitialized service: logging
 2025-08-06 21:54:12 - service_lifecycle - ERROR - base.py:160 - start() - Cannot start uninitialized service: code_execution
+2025-08-06 21:57:10 - service_lifecycle - ERROR - service.py:76 - _initialize() - Failed to initialize logging: 'NoneType' object has no attribute 'get_service'
+2025-08-06 21:57:10 - service_lifecycle - ERROR - service.py:99 - _start() - Failed to start logging service: unsupported operand type(s) for /: 'NoneType' and 'str'
+2025-08-06 21:57:10 - service_lifecycle - ERROR - service.py:358 - validate_code() - Code validation failed: [Errno 2] No such file or directory: 'pylint'
