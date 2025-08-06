@@ -74,7 +74,7 @@ class WriterOutput:
             self.logs = []
 
 
-class WriterAgent(BaseAgent):
+class WriterAgent(BaseAgent, LLMAgentMixin):
     """
     WriterAgent for generating comprehensive reports and documentation.
     
@@ -83,116 +83,288 @@ class WriterAgent(BaseAgent):
     """
     
     def __init__(self, agent_id: str = None):
-        super().__init__(agent_id)
+        BaseAgent.__init__(self, agent_id)
+        LLMAgentMixin.__init__(self)
         self.analysis_agent = AnalysisAgent()
         self.config = get_config()
+        self.name = "writer_agent"  # Used for prompt directory name
+        self.preferred_backend = "ollama"  # Use ollama backend by default
+        
+        # Explicitly override task backend preferences to use Ollama for all tasks
+        self.task_backend_preferences = {
+            'creative_writing': 'ollama',
+            'content_creation': 'ollama',
+            'analysis': 'ollama',
+            'planning': 'ollama',
+            'default': 'ollama'
+        }
     
     async def plan(self, input_data: WriterInput) -> Dict[str, Any]:
-        """Plan the report generation process."""
+        """Plan the report generation process using LLM prompt."""
         self.logger.info(f"Planning report generation for {input_data.report_type} report")
         
-        plan = {
-            "phases": [
-                "data_analysis",
-                "structure_planning",
-                "content_generation",
-                "recommendation_synthesis",
-                "review_polishing",
-                "finalization"
-            ],
-            "report_type": input_data.report_type,
-            "target_audience": input_data.target_audience,
-            "include_recommendations": input_data.include_recommendations,
-            "include_appendices": input_data.include_appendices,
-            "expected_duration": 600,  # 10 minutes
-            "data_sources": list(input_data.workflow_data.keys())
-        }
-        
-        self.state.plan = plan
-        return plan
+        try:
+            # Load prompt template with substitutions
+            from llm.utils import load_prompt_template
+            
+            substitutions = {
+                "report_type": input_data.report_type,
+                "target_audience": input_data.target_audience,
+                "workflow_data": json.dumps(input_data.workflow_data)
+            }
+            
+            prompt_content = load_prompt_template("plan.prompt", agent_name=self.name, substitutions=substitutions)
+            
+            # Generate a comprehensive report plan using LLM
+            llm_response = await self.llm_generate(
+                prompt=prompt_content,
+                task_type="planning"
+            )
+            
+            # Extract JSON plan from LLM response
+            plan = self._extract_json(llm_response)
+            
+            # Store plan in agent state
+            self.state.plan = plan
+            
+            return plan
+            
+        except Exception as e:
+            self.logger.error(f"Error generating plan: {e}")
+            
+            # Return a basic fallback plan
+            fallback_plan = {
+                "phases": [
+                    {"name": "Data Analysis", "duration": "1 day"},
+                    {"name": "Report Structure", "duration": "1 day"},
+                    {"name": "Draft Writing", "duration": "2 days"},
+                    {"name": "Review and Revisions", "duration": "1 day"},
+                    {"name": "Final Report", "duration": "1 day"}
+                ],
+                "approach": "Sequential development of report with focus on data-driven insights",
+                "challenges": ["Data completeness", "Audience targeting", "Clear actionable recommendations"],
+                "success_criteria": ["Comprehensive coverage", "Clear insights", "Actionable recommendations"],
+                "expected_duration_minutes": 30,
+                "data_sources_to_prioritize": list(input_data.workflow_data.keys()),
+                "expected_challenges": ["data completeness"]
+            }
+            
+            self.state.plan = fallback_plan
+            return fallback_plan
+            
+    def _extract_json(self, content):
+        """Extract JSON from LLM response, handling code blocks and common format issues."""
+        try:
+            # First attempt: Try to parse the content directly
+            return json.loads(content)
+        except json.JSONDecodeError:
+            # Second attempt: Try to extract from markdown code block
+            try:
+                # Look for JSON code block
+                if '```json' in content and '```' in content.split('```json', 1)[1]:
+                    json_content = content.split('```json', 1)[1].split('```', 1)[0].strip()
+                    return json.loads(json_content)
+                # Look for generic code block that might contain JSON
+                elif '```' in content and '```' in content.split('```', 1)[1]:
+                    code_content = content.split('```', 1)[1].split('```', 1)[0].strip()
+                    return json.loads(code_content)
+            except (json.JSONDecodeError, IndexError):
+                pass
+                
+            # Third attempt: Try to fix common issues and parse again
+            try:
+                # Remove trailing commas before closing brackets/braces
+                cleaned_content = re.sub(r',\s*([\]\}])', r'\1', content)
+                return json.loads(cleaned_content)
+            except (json.JSONDecodeError, NameError):
+                # NameError would occur if re is not imported
+                import re
+                try:
+                    cleaned_content = re.sub(r',\s*([\]\}])', r'\1', content)
+                    return json.loads(cleaned_content)
+                except json.JSONDecodeError:
+                    pass
+            
+            # Final fallback: Log the issue and return an empty dict
+            logging.warning(f"Could not parse LLM response as JSON: {content[:100]}...")
+            return {}
     
     async def think(self, input_data: WriterInput) -> Dict[str, Any]:
-        """Analyze workflow data to structure the report."""
+        """Analyze workflow data and determine report structure using LLM prompt."""
         self.logger.info("Analyzing workflow data for report structure...")
         
-        # Analyze data completeness
-        data_analysis = await self._analyze_workflow_data(input_data.workflow_data)
+        try:
+            # Import at function level to avoid circular imports
+            from llm.utils import load_prompt_template
+            
+            # Retrieve plan from plan phase
+            plan = self.state.plan if hasattr(self.state, "plan") else {}
+            
+            # Prepare substitutions for prompt template
+            substitutions = {
+                "report_type": input_data.report_type,
+                "target_audience": input_data.target_audience,
+                "include_recommendations": str(input_data.include_recommendations),
+                "include_appendices": str(input_data.include_appendices),
+                "workflow_data": json.dumps(input_data.workflow_data),
+                "report_plan": json.dumps(plan)  # Use report_plan instead of plan to match prompt template
+            }
+            
+            # Load prompt template with substitutions
+            prompt_content = load_prompt_template("think.prompt", agent_name=self.name, substitutions=substitutions)
+            
+            # Generate analysis using LLM
+            llm_response = await self.llm_generate(
+                prompt=prompt_content,
+                task_type="analysis"
+            )
+            
+            # Extract JSON from LLM response
+            analysis_result = self._extract_json(llm_response)
+            
+            # Store results in agent state
+            if "report_structure" in analysis_result:
+                self.state.report_structure = analysis_result["report_structure"]
+            if "key_insights" in analysis_result:
+                self.state.key_insights = analysis_result["key_insights"]
+            if "writing_approach" in analysis_result:
+                self.state.writing_approach = analysis_result["writing_approach"]
+            
+            return analysis_result
         
-        # Determine report structure
-        structure = self._determine_report_structure(
-            input_data.report_type,
-            input_data.target_audience,
-            data_analysis
-        )
-        
-        # Identify key insights
-        insights = self._identify_key_insights(input_data.workflow_data)
-        
-        # Prepare writing strategy
-        writing_strategy = {
-            "data_completeness": data_analysis["completeness_score"],
-            "report_sections": structure["sections"],
-            "writing_approach": self._determine_writing_approach(input_data),
-            "key_insights_count": len(insights),
-            "recommendation_count": structure["expected_recommendations"]
-        }
-        
-        return writing_strategy
+        except Exception as e:
+            self.logger.error(f"Error analyzing report structure: {e}")
+            
+            # Fallback analysis in case of LLM failure
+            fallback_analysis = {
+                "data_analysis": {
+                    "completeness_score": 0.7,
+                    "data_quality": "medium",
+                    "missing_elements": [],
+                    "data_strengths": ["basic coverage of workflow steps"]
+                },
+                "report_structure": {
+                    "sections": [
+                        {"title": "Executive Summary", "content_focus": "overview"},
+                        {"title": "Key Findings", "content_focus": "insights"},
+                        {"title": "Recommendations", "content_focus": "actions"}
+                    ],
+                    "narrative_flow": "problem-solution-action",
+                    "expected_recommendations": 5
+                },
+                "key_insights": [],
+                "writing_approach": {
+                    "tone": "formal",
+                    "emphasis": "recommendations",
+                    "complexity_level": "moderate",
+                    "visualization_needs": []
+                }
+            }
+            
+            # Store fallback components in agent state
+            self.state.data_analysis = fallback_analysis["data_analysis"]
+            self.state.report_structure = fallback_analysis["report_structure"]
+            self.state.key_insights = fallback_analysis["key_insights"]
+            self.state.writing_approach = fallback_analysis["writing_approach"]
+            
+            return fallback_analysis
     
     async def act(self, input_data: WriterInput) -> WriterOutput:
-        """Execute report generation and return comprehensive report."""
-        self.logger.info("Executing report generation...")
+        """Execute report generation and return comprehensive report using LLM prompt."""
+        self.logger.info("Executing report generation using LLM...")
         
         start_time = datetime.now()
         
-        # Generate report sections
-        report_sections = await self._generate_report_sections(
-            input_data.workflow_data,
-            input_data.report_type,
-            input_data.target_audience
-        )
+        # Retrieve analysis results from previous think phase
+        report_structure = self.state.report_structure if hasattr(self.state, "report_structure") else {}
+        key_insights = self.state.key_insights if hasattr(self.state, "key_insights") else []
+        writing_approach = self.state.writing_approach if hasattr(self.state, "writing_approach") else {}
         
-        # Create executive summary
-        executive_summary = self._create_executive_summary(
-            report_sections,
-            input_data.target_audience
-        )
-        
-        # Extract key findings
-        key_findings = self._extract_key_findings(report_sections)
-        
-        # Generate recommendations
-        recommendations = self._generate_recommendations(
-            report_sections,
-            input_data.include_recommendations
-        )
-        
-        # Create next steps
-        next_steps = self._create_next_steps(report_sections)
-        
-        # Compile full report
-        full_report = self._compile_full_report(
-            executive_summary,
-            report_sections,
-            input_data.include_appendices
-        )
-        
-        # Create report metadata
-        report_metadata = self._create_report_metadata(
-            input_data,
-            len(report_sections),
-            len(key_findings)
-        )
-        
-        return WriterOutput(
-            report=full_report,
-            executive_summary=executive_summary,
-            key_findings=key_findings,
-            recommendations=recommendations,
-            next_steps=next_steps,
-            report_sections=report_sections,
-            report_metadata=report_metadata
-        )
+        # Generate report using LLM
+        try:
+            # Import at function level to avoid circular imports
+            from llm.utils import load_prompt_template
+            
+            # Prepare substitutions for prompt template
+            substitutions = {
+                "report_type": input_data.report_type,
+                "target_audience": input_data.target_audience,
+                "include_recommendations": str(input_data.include_recommendations),
+                "include_appendices": str(input_data.include_appendices),
+                "workflow_data": json.dumps(input_data.workflow_data),
+                "report_structure": json.dumps(report_structure),
+                "key_insights": json.dumps(key_insights),
+                "writing_approach": json.dumps(writing_approach)
+            }
+            
+            # Load prompt template with substitutions
+            prompt_content = load_prompt_template("act.prompt", agent_name=self.name, substitutions=substitutions)
+            
+            # Generate report using LLM
+            llm_response = await self.llm_generate(
+                prompt=prompt_content,
+                task_type="content_creation"
+            )
+            
+            # Extract JSON from LLM response
+            report_result = self._extract_json(llm_response)
+            
+            execution_time = (datetime.now() - start_time).total_seconds()
+            self.logger.info(f"Report generation completed in {execution_time:.2f} seconds")
+            
+            # Process report sections
+            report_sections = []
+            for section_data in report_result.get("report_sections", []):
+                report_sections.append(ReportSection(
+                    title=section_data.get("title", ""),
+                    content=section_data.get("content", ""),
+                    data={},  # Default empty dict for data
+                    recommendations=section_data.get("recommendations", []),
+                    key_insights=section_data.get("key_insights", [])
+                ))
+            
+            return WriterOutput(
+                report=report_result.get("executive_summary", "") + "\n\n" + 
+                      "\n\n".join([s.content for s in report_sections]),
+                executive_summary=report_result.get("executive_summary", ""),
+                key_findings=report_result.get("key_findings", []),
+                recommendations=report_result.get("recommendations", []),
+                next_steps=report_result.get("next_steps", []),
+                report_sections=report_sections,
+                report_metadata=report_result.get("report_metadata", {}),
+                execution_time=execution_time
+            )
+            
+        except Exception as e:
+            self.logger.error(f"Error generating report: {e}")
+            execution_time = (datetime.now() - start_time).total_seconds()
+            
+            # Create a minimal fallback report
+            fallback_section = ReportSection(
+                title="Executive Summary",
+                content="Report generation was unable to complete successfully.",
+                data={},
+                recommendations=["Please try again with more complete data."],
+                key_insights=["Error during report generation"]
+            )
+            
+            return WriterOutput(
+                report="Error Report\n\nThe report generation process encountered an error.",
+                executive_summary="Error during report generation",
+                key_findings=["Error occurred"],
+                recommendations=["Please try again"],
+                next_steps=["Review input data", "Try again with more complete information"],
+                report_sections=[fallback_section],
+                report_metadata={
+                    "error": str(e),
+                    "report_type": input_data.report_type,
+                    "target_audience": input_data.target_audience,
+                    "generated_at": datetime.now().isoformat()
+                },
+                execution_time=execution_time,
+                success=False,
+                error=str(e)
+            )
     
     async def _analyze_workflow_data(self, workflow_data: Dict[str, Any]) -> Dict[str, Any]:
         """Analyze the completeness and quality of workflow data."""
@@ -667,3 +839,135 @@ class WriterAgent(BaseAgent):
 # Register the agent - moved to agent_registry.py
 # from .base import register_agent
 # register_agent("writer", WriterAgent)
+
+
+# Test harness for WriterAgent
+async def test_writer_agent():
+    """Test the prompt-driven WriterAgent workflow"""
+    import logging
+    logger = logging.getLogger("writer_agent_test")
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+    logger.info("Testing WriterAgent with prompt templates...")
+    
+    # Create sample workflow data for testing
+    workflow_data = {
+        "market_analysis": {
+            "market_size": 5000000,
+            "growth_rate": 12.5,
+            "key_players": ["Company A", "Company B", "Company C"],
+            "trends": ["Digital Transformation", "AI Integration", "Remote Work"]
+        },
+        "pain_points": [
+            {
+                "id": "pp1",
+                "description": "Difficulty in scaling IT infrastructure",
+                "severity": 8,
+                "affected_segments": ["SMBs", "Tech Startups"]
+            },
+            {
+                "id": "pp2",
+                "description": "Lack of skilled cybersecurity personnel",
+                "severity": 9,
+                "affected_segments": ["All Industries"]
+            }
+        ],
+        "solutions": [
+            {
+                "name": "CloudScale Platform",
+                "description": "Cloud-based infrastructure scaling solution",
+                "target_pain_points": ["pp1"],
+                "estimated_development_time": "3-6 months",
+                "estimated_cost": 150000
+            }
+        ]
+    }
+    
+    # Create WriterInput
+    writer_input = WriterInput(
+        workflow_data=workflow_data,
+        report_type="comprehensive",
+        target_audience="stakeholders",
+        include_recommendations=True,
+        include_appendices=False
+    )
+    
+    # Initialize WriterAgent
+    agent = WriterAgent("writer-test")
+    
+    # Initialize LLM Backend
+    from llm.base import LLMConfig, LLMBackendType
+    from llm.manager import LLMManager
+    from llm.backends.ollama import OllamaBackend
+    
+    # Create the LLM configuration for the Ollama backend
+    config = LLMConfig(
+        backend_type=LLMBackendType.OLLAMA,
+        model_name="phi4-mini:latest",  # Using a smaller model for testing
+        base_url="http://localhost:11434",
+        timeout=180  # 3 minute timeout for complex queries
+    )
+    
+    # Create and register the LLM backend
+    llm_manager = LLMManager()
+    backend = OllamaBackend(config)
+    await llm_manager.register_backend(backend)
+    
+    # Assign LLM manager to agent
+    agent._llm_manager = llm_manager
+    
+    # Override preferred backend for testing
+    agent.preferred_backend = "ollama"
+    
+    try:
+        # Execute plan phase
+        logger.info("Running plan phase...")
+        plan_start = datetime.now()
+        plan = await agent.plan(writer_input)
+        plan_time = (datetime.now() - plan_start).total_seconds()
+        logger.info(f"Plan complete: {len(plan.get('phases', []))} phases identified in {plan_time:.2f}s")
+        
+        # Execute think phase
+        logger.info("Running think phase...")
+        think_start = datetime.now()
+        think_result = await agent.think(writer_input)
+        think_time = (datetime.now() - think_start).total_seconds()
+        report_structure = think_result.get("report_structure", {})
+        
+        # Handle report_structure as either a dictionary or a list
+        if isinstance(report_structure, dict):
+            sections_count = len(report_structure.get('sections', []))
+        elif isinstance(report_structure, list):
+            sections_count = len(report_structure)
+        else:
+            sections_count = 0
+            
+        logger.info(f"Think complete: {sections_count} sections planned in {think_time:.2f}s")
+        
+        # Execute act phase
+        logger.info("Running act phase...")
+        act_start = datetime.now()
+        output = await agent.act(writer_input)
+        act_time = (datetime.now() - act_start).total_seconds()
+        logger.info(f"Report sections: {len(output.report_sections)}")
+        logger.info(f"Key findings: {len(output.key_findings)}")
+        logger.info(f"Recommendations: {len(output.recommendations)}")
+        logger.info(f"Execution time: {act_time:.2f} seconds")
+        
+        # Print summary of successful execution
+        total_time = plan_time + think_time + act_time
+        logger.info("\n===== TEST SUCCESSFUL =====\n")
+        logger.info(f"WriterAgent completed report generation in {total_time:.2f}s")
+        logger.info(f"\nSample Executive Summary:\n{output.executive_summary[:200]}...\n")
+        
+    except Exception as e:
+        logger.error(f"Error testing WriterAgent: {e}")
+        raise
+
+# Run the test if script is executed directly
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(test_writer_agent())

@@ -10,3 +10,21 @@
     "Anal...
 2025-08-06 02:20:31 - config - ERROR - manager.py:179 - generate() - Error generating response with ollama: Ollama request timed out after 60s
 2025-08-06 02:20:31 - config - ERROR - utils.py:201 - llm_generate() - Error in LLM generation: Ollama request timed out after 60s
+2025-08-06 02:40:45 - config - ERROR - writer.py:125 - plan() - Error generating plan: LLMRequest.__init__() got an unexpected keyword argument 'template'
+2025-08-06 02:40:45 - config - ERROR - writer.py:232 - think() - Error analyzing report structure: LLMRequest.__init__() got an unexpected keyword argument 'template'
+2025-08-06 02:40:45 - config - ERROR - writer.py:346 - act() - Error generating report: LLMRequest.__init__() got an unexpected keyword argument 'template'
+2025-08-06 02:53:42 - config - ERROR - writer.py:121 - plan() - Error generating plan: name 'load_prompt_template' is not defined
+2025-08-06 02:53:42 - config - ERROR - writer.py:224 - think() - Error analyzing report structure: 'report_plan'
+2025-08-06 02:53:58 - config - ERROR - writer.py:121 - plan() - Error generating plan: name 'load_prompt_template' is not defined
+2025-08-06 02:53:58 - config - ERROR - writer.py:224 - think() - Error analyzing report structure: 'report_plan'
+2025-08-06 02:54:03 - config - ERROR - writer.py:121 - plan() - Error generating plan: name 'load_prompt_template' is not defined
+2025-08-06 02:54:03 - config - ERROR - writer.py:224 - think() - Error analyzing report structure: 'report_plan'
+2025-08-06 03:00:46 - config - ERROR - writer.py:123 - plan() - Error generating plan: 'include_recommendations'
+2025-08-06 03:01:07 - config - ERROR - utils.py:201 - llm_generate() - Error in LLM generation: Backend not available: claude
+2025-08-06 03:01:07 - config - ERROR - writer.py:329 - act() - Error generating report: Backend not available: claude
+2025-08-06 03:02:59 - config - ERROR - writer.py:124 - plan() - Error generating plan: 'include_recommendations'
+2025-08-06 03:03:24 - config - ERROR - utils.py:201 - llm_generate() - Error in LLM generation: Backend not available: claude
+2025-08-06 03:03:24 - config - ERROR - writer.py:330 - act() - Error generating report: Backend not available: claude
+2025-08-06 03:10:02 - config - ERROR - writer.py:133 - plan() - Error generating plan: 'include_recommendations'
+2025-08-06 03:12:45 - config - ERROR - writer.py:133 - plan() - Error generating plan: 'include_recommendations'
+2025-08-06 03:14:13 - config - ERROR - writer.py:133 - plan() - Error generating plan: 'include_recommendations'

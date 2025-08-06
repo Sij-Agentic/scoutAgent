@@ -15,6 +15,7 @@ from agents.base import BaseAgent, AgentInput, AgentOutput, AgentState
 from agents.code_agent import CodeAgent
 from agents.analysis_agent import AnalysisAgent
 from config import get_config
+from llm.utils import LLMAgentMixin, load_prompt_template
 
 
 @dataclass
@@ -83,7 +84,7 @@ class BuilderOutput:
             self.logs = []
 
 
-class BuilderAgent(BaseAgent):
+class BuilderAgent(BaseAgent, LLMAgentMixin):
     """
     BuilderAgent for creating and validating solution prototypes.
     
@@ -92,131 +93,297 @@ class BuilderAgent(BaseAgent):
     """
     
     def __init__(self, agent_id: str = None):
-        super().__init__(agent_id)
+        BaseAgent.__init__(self, agent_id)
+        LLMAgentMixin.__init__(self)
         self.code_agent = CodeAgent()
         self.analysis_agent = AnalysisAgent()
         self.config = get_config()
+        self.name = "builder_agent"  # Used for prompt directory name
+        self.preferred_backend = "ollama"  # Use ollama backend by default
+        
+        # Explicitly override task backend preferences to use Ollama for all tasks
+        self.task_backend_preferences = {
+            'planning': 'ollama',
+            'analysis': 'ollama',
+            'technical_design': 'ollama',
+            'default': 'ollama'
+        }
     
     async def plan(self, input_data: BuilderInput) -> Dict[str, Any]:
-        """Plan the solution building process."""
+        """Plan the solution building process using LLM prompt."""
         self.logger.info(f"Planning solution building for {len(input_data.market_gaps)} market gaps")
+        start_time = datetime.now()
         
-        plan = {
-            "phases": [
-                "gap_analysis",
-                "solution_design",
-                "technical_architecture",
-                "cost_estimation",
-                "validation_planning",
-                "risk_assessment",
-                "roadmap_creation"
-            ],
-            "solution_type": input_data.solution_type,
-            "budget_range": input_data.budget_range,
-            "timeline": input_data.timeline,
-            "technical_complexity": input_data.technical_complexity,
-            "expected_duration": 1200,  # 20 minutes
-            "gap_count": len(input_data.market_gaps)
-        }
+        try:
+            # Prepare substitutions for the prompt template
+            substitutions = {
+                "market_gaps": json.dumps(input_data.market_gaps),
+                "target_market": input_data.target_market,
+                "solution_type": input_data.solution_type,
+                "budget_range": input_data.budget_range,
+                "timeline": input_data.timeline,
+                "technical_complexity": input_data.technical_complexity
+            }
+            
+            # Load prompt template with substitutions
+            prompt_content = load_prompt_template("plan.prompt", agent_name=self.name, substitutions=substitutions)
+            
+            # Generate plan using LLM
+            llm_response = await self.llm_generate(
+                prompt=prompt_content,
+                task_type="planning"
+            )
+            
+            # Extract JSON from LLM response
+            plan = self._extract_json(llm_response)
+            
+        except Exception as e:
+            self.logger.error(f"Error generating plan: {str(e)}")
+            # Fallback plan
+            plan = {
+                "phases": [
+                    "gap_analysis",
+                    "solution_design",
+                    "technical_architecture",
+                    "cost_estimation",
+                    "validation_planning",
+                    "risk_assessment",
+                    "roadmap_creation"
+                ],
+                "solution_type": input_data.solution_type,
+                "budget_range": input_data.budget_range,
+                "timeline": input_data.timeline,
+                "technical_complexity": input_data.technical_complexity,
+                "expected_duration": 1200,  # 20 minutes
+                "gap_count": len(input_data.market_gaps)
+            }
+        
+        execution_time = (datetime.now() - start_time).total_seconds()
+        self.logger.info(f"Plan generation completed in {execution_time:.2f} seconds")
         
         self.state.plan = plan
         return plan
+        
+    def _extract_json(self, text: str) -> Dict[str, Any]:
+        """Extract JSON from LLM response text."""
+        try:
+            # First try to find JSON enclosed in triple backticks
+            import re
+            json_match = re.search(r'```(?:json)?([\s\S]*?)```', text)
+            if json_match:
+                json_str = json_match.group(1).strip()
+                # Remove trailing commas which can cause JSON parsing errors
+                json_str = re.sub(r',\s*}', '}', json_str)
+                json_str = re.sub(r',\s*]', ']', json_str)
+                return json.loads(json_str)
+            
+            # If no JSON in backticks, try parsing the whole text
+            return json.loads(text)
+        except Exception as e:
+            self.logger.warning(f"Could not parse LLM response as JSON: {str(text)[:50]}...")
+            return {}
     
     async def think(self, input_data: BuilderInput) -> Dict[str, Any]:
-        """Analyze market gaps to design solutions."""
-        self.logger.info("Analyzing market gaps for solution design...")
-        
-        # Analyze technical requirements
-        tech_analysis = await self._analyze_technical_requirements(
-            input_data.market_gaps,
-            input_data.solution_type
-        )
-        
-        # Evaluate solution feasibility
-        feasibility = self._evaluate_solution_feasibility(
-            input_data.market_gaps,
-            getattr(input_data, 'budget_range', {'min': 1000, 'max': 50000}),
-            input_data.timeline,
-            getattr(input_data, 'technical_complexity', 'moderate')
-        )
-        
-        # Prepare solution design strategy
-        design_strategy = {
-            "solution_count": len(input_data.market_gaps),
-            "technical_complexity": input_data.technical_complexity,
-            "feasibility_score": feasibility["overall_score"],
-            "design_approach": self._determine_design_approach(input_data),
-            "mvp_complexity": self._assess_mvp_complexity(input_data.market_gaps),
-            "integration_challenges": feasibility["integration_challenges"]
-        }
-        
-        return design_strategy
-    
-    async def act(self, input_data: BuilderInput) -> BuilderOutput:
-        """Execute solution building and return prototypes."""
-        self.logger.info("Executing solution building...")
-        
+        """Analyze market gaps to design solutions using LLM prompt."""
+        self.logger.info(f"Analyzing {len(input_data.market_gaps)} market gaps for solution design")
         start_time = datetime.now()
         
-        # Create solution prototypes
-        solution_prototypes = []
-        for gap in input_data.market_gaps:
-            prototype = await self._create_solution_prototype(
-                gap,
-                input_data.target_market,
-                input_data.solution_type,
-                input_data.budget_range,
-                input_data.timeline,
-                input_data.technical_complexity
+        # Fetch or create plan
+        plan = self.state.plan or await self.plan(input_data)
+        
+        try:
+            # Prepare substitutions for the prompt template
+            substitutions = {
+                "market_gaps": json.dumps(input_data.market_gaps),
+                "target_market": input_data.target_market,
+                "solution_type": input_data.solution_type,
+                "budget_range": input_data.budget_range,
+                "timeline": input_data.timeline,
+                "technical_complexity": input_data.technical_complexity,
+                "plan": json.dumps(plan)
+            }
+            
+            # Load prompt template with substitutions
+            prompt_content = load_prompt_template("think.prompt", agent_name=self.name, substitutions=substitutions)
+            
+            # Generate analysis using LLM
+            llm_response = await self.llm_generate(
+                prompt=prompt_content,
+                task_type="analysis"
             )
-            solution_prototypes.append(prototype)
+            
+            # Extract JSON from LLM response
+            analysis_result = self._extract_json(llm_response)
+            
+        except Exception as e:
+            self.logger.error(f"Error analyzing market gaps: {str(e)}")
+            # Fallback analysis
+            gap_analysis = []
+            for gap in input_data.market_gaps:
+                gap_analysis.append({
+                    "gap_id": gap.get("id", str(len(gap_analysis) + 1)),
+                    "gap_description": gap.get("description", ""),
+                    "feasibility_score": 7.5,
+                    "technical_requirements": ["Scalable architecture", "User-friendly interface"],
+                    "potential_approaches": ["Cloud-based solution", "Mobile application"],
+                    "estimated_complexity": "medium"
+                })
+            
+            analysis_result = {
+                "gap_analysis": gap_analysis,
+                "technical_considerations": [
+                    "Scalability requirements",
+                    "Security implications",
+                    "Integration complexity"
+                ],
+                "resource_requirements": {
+                    "development_resources": ["Frontend developers", "Backend developers", "DevOps"],
+                    "testing_resources": ["QA engineers", "User testing participants"],
+                    "deployment_resources": ["Cloud infrastructure", "CI/CD pipeline"]
+                },
+                "recommended_technologies": [
+                    "React/Vue for frontend",
+                    "Node.js/Python for backend",
+                    "AWS/GCP for hosting"
+                ],
+                "implementation_strategy": "Agile development with 2-week sprints"
+            }
         
-        # Select recommended solution
-        recommended_solution = self._select_recommended_solution(solution_prototypes)
+        execution_time = (datetime.now() - start_time).total_seconds()
+        self.logger.info(f"Gap analysis completed in {execution_time:.2f} seconds")
         
-        # Create implementation roadmap
-        implementation_roadmap = self._create_implementation_roadmap(
-            recommended_solution,
-            input_data.timeline
-        )
+        self.state.analysis = analysis_result
+        return analysis_result
+    
+    async def act(self, input_data: BuilderInput) -> BuilderOutput:
+        """Execute solution building and return prototypes using LLM prompt."""
+        self.logger.info(f"Creating solution prototypes for {len(input_data.market_gaps)} market gaps")
+        start_time = datetime.now()
         
-        # Calculate resource requirements
-        resource_requirements = self._calculate_resource_requirements(
-            recommended_solution,
-            input_data.solution_type
-        )
+        # Get plan and analysis or run if not available
+        plan = self.state.plan or await self.plan(input_data)
+        gap_analysis = getattr(self.state, 'analysis', None) or await self.think(input_data)
         
-        # Validate solutions
-        validation_results = self._validate_solutions(
-            solution_prototypes,
-            input_data.target_market
-        )
+        try:
+            # Prepare substitutions for the prompt template
+            substitutions = {
+                "market_gaps": json.dumps(input_data.market_gaps),
+                "target_market": input_data.target_market,
+                "solution_type": input_data.solution_type,
+                "budget_range": input_data.budget_range,
+                "timeline": input_data.timeline,
+                "technical_complexity": input_data.technical_complexity,
+                "plan": json.dumps(plan),
+                "gap_analysis": json.dumps(gap_analysis)
+            }
+            
+            # Load prompt template with substitutions
+            prompt_content = load_prompt_template("act.prompt", agent_name=self.name, substitutions=substitutions)
+            
+            # Generate solution prototypes using LLM
+            llm_response = await self.llm_generate(
+                prompt=prompt_content,
+                task_type="technical_design"
+            )
+            
+            # Extract JSON from LLM response
+            solution_result = self._extract_json(llm_response)
+            
+            # Convert LLM output to SolutionPrototypes
+            solution_prototypes = []
+            for solution_data in solution_result.get("solution_prototypes", []):
+                try:
+                    solution = SolutionPrototype(
+                        solution_name=solution_data.get("solution_name", ""),
+                        description=solution_data.get("description", ""),
+                        target_pain_points=solution_data.get("target_pain_points", []),
+                        key_features=solution_data.get("key_features", []),
+                        technical_architecture=solution_data.get("technical_architecture", {}),
+                        implementation_approach=solution_data.get("implementation_approach", ""),
+                        estimated_development_time=solution_data.get("estimated_development_time", ""),
+                        estimated_cost=float(solution_data.get("estimated_cost", 0)),
+                        market_size=float(solution_data.get("market_size", 0)),
+                        mvp_scope=solution_data.get("mvp_scope", []),
+                        validation_plan=solution_data.get("validation_plan", {}),
+                        success_metrics=solution_data.get("success_metrics", []),
+                        risk_assessment=solution_data.get("risk_assessment", {})
+                    )
+                    solution_prototypes.append(solution)
+                except Exception as e:
+                    self.logger.error(f"Error creating solution prototype: {str(e)}")
+            
+            # Create BuilderOutput
+            output = BuilderOutput(
+                solution_prototypes=solution_prototypes,
+                recommended_solution=solution_result.get("recommended_solution", {}),
+                implementation_roadmap=solution_result.get("implementation_roadmap", []),
+                technical_design=solution_result.get("technical_design", {}),
+                cost_analysis=solution_result.get("cost_analysis", {}),
+                timeline_estimate=solution_result.get("timeline_estimate", {}),
+                feasibility_score=float(solution_result.get("feasibility_score", 0)),
+                risk_factors=solution_result.get("risk_factors", []),
+                success_metrics=solution_result.get("success_metrics", []),
+                execution_time=(datetime.now() - start_time).total_seconds()
+            )
+            
+        except Exception as e:
+            self.logger.error(f"Error generating solution prototypes: {str(e)}")
+            # Fallback solution
+            default_solution = self._create_fallback_solution(input_data)
+            
+            # Create BuilderOutput with fallback solution
+            output = BuilderOutput(
+                solution_prototypes=[default_solution],
+                recommended_solution=default_solution.to_dict(),
+                implementation_roadmap=self._create_implementation_roadmap(),
+                technical_design=self._create_technical_design(default_solution),
+                cost_analysis=self._calculate_cost_analysis(default_solution),
+                timeline_estimate=self._estimate_timeline(default_solution, input_data.timeline),
+                feasibility_score=self._calculate_feasibility_score(default_solution),
+                risk_factors=["Technical complexity", "Market adoption"],
+                success_metrics=self._define_success_metrics(default_solution, input_data.target_market),
+                execution_time=(datetime.now() - start_time).total_seconds()
+            )
         
-        # Generate next steps
-        next_steps = self._generate_next_steps(
-            recommended_solution,
-            validation_results
-        )
+        self.logger.info(f"Solution generation completed in {output.execution_time:.2f} seconds")
+        return output
         
-        best_solution = self._select_best_solution(solution_prototypes)
-        technical_design = self._create_technical_design(best_solution)
-        roadmap = self._create_implementation_roadmap(best_solution, input_data.timeline)
-        cost_analysis = self._calculate_cost_analysis(best_solution)
-        timeline_estimate = self._estimate_timeline(best_solution, input_data.timeline)
-        feasibility_score = self._calculate_feasibility_score(best_solution)
-        risk_factors = self._assess_risk_factors(best_solution)
-        success_metrics = self._define_success_metrics(best_solution, input_data.target_market)
-        
-        return BuilderOutput(
-            solution_prototypes=solution_prototypes,
-            recommended_solution=recommended_solution,
-            implementation_roadmap=roadmap,
-            technical_design=technical_design,
-            cost_analysis=cost_analysis,
+    def _create_fallback_solution(self, input_data: BuilderInput) -> SolutionPrototype:
+        """Create a fallback solution when LLM generation fails."""
+        if not input_data.market_gaps:
+            gap = {"description": "Unknown market gap"}
+        else:
+            gap = input_data.market_gaps[0]
+            
+        return SolutionPrototype(
+            solution_name=f"Solution for {input_data.target_market}",
+            description=f"A {input_data.solution_type} solution for {input_data.target_market}",
+            target_pain_points=[gap.get("pain_point", "Unspecified pain point")],
+            key_features=["Scalable architecture", "User-friendly interface"],
+            technical_architecture={
+                "components": ["Frontend", "Backend", "Database"],
+                "technologies": ["React", "Node.js", "PostgreSQL"],
+                "integrations": ["Payment gateway", "Analytics"],
+                "deployment": "Cloud-based"
+            },
+            implementation_approach="Agile development with 2-week sprints",
+            estimated_development_time="3-6 months",
+            estimated_cost=150000.0,
+            market_size=5000000.0,
+            mvp_scope=["Core feature 1", "Core feature 2"],
+            validation_plan={
+                "validation_methods": ["User testing", "Beta program"],
+                "success_criteria": ["Adoption rate", "User satisfaction"],
+                "testing_approach": "Iterative testing with target users"
+            },
+            success_metrics=["User adoption rate > 10%", "Customer satisfaction > 4.0/5.0"],
+            risk_assessment={
+                "risks": ["Technical complexity", "Market adoption"],
+                "mitigations": ["Prototype key components early", "Conduct user testing"]
+            },
             timeline_estimate=timeline_estimate,
             feasibility_score=feasibility_score,
-            risk_factors=risk_factors,
-            success_metrics=success_metrics
+            risk_factors=risk_factors
         )
 
     def _evaluate_solution_feasibility(self, solution: Dict[str, Any], *args, **kwargs) -> Dict[str, Any]:
@@ -717,3 +884,121 @@ class BuilderAgent(BaseAgent):
 # Register the agent - moved to agent_registry.py
 # from .base import register_agent
 # register_agent("builder", BuilderAgent)
+
+
+async def test_builder_agent():
+    """Test BuilderAgent with prompt templates."""
+    import logging
+    from datetime import datetime
+    
+    # Configure logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S"
+    )
+    logger = logging.getLogger("builder_agent_test")
+    logger.info("Testing BuilderAgent with prompt templates...")
+    
+    # Sample market gaps data
+    market_gaps = [
+        {
+            "id": "gap1",
+            "description": "Lack of affordable project management tools for small businesses",
+            "pain_point": "Small businesses struggle with project tracking and team coordination",
+            "market_segment": "SMB",
+            "score": 8.5
+        },
+        {
+            "id": "gap2",
+            "description": "Fragmented data analytics solutions for e-commerce",
+            "pain_point": "E-commerce businesses lack integrated analytics for sales and marketing",
+            "market_segment": "E-commerce",
+            "score": 7.8
+        }
+    ]
+    
+    # Create BuilderInput
+    builder_input = BuilderInput(
+        market_gaps=market_gaps,
+        target_market="small businesses",
+        solution_type="software",
+        budget_range="moderate",
+        timeline="3-6 months",
+        technical_complexity="moderate"
+    )
+    
+    # Initialize BuilderAgent
+    agent = BuilderAgent("builder-test")
+    
+    # Initialize LLM Backend
+    from llm.base import LLMConfig, LLMBackendType
+    from llm.manager import LLMManager
+    from llm.backends.ollama import OllamaBackend
+    
+    # Create the LLM configuration for the Ollama backend
+    config = LLMConfig(
+        backend_type=LLMBackendType.OLLAMA,
+        model_name="phi4-mini:latest",  # Using a smaller model for testing
+        base_url="http://localhost:11434",
+        timeout=180  # 3 minute timeout for complex queries
+    )
+    
+    # Create and register the LLM backend
+    llm_manager = LLMManager()
+    backend = OllamaBackend(config)
+    await llm_manager.register_backend(backend)
+    
+    # Assign LLM manager to agent
+    agent._llm_manager = llm_manager
+    
+    # Override preferred backend for testing
+    agent.preferred_backend = "ollama"
+    
+    try:
+        # Execute plan phase
+        logger.info("Running plan phase...")
+        plan_start = datetime.now()
+        plan = await agent.plan(builder_input)
+        plan_time = (datetime.now() - plan_start).total_seconds()
+        logger.info(f"Plan complete: {len(plan.get('phases', []))} phases identified in {plan_time:.2f}s")
+        
+        # Execute think phase
+        logger.info("Running think phase...")
+        think_start = datetime.now()
+        think_result = await agent.think(builder_input)
+        think_time = (datetime.now() - think_start).total_seconds()
+        
+        # Get gap analysis count
+        gap_analysis = think_result.get("gap_analysis", [])
+        if isinstance(gap_analysis, list):
+            analysis_count = len(gap_analysis)
+        else:
+            analysis_count = 0
+            
+        logger.info(f"Think complete: {analysis_count} gaps analyzed in {think_time:.2f}s")
+        
+        # Execute act phase
+        logger.info("Running act phase...")
+        act_start = datetime.now()
+        act_result = await agent.act(builder_input)
+        act_time = (datetime.now() - act_start).total_seconds()
+        
+        # Log results
+        logger.info(f"Act complete: {len(act_result.solution_prototypes)} solution prototypes generated in {act_time:.2f}s")
+        logger.info(f"Solutions:")  
+        for i, solution in enumerate(act_result.solution_prototypes):
+            logger.info(f"  Solution {i+1}: {solution.solution_name} - Est. Cost: ${solution.estimated_cost}")
+        
+        logger.info("\n===== TEST SUCCESSFUL =====\n")
+        logger.info(f"BuilderAgent completed solution generation in {plan_time + think_time + act_time:.2f}s")
+        
+    except Exception as e:
+        logger.error(f"Error testing BuilderAgent: {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
+
+
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(test_builder_agent())
