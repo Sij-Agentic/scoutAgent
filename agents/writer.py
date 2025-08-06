@@ -7,6 +7,7 @@ for the entire pain point scouting and solution development workflow.
 
 import asyncio
 import json
+import logging
 from typing import Dict, List, Any, Optional
 from datetime import datetime
 from dataclasses import dataclass, asdict
@@ -14,6 +15,8 @@ from dataclasses import dataclass, asdict
 from agents.base import BaseAgent, AgentInput, AgentOutput, AgentState
 from agents.analysis_agent import AnalysisAgent
 from config import get_config
+from llm.utils import LLMAgentMixin
+from llm.base import LLMRequest
 
 
 @dataclass

@@ -1,2 +1,12 @@
 2025-08-06 01:33:41 - config - ERROR - memory_agent.py:105 - _extract_json() - Failed to decode JSON: Expecting property name enclosed in double quotes: line 68 column 30 (char 1999)
 2025-08-06 01:33:41 - config - ERROR - memory_agent.py:227 - act() - Failed to parse memory execution results from LLM response
+2025-08-06 01:43:31 - config - ERROR - memory_agent.py:108 - _extract_json() - No JSON found in response
+2025-08-06 02:11:36 - config - ERROR - utils.py:201 - llm_generate() - Error in LLM generation: Backend not available: claude
+2025-08-06 02:19:30 - config - ERROR - gap_finder_enhanced.py:181 - _extract_json() - Failed to decode JSON: ```json
+{
+  "operation": "market_gap_analysis",
+  "phases": [
+    "Identify Pain Points", 
+    "Anal...
+2025-08-06 02:20:31 - config - ERROR - manager.py:179 - generate() - Error generating response with ollama: Ollama request timed out after 60s
+2025-08-06 02:20:31 - config - ERROR - utils.py:201 - llm_generate() - Error in LLM generation: Ollama request timed out after 60s

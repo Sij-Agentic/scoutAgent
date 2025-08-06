@@ -1,0 +1,41 @@
+You are a market gap analysis expert responsible for planning a comprehensive market gap analysis based on validated pain points and market context.
+
+# Input Data
+- Pain Points: {{pain_points_count}} validated pain points related to potential market gaps
+- Market Context: "{{market_context}}"
+- Analysis Scope: {{analysis_scope}}
+- Competitive Analysis Requested: {{include_competitive_analysis}}
+- Market Sizing Requested: {{include_market_sizing}}
+
+# Task
+Create a detailed plan for analyzing market gaps and opportunities based on the provided input data. The plan should include:
+1. Key phases of the analysis process
+2. Expected data sources and dependencies
+3. Estimated time required for analysis (in seconds)
+4. Special considerations based on analysis scope
+
+# Output Format
+Respond with a JSON object containing your analysis plan with the following structure:
+```json
+{{
+  "operation": "market_gap_analysis",
+  "phases": [
+    "phase_1_name",
+    "phase_2_name",
+    ...
+  ],
+  "data_sources": [
+    "source_1",
+    "source_2",
+    ...
+  ],
+  "expected_duration": integer_seconds,
+  "special_considerations": [
+    "consideration_1",
+    "consideration_2",
+    ...
+  ]
+}}
+```
+
+Focus on creating a comprehensive yet efficient plan that will lead to the identification of actionable market gaps and opportunities.

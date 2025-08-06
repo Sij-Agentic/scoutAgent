@@ -51,3 +51,307 @@
 2025-08-06 01:33:41 - config - ERROR - memory_agent.py:105 - _extract_json() - Failed to decode JSON: Expecting property name enclosed in double quotes: line 68 column 30 (char 1999)
 2025-08-06 01:33:41 - config - ERROR - memory_agent.py:227 - act() - Failed to parse memory execution results from LLM response
 2025-08-06 01:33:41 - config - INFO - memory_agent.py:230 - act() - Falling back to traditional execution methods
+2025-08-06 01:43:23 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 01:43:23 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 01:43:23 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 01:43:23 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-06 01:43:23 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-06 01:43:23 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 01:43:23 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 01:43:23 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 01:43:23 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 01:43:23 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 01:43:23 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 01:43:23 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 01:43:23 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 01:43:23 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-06 01:43:23 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-06 01:43:23 - config - WARNING - config.py:192 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-06 01:43:23 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 01:43:23 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 01:43:23 - config - INFO - base.py:89 - __init__() - Initialized agent: memory (6c6d3877-6560-43f1-a48a-eb1cf455e046)
+2025-08-06 01:43:23 - config - INFO - memory_agent.py:113 - plan() - Planning memory operation: store
+2025-08-06 01:43:23 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: phi4-mini:latest
+2025-08-06 01:43:23 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-06 01:43:23 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-06 01:43:23 - config - INFO - manager.py:442 - initialize_llm_backends() - Initialized Ollama backend
+2025-08-06 01:43:23 - config - INFO - manager.py:450 - initialize_llm_backends() - LLM initialization complete. Available backends: ['ollama']
+2025-08-06 01:43:23 - config - INFO - manager.py:451 - initialize_llm_backends() - Default backend: ollama
+2025-08-06 01:43:28 - config - INFO - memory_agent.py:147 - plan() - Memory plan created for operation: store
+2025-08-06 01:43:28 - config - INFO - memory_agent.py:153 - think() - Analyzing memory operation requirements...
+2025-08-06 01:43:31 - config - ERROR - memory_agent.py:108 - _extract_json() - No JSON found in response
+2025-08-06 01:43:31 - config - WARNING - memory_agent.py:181 - think() - Failed to parse memory analysis from LLM response, using default
+2025-08-06 01:43:31 - config - INFO - memory_agent.py:190 - think() - Memory operation requirements analyzed
+2025-08-06 01:43:31 - config - INFO - memory_agent.py:196 - act() - Executing memory operation: store
+2025-08-06 01:43:42 - config - INFO - memory_agent.py:279 - act() - Memory store operation completed successfully
+2025-08-06 01:56:17 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 01:56:17 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 01:56:17 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 01:56:17 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-06 01:56:17 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-06 01:56:17 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 01:56:17 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 01:56:17 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 01:56:17 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 01:56:17 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 01:56:17 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 01:56:17 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 01:56:17 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 01:56:17 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-06 01:56:17 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-06 01:58:59 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 01:58:59 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 01:58:59 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 01:58:59 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-06 01:58:59 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-06 01:58:59 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 01:58:59 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 01:58:59 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 01:58:59 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 01:58:59 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 01:58:59 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 01:58:59 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 01:58:59 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 01:58:59 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-06 01:58:59 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-06 01:59:57 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 01:59:57 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 01:59:57 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 01:59:57 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-06 01:59:57 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-06 01:59:57 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 01:59:57 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 01:59:57 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 01:59:57 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 01:59:57 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 01:59:57 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 01:59:57 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 01:59:57 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 01:59:57 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-06 01:59:57 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-06 02:01:02 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 02:01:02 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 02:01:02 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 02:01:02 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-06 02:01:02 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-06 02:01:02 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 02:01:02 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 02:01:02 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 02:01:02 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 02:01:02 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 02:01:02 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 02:01:02 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 02:01:02 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 02:01:02 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-06 02:01:02 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-06 02:01:02 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 02:01:02 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 02:01:02 - config - INFO - base.py:89 - __init__() - Initialized agent: gap_finder_agent (gap-finder-test)
+2025-08-06 02:02:12 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 02:02:12 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 02:02:12 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 02:02:12 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-06 02:02:12 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-06 02:02:12 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 02:02:12 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 02:02:12 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 02:02:12 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 02:02:12 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 02:02:12 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 02:02:12 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 02:02:12 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 02:02:12 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-06 02:02:12 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-06 02:02:12 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 02:02:12 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 02:02:12 - config - INFO - base.py:89 - __init__() - Initialized agent: gap_finder_agent (gap-finder-test)
+2025-08-06 02:04:48 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 02:04:48 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 02:04:48 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 02:04:48 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-06 02:04:48 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-06 02:04:48 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 02:04:48 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 02:04:48 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 02:04:48 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 02:04:48 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 02:04:48 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 02:04:48 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 02:04:48 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 02:04:48 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-06 02:04:48 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-06 02:06:09 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 02:06:09 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 02:06:09 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 02:06:09 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-06 02:06:09 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-06 02:06:09 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 02:06:09 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 02:06:09 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 02:06:09 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 02:06:09 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 02:06:09 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 02:06:09 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 02:06:09 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 02:06:09 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-06 02:06:09 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-06 02:06:09 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 02:06:09 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 02:07:19 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 02:07:19 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 02:07:19 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 02:07:19 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-06 02:07:19 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-06 02:07:19 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 02:07:19 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 02:07:19 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 02:07:19 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 02:07:19 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 02:07:19 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 02:07:19 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 02:07:19 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 02:07:19 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-06 02:07:19 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-06 02:07:19 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 02:07:19 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 02:07:19 - config - INFO - base.py:89 - __init__() - Initialized agent: gap_finder_agent (gap-finder-test)
+2025-08-06 02:07:19 - config - INFO - ollama.py:226 - _ensure_model_available() - Model llama3 not found, attempting to pull...
+2025-08-06 02:08:20 - config - WARNING - ollama.py:233 - _ensure_model_available() - Could not verify model availability: Failed to pull model llama3: 
+2025-08-06 02:08:20 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: llama3
+2025-08-06 02:08:20 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-06 02:08:20 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-06 02:08:20 - config - INFO - gap_finder_enhanced.py:116 - plan() - Planning enhanced gap analysis for 3 pain points
+2025-08-06 02:10:35 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 02:10:35 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 02:10:35 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 02:10:35 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-06 02:10:35 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-06 02:10:35 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 02:10:35 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 02:10:35 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 02:10:35 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 02:10:35 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 02:10:35 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 02:10:35 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 02:10:35 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 02:10:35 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-06 02:10:35 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-06 02:10:35 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 02:10:35 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 02:10:35 - config - INFO - base.py:89 - __init__() - Initialized agent: gap_finder_agent (gap-finder-test)
+2025-08-06 02:10:35 - config - INFO - ollama.py:226 - _ensure_model_available() - Model llama3 not found, attempting to pull...
+2025-08-06 02:11:36 - config - WARNING - ollama.py:233 - _ensure_model_available() - Could not verify model availability: Failed to pull model llama3: 
+2025-08-06 02:11:36 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: llama3
+2025-08-06 02:11:36 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-06 02:11:36 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-06 02:11:36 - config - INFO - gap_finder_enhanced.py:116 - plan() - Planning enhanced gap analysis for 3 pain points
+2025-08-06 02:11:36 - config - ERROR - utils.py:201 - llm_generate() - Error in LLM generation: Backend not available: claude
+2025-08-06 02:12:44 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 02:12:44 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 02:12:44 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 02:12:44 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-06 02:12:44 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-06 02:12:44 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 02:12:44 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 02:12:44 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 02:12:44 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 02:12:44 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 02:12:44 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 02:12:44 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 02:12:44 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 02:12:44 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-06 02:12:44 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-06 02:12:44 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 02:12:44 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 02:12:44 - config - INFO - base.py:89 - __init__() - Initialized agent: gap_finder_agent (gap-finder-test)
+2025-08-06 02:12:44 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: phi4-mini:latest
+2025-08-06 02:12:44 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-06 02:12:44 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-06 02:12:44 - config - INFO - gap_finder_enhanced.py:116 - plan() - Planning enhanced gap analysis for 3 pain points
+2025-08-06 02:13:01 - config - INFO - gap_finder_enhanced.py:155 - plan() - Market gap analysis plan created with 4 phases
+2025-08-06 02:13:01 - config - INFO - gap_finder_enhanced.py:190 - think() - Analyzing market gaps and opportunities...
+2025-08-06 02:16:32 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 02:16:32 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 02:16:32 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 02:16:32 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-06 02:16:32 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-06 02:16:32 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 02:16:32 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 02:16:32 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 02:16:32 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 02:16:32 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 02:16:32 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 02:16:32 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 02:16:32 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 02:16:32 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-06 02:16:32 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-06 02:16:32 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 02:16:32 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 02:16:32 - config - INFO - base.py:89 - __init__() - Initialized agent: gap_finder_agent (gap-finder-test)
+2025-08-06 02:16:32 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: phi4-mini:latest
+2025-08-06 02:16:32 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-06 02:16:32 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-06 02:16:32 - config - INFO - gap_finder_enhanced.py:116 - plan() - Planning enhanced gap analysis for 3 pain points
+2025-08-06 02:16:38 - config - INFO - gap_finder_enhanced.py:155 - plan() - Market gap analysis plan created with 5 phases
+2025-08-06 02:16:38 - config - INFO - gap_finder_enhanced.py:190 - think() - Analyzing market gaps and opportunities...
+2025-08-06 02:16:46 - config - INFO - gap_finder_enhanced.py:254 - think() - Market gap analysis completed.
+2025-08-06 02:16:46 - config - INFO - gap_finder_enhanced.py:265 - act() - Executing market gap analysis with 3 market themes
+2025-08-06 02:19:25 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 02:19:25 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 02:19:25 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 02:19:25 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-06 02:19:25 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-06 02:19:25 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 02:19:25 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 02:19:25 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 02:19:25 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 02:19:25 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 02:19:25 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 02:19:25 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 02:19:25 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 02:19:25 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-06 02:19:25 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-06 02:19:25 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 02:19:25 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 02:19:25 - config - INFO - base.py:89 - __init__() - Initialized agent: gap_finder_agent (gap-finder-test)
+2025-08-06 02:19:25 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: phi4-mini:latest
+2025-08-06 02:19:25 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-06 02:19:25 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-06 02:19:25 - config - INFO - gap_finder_enhanced.py:116 - plan() - Planning enhanced gap analysis for 3 pain points
+2025-08-06 02:19:30 - config - ERROR - gap_finder_enhanced.py:181 - _extract_json() - Failed to decode JSON: ```json
+{
+  "operation": "market_gap_analysis",
+  "phases": [
+    "Identify Pain Points", 
+    "Anal...
+2025-08-06 02:19:30 - config - WARNING - gap_finder_enhanced.py:138 - plan() - Failed to parse market gap analysis plan from LLM response, using default
+2025-08-06 02:19:30 - config - INFO - gap_finder_enhanced.py:155 - plan() - Market gap analysis plan created with 7 phases
+2025-08-06 02:19:30 - config - INFO - gap_finder_enhanced.py:190 - think() - Analyzing market gaps and opportunities...
+2025-08-06 02:20:31 - config - ERROR - manager.py:179 - generate() - Error generating response with ollama: Ollama request timed out after 60s
+2025-08-06 02:20:31 - config - ERROR - utils.py:201 - llm_generate() - Error in LLM generation: Ollama request timed out after 60s
+2025-08-06 02:23:31 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 02:23:31 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 02:23:31 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 02:23:31 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-06 02:23:31 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-06 02:23:31 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 02:23:31 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 02:23:31 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 02:23:31 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 02:23:31 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 02:23:31 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 02:23:31 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 02:23:31 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 02:23:31 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-06 02:23:31 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-06 02:23:31 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 02:23:31 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 02:23:31 - config - INFO - base.py:89 - __init__() - Initialized agent: gap_finder_agent (gap-finder-test)
+2025-08-06 02:23:31 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: phi4-mini:latest
+2025-08-06 02:23:31 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-06 02:23:31 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-06 02:23:31 - config - INFO - gap_finder_enhanced.py:116 - plan() - Planning enhanced gap analysis for 3 pain points
+2025-08-06 02:23:38 - config - INFO - gap_finder_enhanced.py:155 - plan() - Market gap analysis plan created with 6 phases
+2025-08-06 02:23:38 - config - INFO - gap_finder_enhanced.py:204 - think() - Analyzing market gaps and opportunities...
+2025-08-06 02:23:53 - config - INFO - gap_finder_enhanced.py:268 - think() - Market gap analysis completed.
+2025-08-06 02:23:53 - config - INFO - gap_finder_enhanced.py:279 - act() - Executing market gap analysis with 2 market themes
