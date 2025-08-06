@@ -1,0 +1,46 @@
+You are a market analysis expert examining validated pain points to identify significant market gaps and opportunities.
+
+# Input Context
+- Pain Points: {{pain_points_count}} validated pain points 
+- Market Context: "{{market_context}}"
+- Analysis Scope: {{analysis_scope}}
+
+# Pain Points Sample
+```
+{{pain_points_sample}}
+```
+
+# Task
+Analyze the pain points and market context to identify key market themes, potential opportunities, and develop initial insights about market gaps. Focus on:
+
+1. Clustering related pain points into market themes
+2. Identifying underserved market segments
+3. Recognizing patterns that suggest gaps in current market offerings
+4. Calculating relative importance and urgency of identified gaps
+5. Estimating market complexity and sizing requirements
+
+# Output Format
+Return a JSON object with the following structure:
+```json
+{{
+  "market_themes": [
+    {{
+      "theme_id": "unique_id",
+      "theme_name": "descriptive_name",
+      "related_pain_points": [pain_point_indices],
+      "description": "theme_description",
+      "potential_impact": "high|medium|low"
+    }}
+  ],
+  "data_complexity": "high|medium|low",
+  "storage_requirements": {{
+    "estimated_size_kb": numeric_value,
+    "entries_count": numeric_value,
+    "complexity": "high|medium|low"
+  }},
+  "analysis_scope": "description_of_scope",
+  "expected_insights": integer_count
+}}
+```
+
+Your analysis should be thorough and identify the most promising market gaps based on the validated pain points.

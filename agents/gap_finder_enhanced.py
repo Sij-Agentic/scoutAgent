@@ -7,12 +7,15 @@ into the existing ScoutAgent architecture.
 
 import asyncio
 import json
-from typing import Dict, List, Any, Optional
+import logging
+import re
 from datetime import datetime
+from typing import Dict, List, Any, Optional
 from dataclasses import dataclass, asdict
 
 from agents.base import BaseAgent, AgentInput, AgentOutput, AgentState
 from agents.gap_finder import MarketGap, GapFinderInput, GapFinderOutput
+from llm.utils import LLMAgentMixin, AgentPrompt, AgentPromptTemplates, load_prompt_template
 from llm.utils import LLMAgentMixin, AgentPrompt, AgentPromptTemplates
 from config import get_config
 
@@ -88,13 +91,19 @@ class EnhancedGapFinderAgent(BaseAgent, LLMAgentMixin):
             )
             return output
     
-    def __init__(self, config: Optional[Any] = None):
+    def __init__(self, config: Optional[Any] = None, agent_id: str = None):
         """Initialize the enhanced gap finder agent."""
-        super().__init__(name="EnhancedGapFinderAgent", config=config)
+        # Initialize BaseAgent
+        BaseAgent.__init__(self, agent_id=agent_id, name="gap_finder_agent", config=config)
         self.description = "AI-powered market gap analysis with LLM insights"
-        # Initialize LLM capabilities after base initialization
-        LLMAgentMixin.__init__(self)
-        self.initialize_llm()
+        
+        # Initialize LLM capabilities
+        from llm.utils import LLMAgentMixin
+        LLMAgentMixin.__init__(self, preferred_backend="claude")
+        
+        # Explicitly initialize LLM manager
+        if not hasattr(self, '_llm_manager') or self._llm_manager is None:
+            self.initialize_llm()
     
     async def plan(self, agent_input: AgentInput) -> Dict[str, Any]:
         """Plan the enhanced market gap analysis process."""
@@ -102,125 +111,274 @@ class EnhancedGapFinderAgent(BaseAgent, LLMAgentMixin):
             raise ValueError("Expected GapFinderInput data")
         
         input_data = agent_input.data
+        pain_points_count = len(input_data.validated_pain_points)
         
-        self.logger.info(f"Planning enhanced gap analysis for {len(input_data.validated_pain_points)} pain points")
+        self.logger.info(f"Planning enhanced gap analysis for {pain_points_count} pain points")
         
-        plan = {
-            "phases": [
-                "llm_pain_point_analysis",
-                "llm_market_theme_identification", 
-                "llm_competitive_landscape_analysis",
-                "llm_opportunity_assessment",
-                "llm_solution_generation",
-                "llm_risk_analysis",
-                "results_synthesis"
-            ],
-            "analysis_scope": input_data.analysis_scope,
-            "use_llm": True,
-            "llm_backend": self._llm_manager.get_default_backend() if self._llm_manager else "auto",
-            "include_competitive_analysis": input_data.include_competitive_analysis,
-            "include_market_sizing": input_data.include_market_sizing,
-            "expected_duration": 600,  # 10 minutes with LLM processing
-            "pain_point_count": len(input_data.validated_pain_points)
-        }
+        # Load the plan prompt template
+        prompt_template = load_prompt_template(
+            'plan.prompt',
+            agent_name=self.name,
+            substitutions={
+                'pain_points_count': pain_points_count,
+                'market_context': input_data.market_context,
+                'analysis_scope': input_data.analysis_scope,
+                'include_competitive_analysis': input_data.include_competitive_analysis,
+                'include_market_sizing': input_data.include_market_sizing
+            }
+        )
         
+        # Generate plan using LLM
+        response = await self.llm_generate(prompt_template)
+        
+        # Extract plan from LLM response
+        plan = self._extract_json(response)
+        
+        if not plan:
+            self.logger.warning("Failed to parse market gap analysis plan from LLM response, using default")
+            plan = {
+                "operation": "market_gap_analysis",
+                "phases": [
+                    "pain_point_clustering",
+                    "market_research",
+                    "competitive_analysis",
+                    "gap_identification",
+                    "opportunity_scoring",
+                    "risk_assessment",
+                    "recommendation_generation"
+                ],
+                "expected_duration": 600,  # 10 minutes
+                "data_sources": ["pain_points", "market_context"],
+                "special_considerations": [input_data.analysis_scope]
+            }
+        
+        self.logger.info(f"Market gap analysis plan created with {len(plan.get('phases', []))} phases")
+        self.state.plan = plan
         return plan
+    
+    def _extract_json(self, text: str) -> Dict[str, Any]:
+        """Extract JSON data from LLM output text with enhanced parsing."""
+        # Log the full response for debugging
+        self.logger.debug(f"Raw LLM response: {text}")
+        
+        try:
+            # Try to load as-is first
+            return json.loads(text)
+        except json.JSONDecodeError:
+            # Look for JSON block in markdown format (common LLM output pattern)
+            json_match = re.search(r"```(?:json)?\s*([\s\S]+?)\s*```", text)
+            if json_match:
+                json_content = json_match.group(1).strip()
+                try:
+                    return json.loads(json_content)
+                except json.JSONDecodeError as e:
+                    self.logger.warning(f"JSON decode error in markdown block: {e}")
+                    # Try to clean up common issues with LLM-generated JSON
+                    # Remove trailing commas before closing brackets or braces
+                    cleaned_json = re.sub(r',\s*([\]\}])', r'\1', json_content)
+                    try:
+                        return json.loads(cleaned_json)
+                    except json.JSONDecodeError:
+                        self.logger.warning("Failed to parse JSON even after cleanup")
+            
+            # Look for { ... } pattern as a fallback
+            brace_match = re.search(r"\{[\s\S]*?\}", text)
+            if brace_match:
+                try:
+                    json_content = brace_match.group(0)
+                    # Try cleaning this content too
+                    cleaned_json = re.sub(r',\s*([\]\}])', r'\1', json_content)
+                    return json.loads(cleaned_json)
+                except json.JSONDecodeError as e:
+                    self.logger.warning(f"JSON decode error in brace match: {e}")
+        
+        self.logger.error(f"Failed to decode JSON: {text[:100]}...")
+        return {}
     
     async def think(self, agent_input: AgentInput, plan: Dict[str, Any]) -> Dict[str, Any]:
         """Enhanced thinking phase using LLM analysis."""
         input_data = agent_input.data
+        pain_points = input_data.validated_pain_points
+        pain_points_count = len(pain_points)
         
-        self.logger.info("Starting enhanced LLM-powered analysis...")
+        self.logger.info("Analyzing market gaps and opportunities...")
         
-        # Phase 1: LLM Pain Point Analysis
-        pain_point_analysis = await self._llm_analyze_pain_points(
-            input_data.validated_pain_points,
-            input_data.market_context
+        # Get a sample of pain points for the prompt template
+        pain_points_sample = json.dumps(pain_points[:3], indent=2) if pain_points else "[]"
+        
+        # Load the think prompt template
+        from llm.utils import load_prompt_template
+        prompt_template = load_prompt_template(
+            'think.prompt',
+            agent_name=self.name,
+            substitutions={
+                'pain_points_count': pain_points_count,
+                'market_context': input_data.market_context,
+                'analysis_scope': input_data.analysis_scope,
+                'pain_points_sample': pain_points_sample
+            }
         )
         
-        # Phase 2: Market Theme Identification
-        market_themes = await self._llm_identify_market_themes(
-            pain_point_analysis,
-            input_data.market_context
-        )
+        # Generate analysis using LLM
+        response = await self.llm_generate(prompt_template)
         
-        # Phase 3: Competitive Landscape Analysis (if enabled)
-        competitive_analysis = {}
-        if input_data.include_competitive_analysis:
-            competitive_analysis = await self._llm_analyze_competitive_landscape(
-                market_themes,
+        # Extract analysis from LLM response
+        thoughts = self._extract_json(response)
+        
+        if not thoughts:
+            self.logger.warning("Failed to parse market gap analysis from LLM response, using traditional methods")
+            # Use LLM to analyze pain points
+            pain_point_analysis = await self._llm_analyze_pain_points(
+                pain_points, 
                 input_data.market_context
             )
-        
-        thoughts = {
-            "pain_point_analysis": pain_point_analysis,
-            "market_themes": market_themes,
-            "competitive_analysis": competitive_analysis,
-            "analysis_confidence": self._calculate_analysis_confidence(
-                pain_point_analysis, market_themes, competitive_analysis
-            ),
-            "llm_insights": await self._extract_key_insights(
-                pain_point_analysis, market_themes, competitive_analysis
+            
+            # Use LLM to identify market themes
+            market_themes = await self._llm_identify_market_themes(
+                pain_point_analysis, 
+                input_data.market_context
             )
-        }
+            
+            # Extract key insights
+            insights = await self._extract_key_insights(
+                pain_point_analysis,
+                market_themes,
+                {}
+            )
+            
+            # Calculate analysis confidence
+            confidence = self._calculate_analysis_confidence(
+                pain_point_analysis,
+                market_themes,
+                {}
+            )
+            
+            thoughts = {
+                "market_themes": market_themes,
+                "data_complexity": "medium",
+                "storage_requirements": {
+                    "estimated_size_kb": 100,
+                    "entries_count": len(market_themes),
+                    "complexity": "medium"
+                },
+                "analysis_scope": input_data.analysis_scope,
+                "expected_insights": len(insights)
+            }
         
+        self.logger.info("Market gap analysis completed.")
+        self.state.thoughts = thoughts
         return thoughts
     
     async def act(self, agent_input: AgentInput, plan: Dict[str, Any], thoughts: Dict[str, Any]) -> GapFinderOutput:
         """Execute enhanced market gap analysis with LLM-generated insights."""
         input_data = agent_input.data
+        market_themes = thoughts.get("market_themes", [])
+        market_themes_count = len(market_themes)
+        pain_points_count = len(input_data.validated_pain_points)
         
-        self.logger.info("Executing enhanced gap analysis with LLM insights...")
+        self.logger.info(f"Executing market gap analysis with {market_themes_count} market themes")
+        start_time = datetime.now()
         
-        # Generate market gaps using LLM analysis
-        market_gaps = await self._generate_enhanced_market_gaps(
-            thoughts["market_themes"],
-            thoughts["competitive_analysis"],
-            input_data
-        )
+        # Prepare market themes sample for the prompt
+        market_themes_sample = json.dumps(market_themes[:2], indent=2) if market_themes else "[]"
         
-        # Generate LLM-powered competitive landscape
-        competitive_landscape = await self._generate_competitive_landscape(
-            market_gaps,
-            thoughts["competitive_analysis"]
-        )
-        
-        # Generate market analysis with LLM insights
-        market_analysis = await self._generate_market_analysis(
-            market_gaps,
-            thoughts["llm_insights"]
-        )
-        
-        # Prioritize opportunities using LLM scoring
-        prioritized_opportunities = await self._llm_prioritize_opportunities(market_gaps)
-        
-        # Generate LLM recommendations
-        recommendations = await self._generate_llm_recommendations(
-            market_gaps,
-            prioritized_opportunities,
-            thoughts["llm_insights"]
-        )
-        
-        # Risk assessment with LLM
-        risk_assessment = await self._llm_assess_risks(
-            market_gaps,
-            input_data.market_context
-        )
-        
-        return GapFinderOutput(
-            market_gaps=market_gaps,
-            prioritized_opportunities=prioritized_opportunities,
-            market_analysis=market_analysis,
-            competitive_landscape=competitive_landscape,
-            recommendations=recommendations,
-            risk_assessment=risk_assessment,
-            result={
-                "enhanced_analysis": True,
-                "llm_powered": True,
-                "confidence_score": thoughts["analysis_confidence"],
-                "key_insights": thoughts["llm_insights"]
+        # Load the act prompt template
+        from llm.utils import load_prompt_template
+        prompt_template = load_prompt_template(
+            'act.prompt',
+            agent_name=self.name,
+            substitutions={
+                'market_themes_count': market_themes_count,
+                'pain_points_count': pain_points_count,
+                'market_context': input_data.market_context,
+                'analysis_scope': input_data.analysis_scope,
+                'include_competitive_analysis': input_data.include_competitive_analysis,
+                'include_market_sizing': input_data.include_market_sizing,
+                'market_themes_sample': market_themes_sample
             }
         )
+        
+        # Generate execution results using LLM
+        response = await self.llm_generate(prompt_template)
+        
+        # Extract execution results from LLM response
+        results = self._extract_json(response)
+        
+        if not results:
+            self.logger.warning("Failed to parse market gap results from LLM response, falling back to traditional methods")
+            # Generate market gaps using traditional method
+            market_gaps = await self._generate_enhanced_market_gaps(
+                market_themes, 
+                {},  # empty competitive analysis
+                input_data
+            )
+            
+            # Prioritize opportunities using traditional method
+            prioritized_opportunities = await self._llm_prioritize_opportunities(market_gaps)
+            
+            # Generate recommendations using traditional method
+            recommendations = await self._generate_llm_recommendations(
+                market_gaps,
+                prioritized_opportunities,
+                []
+            )
+            
+            # Risk assessment using traditional method
+            risk_assessment = await self._llm_assess_risks(
+                market_gaps,
+                input_data.market_context
+            )
+            
+            # Create result structure to match expected output
+            results = {
+                "market_gaps": [gap.to_dict() for gap in market_gaps],
+                "prioritized_opportunities": prioritized_opportunities,
+                "market_analysis": await self._generate_market_analysis(market_gaps, []),
+                "competitive_landscape": await self._generate_competitive_landscape(market_gaps, {}),
+                "recommendations": recommendations,
+                "risk_assessment": risk_assessment
+            }
+        
+        # Convert market_gaps from dict to MarketGap objects if needed
+        market_gaps = []
+        for gap_dict in results.get("market_gaps", []):
+            market_gap = MarketGap(
+                gap_description=gap_dict.get("gap_description", "Unknown gap"),
+                market_size=float(gap_dict.get("market_size", 0.0)),
+                competition_level=gap_dict.get("competition_level", "medium"),
+                opportunity_score=float(gap_dict.get("opportunity_score", 0.0)),
+                target_segments=gap_dict.get("target_segments", []),
+                solution_ideas=gap_dict.get("solution_ideas", []),
+                barriers_to_entry=gap_dict.get("barriers_to_entry", []),
+                estimated_tam=float(gap_dict.get("estimated_tam", 0.0)),
+                estimated_sam=float(gap_dict.get("estimated_sam", 0.0)),
+                estimated_som=float(gap_dict.get("estimated_som", 0.0)),
+                risk_factors=gap_dict.get("risk_factors", []),
+                timeline_to_market=gap_dict.get("timeline_to_market", "12-18 months")
+            )
+            market_gaps.append(market_gap)
+        
+        # Calculate execution time
+        execution_time = (datetime.now() - start_time).total_seconds()
+        
+        # Create and return output
+        output = GapFinderOutput(
+            market_gaps=market_gaps,
+            prioritized_opportunities=results.get("prioritized_opportunities", []),
+            market_analysis=results.get("market_analysis", {}),
+            competitive_landscape=results.get("competitive_landscape", {}),
+            recommendations=results.get("recommendations", []),
+            risk_assessment=results.get("risk_assessment", {}),
+            execution_time=execution_time,
+            metadata={
+                "llm_enhanced": True,
+                "prompt_driven": True,
+                "market_themes_count": market_themes_count,
+                "pain_points_count": pain_points_count
+            }
+        )
+        
+        return output
     
     async def _llm_analyze_pain_points(self, pain_points: List[Dict[str, Any]], 
                                      market_context: str) -> Dict[str, Any]:
@@ -608,3 +766,137 @@ Please assess the risks associated with pursuing these market opportunities."""
             confidence_factors.append(0.85)
         
         return sum(confidence_factors) / len(confidence_factors) if confidence_factors else 0.5
+
+
+if __name__ == "__main__":
+    import asyncio
+    import logging
+    from dataclasses import asdict
+    from llm.backends.ollama import OllamaBackend
+    
+    # Configure logging
+    logging.basicConfig(level=logging.INFO,
+                        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    logger = logging.getLogger("gap_finder_test")
+    
+    async def test_gap_finder_agent():
+        logger.info("Testing EnhancedGapFinderAgent with prompt templates...")
+        
+        # Create test pain points
+        test_pain_points = [
+            {
+                "pain_point_id": "pp1",
+                "description": "Small businesses struggle to find affordable cybersecurity solutions",
+                "severity": "high",
+                "frequency": "high",
+                "source": "customer interview"
+            },
+            {
+                "pain_point_id": "pp2",
+                "description": "SMBs lack technical expertise to implement security measures",
+                "severity": "high",
+                "frequency": "medium",
+                "source": "market survey"
+            },
+            {
+                "pain_point_id": "pp3",
+                "description": "Existing security solutions are too complex for small teams",
+                "severity": "medium",
+                "frequency": "high",
+                "source": "customer feedback"
+            }
+        ]
+        
+        # Create input data
+        input_data = GapFinderInput(
+            validated_pain_points=test_pain_points,
+            market_context="Small business cybersecurity solutions market with focus on simplicity and affordability",
+            analysis_scope="Identify gaps in SMB cybersecurity product offerings",
+            include_competitive_analysis=True,
+            include_market_sizing=True
+        )
+        
+        # Create agent input
+        agent_input = AgentInput(
+            data=input_data,
+            metadata={"agent_id": "gap-finder-test"}
+        )
+        
+        # Import required classes for LLM backend setup
+        from llm.backends.ollama import OllamaBackend
+        from llm.base import LLMConfig, LLMBackendType
+        from llm.manager import LLMManager
+        
+        # Create the LLM configuration for the Ollama backend
+        config = LLMConfig(
+            backend_type=LLMBackendType.OLLAMA,
+            model_name="phi4-mini:latest",  # Using a smaller model for testing
+            base_url="http://localhost:11434",
+            timeout=180  # 3 minute timeout for complex queries
+        )
+        
+        # Create the OllamaBackend with proper config
+        llm_backend = OllamaBackend(config=config)
+        
+        # Create agent instance with ollama as preferred backend instead of claude
+        agent = EnhancedGapFinderAgent(agent_id="gap-finder-test")
+        agent.preferred_backend = "ollama"  # Override the default claude backend
+        
+        # We need to initialize the LLM capabilities correctly with proper backend registration
+        # This is an async approach that follows the code pattern in LLMAgentMixin initialization
+        llm_manager = LLMManager()
+        await llm_manager.register_backend(llm_backend, is_default=True)
+        
+        # Set the LLM manager to the agent
+        agent._llm_manager = llm_manager
+        
+        try:
+            # Execute agent's plan phase
+            logger.info("Running plan phase...")
+            plan_result = await agent.plan(agent_input)
+            logger.info(f"Plan complete: {len(plan_result.get('phases', []))} phases identified")
+            
+            # Execute agent's think phase
+            logger.info("Running think phase...")
+            think_result = await agent.think(agent_input, plan_result)
+            logger.info(f"Think complete: {len(think_result.get('market_themes', []))} market themes identified")
+            
+            # Execute agent's act phase
+            logger.info("Running act phase...")
+            act_result = await agent.act(agent_input, plan_result, think_result)
+            
+            # Log results
+            logger.info(f"Market gaps identified: {len(act_result.market_gaps)}")
+            logger.info(f"Prioritized opportunities: {len(act_result.prioritized_opportunities)}")
+            logger.info(f"Recommendations: {len(act_result.recommendations) if act_result.recommendations else 0}")
+            
+            # Print execution time
+            logger.info(f"Execution time: {act_result.execution_time:.2f} seconds")
+            
+            # Success!  
+            logger.info("Successfully executed all GapFinderAgent phases!")
+            return act_result
+        
+        except Exception as e:
+            logger.error(f"Error testing GapFinderAgent: {str(e)}")
+            import traceback
+            logger.error(traceback.format_exc())
+            return None
+    
+    # Run the test
+    result = asyncio.run(test_gap_finder_agent())
+    
+    if result:
+        print("\n===== TEST SUCCESSFUL =====\n")
+        print(f"GapFinderAgent completed analysis with {len(result.market_gaps)} market gaps identified")
+        
+        # Print first market gap as sample
+        if result.market_gaps:
+            first_gap = result.market_gaps[0]
+            print(f"\nSample Market Gap: {first_gap.gap_description}")
+            print(f"  Market Size: {first_gap.market_size}")
+            print(f"  Opportunity Score: {first_gap.opportunity_score}")
+            print(f"  Target Segments: {', '.join(first_gap.target_segments)}")
+            print(f"  Solution Ideas: {', '.join(first_gap.solution_ideas[:2])}...")
+    else:
+        print("\n===== TEST FAILED =====\n")
