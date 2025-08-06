@@ -15,6 +15,7 @@ from .base import BaseAgent, AgentInput, AgentOutput, AgentState
 from .research_agent import ResearchAgent
 from .analysis_agent import AnalysisAgent
 from ..config import get_config
+from ..llm.utils import LLMAgentMixin, load_prompt_template
 
 
 @dataclass
@@ -60,123 +61,286 @@ class ValidatorOutput(AgentOutput):
     recommendations: List[str]
 
 
-class ValidatorAgent(BaseAgent):
+class ValidatorAgent(BaseAgent, LLMAgentMixin):
     """
     ValidatorAgent for deep validation of pain points.
     
     Uses comprehensive research, analysis, and verification
     to validate the business potential of discovered pain points.
+    Uses LLM-driven prompt templates for plan, think, and act phases.
     """
     
     def __init__(self, agent_id: str = None):
-        super().__init__(agent_id)
+        BaseAgent.__init__(self, agent_id)
+        LLMAgentMixin.__init__(self)
         self.research_agent = ResearchAgent()
         self.analysis_agent = AnalysisAgent()
         self.config = get_config()
+        self.name = "validator_agent"  # Used for prompt template loading
+        
+        # Set preferred backend to Ollama for all tasks
+        self.preferred_backend = "ollama"
+        self.task_backend_preferences = {
+            "validation": "ollama",
+            "research": "ollama",
+            "analysis": "ollama"
+        }
     
     async def plan(self, input_data: ValidatorInput) -> Dict[str, Any]:
-        """Plan the validation process."""
+        """Plan the validation process using LLM prompt."""
         self.logger.info(f"Planning validation for {len(input_data.pain_points)} pain points")
+        start_time = datetime.now()
         
-        plan = {
-            "phases": [
-                "market_research",
-                "competitor_analysis",
-                "user_demand_assessment",
-                "business_potential_evaluation",
-                "final_validation"
-            ],
-            "validation_depth": input_data.validation_depth,
-            "include_user_interviews": input_data.include_user_interviews,
-            "include_competitor_analysis": input_data.include_competitor_analysis,
-            "expected_duration": 600,  # 10 minutes
-            "pain_point_count": len(input_data.pain_points)
-        }
-        
+        try:
+            # Prepare substitutions for the prompt template
+            substitutions = {
+                "pain_points": json.dumps(input_data.pain_points, indent=2),
+                "pain_point_count": len(input_data.pain_points),
+                "validation_depth": input_data.validation_depth,
+                "market_context": input_data.market_context,
+                "include_user_interviews": str(input_data.include_user_interviews).lower(),
+                "include_competitor_analysis": str(input_data.include_competitor_analysis).lower()
+            }
+            
+            # Load prompt template with substitutions
+            prompt_content = load_prompt_template("plan.prompt", agent_name=self.name, substitutions=substitutions)
+            
+            # Generate plan using LLM
+            llm_response = await self.llm_generate(
+                prompt=prompt_content,
+                task_type="validation"
+            )
+            
+            # Extract JSON from LLM response
+            plan = self._extract_json(llm_response)
+            
+            # Set the expected_duration from the plan or default to 600 seconds (10 minutes)
+            if "expected_duration" not in plan:
+                plan["expected_duration"] = 600
+                
+            # Add execution time
+            plan["execution_time"] = (datetime.now() - start_time).total_seconds()
+            self.logger.info(f"Plan generation completed in {plan['execution_time']:.2f} seconds")
+            
+        except Exception as e:
+            self.logger.error(f"Error generating validation plan: {str(e)}")
+            # Create fallback plan
+            plan = {
+                "phases": [
+                    "market_research",
+                    "competitor_analysis",
+                    "user_demand_assessment",
+                    "business_potential_evaluation",
+                    "final_validation"
+                ],
+                "validation_depth": input_data.validation_depth,
+                "include_user_interviews": input_data.include_user_interviews,
+                "include_competitor_analysis": input_data.include_competitor_analysis,
+                "expected_duration": 600,  # 10 minutes
+                "pain_point_count": len(input_data.pain_points),
+                "execution_time": (datetime.now() - start_time).total_seconds()
+            }
+            
+        # Store plan in state
         self.state.plan = plan
         return plan
+        
+    def _extract_json(self, text: str) -> Dict[str, Any]:
+        """Extract JSON from LLM response."""
+        try:
+            # First attempt: Try to parse the entire response as JSON
+            return json.loads(text)
+        except json.JSONDecodeError:
+            try:
+                # Second attempt: Look for JSON code block
+                import re
+                json_match = re.search(r'```(?:json)?\n([\s\S]*?)\n```', text)
+                if json_match:
+                    json_str = json_match.group(1).strip()
+                    # Handle trailing commas which are not valid in JSON
+                    json_str = re.sub(r',\s*}', '}', json_str)
+                    json_str = re.sub(r',\s*\]', ']', json_str)
+                    return json.loads(json_str)
+            except Exception:
+                pass
+                
+            try:
+                # Third attempt: Try to find any JSON-like structure
+                start_idx = text.find('{')
+                end_idx = text.rfind('}')
+                if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
+                    json_str = text[start_idx:end_idx+1]
+                    # Handle trailing commas
+                    json_str = re.sub(r',\s*}', '}', json_str)
+                    json_str = re.sub(r',\s*\]', ']', json_str)
+                    return json.loads(json_str)
+            except Exception:
+                pass
+                
+            # If all parsing attempts fail, log warning and return empty dict
+            self.logger.warning(f"Could not parse LLM response as JSON: {text[:50]}...")
+            return {}
     
     async def think(self, input_data: ValidatorInput) -> Dict[str, Any]:
-        """Analyze pain points for validation decisions."""
+        """Analyze pain points for validation decisions using LLM prompt."""
         self.logger.info("Analyzing pain points for validation...")
+        start_time = datetime.now()
         
-        # Analyze market context
-        market_analysis = await self._analyze_market_context(
-            input_data.pain_points,
-            input_data.market_context
-        )
+        # Get plan or run if not available
+        plan = getattr(self.state, 'plan', None) or await self.plan(input_data)
         
-        # Prepare validation strategy
-        validation_strategy = {
-            "validation_approach": self._determine_validation_approach(input_data.validation_depth),
-            "research_scope": self._determine_research_scope(input_data.pain_points),
-            "competitor_analysis_needed": input_data.include_competitor_analysis,
-            "user_research_needed": input_data.include_user_interviews,
-            "expected_confidence_range": [0.7, 0.95]
-        }
+        try:
+            # Prepare substitutions for the prompt template
+            substitutions = {
+                "pain_points": json.dumps(input_data.pain_points, indent=2),
+                "pain_point_count": len(input_data.pain_points),
+                "market_context": input_data.market_context,
+                "validation_plan": json.dumps(plan, indent=2),
+                "validation_depth": input_data.validation_depth,
+                "include_user_interviews": str(input_data.include_user_interviews).lower(),
+                "include_competitor_analysis": str(input_data.include_competitor_analysis).lower()
+            }
+            
+            # Load prompt template with substitutions
+            prompt_content = load_prompt_template("think.prompt", agent_name=self.name, substitutions=substitutions)
+            
+            # Generate validation strategy using LLM
+            llm_response = await self.llm_generate(
+                prompt=prompt_content,
+                task_type="analysis"
+            )
+            
+            # Extract JSON from LLM response
+            validation_strategy = self._extract_json(llm_response)
+            
+            # Add execution time
+            validation_strategy["execution_time"] = (datetime.now() - start_time).total_seconds()
+            self.logger.info(f"Validation strategy analysis completed in {validation_strategy['execution_time']:.2f} seconds")
+            
+        except Exception as e:
+            self.logger.error(f"Error generating validation strategy: {str(e)}")
+            # Create fallback strategy
+            validation_strategy = {
+                "validation_approach": self._determine_validation_approach(input_data.validation_depth),
+                "research_scope": self._determine_research_scope(input_data.pain_points),
+                "competitor_analysis_needed": input_data.include_competitor_analysis,
+                "user_research_needed": input_data.include_user_interviews,
+                "expected_confidence_range": [0.7, 0.95],
+                "market_analysis": {
+                    "key_segments": ["small businesses", "mid-market companies"],
+                    "market_size_estimate": "Unknown",
+                    "growth_trend": "Unknown"
+                },
+                "validation_criteria": {
+                    "user_demand_threshold": 7.5,
+                    "market_size_threshold": 1000000,
+                    "competition_level_acceptable": "medium"
+                },
+                "execution_time": (datetime.now() - start_time).total_seconds()
+            }
         
+        # Store validation strategy in state
+        self.state.validation_strategy = validation_strategy
         return validation_strategy
     
     async def act(self, input_data: ValidatorInput) -> ValidatorOutput:
-        """Execute validation and return results."""
-        self.logger.info("Executing pain point validation...")
-        
+        """Execute validation and return results using LLM prompt."""
+        self.logger.info(f"Validating {len(input_data.pain_points)} pain points")
         start_time = datetime.now()
         
-        validation_results = []
+        # Get plan and validation strategy or run if not available
+        plan = getattr(self.state, 'plan', None) or await self.plan(input_data)
+        validation_strategy = getattr(self.state, 'validation_strategy', None) or await self.think(input_data)
         
-        for pain_point in input_data.pain_points:
-            result = await self._validate_single_pain_point(
-                pain_point,
-                input_data.validation_depth,
-                input_data.market_context
+        try:
+            # Prepare substitutions for the prompt template
+            substitutions = {
+                "pain_points": json.dumps(input_data.pain_points, indent=2),
+                "pain_point_count": len(input_data.pain_points),
+                "market_context": input_data.market_context,
+                "validation_plan": json.dumps(plan, indent=2),
+                "validation_strategy": json.dumps(validation_strategy, indent=2),
+                "validation_depth": input_data.validation_depth,
+                "include_user_interviews": str(input_data.include_user_interviews).lower(),
+                "include_competitor_analysis": str(input_data.include_competitor_analysis).lower()
+            }
+            
+            # Load prompt template with substitutions
+            prompt_content = load_prompt_template("act.prompt", agent_name=self.name, substitutions=substitutions)
+            
+            # Generate validation results using LLM
+            llm_response = await self.llm_generate(
+                prompt=prompt_content,
+                task_type="validation"
             )
-            validation_results.append(result)
+            
+            # Extract JSON from LLM response
+            validation_results = self._extract_json(llm_response)
+            
+            # Process validation results
+            validated_pain_points = validation_results.get("validated_pain_points", [])
+            invalid_pain_points = validation_results.get("invalid_pain_points", [])
+            validation_summary = validation_results.get("validation_summary", 
+                                                        f"Validated {len(validated_pain_points)} of {len(input_data.pain_points)} pain points")
+            market_insights = validation_results.get("market_insights", {"insights": [], "market_opportunities": 0})
+            confidence_scores = validation_results.get("confidence_scores", {})
+            recommendations = validation_results.get("recommendations", [])
+            
+            # Create and return output
+            output = ValidatorOutput(
+                validated_pain_points=validated_pain_points,
+                invalid_pain_points=invalid_pain_points,
+                validation_summary=validation_summary,
+                market_insights=market_insights,
+                confidence_scores=confidence_scores,
+                recommendations=recommendations,
+                execution_time=(datetime.now() - start_time).total_seconds()
+            )
+            
+            self.logger.info(f"Validation completed in {output.execution_time:.2f} seconds")
+            
+        except Exception as e:
+            self.logger.error(f"Error executing validation: {str(e)}")
+            # Create fallback validation using internal methods
+            validation_results = []
+            for pain_point in input_data.pain_points:
+                result = await self._validate_single_pain_point(
+                    pain_point,
+                    input_data.validation_depth,
+                    input_data.market_context
+                )
+                validation_results.append(result)
+            
+            # Separate valid and invalid pain points
+            validated_points = [p.to_dict() for p in validation_results if p.is_valid]
+            invalid_points = [p.to_dict() for p in validation_results if not p.is_valid]
+            
+            # Generate confidence scores
+            confidence_scores = {r.pain_point_id: r.confidence_score for r in validation_results}
+            
+            # Generate market insights
+            market_insights = await self._generate_market_insights(validated_points)
+            
+            # Generate recommendations
+            recommendations = self._generate_recommendations(validated_points, market_insights)
+            
+            # Create validation summary
+            validation_summary = f"Validated {len(validated_points)} of {len(input_data.pain_points)} pain points"
+            
+            # Create and return output
+            output = ValidatorOutput(
+                validated_pain_points=validated_points,
+                invalid_pain_points=invalid_points,
+                validation_summary=validation_summary,
+                market_insights=market_insights,
+                confidence_scores=confidence_scores,
+                recommendations=recommendations,
+                execution_time=(datetime.now() - start_time).total_seconds()
+            )
+            
+            self.logger.info(f"Validation completed with fallback in {output.execution_time:.2f} seconds")
         
-        # Separate valid and invalid points
-        validated_points = []
-        invalid_points = []
-        
-        for result in validation_results:
-            if result.is_valid:
-                validated_points.append({
-                    **next(p for p in input_data.pain_points if p.get("description") == result.pain_point_id),
-                    "validation_result": result.to_dict()
-                })
-            else:
-                invalid_points.append({
-                    **next(p for p in input_data.pain_points if p.get("description") == result.pain_point_id),
-                    "validation_result": result.to_dict(),
-                    "invalid_reason": result.validation_notes
-                })
-        
-        # Generate market insights
-        market_insights = await self._generate_market_insights(validated_points)
-        
-        # Generate recommendations
-        recommendations = self._generate_recommendations(validated_points, market_insights)
-        
-        # Generate summary
-        summary = self._generate_validation_summary(
-            validated_points,
-            invalid_points,
-            input_data.market_context
-        )
-        
-        # Calculate confidence scores
-        confidence_scores = {
-            point["description"]: point["validation_result"]["confidence_score"]
-            for point in validated_points
-        }
-        
-        return ValidatorOutput(
-            validated_pain_points=validated_points,
-            invalid_pain_points=invalid_points,
-            validation_summary=summary,
-            market_insights=market_insights,
-            confidence_scores=confidence_scores,
-            recommendations=recommendations
-        )
+        return output
     
     async def _validate_single_pain_point(self, pain_point: Dict[str, Any], 
                                         depth: str, market_context: str) -> ValidationResult:

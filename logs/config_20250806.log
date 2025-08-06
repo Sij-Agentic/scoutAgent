@@ -645,3 +645,33 @@
 2025-08-06 16:50:11 - config - INFO - builder.py:260 - act() - Creating solution prototypes for 2 market gaps
 2025-08-06 16:51:12 - config - WARNING - builder.py:183 - _extract_json() - Could not parse LLM response as JSON: Based on the provided input data, here is a JSON o...
 2025-08-06 16:51:12 - config - INFO - builder.py:348 - act() - Solution generation completed in 60.19 seconds
+2025-08-06 17:12:33 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 17:12:33 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 17:12:33 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 17:12:33 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-06 17:12:33 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-06 17:12:33 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 17:12:33 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 17:12:33 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 17:12:33 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 17:12:33 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 17:12:33 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 17:12:33 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 17:12:33 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 17:12:33 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-06 17:12:33 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
+2025-08-06 17:21:32 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 17:21:32 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 17:21:32 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 17:21:32 - config - INFO - base.py:301 - register_agent() - Registered agent: CodeAgent
+2025-08-06 17:21:32 - config - INFO - base.py:303 - register_agent() - Registered agent alias: code
+2025-08-06 17:21:32 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 17:21:32 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 17:21:32 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 17:21:32 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 17:21:32 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 17:21:32 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 17:21:32 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 17:21:32 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 17:21:32 - config - INFO - base.py:301 - register_agent() - Registered agent: MemoryAgent
+2025-08-06 17:21:32 - config - INFO - base.py:303 - register_agent() - Registered agent alias: memory
