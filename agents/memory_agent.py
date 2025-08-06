@@ -12,6 +12,9 @@ from datetime import datetime
 from dataclasses import dataclass, asdict
 
 from agents.base import BaseAgent, AgentInput, AgentOutput, AgentState
+from llm.utils import LLMAgentMixin
+import json
+import re
 from memory.persistence import MemoryManager
 from memory.context import ContextManager
 from config import get_config
@@ -73,7 +76,7 @@ class MemoryAgentOutput:
             self.logs = []
 
 
-class MemoryAgent(BaseAgent):
+class MemoryAgent(BaseAgent, LLMAgentMixin):
     """
     MemoryAgent for knowledge management and long-term learning.
     
@@ -81,57 +84,200 @@ class MemoryAgent(BaseAgent):
     intelligent insights generation from historical workflow data.
     """
     
-    def __init__(self, agent_id: str = None):
-        super().__init__(agent_id)
+    def __init__(self, agent_id: str = None, config: Dict[str, Any] = None):
+        # Explicitly call parent class initializers
+        BaseAgent.__init__(self, 'memory', agent_id=agent_id, config=config)
+        LLMAgentMixin.__init__(self, preferred_backend='ollama')
+        
+        # Additional initialization
         self.memory_manager = MemoryManager()
         self.context_manager = ContextManager()
         self.config = get_config()
     
+    def _extract_json(self, text: str) -> Dict[str, Any]:
+        """Extract and parse JSON from LLM response text."""
+        json_match = re.search(r'```(?:json)?\s*(.+?)\s*```', text, re.DOTALL)
+        if json_match:
+            json_str = json_match.group(1).strip()
+            try:
+                return json.loads(json_str)
+            except json.JSONDecodeError as e:
+                self.logger.error(f"Failed to decode JSON: {e}")
+                return {}
+        else:
+            self.logger.error("No JSON found in response")
+            return {}
+    
     async def plan(self, input_data: MemoryAgentInput) -> Dict[str, Any]:
-        """Plan the memory management operation."""
+        """Plan the memory management operation using LLM."""
         self.logger.info(f"Planning memory operation: {input_data.operation}")
         
-        plan = {
-            "operation": input_data.operation,
-            "phases": self._get_operation_phases(input_data.operation),
-            "expected_duration": 300,  # 5 minutes
-            "data_sources": list(input_data.workflow_data.keys()) if input_data.workflow_data else []
-        }
+        # Prepare data for prompt
+        operation = input_data.operation
+        data_sources = json.dumps(list(input_data.workflow_data.keys()) if input_data.workflow_data else [])
         
+        # Load prompt template
+        from llm.utils import load_prompt_template
+        prompt_template = load_prompt_template(
+            'plan.prompt',
+            agent_name='memory_agent',
+            substitutions={
+                'operation': operation,
+                'data_sources': data_sources
+            }
+        )
+        
+        # Generate plan using LLM
+        response = await self.llm_generate(prompt_template)
+        if not response:
+            self.logger.error("Failed to generate memory plan")
+            return {}
+            
+        # Extract plan from LLM response
+        plan = self._extract_json(response)
+        if not plan:
+            self.logger.warning("Failed to parse memory plan from LLM response, using default")
+            plan = {
+                "operation": input_data.operation,
+                "phases": self._get_operation_phases(input_data.operation),
+                "expected_duration": 300,  # 5 minutes
+                "data_sources": list(input_data.workflow_data.keys()) if input_data.workflow_data else []
+            }
+        
+        self.logger.info(f"Memory plan created for operation: {operation}")
         self.state.plan = plan
         return plan
     
     async def think(self, input_data: MemoryAgentInput) -> Dict[str, Any]:
-        """Analyze the memory operation requirements."""
+        """Analyze the memory operation requirements using LLM."""
         self.logger.info("Analyzing memory operation requirements...")
         
-        # Determine operation strategy
-        strategy = {
-            "operation_type": input_data.operation,
-            "data_complexity": self._assess_data_complexity(input_data.workflow_data),
-            "storage_requirements": self._calculate_storage_requirements(input_data.workflow_data),
-            "analysis_scope": self._determine_analysis_scope(input_data.operation),
-            "expected_insights": 5 if input_data.operation in ["analyze", "retrieve"] else 0
-        }
+        # Prepare data for prompt
+        operation = input_data.operation
+        workflow_data_sample = json.dumps(input_data.workflow_data, indent=2)[:500] + "..."  # Truncate for prompt
+        plan_str = json.dumps(self.state.plan, indent=2) if self.state.plan else "{}"
         
-        return strategy
+        # Load prompt template
+        from llm.utils import load_prompt_template
+        prompt_template = load_prompt_template(
+            'think.prompt',
+            agent_name='memory_agent',
+            substitutions={
+                'operation': operation,
+                'workflow_data_sample': workflow_data_sample,
+                'plan': plan_str
+            }
+        )
+        
+        # Generate analysis using LLM
+        response = await self.llm_generate(prompt_template)
+        if not response:
+            self.logger.error("Failed to analyze memory operation requirements")
+            return {}
+            
+        # Extract analysis from LLM response
+        thoughts = self._extract_json(response)
+        if not thoughts:
+            self.logger.warning("Failed to parse memory analysis from LLM response, using default")
+            thoughts = {
+                "operation_type": input_data.operation,
+                "data_complexity": self._assess_data_complexity(input_data.workflow_data),
+                "storage_requirements": self._calculate_storage_requirements(input_data.workflow_data),
+                "analysis_scope": self._determine_analysis_scope(input_data.operation),
+                "expected_insights": 5 if input_data.operation in ["analyze", "retrieve"] else 0
+            }
+        
+        self.logger.info(f"Memory operation requirements analyzed")
+        self.state.thoughts = thoughts
+        return thoughts
     
     async def act(self, input_data: MemoryAgentInput) -> MemoryAgentOutput:
-        """Execute memory management operation."""
+        """Execute memory management operation using LLM."""
         self.logger.info(f"Executing memory operation: {input_data.operation}")
-        
         start_time = datetime.now()
         
-        if input_data.operation == "store":
-            return await self._store_knowledge(input_data.workflow_data)
-        elif input_data.operation == "retrieve":
-            return await self._retrieve_knowledge(input_data.query, input_data.filters)
-        elif input_data.operation == "analyze":
-            return await self._analyze_knowledge(input_data.workflow_data)
-        elif input_data.operation == "update":
-            return await self._update_knowledge(input_data.workflow_data)
-        else:
-            raise ValueError(f"Unsupported operation: {input_data.operation}")
+        # Prepare data for prompt
+        operation = input_data.operation
+        workflow_data_sample = json.dumps(input_data.workflow_data, indent=2)[:500] + "..."  # Truncate for prompt
+        plan_str = json.dumps(self.state.plan, indent=2) if self.state.plan else "{}"
+        thoughts_str = json.dumps(self.state.thoughts, indent=2) if self.state.thoughts else "{}"
+        
+        # Load prompt template
+        from llm.utils import load_prompt_template
+        prompt_template = load_prompt_template(
+            'act.prompt',
+            agent_name='memory_agent',
+            substitutions={
+                'operation': operation,
+                'workflow_data_sample': workflow_data_sample,
+                'plan': plan_str,
+                'thoughts': thoughts_str
+            }
+        )
+        
+        # Generate execution results using LLM
+        response = await self.llm_generate(prompt_template)
+        if not response:
+            self.logger.error(f"Failed to execute memory {operation} operation")
+            raise ValueError(f"LLM execution failed for operation: {operation}")
+        
+        # Extract execution results from LLM response
+        results = self._extract_json(response)
+        if not results:
+            self.logger.error(f"Failed to parse memory execution results from LLM response")
+            
+            # Fallback to traditional methods if LLM fails
+            self.logger.info(f"Falling back to traditional execution methods")
+            if input_data.operation == "store":
+                return await self._store_knowledge(input_data.workflow_data)
+            elif input_data.operation == "retrieve":
+                return await self._retrieve_knowledge(input_data.query, input_data.filters)
+            elif input_data.operation == "analyze":
+                return await self._analyze_knowledge(input_data.workflow_data)
+            elif input_data.operation == "update":
+                return await self._update_knowledge(input_data.workflow_data)
+            else:
+                raise ValueError(f"Unsupported operation: {input_data.operation}")
+        
+        # Convert the LLM response into a proper MemoryAgentOutput
+        execution_time = (datetime.now() - start_time).total_seconds()
+        
+        # Create stub knowledge entries if none provided
+        if "knowledge_entries" not in results:
+            results["knowledge_entries"] = []
+            
+        # Create a proper response object
+        output = MemoryAgentOutput(
+            knowledge_entries=[],  # We'll need to convert dict entries to KnowledgeEntry objects
+            insights=results.get("insights", []),
+            patterns=results.get("patterns", []),
+            recommendations=results.get("recommendations", []),
+            storage_status=results.get("storage_status", {"status": "success"}),
+            retrieval_results=results.get("retrieval_results"),
+            success=results.get("success", True),
+            error=results.get("error"),
+            execution_time=execution_time
+        )
+        
+        # Convert knowledge entry dictionaries to objects
+        for entry_dict in results.get("knowledge_entries", []):
+            try:
+                entry = KnowledgeEntry(
+                    id=entry_dict.get("id", "unknown"),
+                    type=entry_dict.get("type", "unknown"),
+                    content=entry_dict.get("content", {}),
+                    metadata=entry_dict.get("metadata", {}),
+                    confidence=entry_dict.get("confidence", 0.5),
+                    source=entry_dict.get("source", "memory_agent"),
+                    tags=entry_dict.get("tags", []),
+                    timestamp=datetime.now()
+                )
+                output.knowledge_entries.append(entry)
+            except Exception as e:
+                self.logger.error(f"Error creating knowledge entry: {e}")
+        
+        self.logger.info(f"Memory {operation} operation completed successfully")
+        return output
     
     async def _store_knowledge(self, workflow_data: Dict[str, Any]) -> MemoryAgentOutput:
         """Store workflow data as knowledge entries."""
@@ -496,3 +642,69 @@ class MemoryAgent(BaseAgent):
 # Register the agent - moved to agent_registry.py
 # from .base import register_agent
 # register_agent("memory_agent", MemoryAgent)
+
+
+# Test code - run this file directly to test the MemoryAgent
+if __name__ == "__main__":
+    import asyncio
+    
+    async def test_agent():
+        print("Testing MemoryAgent with prompt-driven lifecycle...")
+        
+        # Create a sample workflow data for testing
+        sample_data = {
+            "analysis_agent": {
+                "pain_points": [
+                    {"description": "Difficult navigation", "severity": "high"},
+                    {"description": "Slow loading times", "severity": "medium"}
+                ],
+                "market_gaps": [
+                    {"description": "Mobile-friendly interface", "potential": "high"}
+                ]
+            },
+            "research_agent": {
+                "findings": ["Competitor A has better UX", "Users prefer simplicity"]
+            }
+        }
+        
+        # Create agent input
+        agent_input = MemoryAgentInput(
+            workflow_data=sample_data,
+            operation="store"
+        )
+        
+        # Initialize the agent
+        agent = MemoryAgent()
+        
+        # Execute the agent's full lifecycle
+        try:
+            print("\n1. Planning memory operation...")
+            plan = await agent.plan(agent_input)
+            print(f"Plan: {json.dumps(plan, indent=2)}")
+            
+            print("\n2. Analyzing memory operation requirements...")
+            thoughts = await agent.think(agent_input)
+            print(f"Analysis: {json.dumps(thoughts, indent=2)}")
+            
+            print("\n3. Executing memory operation...")
+            result = await agent.act(agent_input)
+            print("\nMemory operation completed!")
+            
+            # Display the results
+            print(f"Success: {result.success}")
+            print(f"Knowledge entries: {len(result.knowledge_entries)}")
+            print(f"Insights: {len(result.insights)}")
+            print(f"Recommendations: {len(result.recommendations)}")
+            if result.recommendations:
+                print("\nRecommendations:")
+                for rec in result.recommendations[:3]:  # Show first 3 recommendations
+                    print(f"- {rec}")
+                    
+            return result
+            
+        except Exception as e:
+            print(f"Error testing MemoryAgent: {e}")
+            raise e
+    
+    # Run the test
+    asyncio.run(test_agent())
