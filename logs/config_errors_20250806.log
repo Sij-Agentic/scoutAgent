@@ -28,3 +28,386 @@
 2025-08-06 03:10:02 - config - ERROR - writer.py:133 - plan() - Error generating plan: 'include_recommendations'
 2025-08-06 03:12:45 - config - ERROR - writer.py:133 - plan() - Error generating plan: 'include_recommendations'
 2025-08-06 03:14:13 - config - ERROR - writer.py:133 - plan() - Error generating plan: 'include_recommendations'
+2025-08-06 18:41:14 - config - ERROR - screener.py:159 - plan() - Error in ScreenerAgent plan: load_prompt_template() got an unexpected keyword argument 'prompt_name'
+2025-08-06 18:41:14 - config - ERROR - screener.py:209 - think() - Error in ScreenerAgent think: load_prompt_template() got an unexpected keyword argument 'prompt_name'
+2025-08-06 18:41:14 - config - ERROR - base.py:140 - execute() - Agent analysis failed: 'dict' object has no attribute 'data'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/screener.py", line 188, in think
+    prompt = load_prompt_template(
+             ^^^^^^^^^^^^^^^^^^^^^
+TypeError: load_prompt_template() got an unexpected keyword argument 'prompt_name'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/analysis_agent.py", line 70, in plan
+    data = agent_input.data
+           ^^^^^^^^^^^^^^^^
+AttributeError: 'dict' object has no attribute 'data'
+2025-08-06 18:41:14 - config - ERROR - test_screener_agent.py:139 - test_screener_agent() - Error testing ScreenerAgent: 'AgentOutput' object has no attribute 'get'
+2025-08-06 18:41:14 - config - ERROR - test_screener_agent.py:141 - test_screener_agent() - Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/screener.py", line 188, in think
+    prompt = load_prompt_template(
+             ^^^^^^^^^^^^^^^^^^^^^
+TypeError: load_prompt_template() got an unexpected keyword argument 'prompt_name'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/test_screener_agent.py", line 118, in test_screener_agent
+    think_result = await agent.think(screener_input)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/screener.py", line 228, in think
+    "categorization_potential": len(analysis_results.get("categories", [])),
+                                    ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'AgentOutput' object has no attribute 'get'
+
+2025-08-06 18:45:00 - config - ERROR - screener.py:159 - plan() - Error in ScreenerAgent plan: load_prompt_template() got an unexpected keyword argument 'stage'
+2025-08-06 18:45:00 - config - ERROR - screener.py:209 - think() - Error in ScreenerAgent think: load_prompt_template() got an unexpected keyword argument 'stage'
+2025-08-06 18:45:00 - config - ERROR - base.py:140 - execute() - Agent analysis failed: 'dict' object has no attribute 'data'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/screener.py", line 188, in think
+    prompt = load_prompt_template(
+             ^^^^^^^^^^^^^^^^^^^^^
+TypeError: load_prompt_template() got an unexpected keyword argument 'stage'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/analysis_agent.py", line 70, in plan
+    data = agent_input.data
+           ^^^^^^^^^^^^^^^^
+AttributeError: 'dict' object has no attribute 'data'
+2025-08-06 18:45:00 - config - ERROR - test_screener_agent.py:139 - test_screener_agent() - Error testing ScreenerAgent: 'AgentOutput' object has no attribute 'get'
+2025-08-06 18:45:00 - config - ERROR - test_screener_agent.py:141 - test_screener_agent() - Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/screener.py", line 188, in think
+    prompt = load_prompt_template(
+             ^^^^^^^^^^^^^^^^^^^^^
+TypeError: load_prompt_template() got an unexpected keyword argument 'stage'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/test_screener_agent.py", line 118, in test_screener_agent
+    think_result = await agent.think(screener_input)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/screener.py", line 228, in think
+    "categorization_potential": len(analysis_results.get("categories", [])),
+                                    ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'AgentOutput' object has no attribute 'get'
+
+2025-08-06 18:51:10 - config - ERROR - screener.py:159 - plan() - Error in ScreenerAgent plan: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/plan
+2025-08-06 18:51:10 - config - ERROR - screener.py:209 - think() - Error in ScreenerAgent think: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/think
+2025-08-06 18:51:10 - config - ERROR - base.py:140 - execute() - Agent analysis failed: 'dict' object has no attribute 'data'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/screener.py", line 188, in think
+    prompt = load_prompt_template(
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/utils.py", line 551, in load_prompt_template
+    raise FileNotFoundError(f"Prompt template not found: {prompt_path}")
+FileNotFoundError: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/think
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/analysis_agent.py", line 70, in plan
+    data = agent_input.data
+           ^^^^^^^^^^^^^^^^
+AttributeError: 'dict' object has no attribute 'data'
+2025-08-06 18:51:10 - config - ERROR - test_screener_agent.py:139 - test_screener_agent() - Error testing ScreenerAgent: 'AgentOutput' object has no attribute 'get'
+2025-08-06 18:51:10 - config - ERROR - test_screener_agent.py:141 - test_screener_agent() - Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/screener.py", line 188, in think
+    prompt = load_prompt_template(
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/utils.py", line 551, in load_prompt_template
+    raise FileNotFoundError(f"Prompt template not found: {prompt_path}")
+FileNotFoundError: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/think
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/test_screener_agent.py", line 118, in test_screener_agent
+    think_result = await agent.think(screener_input)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/screener.py", line 228, in think
+    "categorization_potential": len(analysis_results.get("categories", [])),
+                                    ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'AgentOutput' object has no attribute 'get'
+
+2025-08-06 18:54:08 - config - ERROR - utils.py:201 - llm_generate() - Error in LLM generation: Backend not available: openai
+2025-08-06 18:54:08 - config - ERROR - screener.py:159 - plan() - Error in ScreenerAgent plan: Backend not available: openai
+2025-08-06 18:54:08 - config - ERROR - utils.py:201 - llm_generate() - Error in LLM generation: Backend not available: openai
+2025-08-06 18:54:08 - config - ERROR - screener.py:209 - think() - Error in ScreenerAgent think: Backend not available: openai
+2025-08-06 18:54:08 - config - ERROR - base.py:140 - execute() - Agent analysis failed: 'dict' object has no attribute 'data'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/screener.py", line 200, in think
+    response = await self.llm_generate(prompt)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/utils.py", line 191, in llm_generate
+    response = await self._llm_manager.generate(request, backend_type)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/manager.py", line 147, in generate
+    raise LLMError(f"Backend not available: {target_backend}")
+llm.base.LLMError: Backend not available: openai
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/analysis_agent.py", line 70, in plan
+    data = agent_input.data
+           ^^^^^^^^^^^^^^^^
+AttributeError: 'dict' object has no attribute 'data'
+2025-08-06 18:54:08 - config - ERROR - test_screener_agent.py:139 - test_screener_agent() - Error testing ScreenerAgent: 'AgentOutput' object has no attribute 'get'
+2025-08-06 18:54:08 - config - ERROR - test_screener_agent.py:141 - test_screener_agent() - Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/screener.py", line 200, in think
+    response = await self.llm_generate(prompt)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/utils.py", line 191, in llm_generate
+    response = await self._llm_manager.generate(request, backend_type)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/manager.py", line 147, in generate
+    raise LLMError(f"Backend not available: {target_backend}")
+llm.base.LLMError: Backend not available: openai
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/test_screener_agent.py", line 118, in test_screener_agent
+    think_result = await agent.think(screener_input)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/screener.py", line 228, in think
+    "categorization_potential": len(analysis_results.get("categories", [])),
+                                    ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'AgentOutput' object has no attribute 'get'
+
+2025-08-06 18:54:14 - config - ERROR - utils.py:201 - llm_generate() - Error in LLM generation: Backend not available: openai
+2025-08-06 18:54:14 - config - ERROR - screener.py:159 - plan() - Error in ScreenerAgent plan: Backend not available: openai
+2025-08-06 18:54:14 - config - ERROR - utils.py:201 - llm_generate() - Error in LLM generation: Backend not available: openai
+2025-08-06 18:54:14 - config - ERROR - screener.py:209 - think() - Error in ScreenerAgent think: Backend not available: openai
+2025-08-06 18:54:14 - config - ERROR - base.py:140 - execute() - Agent analysis failed: 'dict' object has no attribute 'data'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/screener.py", line 200, in think
+    response = await self.llm_generate(prompt)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/utils.py", line 191, in llm_generate
+    response = await self._llm_manager.generate(request, backend_type)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/manager.py", line 147, in generate
+    raise LLMError(f"Backend not available: {target_backend}")
+llm.base.LLMError: Backend not available: openai
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/analysis_agent.py", line 70, in plan
+    data = agent_input.data
+           ^^^^^^^^^^^^^^^^
+AttributeError: 'dict' object has no attribute 'data'
+2025-08-06 18:54:14 - config - ERROR - test_screener_agent.py:139 - test_screener_agent() - Error testing ScreenerAgent: 'AgentOutput' object has no attribute 'get'
+2025-08-06 18:54:14 - config - ERROR - test_screener_agent.py:141 - test_screener_agent() - Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/screener.py", line 200, in think
+    response = await self.llm_generate(prompt)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/utils.py", line 191, in llm_generate
+    response = await self._llm_manager.generate(request, backend_type)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/manager.py", line 147, in generate
+    raise LLMError(f"Backend not available: {target_backend}")
+llm.base.LLMError: Backend not available: openai
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/test_screener_agent.py", line 118, in test_screener_agent
+    think_result = await agent.think(screener_input)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/screener.py", line 228, in think
+    "categorization_potential": len(analysis_results.get("categories", [])),
+                                    ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'AgentOutput' object has no attribute 'get'
+
+2025-08-06 18:57:59 - config - ERROR - utils.py:201 - llm_generate() - Error in LLM generation: Backend not available: LLMBackendType.OLLAMA
+2025-08-06 18:57:59 - config - ERROR - screener.py:159 - plan() - Error in ScreenerAgent plan: Backend not available: LLMBackendType.OLLAMA
+2025-08-06 18:57:59 - config - ERROR - utils.py:201 - llm_generate() - Error in LLM generation: Backend not available: LLMBackendType.OLLAMA
+2025-08-06 18:57:59 - config - ERROR - screener.py:209 - think() - Error in ScreenerAgent think: Backend not available: LLMBackendType.OLLAMA
+2025-08-06 18:57:59 - config - ERROR - base.py:140 - execute() - Agent analysis failed: 'dict' object has no attribute 'data'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/screener.py", line 200, in think
+    response = await self.llm_generate(prompt, backend_type=LLMBackendType.OLLAMA)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/utils.py", line 191, in llm_generate
+    response = await self._llm_manager.generate(request, backend_type)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/manager.py", line 147, in generate
+    raise LLMError(f"Backend not available: {target_backend}")
+llm.base.LLMError: Backend not available: LLMBackendType.OLLAMA
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/analysis_agent.py", line 70, in plan
+    data = agent_input.data
+           ^^^^^^^^^^^^^^^^
+AttributeError: 'dict' object has no attribute 'data'
+2025-08-06 18:57:59 - config - ERROR - test_screener_agent.py:139 - test_screener_agent() - Error testing ScreenerAgent: 'AgentOutput' object has no attribute 'get'
+2025-08-06 18:57:59 - config - ERROR - test_screener_agent.py:141 - test_screener_agent() - Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/screener.py", line 200, in think
+    response = await self.llm_generate(prompt, backend_type=LLMBackendType.OLLAMA)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/utils.py", line 191, in llm_generate
+    response = await self._llm_manager.generate(request, backend_type)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/manager.py", line 147, in generate
+    raise LLMError(f"Backend not available: {target_backend}")
+llm.base.LLMError: Backend not available: LLMBackendType.OLLAMA
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/test_screener_agent.py", line 118, in test_screener_agent
+    think_result = await agent.think(screener_input)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/screener.py", line 228, in think
+    "categorization_potential": len(analysis_results.get("categories", [])),
+                                    ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'AgentOutput' object has no attribute 'get'
+
+2025-08-06 18:59:42 - config - ERROR - screener.py:159 - plan() - Error in ScreenerAgent plan: Expecting property name enclosed in double quotes: line 11 column 32 (char 309)
+2025-08-06 18:59:46 - config - ERROR - screener.py:285 - act() - Error in ScreenerAgent act: 'AgentState' object has no attribute 'get'
+2025-08-06 18:59:46 - config - ERROR - screener.py:308 - act() - Error in ScreenerAgent fallback handling, using helper methods
+2025-08-06 18:59:46 - config - ERROR - test_screener_agent.py:139 - test_screener_agent() - Error testing ScreenerAgent: 'list' object has no attribute 'get'
+2025-08-06 18:59:46 - config - ERROR - test_screener_agent.py:141 - test_screener_agent() - Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/screener.py", line 240, in act
+    analysis = self.state.get("think_result")
+               ^^^^^^^^^^^^^^
+AttributeError: 'AgentState' object has no attribute 'get'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/screener.py", line 297, in act
+    execution_time=time.time() - self.start_time,
+                   ^^^^
+NameError: name 'time' is not defined. Did you forget to import 'time'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/test_screener_agent.py", line 125, in test_screener_agent
+    act_result = await agent.act(screener_input)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/screener.py", line 315, in act
+    categories = self._categorize_pain_points(accepted_points)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/screener.py", line 419, in _categorize_pain_points
+    tags = point.get("tags", [])
+           ^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+
+2025-08-06 19:05:11 - config - ERROR - screener.py:160 - plan() - Error in ScreenerAgent plan: Expecting property name enclosed in double quotes: line 11 column 31 (char 311)
+2025-08-06 19:05:31 - config - ERROR - screener.py:286 - act() - Error in ScreenerAgent act: unsupported operand type(s) for -: 'float' and 'NoneType'
+2025-08-06 19:05:31 - config - ERROR - screener.py:309 - act() - Error in ScreenerAgent fallback handling, using helper methods
+2025-08-06 19:05:31 - config - ERROR - test_screener_agent.py:139 - test_screener_agent() - Error testing ScreenerAgent: 'list' object has no attribute 'get'
+2025-08-06 19:05:31 - config - ERROR - test_screener_agent.py:141 - test_screener_agent() - Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/screener.py", line 275, in act
+    execution_time=time.time() - self.start_time,
+                   ~~~~~~~~~~~~^~~~~~~~~~~~~~~~~
+TypeError: unsupported operand type(s) for -: 'float' and 'NoneType'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/screener.py", line 298, in act
+    execution_time=time.time() - self.start_time,
+                   ~~~~~~~~~~~~^~~~~~~~~~~~~~~~~
+TypeError: unsupported operand type(s) for -: 'float' and 'NoneType'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/test_screener_agent.py", line 125, in test_screener_agent
+    act_result = await agent.act(screener_input)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/screener.py", line 316, in act
+    categories = self._categorize_pain_points(accepted_points)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/screener.py", line 432, in _categorize_pain_points
+    categories[category].append(point.get("description", ""))
+                                ^^^^^^^^^
+AttributeError: 'list' object has no attribute 'get'
+
+2025-08-06 19:11:44 - config - ERROR - screener.py:161 - plan() - Error in ScreenerAgent plan: Expecting property name enclosed in double quotes: line 11 column 32 (char 329)
+2025-08-06 19:11:50 - config - ERROR - screener.py:211 - think() - Error in ScreenerAgent think: Expecting property name enclosed in double quotes: line 18 column 34 (char 296)
+2025-08-06 19:11:50 - config - ERROR - base.py:140 - execute() - Agent analysis failed: 'dict' object has no attribute 'data'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/screener.py", line 205, in think
+    analysis = json.loads(self.extract_json_from_markdown(response))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/miniconda3/lib/python3.12/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/miniconda3/lib/python3.12/json/decoder.py", line 338, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/miniconda3/lib/python3.12/json/decoder.py", line 354, in raw_decode
+    obj, end = self.scan_once(s, idx)
+               ^^^^^^^^^^^^^^^^^^^^^^
+json.decoder.JSONDecodeError: Expecting property name enclosed in double quotes: line 18 column 34 (char 296)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/analysis_agent.py", line 70, in plan
+    data = agent_input.data
+           ^^^^^^^^^^^^^^^^
+AttributeError: 'dict' object has no attribute 'data'
+2025-08-06 19:11:50 - config - ERROR - test_screener_agent.py:139 - test_screener_agent() - Error testing ScreenerAgent: 'AgentOutput' object has no attribute 'get'
+2025-08-06 19:11:50 - config - ERROR - test_screener_agent.py:141 - test_screener_agent() - Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/screener.py", line 205, in think
+    analysis = json.loads(self.extract_json_from_markdown(response))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/miniconda3/lib/python3.12/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/miniconda3/lib/python3.12/json/decoder.py", line 338, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/miniconda3/lib/python3.12/json/decoder.py", line 354, in raw_decode
+    obj, end = self.scan_once(s, idx)
+               ^^^^^^^^^^^^^^^^^^^^^^
+json.decoder.JSONDecodeError: Expecting property name enclosed in double quotes: line 18 column 34 (char 296)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/test_screener_agent.py", line 118, in test_screener_agent
+    think_result = await agent.think(screener_input)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/screener.py", line 230, in think
+    "categorization_potential": len(analysis_results.get("categories", [])),
+                                    ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'AgentOutput' object has no attribute 'get'
+
+2025-08-06 19:13:43 - config - ERROR - screener.py:164 - extract_json_from_markdown() - Failed to extract valid JSON from LLM response
+2025-08-06 19:14:25 - config - ERROR - screener.py:164 - extract_json_from_markdown() - Failed to extract valid JSON from LLM response
