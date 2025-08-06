@@ -170,33 +170,50 @@ async def main():
     print("Starting direct agent services test...")
     
     try:
+        # Create a simple config class for testing
+        class TestConfig:
+            def get_config_value(self, key, default=None):
+                return default
+            
+            def get_llm_backend_for_agent(self, agent_name):
+                return {}
+        
         # Create services directly
         print("Creating services...")
         config_service = ConfigService()
         logging_service = LoggingService()
         
-        # Initialize services manually with minimal dependencies
+        # Initialize config service first
         print("Initializing config service...")
         await config_service._initialize(None)
         await config_service._start()
         
+        # Initialize logging service
         print("Initializing logging service...")
         logging_service._config = config_service
         await logging_service._initialize(None)
         await logging_service._start()
         logger = logging_service.get_logger("direct_test")
         
+        # Create and set up code execution service using direct setup
         print("Initializing code execution service...")
         code_service = CodeExecutionService()
-        code_service._config = config_service
-        code_service._logger = logging_service.get_logger("code_execution")
+        code_service.setup_direct(
+            config=config_service,
+            logger=logging_service.get_logger("code_execution"),
+            working_dir="/tmp/scout_agent_test/code_execution"
+        )
         await code_service._initialize(None)
         await code_service._start()
         
+        # Create and set up memory service using direct setup
         print("Initializing memory service...")
         memory_service = MemoryService()
-        memory_service._config = config_service
-        memory_service._logger = logging_service.get_logger("memory_service")
+        memory_service.setup_direct(
+            config=config_service,
+            logger=logging_service.get_logger("memory_service"),
+            backend_config={"data_dir": "/tmp/scout_agent_test/memory"}
+        )
         await memory_service._initialize(None)
         await memory_service._start()
         

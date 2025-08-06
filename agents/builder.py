@@ -12,7 +12,7 @@ from datetime import datetime
 from dataclasses import dataclass, asdict
 
 from agents.base import BaseAgent, AgentInput, AgentOutput, AgentState
-from agents.code_agent import CodeAgent
+from services.agents.code import get_code_execution_service
 from agents.analysis_agent import AnalysisAgent
 from config import get_config
 from llm.utils import LLMAgentMixin, load_prompt_template
@@ -95,7 +95,7 @@ class BuilderAgent(BaseAgent, LLMAgentMixin):
     def __init__(self, agent_id: str = None):
         BaseAgent.__init__(self, agent_id)
         LLMAgentMixin.__init__(self)
-        self.code_agent = CodeAgent()
+        self.code_service = get_code_execution_service()
         self.analysis_agent = AnalysisAgent()
         self.config = get_config()
         self.name = "builder_agent"  # Used for prompt directory name

@@ -74,8 +74,8 @@ class CodeExecResult:
 
 
 @service(name="code_execution", singleton=True)
-@requires("config")
-@requires("logging")
+@requires("config", optional=True)
+@requires("logging", optional=True)
 class CodeExecutionService(ServiceBase):
     """
     Service for code generation, validation, and execution.
@@ -115,6 +115,25 @@ class CodeExecutionService(ServiceBase):
             }
             # More languages can be added here
         }
+        
+    def setup_direct(self, config=None, logger=None, working_dir=None):
+        """
+        Setup the service directly without using the service registry.
+        Useful for testing and standalone usage.
+        
+        Args:
+            config: Configuration service or dict
+            logger: Logger instance
+            working_dir: Working directory for code execution
+        """
+        if logger:
+            self.logger = logger
+        if config:
+            self.config = config
+        if working_dir:
+            self.working_dir = Path(working_dir)
+        else:
+            self.working_dir = Path(tempfile.mkdtemp(prefix="code_exec_"))
     
     async def _initialize(self, registry) -> bool:
         """
@@ -129,24 +148,68 @@ class CodeExecutionService(ServiceBase):
         self.logger.info("Initializing code execution service")
         
         try:
-            # Get config service
-            self.config = registry.get_service("config")
+            # Handle direct initialization (no registry)
+            if registry is None:
+                self.logger.info("Initializing code execution service directly (no registry)")
+                if not self.working_dir:
+                    # Set up default working directory
+                    self.working_dir = Path(tempfile.mkdtemp(prefix="code_exec_"))
+                    self.logger.info(f"Created temporary working directory: {self.working_dir}")
+                return True
+                
+            # Try to get config service if available
+            try:
+                self.config = registry.get_service("config")
+            except Exception as e:
+                self.logger.warning(f"Could not get config service: {e}. Using default configuration.")
+                # Create a minimal config object for testing
+                class MinimalConfig:
+                    def get_config_value(self, key, default=None):
+                        return default
+                    def get_llm_backend_for_agent(self, agent_name):
+                        return {}
+                self.config = MinimalConfig()
+            
+            # Try to get logging service if we need to update logger
+            try:
+                logging_service = registry.get_service("logging")
+                self.logger = logging_service.get_logger("code_execution_service")
+            except Exception as e:
+                # Keep using default logger if logging service not available
+                self.logger.warning(f"Could not get logging service: {e}. Using default logger.")
             
             # Set up working directory
-            code_dir = self.config.get_config_value("code_execution.working_dir", "./code_execution")
-            self.working_dir = Path(code_dir).resolve()
-            self.working_dir.mkdir(parents=True, exist_ok=True)
+            try:
+                working_dir = self.config.get_config_value(
+                    "code_execution.working_dir",
+                    "/tmp/scout_agent/code_execution"
+                )
+                self.working_dir = Path(working_dir)
+                self.working_dir.mkdir(parents=True, exist_ok=True)
+                self.logger.info(f"Using working directory: {self.working_dir}")
+            except Exception as e:
+                self.logger.warning(f"Error setting working directory from config: {e}. Using default.")
+                self.working_dir = Path(tempfile.mkdtemp(prefix="code_exec_"))
+                self.logger.info(f"Created temporary working directory: {self.working_dir}")
             
-            # Load resource limits from config
-            limits_config = self.config.get_config_value("code_execution.resource_limits", {})
-            for key, default in self.resource_limits.items():
-                if key in limits_config:
-                    self.resource_limits[key] = limits_config[key]
-                    
+            # Get resource limits
+            try:
+                resource_limits = self.config.get_config_value(
+                    "code_execution.resource_limits", 
+                    self.resource_limits
+                )
+                self.resource_limits.update(resource_limits)
+            except Exception as e:
+                self.logger.warning(f"Error getting resource limits from config: {e}. Using defaults.")
+            
             # Get LLM backend preference
-            self.llm_backend_config = self.config.get_llm_backend_for_agent("code") or {}
-                    
-            self.logger.info(f"Code execution service initialized with working dir: {self.working_dir}")
+            try:
+                self.llm_backend_config = self.config.get_llm_backend_for_agent("code") or {}
+            except Exception as e:
+                self.logger.warning(f"Could not get LLM backend config: {e}. Using default.")
+                self.llm_backend_config = {}
+            
+            self.logger.info("Code execution service initialized")
             return True
             
         except Exception as e:
@@ -165,20 +228,28 @@ class CodeExecutionService(ServiceBase):
         self.logger.info("Starting code execution service")
         
         try:
-            # Verify that required executables are available
-            for lang, info in self.supported_languages.items():
-                cmd = info["command"]
+            # Ensure working directory exists
+            if not self.working_dir:
+                self.working_dir = Path(tempfile.mkdtemp(prefix="code_exec_"))
+                self.logger.info(f"Created temporary working directory: {self.working_dir}")
+            elif not self.working_dir.exists():
+                self.working_dir.mkdir(parents=True, exist_ok=True)
+                self.logger.info(f"Created working directory: {self.working_dir}")
+            
+            # Validate language support
+            for lang, config in self.supported_languages.items():
+                cmd = config["command"]
                 try:
-                    # Check if command exists
-                    subprocess.run(["which", cmd], check=True, capture_output=True)
-                    self.logger.info(f"Language {lang} supported with {cmd}")
-                except subprocess.CalledProcessError:
-                    self.logger.warning(f"Command {cmd} for language {lang} not found, may not be available")
-                    
-            # Create execution history directory
-            history_dir = self.working_dir / "history"
-            history_dir.mkdir(exist_ok=True)
-                    
+                    subprocess.run(
+                        [cmd, "--version"],
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE
+                    )
+                    self.logger.info(f"{lang.capitalize()} interpreter available: {cmd}")
+                except (subprocess.SubprocessError, FileNotFoundError):
+                    self.logger.warning(f"{lang.capitalize()} interpreter not found: {cmd}")
+            
+            self.logger.info("Code execution service started")
             return True
             
         except Exception as e:
@@ -630,15 +701,23 @@ def get_code_execution_service() -> CodeExecutionService:
     global _code_execution_service_instance
     
     if _code_execution_service_instance is None:
-        from service_registry import get_registry
-        
-        # Check if registered in service registry
-        registry = get_registry()
-        
-        if registry.has_service_instance("code_execution"):
-            _code_execution_service_instance = registry.get_service("code_execution")
-        else:
-            # Create and register a new instance
+        try:
+            from service_registry import get_registry
+            
+            # Check if registered in service registry
+            registry = get_registry()
+            
+            if registry.has_service_instance("code_execution"):
+                _code_execution_service_instance = registry.get_service("code_execution")
+            else:
+                # Create and register a new instance
+                _code_execution_service_instance = CodeExecutionService()
+                # Register in the registry
+                registry.register_instance(_code_execution_service_instance)
+        except Exception as e:
+            # If registry access fails, create a standalone instance
+            logger = get_logger("code_execution_service")
+            logger.warning(f"Could not access service registry: {e}. Creating standalone instance.")
             _code_execution_service_instance = CodeExecutionService()
             
     return _code_execution_service_instance

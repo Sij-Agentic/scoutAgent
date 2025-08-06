@@ -211,3 +211,63 @@ def main():
 2025-08-06 21:54:12 - service_lifecycle - INFO - base.py:165 - start() - Starting service: memory
 2025-08-06 21:54:12 - service_lifecycle - INFO - service.py:554 - _start() - Starting memory service
 2025-08-06 21:54:12 - service_lifecycle - INFO - base.py:171 - start() - Service memory started successfully
+2025-08-06 21:57:10 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: config
+2025-08-06 21:57:10 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: logging
+2025-08-06 21:57:10 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-06 21:57:10 - service_lifecycle - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-06 21:57:10 - service_lifecycle - INFO - service.py:57 - _initialize() - Initializing configuration service
+2025-08-06 21:57:10 - service_lifecycle - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 21:57:10 - service_lifecycle - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 21:57:10 - service_lifecycle - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 21:57:10 - service_lifecycle - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 21:57:10 - service_lifecycle - INFO - service.py:66 - _initialize() - Configuration initialized successfully
+2025-08-06 21:57:10 - service_lifecycle - INFO - service.py:82 - _start() - Starting configuration service
+2025-08-06 21:57:10 - service_lifecycle - INFO - service.py:52 - _initialize() - Initializing logging service
+2025-08-06 21:57:10 - service_lifecycle - ERROR - service.py:76 - _initialize() - Failed to initialize logging: 'NoneType' object has no attribute 'get_service'
+2025-08-06 21:57:10 - service_lifecycle - INFO - service.py:88 - _start() - Starting logging service
+2025-08-06 21:57:10 - service_lifecycle - ERROR - service.py:99 - _start() - Failed to start logging service: unsupported operand type(s) for /: 'NoneType' and 'str'
+2025-08-06 21:57:10 - service_lifecycle - INFO - service.py:148 - _initialize() - Initializing code execution service
+2025-08-06 21:57:10 - service_lifecycle - INFO - service.py:153 - _initialize() - Initializing code execution service directly (no registry)
+2025-08-06 21:57:10 - service_lifecycle - INFO - service.py:228 - _start() - Starting code execution service
+2025-08-06 21:57:10 - service_lifecycle - INFO - service.py:237 - _start() - Created working directory: /tmp/scout_agent_test/code_execution
+2025-08-06 21:57:10 - service_lifecycle - INFO - service.py:248 - _start() - Python interpreter available: python
+2025-08-06 21:57:10 - service_lifecycle - INFO - service.py:248 - _start() - Javascript interpreter available: node
+2025-08-06 21:57:10 - service_lifecycle - INFO - service.py:248 - _start() - Bash interpreter available: bash
+2025-08-06 21:57:10 - service_lifecycle - INFO - service.py:252 - _start() - Code execution service started
+2025-08-06 21:57:10 - service_lifecycle - INFO - service.py:455 - _initialize() - Initializing memory service
+2025-08-06 21:57:10 - service_lifecycle - INFO - service.py:460 - _initialize() - Initializing memory service directly (no registry)
+2025-08-06 21:57:10 - service_lifecycle - INFO - service.py:193 - initialize() - Initialized file system backend with 2 memories
+2025-08-06 21:57:10 - service_lifecycle - INFO - service.py:554 - _start() - Starting memory service
+2025-08-06 21:57:10 - service_lifecycle - INFO - direct_test_agent_services.py:26 - test_memory_service() - Testing memory service...
+2025-08-06 21:57:10 - service_lifecycle - INFO - direct_test_agent_services.py:36 - test_memory_service() - Created memory with ID: f0f56993-551d-4eb7-9144-32171a1a8ed4
+2025-08-06 21:57:10 - service_lifecycle - INFO - direct_test_agent_services.py:40 - test_memory_service() - Retrieved memory: This is a test memory for direct testing
+2025-08-06 21:57:10 - service_lifecycle - INFO - direct_test_agent_services.py:50 - test_memory_service() - Search found 2 results
+2025-08-06 21:57:10 - service_lifecycle - INFO - direct_test_agent_services.py:56 - test_memory_service() - Found 2 memories with 'test' tag
+2025-08-06 21:57:10 - service_lifecycle - INFO - direct_test_agent_services.py:63 - test_memory_service() - Created memory DAG task: memory_search_19a836fe
+2025-08-06 21:57:10 - service_lifecycle - INFO - direct_test_agent_services.py:69 - test_code_execution() - Testing code execution service...
+2025-08-06 21:57:10 - service_lifecycle - INFO - direct_test_agent_services.py:78 - test_code_execution() - Executing Python code...
+2025-08-06 21:57:10 - service_lifecycle - INFO - service.py:387 - execute_code() - Executing python code [id: 13f56315-cf15-487f-877d-a0555a750349]
+2025-08-06 21:57:10 - service_lifecycle - INFO - direct_test_agent_services.py:86 - test_code_execution() - Execution success: True
+2025-08-06 21:57:10 - service_lifecycle - INFO - direct_test_agent_services.py:87 - test_code_execution() - Execution output: Hello from Python direct test!
+The answer is 42
+
+2025-08-06 21:57:10 - service_lifecycle - INFO - direct_test_agent_services.py:90 - test_code_execution() - Testing code generation...
+2025-08-06 21:57:10 - service_lifecycle - INFO - service.py:293 - generate_code() - Generating python code from prompt
+2025-08-06 21:57:10 - service_lifecycle - INFO - direct_test_agent_services.py:97 - test_code_execution() - Generated code sample:
+2025-08-06 21:57:10 - service_lifecycle - INFO - direct_test_agent_services.py:98 - test_code_execution() - # Generated python code based on prompt: Write a function to calculate factorial
+def main():
+    pri...
+2025-08-06 21:57:10 - service_lifecycle - INFO - service.py:324 - validate_code() - Validating python code
+2025-08-06 21:57:10 - service_lifecycle - ERROR - service.py:358 - validate_code() - Code validation failed: [Errno 2] No such file or directory: 'pylint'
+2025-08-06 21:57:10 - service_lifecycle - INFO - direct_test_agent_services.py:105 - test_code_execution() - Code validation result: False
+2025-08-06 21:57:10 - service_lifecycle - INFO - direct_test_agent_services.py:112 - test_code_execution() - Created code execution DAG task: code_exec_cd0fbc42
+2025-08-06 21:57:10 - service_lifecycle - INFO - direct_test_agent_services.py:118 - test_service_integration() - Testing service integration...
+2025-08-06 21:57:10 - service_lifecycle - INFO - service.py:293 - generate_code() - Generating python code from prompt
+2025-08-06 21:57:10 - service_lifecycle - INFO - direct_test_agent_services.py:139 - test_service_integration() - Stored generated code in memory with ID: e7f7c483-f4a7-48d0-ba70-5d3afc361589
+2025-08-06 21:57:10 - service_lifecycle - INFO - service.py:387 - execute_code() - Executing python code [id: 17aadd7b-bbd3-4c6e-b94c-9fdbd8b7ae8c]
+2025-08-06 21:57:10 - service_lifecycle - INFO - direct_test_agent_services.py:149 - test_service_integration() - Executed code from memory, success: True
+2025-08-06 21:57:10 - service_lifecycle - INFO - direct_test_agent_services.py:157 - test_service_integration() - Updated memory with execution results
+2025-08-06 21:57:10 - service_lifecycle - INFO - service.py:569 - _stop() - Stopping memory service
+2025-08-06 21:57:10 - service_lifecycle - INFO - service.py:268 - _stop() - Stopping code execution service
+2025-08-06 21:57:10 - service_lifecycle - INFO - service.py:111 - _stop() - Stopping logging service
+2025-08-06 21:57:10 - service_lifecycle - INFO - service.py:98 - _stop() - Stopping configuration service

@@ -12,7 +12,7 @@ from pathlib import Path
 from agents.gap_finder import GapFinderAgent, GapFinderInput
 from agents.builder import BuilderAgent, BuilderInput
 from agents.writer import WriterAgent, WriterInput
-from agents.memory_agent import MemoryAgent, MemoryAgentInput
+from services.agents.memory import MemoryService, get_memory_service
 
 
 def print_section(title):
@@ -212,11 +212,14 @@ async def test_writer_agent():
 
 
 async def test_memory_agent():
-    """Test the MemoryAgent."""
-    print_section("Testing MemoryAgent")
+    """Test the MemoryService."""
+    print_section("Testing MemoryService")
     
     try:
-        agent = MemoryAgent()
+        # Get memory service instance
+        memory_service = get_memory_service()
+        await memory_service._initialize(None)  # Initialize directly for testing
+        await memory_service._start()
         
         # Mock workflow data
         workflow_data = {
@@ -232,33 +235,36 @@ async def test_memory_agent():
             }
         }
         
-        # Test store operation
-        input_data = MemoryAgentInput(
-            workflow_data=workflow_data,
-            operation="store"
+        # Test create memory operation
+        memory_id = await memory_service.create_memory(
+            content=workflow_data,
+            memory_type="workflow",
+            metadata={"source": "validation_test"},
+            tags=["test", "workflow"]
         )
+        print_test_result("Create Memory", memory_id is not None, f"Created memory with ID: {memory_id}")
         
-        output = await agent.act(input_data)
-        print_test_result("Store Operation", True, f"Stored {len(output.knowledge_entries)} entries")
+        # Test retrieve memory
+        memory = await memory_service.get_memory(memory_id)
+        print_test_result("Retrieve Memory", memory is not None, "Memory retrieved successfully")
         
-        # Test analyze operation
-        analyze_input = MemoryAgentInput(
-            workflow_data=workflow_data,
-            operation="analyze"
+        # Test search memories
+        results = await memory_service.search_memories("onboarding")
+        print_test_result("Search Memories", len(results) > 0, f"Found {len(results)} results")
+        
+        # Test DAG task creation
+        task = await memory_service.create_dag_task(
+            operation="search",
+            params={"query": "onboarding", "limit": 5}
         )
+        print_test_result("DAG Task Creation", task is not None, "Created memory DAG task")
         
-        analyze_output = await agent.act(analyze_input)
-        print_test_result("Analyze Operation", True, f"Generated {len(analyze_output.insights)} insights")
-        
-        # Validate output
-        assert len(output.knowledge_entries) > 0, "Expected knowledge entries"
-        assert output.storage_status["status"] == "success", "Expected successful storage"
-        
-        print_test_result("MemoryAgent Validation", True)
+        await memory_service._stop()
+        print_test_result("MemoryService Validation", True)
         return True
         
     except Exception as e:
-        print_test_result("MemoryAgent Validation", False, str(e))
+        print_test_result("MemoryService Validation", False, str(e))
         return False
 
 
@@ -268,8 +274,10 @@ async def test_agent_registration():
     
     try:
         from agents.base import get_agent_class
+        from service_registry import get_registry
         
-        agents_to_test = ["gapfinder", "builder", "writer", "memory"]
+        # Test traditional agents
+        agents_to_test = ["gapfinder", "builder", "writer"]
         
         for agent_name in agents_to_test:
             agent_class = get_agent_class(agent_name)
@@ -279,10 +287,31 @@ async def test_agent_registration():
                 print_test_result(f"{agent_name} registration", False, "Agent not found")
                 return False
         
+        # Test services
+        registry = get_registry()
+        services_to_test = ["memory", "code_execution"]
+        
+        for service_name in services_to_test:
+            if registry.has_service(service_name):
+                print_test_result(f"{service_name} service registration", True)
+            else:
+                try:
+                    if service_name == "memory":
+                        from services.agents.memory import get_memory_service
+                        service = get_memory_service()
+                        print_test_result(f"{service_name} service factory", True)
+                    elif service_name == "code_execution":
+                        from services.agents.code import get_code_execution_service
+                        service = get_code_execution_service()
+                        print_test_result(f"{service_name} service factory", True)
+                except Exception as e:
+                    print_test_result(f"{service_name} service access", False, str(e))
+                    return False
+        
         return True
         
     except Exception as e:
-        print_test_result("Agent Registration", False, str(e))
+        print_test_result("Registration Tests", False, str(e))
         return False
 
 

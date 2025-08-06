@@ -1,0 +1,25 @@
+{
+  "memory_id": "e7f7c483-f4a7-48d0-ba70-5d3afc361589",
+  "content": "# Generated python code based on prompt: Write a function to check if a number is prime\ndef main():\n    print('Hello, World!')\n\nif __name__ == '__main__':\n    main()",
+  "memory_type": "code",
+  "metadata": {
+    "language": "python",
+    "description": "Prime number checker function",
+    "generated": true,
+    "execution_result": {
+      "success": true,
+      "output": "Hello, World!\n",
+      "error": "",
+      "exec_id": "17aadd7b-bbd3-4c6e-b94c-9fdbd8b7ae8c",
+      "duration_ms": 10
+    }
+  },
+  "tags": [
+    "code",
+    "python",
+    "prime",
+    "generated"
+  ],
+  "timestamp": 1754513830.43926,
+  "embedding": null
+}
