@@ -1,0 +1,26 @@
+2025-08-07 00:25:11 - config - ERROR - manager.py:395 - initialize_llm_backends() - Failed to initialize Claude backend: Anthropic library not available. Install with: pip install anthropic
+2025-08-07 00:25:11 - config - ERROR - manager.py:411 - initialize_llm_backends() - Failed to initialize Gemini backend: Google GenerativeAI library not available. Install with: pip install google-generativeai
+2025-08-07 00:25:53 - config - ERROR - writer.py:220 - plan() - Error generating plan: 'include_recommendations'
+2025-08-07 00:51:53 - config - ERROR - manager.py:395 - initialize_llm_backends() - Failed to initialize Claude backend: Anthropic library not available. Install with: pip install anthropic
+2025-08-07 00:51:53 - config - ERROR - manager.py:411 - initialize_llm_backends() - Failed to initialize Gemini backend: Google GenerativeAI library not available. Install with: pip install google-generativeai
+2025-08-07 00:52:09 - config - ERROR - writer.py:220 - plan() - Error generating plan: 'include_recommendations'
+2025-08-07 01:00:09 - config - ERROR - manager.py:395 - initialize_llm_backends() - Failed to initialize Claude backend: Anthropic library not available. Install with: pip install anthropic
+2025-08-07 01:00:09 - config - ERROR - manager.py:411 - initialize_llm_backends() - Failed to initialize Gemini backend: Google GenerativeAI library not available. Install with: pip install google-generativeai
+2025-08-07 01:02:09 - config - ERROR - manager.py:179 - generate() - Error generating response with ollama: Ollama request timed out after 60s
+2025-08-07 01:02:09 - config - ERROR - utils.py:203 - llm_generate() - Error in LLM generation: Ollama request timed out after 60s
+2025-08-07 01:02:09 - config - ERROR - builder.py:261 - think() - Error analyzing market gaps: Ollama request timed out after 60s
+2025-08-07 01:02:41 - config - ERROR - writer.py:220 - plan() - Error generating plan: 'include_recommendations'
+2025-08-07 01:02:41 - config - ERROR - writer.py:359 - think() - Error analyzing report structure: 'report_plan'
+2025-08-07 01:09:29 - config - ERROR - manager.py:395 - initialize_llm_backends() - Failed to initialize Claude backend: Anthropic library not available. Install with: pip install anthropic
+2025-08-07 01:09:29 - config - ERROR - manager.py:411 - initialize_llm_backends() - Failed to initialize Gemini backend: Google GenerativeAI library not available. Install with: pip install google-generativeai
+2025-08-07 01:09:53 - config - ERROR - writer.py:220 - plan() - Error generating plan: 'include_recommendations'
+2025-08-07 01:09:53 - config - ERROR - writer.py:359 - think() - Error analyzing report structure: 'report_plan'
+2025-08-07 01:09:53 - config - ERROR - writer.py:470 - act() - Error generating report: 'report_structure'
+2025-08-07 01:19:16 - config - ERROR - manager.py:395 - initialize_llm_backends() - Failed to initialize Claude backend: Anthropic library not available. Install with: pip install anthropic
+2025-08-07 01:19:16 - config - ERROR - manager.py:411 - initialize_llm_backends() - Failed to initialize Gemini backend: Google GenerativeAI library not available. Install with: pip install google-generativeai
+2025-08-07 01:20:47 - config - ERROR - writer.py:220 - plan() - Error generating plan: 'include_recommendations'
+2025-08-07 01:20:47 - config - ERROR - writer.py:359 - think() - Error analyzing report structure: 'report_plan'
+2025-08-07 01:20:47 - config - ERROR - writer.py:470 - act() - Error generating report: 'report_structure'
+2025-08-07 01:35:15 - config - ERROR - writer.py:220 - plan() - Error generating plan: 'include_recommendations'
+2025-08-07 01:35:15 - config - ERROR - writer.py:359 - think() - Error analyzing report structure: 'report_plan'
+2025-08-07 01:35:15 - config - ERROR - writer.py:470 - act() - Error generating report: 'report_structure'

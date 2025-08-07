@@ -67,7 +67,9 @@ class LLMAgentMixin:
         if self.preferred_backend:
             return
 
-        agent_name = getattr(self, 'name', '').lower()
+        # Safely handle None or missing name attribute
+        agent_name = getattr(self, 'name', None)
+        agent_name = agent_name.lower() if isinstance(agent_name, str) else ''
         
         # Set agent-specific preferences based on agent name
         if 'code' in agent_name or 'builder' in agent_name:

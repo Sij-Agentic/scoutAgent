@@ -1592,3 +1592,614 @@ AttributeError: 'AgentOutput' object has no attribute 'get'
 ===== TEST SUCCESSFUL =====
 
 2025-08-06 19:14:45 - config - INFO - test_screener_agent.py:136 - test_screener_agent() - ScreenerAgent completed screening in 24.80s
+2025-08-06 22:31:49 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-06 22:31:49 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 22:31:49 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 22:31:49 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 22:31:49 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 22:31:49 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 22:31:49 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 22:31:49 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 22:31:49 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 22:31:49 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 22:31:49 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 22:31:49 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 22:31:49 - config - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-06 22:31:49 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 22:31:49 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 22:31:49 - config - INFO - base.py:89 - __init__() - Initialized agent: None (83b2c43d-4005-412c-b64a-9c2835c05d09)
+2025-08-06 22:31:49 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (c8c75caa-afca-4152-89e0-1568fc2dd476)
+2025-08-06 22:31:49 - config - INFO - base.py:89 - __init__() - Initialized agent: research (564fa0cc-baa9-4af4-ad0e-a15acf4cf389)
+2025-08-06 22:31:49 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-06 22:31:49 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-06 22:31:49 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-06 22:31:49 - config - INFO - base.py:89 - __init__() - Initialized agent: None (88bc4a6c-c1ee-4fb1-b22a-e4dd91601589)
+2025-08-06 22:31:49 - config - INFO - base.py:89 - __init__() - Initialized agent: None (5c7b5904-2319-488a-b5f9-92cc733ebb38)
+2025-08-06 22:31:49 - config - WARNING - service.py:877 - get_memory_service() - Could not access service registry: 'ServiceRegistry' object has no attribute 'register_instance'. Creating standalone instance.
+2025-08-06 22:31:49 - config - INFO - service.py:455 - _initialize() - Initializing memory service
+2025-08-06 22:31:49 - config - INFO - service.py:460 - _initialize() - Initializing memory service directly (no registry)
+2025-08-06 22:31:49 - config - INFO - service.py:193 - initialize() - Initialized file system backend with 4 memories
+2025-08-06 22:31:49 - config - INFO - service.py:554 - _start() - Starting memory service
+2025-08-06 22:31:49 - config - INFO - service.py:569 - _stop() - Stopping memory service
+2025-08-06 22:33:54 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-06 22:33:54 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 22:33:54 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 22:33:54 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 22:33:54 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 22:33:54 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 22:33:54 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 22:33:54 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 22:33:54 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 22:33:54 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 22:33:54 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 22:33:54 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 22:33:54 - config - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-06 22:33:54 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 22:33:54 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 22:33:54 - config - INFO - base.py:89 - __init__() - Initialized agent: None (625fdfb1-e486-419e-b39c-be2187005cbf)
+2025-08-06 22:33:54 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (5f1589c6-0b6e-4329-9c7c-e814dc8f643d)
+2025-08-06 22:33:54 - config - INFO - base.py:89 - __init__() - Initialized agent: research (90d7be1e-1436-42c6-bcbd-3c3626df379c)
+2025-08-06 22:33:54 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-06 22:33:54 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-06 22:33:54 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-06 22:33:54 - config - INFO - base.py:89 - __init__() - Initialized agent: None (ef3b57c5-1a43-4140-9a30-fbc4646698ba)
+2025-08-06 22:33:54 - config - INFO - base.py:89 - __init__() - Initialized agent: None (5253d180-b0c7-4813-8ee2-8ceba715cbb6)
+2025-08-06 22:33:54 - config - WARNING - service.py:877 - get_memory_service() - Could not access service registry: 'ServiceRegistry' object has no attribute 'register_instance'. Creating standalone instance.
+2025-08-06 22:33:54 - config - INFO - service.py:455 - _initialize() - Initializing memory service
+2025-08-06 22:33:54 - config - INFO - service.py:460 - _initialize() - Initializing memory service directly (no registry)
+2025-08-06 22:33:54 - config - INFO - service.py:193 - initialize() - Initialized file system backend with 5 memories
+2025-08-06 22:33:54 - config - INFO - service.py:554 - _start() - Starting memory service
+2025-08-06 22:33:54 - config - INFO - service.py:569 - _stop() - Stopping memory service
+2025-08-06 22:37:06 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-06 22:37:06 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 22:37:06 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 22:37:06 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 22:37:06 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 22:37:06 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 22:37:06 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 22:37:06 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 22:37:06 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 22:37:06 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 22:37:06 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 22:37:06 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 22:37:06 - config - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-06 22:37:06 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 22:37:06 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 22:37:06 - config - INFO - base.py:89 - __init__() - Initialized agent: None (72165bd6-adc1-4f4c-9795-48a624491166)
+2025-08-06 22:37:06 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (06b2989f-9ec5-45dd-a0c5-a6a2f514f358)
+2025-08-06 22:37:06 - config - INFO - base.py:89 - __init__() - Initialized agent: research (6fc5ab9c-b5e7-471d-9653-5dbb30de9f6b)
+2025-08-06 22:37:06 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-06 22:37:06 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-06 22:37:06 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-06 22:37:06 - config - INFO - base.py:89 - __init__() - Initialized agent: None (b1bb6399-5afa-472b-b12f-52858b6bcfcf)
+2025-08-06 22:37:06 - config - INFO - base.py:89 - __init__() - Initialized agent: None (9d7d5310-4f96-49d3-ad0f-4d3c003f5a80)
+2025-08-06 22:37:06 - config - WARNING - service.py:877 - get_memory_service() - Could not access service registry: 'ServiceRegistry' object has no attribute 'register_instance'. Creating standalone instance.
+2025-08-06 22:37:06 - config - INFO - service.py:455 - _initialize() - Initializing memory service
+2025-08-06 22:37:06 - config - INFO - service.py:460 - _initialize() - Initializing memory service directly (no registry)
+2025-08-06 22:37:06 - config - INFO - service.py:193 - initialize() - Initialized file system backend with 6 memories
+2025-08-06 22:37:06 - config - INFO - service.py:554 - _start() - Starting memory service
+2025-08-06 22:37:06 - config - INFO - service.py:569 - _stop() - Stopping memory service
+2025-08-06 22:43:10 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-06 22:43:10 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 22:43:10 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 22:43:10 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 22:43:10 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 22:43:10 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 22:43:10 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 22:43:10 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 22:43:10 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 22:43:10 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 22:43:10 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 22:43:10 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 22:43:10 - config - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-06 22:43:10 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 22:43:10 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 22:43:10 - config - INFO - base.py:89 - __init__() - Initialized agent: None (7a79cce1-41b3-42c3-87ea-52c8fcb0df24)
+2025-08-06 22:43:10 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (61ccdcd6-f4c3-4f01-8605-3601f8a4dc74)
+2025-08-06 22:43:10 - config - INFO - base.py:89 - __init__() - Initialized agent: research (5054c750-fc03-40fe-9e2f-fc1bf97dad7c)
+2025-08-06 22:43:10 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-06 22:43:10 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-06 22:43:10 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-06 22:43:10 - config - INFO - base.py:89 - __init__() - Initialized agent: None (28c3cb22-8701-4a71-a2d6-e56ce6c76f88)
+2025-08-06 22:43:10 - config - INFO - base.py:89 - __init__() - Initialized agent: None (f28e9b9e-2938-49bf-9447-7bfc107a341d)
+2025-08-06 22:43:10 - config - WARNING - service.py:877 - get_memory_service() - Could not access service registry: 'ServiceRegistry' object has no attribute 'register_instance'. Creating standalone instance.
+2025-08-06 22:43:10 - config - INFO - service.py:455 - _initialize() - Initializing memory service
+2025-08-06 22:43:10 - config - INFO - service.py:460 - _initialize() - Initializing memory service directly (no registry)
+2025-08-06 22:43:10 - config - INFO - service.py:193 - initialize() - Initialized file system backend with 7 memories
+2025-08-06 22:43:10 - config - INFO - service.py:554 - _start() - Starting memory service
+2025-08-06 22:43:10 - config - INFO - service.py:569 - _stop() - Stopping memory service
+2025-08-06 22:51:34 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-06 22:51:34 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 22:51:34 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 22:51:34 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 22:51:34 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 22:51:34 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 22:51:34 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 22:51:34 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 22:51:34 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 22:51:34 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 22:51:34 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 22:51:34 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 22:51:34 - config - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-06 22:51:34 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 22:51:34 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 22:51:34 - config - INFO - base.py:89 - __init__() - Initialized agent: None (c04c6816-9522-435b-b559-81c57bed23bb)
+2025-08-06 22:51:34 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (d275862a-d784-47f2-923d-6f9ba31df348)
+2025-08-06 22:51:34 - config - INFO - base.py:89 - __init__() - Initialized agent: research (52f453e0-9f8b-4942-81db-fc3ee0f7f873)
+2025-08-06 22:51:34 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-06 22:51:34 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-06 22:51:34 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-06 22:51:34 - config - INFO - base.py:89 - __init__() - Initialized agent: None (f05dd3fe-b2ce-4bb9-8c43-0bf8a9b17ac7)
+2025-08-06 22:51:34 - config - INFO - base.py:89 - __init__() - Initialized agent: None (b60cf1ee-d8c1-4b60-ae04-38e0674bd82c)
+2025-08-06 22:51:34 - config - WARNING - service.py:877 - get_memory_service() - Could not access service registry: 'ServiceRegistry' object has no attribute 'register_instance'. Creating standalone instance.
+2025-08-06 22:51:34 - config - INFO - service.py:455 - _initialize() - Initializing memory service
+2025-08-06 22:51:34 - config - INFO - service.py:460 - _initialize() - Initializing memory service directly (no registry)
+2025-08-06 22:51:34 - config - INFO - service.py:193 - initialize() - Initialized file system backend with 8 memories
+2025-08-06 22:51:34 - config - INFO - service.py:554 - _start() - Starting memory service
+2025-08-06 22:51:34 - config - INFO - service.py:569 - _stop() - Stopping memory service
+2025-08-06 22:51:43 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-06 22:51:43 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 22:51:43 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 22:51:43 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 22:51:43 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 22:51:43 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 22:51:43 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 22:51:43 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 22:51:43 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 22:51:43 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 22:51:43 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 22:51:43 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 22:51:43 - config - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-06 22:51:43 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 22:51:43 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 22:51:43 - config - INFO - base.py:89 - __init__() - Initialized agent: None (e7bf3a96-6f3f-4c1f-8ff5-3f4941011998)
+2025-08-06 22:51:43 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (57f3cbd0-aa3d-460e-82d2-23c7df7b270a)
+2025-08-06 22:51:43 - config - INFO - base.py:89 - __init__() - Initialized agent: research (d73255b0-07aa-4750-9313-16d76ec0711c)
+2025-08-06 22:51:43 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-06 22:51:43 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-06 22:51:43 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-06 22:51:43 - config - INFO - base.py:89 - __init__() - Initialized agent: None (4b4dd839-25fc-4af0-ac72-6d917bdde1af)
+2025-08-06 22:51:43 - config - INFO - base.py:89 - __init__() - Initialized agent: None (3b86b4fa-ed39-463a-8c02-5411af9c4a45)
+2025-08-06 22:51:43 - config - WARNING - service.py:877 - get_memory_service() - Could not access service registry: 'ServiceRegistry' object has no attribute 'register_instance'. Creating standalone instance.
+2025-08-06 22:51:43 - config - INFO - service.py:455 - _initialize() - Initializing memory service
+2025-08-06 22:51:43 - config - INFO - service.py:460 - _initialize() - Initializing memory service directly (no registry)
+2025-08-06 22:51:43 - config - INFO - service.py:193 - initialize() - Initialized file system backend with 9 memories
+2025-08-06 22:51:43 - config - INFO - service.py:554 - _start() - Starting memory service
+2025-08-06 22:51:43 - config - INFO - service.py:569 - _stop() - Stopping memory service
+2025-08-06 22:58:18 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-06 22:58:18 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 22:58:18 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 22:58:18 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 22:58:18 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 22:58:18 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 22:58:18 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 22:58:18 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 22:58:18 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 22:58:18 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 22:58:18 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 22:58:18 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 22:58:18 - config - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-06 22:58:18 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 22:58:18 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 22:58:18 - config - INFO - base.py:89 - __init__() - Initialized agent: None (e34e62c3-4703-425a-b553-7c98ac30111c)
+2025-08-06 22:58:18 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (4bc4f10e-261e-4bf7-a48a-f806581d4806)
+2025-08-06 22:58:18 - config - INFO - base.py:89 - __init__() - Initialized agent: research (b7c23950-54b8-495b-a8e7-04ea61199569)
+2025-08-06 22:58:18 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-06 22:58:18 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-06 22:58:18 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-06 22:58:18 - config - INFO - base.py:89 - __init__() - Initialized agent: None (b2aeb40a-5422-443c-9241-68680c928301)
+2025-08-06 22:58:18 - config - INFO - base.py:89 - __init__() - Initialized agent: None (80c4e0a4-6f28-4b2c-9aaf-979e5c15f0b3)
+2025-08-06 22:58:18 - config - WARNING - service.py:877 - get_memory_service() - Could not access service registry: 'ServiceRegistry' object has no attribute 'register_instance'. Creating standalone instance.
+2025-08-06 22:58:18 - config - INFO - service.py:455 - _initialize() - Initializing memory service
+2025-08-06 22:58:18 - config - INFO - service.py:460 - _initialize() - Initializing memory service directly (no registry)
+2025-08-06 22:58:18 - config - INFO - service.py:193 - initialize() - Initialized file system backend with 10 memories
+2025-08-06 22:58:18 - config - INFO - service.py:554 - _start() - Starting memory service
+2025-08-06 22:58:18 - config - INFO - service.py:569 - _stop() - Stopping memory service
+2025-08-06 22:58:31 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-06 22:58:31 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 22:58:31 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 22:58:31 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 22:58:31 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 22:58:31 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 22:58:31 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 22:58:31 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 22:58:31 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 22:58:31 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 22:58:31 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 22:58:31 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 22:58:31 - config - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-06 22:58:31 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 22:58:31 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 22:58:31 - config - INFO - base.py:89 - __init__() - Initialized agent: None (9a968f5a-bbd6-4194-9a5d-fb88176d082c)
+2025-08-06 22:58:31 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (08de1a6d-80f1-4634-a687-0a3043607f90)
+2025-08-06 22:58:31 - config - INFO - base.py:89 - __init__() - Initialized agent: research (b043bdc0-23ab-4a67-ae75-16139251ce5a)
+2025-08-06 22:58:31 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-06 22:58:31 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-06 22:58:31 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-06 22:58:31 - config - INFO - base.py:89 - __init__() - Initialized agent: None (6ae80f23-0692-4e67-a697-ebd49cb50058)
+2025-08-06 22:58:31 - config - INFO - base.py:89 - __init__() - Initialized agent: None (668b1e17-2bdd-43fd-99f8-fb5005b39014)
+2025-08-06 22:58:31 - config - WARNING - service.py:877 - get_memory_service() - Could not access service registry: 'ServiceRegistry' object has no attribute 'register_instance'. Creating standalone instance.
+2025-08-06 22:58:31 - config - INFO - service.py:455 - _initialize() - Initializing memory service
+2025-08-06 22:58:31 - config - INFO - service.py:460 - _initialize() - Initializing memory service directly (no registry)
+2025-08-06 22:58:31 - config - INFO - service.py:193 - initialize() - Initialized file system backend with 11 memories
+2025-08-06 22:58:31 - config - INFO - service.py:554 - _start() - Starting memory service
+2025-08-06 22:58:31 - config - INFO - service.py:569 - _stop() - Stopping memory service
+2025-08-06 23:00:34 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-06 23:00:34 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 23:00:34 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 23:00:34 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 23:00:34 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 23:00:34 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 23:00:34 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 23:00:34 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 23:00:34 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 23:00:34 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 23:00:34 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 23:00:34 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 23:00:34 - config - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-06 23:00:34 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 23:00:34 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 23:00:34 - config - INFO - base.py:89 - __init__() - Initialized agent: None (ec65a858-7d38-4e0b-af7e-eeb074283b52)
+2025-08-06 23:00:34 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (8c2b8e82-af71-49eb-b6ba-7d00935791fa)
+2025-08-06 23:00:34 - config - INFO - base.py:89 - __init__() - Initialized agent: research (865bb87b-45ec-428a-8e23-bfe649a6ef86)
+2025-08-06 23:00:34 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-06 23:00:34 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-06 23:00:34 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-06 23:00:34 - config - INFO - base.py:89 - __init__() - Initialized agent: None (c4a887f9-08a2-4e7e-8cc3-aa6f5aa0d2e3)
+2025-08-06 23:00:34 - config - INFO - base.py:89 - __init__() - Initialized agent: None (1cab5305-a1ae-46c0-a65a-edf8a61c20ae)
+2025-08-06 23:00:34 - config - WARNING - service.py:877 - get_memory_service() - Could not access service registry: 'ServiceRegistry' object has no attribute 'register_instance'. Creating standalone instance.
+2025-08-06 23:00:34 - config - INFO - service.py:455 - _initialize() - Initializing memory service
+2025-08-06 23:00:34 - config - INFO - service.py:460 - _initialize() - Initializing memory service directly (no registry)
+2025-08-06 23:00:34 - config - INFO - service.py:193 - initialize() - Initialized file system backend with 12 memories
+2025-08-06 23:00:34 - config - INFO - service.py:554 - _start() - Starting memory service
+2025-08-06 23:00:34 - config - INFO - service.py:569 - _stop() - Stopping memory service
+2025-08-06 23:01:13 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-06 23:01:13 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 23:01:13 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 23:01:13 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 23:01:13 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 23:01:13 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 23:01:13 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 23:01:13 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 23:01:13 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 23:01:13 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 23:01:13 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 23:01:13 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 23:01:13 - config - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-06 23:01:13 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 23:01:13 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 23:01:13 - config - INFO - base.py:89 - __init__() - Initialized agent: None (14b6da57-9ab5-4c1a-bac6-67d31f52ec2e)
+2025-08-06 23:01:13 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (0ce8cf34-8361-4201-b4c5-7b7569e0a4c4)
+2025-08-06 23:01:13 - config - INFO - base.py:89 - __init__() - Initialized agent: research (9ad7a3db-6afd-4660-9d60-dbbeef1a1fc9)
+2025-08-06 23:01:13 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-06 23:01:13 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-06 23:01:13 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-06 23:01:13 - config - INFO - base.py:89 - __init__() - Initialized agent: None (19825f64-da87-4017-ba23-b0ec547a4a85)
+2025-08-06 23:01:13 - config - INFO - base.py:89 - __init__() - Initialized agent: None (421c5630-6bc1-42c4-9776-437ab6f9d4a0)
+2025-08-06 23:01:13 - config - WARNING - service.py:877 - get_memory_service() - Could not access service registry: 'ServiceRegistry' object has no attribute 'register_instance'. Creating standalone instance.
+2025-08-06 23:01:13 - config - INFO - service.py:455 - _initialize() - Initializing memory service
+2025-08-06 23:01:13 - config - INFO - service.py:460 - _initialize() - Initializing memory service directly (no registry)
+2025-08-06 23:01:13 - config - INFO - service.py:193 - initialize() - Initialized file system backend with 13 memories
+2025-08-06 23:01:13 - config - INFO - service.py:554 - _start() - Starting memory service
+2025-08-06 23:01:13 - config - INFO - service.py:569 - _stop() - Stopping memory service
+2025-08-06 23:04:54 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-06 23:04:54 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 23:04:54 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 23:04:54 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 23:04:54 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 23:04:54 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 23:04:54 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 23:04:54 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 23:04:54 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 23:04:54 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 23:04:54 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 23:04:54 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 23:04:54 - config - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-06 23:04:54 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 23:04:54 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 23:04:54 - config - INFO - base.py:89 - __init__() - Initialized agent: None (c77ccb9c-e31d-41d4-be73-537ea3ca5eba)
+2025-08-06 23:04:54 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (7398457c-5689-4608-a35c-e1b1005497ad)
+2025-08-06 23:04:54 - config - INFO - base.py:89 - __init__() - Initialized agent: research (bf432528-f570-47ca-a87d-e77acdad5f39)
+2025-08-06 23:04:54 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-06 23:04:54 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-06 23:04:54 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-06 23:04:54 - config - INFO - base.py:89 - __init__() - Initialized agent: None (7e513ad2-ca08-4f3d-a0c8-8a95faedea23)
+2025-08-06 23:04:54 - config - INFO - base.py:89 - __init__() - Initialized agent: None (f6f09765-9f05-4678-a259-10a6451b20ba)
+2025-08-06 23:04:54 - config - WARNING - service.py:877 - get_memory_service() - Could not access service registry: 'ServiceRegistry' object has no attribute 'register_instance'. Creating standalone instance.
+2025-08-06 23:04:54 - config - INFO - service.py:455 - _initialize() - Initializing memory service
+2025-08-06 23:04:54 - config - INFO - service.py:460 - _initialize() - Initializing memory service directly (no registry)
+2025-08-06 23:04:54 - config - INFO - service.py:193 - initialize() - Initialized file system backend with 14 memories
+2025-08-06 23:04:54 - config - INFO - service.py:554 - _start() - Starting memory service
+2025-08-06 23:04:54 - config - INFO - service.py:569 - _stop() - Stopping memory service
+2025-08-06 23:05:08 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-06 23:05:08 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 23:05:08 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 23:05:08 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 23:05:08 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 23:05:08 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 23:05:08 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 23:05:08 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 23:05:08 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 23:05:08 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 23:05:08 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 23:05:08 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 23:05:08 - config - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-06 23:05:08 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 23:05:08 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 23:05:08 - config - INFO - base.py:89 - __init__() - Initialized agent: None (94c4f995-c1e7-4cce-8ee8-2e1d227487cf)
+2025-08-06 23:05:08 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (4e611a4d-4496-4e5b-adae-5bb2f5a8bbc1)
+2025-08-06 23:05:08 - config - INFO - base.py:89 - __init__() - Initialized agent: research (aace3aa2-f53e-4d7c-9cdf-3e68307d8890)
+2025-08-06 23:05:08 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-06 23:05:08 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-06 23:05:08 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-06 23:05:08 - config - INFO - base.py:89 - __init__() - Initialized agent: None (085676e2-0d1b-447d-a762-631f101a3a40)
+2025-08-06 23:05:08 - config - INFO - base.py:89 - __init__() - Initialized agent: None (bdffe6a9-0a99-4ae9-8037-7fed97ee9c97)
+2025-08-06 23:05:08 - config - WARNING - service.py:877 - get_memory_service() - Could not access service registry: 'ServiceRegistry' object has no attribute 'register_instance'. Creating standalone instance.
+2025-08-06 23:05:08 - config - INFO - service.py:455 - _initialize() - Initializing memory service
+2025-08-06 23:05:08 - config - INFO - service.py:460 - _initialize() - Initializing memory service directly (no registry)
+2025-08-06 23:05:08 - config - INFO - service.py:193 - initialize() - Initialized file system backend with 15 memories
+2025-08-06 23:05:08 - config - INFO - service.py:554 - _start() - Starting memory service
+2025-08-06 23:05:08 - config - INFO - service.py:569 - _stop() - Stopping memory service
+2025-08-06 23:11:20 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-06 23:11:20 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 23:11:20 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 23:11:20 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 23:11:20 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 23:11:20 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 23:11:20 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 23:11:20 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 23:11:20 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 23:11:20 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 23:11:20 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 23:11:20 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 23:11:20 - config - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-06 23:11:20 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 23:11:20 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 23:11:20 - config - INFO - base.py:89 - __init__() - Initialized agent: None (09d35bdd-c095-4fa5-bdcb-ed677090c3fc)
+2025-08-06 23:11:20 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (e6952cac-d55f-4528-8ed8-0896a7d85f4f)
+2025-08-06 23:11:20 - config - INFO - base.py:89 - __init__() - Initialized agent: research (1ce1daf5-c0cc-4de0-9637-cf1b9f01c9fb)
+2025-08-06 23:11:20 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-06 23:11:20 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-06 23:11:20 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-06 23:11:20 - config - INFO - base.py:89 - __init__() - Initialized agent: None (36567ba0-90d3-486a-83cb-fa79fa32f5ab)
+2025-08-06 23:11:20 - config - INFO - base.py:89 - __init__() - Initialized agent: None (6c855998-9b9a-4b4b-87c3-823d4631bdfb)
+2025-08-06 23:11:20 - config - WARNING - service.py:877 - get_memory_service() - Could not access service registry: 'ServiceRegistry' object has no attribute 'register_instance'. Creating standalone instance.
+2025-08-06 23:11:20 - config - INFO - service.py:455 - _initialize() - Initializing memory service
+2025-08-06 23:11:20 - config - INFO - service.py:460 - _initialize() - Initializing memory service directly (no registry)
+2025-08-06 23:11:20 - config - INFO - service.py:193 - initialize() - Initialized file system backend with 16 memories
+2025-08-06 23:11:20 - config - INFO - service.py:554 - _start() - Starting memory service
+2025-08-06 23:11:20 - config - INFO - service.py:569 - _stop() - Stopping memory service
+2025-08-06 23:17:09 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-06 23:17:09 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 23:17:09 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 23:17:09 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 23:17:09 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 23:17:09 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 23:17:09 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 23:17:09 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 23:17:09 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 23:17:09 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 23:17:09 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 23:17:09 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 23:17:09 - config - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-06 23:17:09 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 23:17:09 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 23:17:09 - config - INFO - base.py:89 - __init__() - Initialized agent: None (7eb20305-1bdd-40f0-a6a0-ece01bf5587c)
+2025-08-06 23:17:09 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (e43f7903-652b-4702-9cd1-cbca7168de1b)
+2025-08-06 23:17:09 - config - INFO - base.py:89 - __init__() - Initialized agent: research (cbeaad26-600f-4d49-838d-c744447159b8)
+2025-08-06 23:17:09 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-06 23:17:09 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-06 23:17:09 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-06 23:17:09 - config - INFO - base.py:89 - __init__() - Initialized agent: None (882252dd-88a2-49f6-9c32-fbaee4ba0983)
+2025-08-06 23:17:09 - config - INFO - base.py:89 - __init__() - Initialized agent: None (8450d873-3610-4f6d-afb0-37eec7ecdb3e)
+2025-08-06 23:17:09 - config - WARNING - service.py:877 - get_memory_service() - Could not access service registry: 'ServiceRegistry' object has no attribute 'register_instance'. Creating standalone instance.
+2025-08-06 23:17:09 - config - INFO - service.py:455 - _initialize() - Initializing memory service
+2025-08-06 23:17:09 - config - INFO - service.py:460 - _initialize() - Initializing memory service directly (no registry)
+2025-08-06 23:17:09 - config - INFO - service.py:193 - initialize() - Initialized file system backend with 17 memories
+2025-08-06 23:17:09 - config - INFO - service.py:554 - _start() - Starting memory service
+2025-08-06 23:17:09 - config - INFO - service.py:569 - _stop() - Stopping memory service
+2025-08-06 23:17:15 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-06 23:17:15 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 23:17:15 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 23:17:15 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 23:17:15 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 23:17:15 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 23:17:15 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 23:17:15 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 23:17:15 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 23:17:15 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 23:17:15 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 23:17:15 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 23:17:15 - config - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-06 23:17:15 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 23:17:15 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 23:17:15 - config - INFO - base.py:89 - __init__() - Initialized agent: None (c922cbbd-17da-41f8-9c34-0dd7f3e21cf4)
+2025-08-06 23:17:15 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (fad6c225-a127-49aa-b081-f98a6573c4a6)
+2025-08-06 23:17:15 - config - INFO - base.py:89 - __init__() - Initialized agent: research (891495e9-5503-4449-8c7f-a3d9b4e7b9ea)
+2025-08-06 23:17:15 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-06 23:17:15 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-06 23:17:15 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-06 23:17:15 - config - INFO - base.py:89 - __init__() - Initialized agent: None (5c0272aa-876a-4c1a-9538-fd8047e70543)
+2025-08-06 23:17:15 - config - INFO - base.py:89 - __init__() - Initialized agent: None (55f59ef5-c6a2-4ca8-b0ed-9fbc971a0e40)
+2025-08-06 23:17:15 - config - WARNING - service.py:877 - get_memory_service() - Could not access service registry: 'ServiceRegistry' object has no attribute 'register_instance'. Creating standalone instance.
+2025-08-06 23:17:15 - config - INFO - service.py:455 - _initialize() - Initializing memory service
+2025-08-06 23:17:15 - config - INFO - service.py:460 - _initialize() - Initializing memory service directly (no registry)
+2025-08-06 23:17:15 - config - INFO - service.py:193 - initialize() - Initialized file system backend with 18 memories
+2025-08-06 23:17:15 - config - INFO - service.py:554 - _start() - Starting memory service
+2025-08-06 23:17:15 - config - INFO - service.py:569 - _stop() - Stopping memory service
+2025-08-06 23:26:38 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-06 23:26:53 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-06 23:33:46 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-06 23:33:46 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 23:33:46 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 23:33:46 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 23:33:46 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 23:33:46 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 23:33:46 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 23:33:46 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 23:33:46 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 23:33:46 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 23:33:46 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 23:33:46 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 23:33:46 - config - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-06 23:33:46 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 23:33:46 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 23:33:46 - config - INFO - base.py:89 - __init__() - Initialized agent: None (e4584680-ffec-47c8-a20f-b55bcb0cd7a1)
+2025-08-06 23:33:46 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (5dd896f7-2458-48a1-8011-f2bf616c41cd)
+2025-08-06 23:33:46 - config - INFO - base.py:89 - __init__() - Initialized agent: research (87a34871-36f9-4143-8106-250360d93b47)
+2025-08-06 23:33:46 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-06 23:33:46 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-06 23:33:46 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-06 23:33:46 - config - INFO - base.py:89 - __init__() - Initialized agent: None (ec07d242-0890-476f-b7b7-0f9e76c0a7f5)
+2025-08-06 23:33:46 - config - INFO - base.py:89 - __init__() - Initialized agent: None (ad0c7974-c435-4e44-b539-908705197053)
+2025-08-06 23:33:46 - config - WARNING - service.py:877 - get_memory_service() - Could not access service registry: 'ServiceRegistry' object has no attribute 'register_instance'. Creating standalone instance.
+2025-08-06 23:33:46 - config - INFO - service.py:455 - _initialize() - Initializing memory service
+2025-08-06 23:33:46 - config - INFO - service.py:460 - _initialize() - Initializing memory service directly (no registry)
+2025-08-06 23:33:46 - config - INFO - service.py:193 - initialize() - Initialized file system backend with 19 memories
+2025-08-06 23:33:46 - config - INFO - service.py:554 - _start() - Starting memory service
+2025-08-06 23:33:46 - config - INFO - service.py:569 - _stop() - Stopping memory service
+2025-08-06 23:34:19 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-06 23:34:19 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 23:34:19 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 23:34:19 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 23:34:19 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 23:34:19 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 23:34:19 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 23:34:19 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 23:34:19 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 23:34:19 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 23:34:19 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 23:34:19 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 23:34:19 - config - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-06 23:34:19 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 23:34:19 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 23:34:19 - config - INFO - base.py:89 - __init__() - Initialized agent: None (e0fdf96e-3a21-4c54-b788-71bd8df40bed)
+2025-08-06 23:34:19 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (cab6ca6f-5da0-4746-9ab3-f17f4d0a0d76)
+2025-08-06 23:34:19 - config - INFO - base.py:89 - __init__() - Initialized agent: research (f966ac3a-7da7-4de8-84c8-9f1e5e249947)
+2025-08-06 23:34:19 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-06 23:34:19 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-06 23:34:19 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-06 23:34:19 - config - INFO - base.py:89 - __init__() - Initialized agent: None (42e37f48-7274-4cd5-8d47-7731202d2b33)
+2025-08-06 23:34:19 - config - INFO - base.py:89 - __init__() - Initialized agent: None (c1a23ad1-69d0-44cd-8acd-b38916a07b3c)
+2025-08-06 23:34:19 - config - WARNING - service.py:877 - get_memory_service() - Could not access service registry: 'ServiceRegistry' object has no attribute 'register_instance'. Creating standalone instance.
+2025-08-06 23:34:19 - config - INFO - service.py:455 - _initialize() - Initializing memory service
+2025-08-06 23:34:19 - config - INFO - service.py:460 - _initialize() - Initializing memory service directly (no registry)
+2025-08-06 23:34:19 - config - INFO - service.py:193 - initialize() - Initialized file system backend with 20 memories
+2025-08-06 23:34:19 - config - INFO - service.py:554 - _start() - Starting memory service
+2025-08-06 23:34:19 - config - INFO - service.py:569 - _stop() - Stopping memory service
+2025-08-06 23:50:22 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-06 23:50:22 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 23:50:22 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 23:50:22 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 23:50:22 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 23:50:22 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 23:50:22 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 23:50:22 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 23:50:22 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 23:50:22 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 23:50:22 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 23:50:22 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 23:50:22 - config - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-06 23:50:22 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 23:50:22 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 23:50:22 - config - INFO - base.py:89 - __init__() - Initialized agent: None (b2eef97f-e4c3-43aa-9c03-b09aad039b4a)
+2025-08-06 23:50:22 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (adc0dbb4-9f31-4ca6-b241-49a2533f078c)
+2025-08-06 23:50:22 - config - INFO - base.py:89 - __init__() - Initialized agent: research (64fe4641-149f-4fad-845f-57d477867f9e)
+2025-08-06 23:50:22 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-06 23:50:22 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-06 23:50:22 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-06 23:50:22 - config - INFO - base.py:89 - __init__() - Initialized agent: None (d9a9ef0c-1939-4945-82bc-482d0fb56114)
+2025-08-06 23:50:22 - config - INFO - base.py:89 - __init__() - Initialized agent: None (3ac5ccb6-64cb-47ee-b940-16108a885b3a)
+2025-08-06 23:50:22 - config - WARNING - service.py:877 - get_memory_service() - Could not access service registry: 'ServiceRegistry' object has no attribute 'register_instance'. Creating standalone instance.
+2025-08-06 23:50:22 - config - INFO - service.py:455 - _initialize() - Initializing memory service
+2025-08-06 23:50:22 - config - INFO - service.py:460 - _initialize() - Initializing memory service directly (no registry)
+2025-08-06 23:50:22 - config - INFO - service.py:193 - initialize() - Initialized file system backend with 21 memories
+2025-08-06 23:50:22 - config - INFO - service.py:554 - _start() - Starting memory service
+2025-08-06 23:50:22 - config - INFO - service.py:569 - _stop() - Stopping memory service
+2025-08-06 23:51:16 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-06 23:51:16 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 23:51:16 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 23:51:16 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 23:51:16 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 23:51:16 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 23:51:16 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 23:51:16 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 23:51:16 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 23:51:16 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 23:51:16 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 23:51:16 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 23:51:16 - config - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-06 23:51:16 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 23:51:16 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 23:51:16 - config - INFO - base.py:89 - __init__() - Initialized agent: None (a622467b-9cef-4fb5-8165-29c3d704bad2)
+2025-08-06 23:51:16 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (51c8c17b-363d-4104-84e5-341f4e1036cf)
+2025-08-06 23:51:16 - config - INFO - base.py:89 - __init__() - Initialized agent: research (6b5af7c1-a4c2-4af1-94f0-b981b6a60f54)
+2025-08-06 23:51:16 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-06 23:51:16 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-06 23:51:16 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-06 23:51:16 - config - INFO - base.py:89 - __init__() - Initialized agent: None (57398621-f1c3-4b24-8d45-124bf3da37b3)
+2025-08-06 23:51:16 - config - INFO - base.py:89 - __init__() - Initialized agent: None (3161a175-454c-46fc-adef-9ab938526dea)
+2025-08-06 23:51:16 - config - WARNING - service.py:877 - get_memory_service() - Could not access service registry: 'ServiceRegistry' object has no attribute 'register_instance'. Creating standalone instance.
+2025-08-06 23:51:16 - config - INFO - service.py:455 - _initialize() - Initializing memory service
+2025-08-06 23:51:16 - config - INFO - service.py:460 - _initialize() - Initializing memory service directly (no registry)
+2025-08-06 23:51:16 - config - INFO - service.py:193 - initialize() - Initialized file system backend with 22 memories
+2025-08-06 23:51:16 - config - INFO - service.py:554 - _start() - Starting memory service
+2025-08-06 23:51:16 - config - INFO - service.py:569 - _stop() - Stopping memory service
+2025-08-06 23:55:04 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-06 23:55:04 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 23:55:04 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 23:55:04 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 23:55:04 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 23:55:04 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 23:55:04 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 23:55:04 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 23:55:04 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 23:55:04 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 23:55:04 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 23:55:04 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 23:55:04 - config - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-06 23:55:04 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 23:55:04 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 23:55:04 - config - INFO - base.py:89 - __init__() - Initialized agent: None (e3a9a692-3d8c-44d5-b8b5-14b4b7b169f2)
+2025-08-06 23:55:04 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (fd488ce8-65e6-494a-9979-370a24f205c8)
+2025-08-06 23:55:04 - config - INFO - base.py:89 - __init__() - Initialized agent: research (26d8a13b-a67d-4a75-ac6c-d0d579b685a1)
+2025-08-06 23:55:04 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-06 23:55:04 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-06 23:55:04 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-06 23:55:04 - config - INFO - base.py:89 - __init__() - Initialized agent: None (1888893b-9953-4afd-92e3-4b16016a4bd4)
+2025-08-06 23:55:04 - config - INFO - base.py:89 - __init__() - Initialized agent: None (5b5065c4-c456-4b89-bff5-f0c9ff530412)
+2025-08-06 23:55:04 - config - WARNING - service.py:877 - get_memory_service() - Could not access service registry: 'ServiceRegistry' object has no attribute 'register_instance'. Creating standalone instance.
+2025-08-06 23:55:04 - config - INFO - service.py:455 - _initialize() - Initializing memory service
+2025-08-06 23:55:04 - config - INFO - service.py:460 - _initialize() - Initializing memory service directly (no registry)
+2025-08-06 23:55:04 - config - INFO - service.py:193 - initialize() - Initialized file system backend with 23 memories
+2025-08-06 23:55:04 - config - INFO - service.py:554 - _start() - Starting memory service
+2025-08-06 23:55:04 - config - INFO - service.py:569 - _stop() - Stopping memory service
+2025-08-06 23:57:49 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-06 23:57:49 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-06 23:57:49 - config - INFO - base.py:301 - register_agent() - Registered agent: ResearchAgent
+2025-08-06 23:57:49 - config - INFO - base.py:303 - register_agent() - Registered agent alias: research
+2025-08-06 23:57:49 - config - INFO - base.py:301 - register_agent() - Registered agent: AnalysisAgent
+2025-08-06 23:57:49 - config - INFO - base.py:303 - register_agent() - Registered agent alias: analysis
+2025-08-06 23:57:49 - config - INFO - base.py:301 - register_agent() - Registered agent: GapFinderAgent
+2025-08-06 23:57:49 - config - INFO - base.py:303 - register_agent() - Registered agent alias: gapfinder
+2025-08-06 23:57:49 - config - INFO - base.py:301 - register_agent() - Registered agent: BuilderAgent
+2025-08-06 23:57:49 - config - INFO - base.py:303 - register_agent() - Registered agent alias: builder
+2025-08-06 23:57:49 - config - INFO - base.py:301 - register_agent() - Registered agent: WriterAgent
+2025-08-06 23:57:49 - config - INFO - base.py:303 - register_agent() - Registered agent alias: writer
+2025-08-06 23:57:49 - config - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-06 23:57:49 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-06 23:57:49 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-06 23:57:49 - config - INFO - base.py:89 - __init__() - Initialized agent: None (53654623-1cbc-4375-9c55-8997e25b24cf)
+2025-08-06 23:57:49 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (275adb54-1b92-4f2b-85d4-1edb6e69d2d5)
+2025-08-06 23:57:49 - config - INFO - base.py:89 - __init__() - Initialized agent: research (4caf2998-d3ff-4018-a7d5-a91e3e66d2de)
+2025-08-06 23:57:49 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-06 23:57:49 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-06 23:57:49 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-06 23:57:49 - config - INFO - base.py:89 - __init__() - Initialized agent: None (a5f5d483-02b5-4762-887c-dbd1176353a5)
+2025-08-06 23:57:49 - config - INFO - base.py:89 - __init__() - Initialized agent: None (f4708080-6a55-46e3-9f96-765bace216eb)
+2025-08-06 23:57:49 - config - WARNING - service.py:877 - get_memory_service() - Could not access service registry: 'ServiceRegistry' object has no attribute 'register_instance'. Creating standalone instance.
+2025-08-06 23:57:49 - config - INFO - service.py:455 - _initialize() - Initializing memory service
+2025-08-06 23:57:49 - config - INFO - service.py:460 - _initialize() - Initializing memory service directly (no registry)
+2025-08-06 23:57:49 - config - INFO - service.py:193 - initialize() - Initialized file system backend with 24 memories
+2025-08-06 23:57:49 - config - INFO - service.py:554 - _start() - Starting memory service
+2025-08-06 23:57:49 - config - INFO - service.py:569 - _stop() - Stopping memory service
