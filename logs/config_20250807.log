@@ -1,0 +1,521 @@
+2025-08-07 00:01:51 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-07 00:01:51 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-07 00:01:51 - config - INFO - base.py:301 - register_agent() - Registered agent alias: research
+2025-08-07 00:01:51 - config - INFO - base.py:305 - register_agent() - Registered agent: ResearchAgent
+2025-08-07 00:01:51 - config - INFO - base.py:307 - register_agent() - Registered agent alias: research
+2025-08-07 00:01:51 - config - INFO - base.py:301 - register_agent() - Registered agent alias: analysis
+2025-08-07 00:01:51 - config - INFO - base.py:305 - register_agent() - Registered agent: AnalysisAgent
+2025-08-07 00:01:51 - config - INFO - base.py:307 - register_agent() - Registered agent alias: analysis
+2025-08-07 00:01:51 - config - INFO - base.py:301 - register_agent() - Registered agent alias: gapfinder
+2025-08-07 00:01:51 - config - INFO - base.py:305 - register_agent() - Registered agent: GapFinderAgent
+2025-08-07 00:01:51 - config - INFO - base.py:307 - register_agent() - Registered agent alias: gapfinder
+2025-08-07 00:01:51 - config - INFO - base.py:301 - register_agent() - Registered agent alias: builder
+2025-08-07 00:01:51 - config - INFO - base.py:305 - register_agent() - Registered agent: BuilderAgent
+2025-08-07 00:01:51 - config - INFO - base.py:307 - register_agent() - Registered agent alias: builder
+2025-08-07 00:01:51 - config - INFO - base.py:301 - register_agent() - Registered agent alias: writer
+2025-08-07 00:01:51 - config - INFO - base.py:305 - register_agent() - Registered agent: WriterAgent
+2025-08-07 00:01:51 - config - INFO - base.py:307 - register_agent() - Registered agent alias: writer
+2025-08-07 00:01:51 - config - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-07 00:01:51 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-07 00:01:51 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-07 00:01:51 - config - INFO - base.py:89 - __init__() - Initialized agent: None (8e97bfad-c414-4032-b556-aabcff407f06)
+2025-08-07 00:01:51 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (802b14b9-1302-41ad-be95-aad01e97b97a)
+2025-08-07 00:01:51 - config - INFO - base.py:89 - __init__() - Initialized agent: research (3734aaaa-c101-481a-80eb-3c463e6d3c52)
+2025-08-07 00:01:51 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-07 00:01:51 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-07 00:01:51 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-07 00:01:51 - config - INFO - base.py:89 - __init__() - Initialized agent: None (ad85441b-69f2-4e10-adee-f51e0f3747f9)
+2025-08-07 00:01:51 - config - INFO - base.py:89 - __init__() - Initialized agent: None (c0885c47-5402-46e6-a026-0c395dc4affb)
+2025-08-07 00:01:51 - config - WARNING - service.py:877 - get_memory_service() - Could not access service registry: 'ServiceRegistry' object has no attribute 'register_instance'. Creating standalone instance.
+2025-08-07 00:01:51 - config - INFO - service.py:455 - _initialize() - Initializing memory service
+2025-08-07 00:01:51 - config - INFO - service.py:460 - _initialize() - Initializing memory service directly (no registry)
+2025-08-07 00:01:51 - config - INFO - service.py:193 - initialize() - Initialized file system backend with 25 memories
+2025-08-07 00:01:51 - config - INFO - service.py:554 - _start() - Starting memory service
+2025-08-07 00:01:51 - config - INFO - service.py:569 - _stop() - Stopping memory service
+2025-08-07 00:10:16 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-07 00:10:16 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-07 00:10:16 - config - INFO - base.py:301 - register_agent() - Registered agent alias: research
+2025-08-07 00:10:16 - config - INFO - base.py:305 - register_agent() - Registered agent: ResearchAgent
+2025-08-07 00:10:16 - config - INFO - base.py:307 - register_agent() - Registered agent alias: research
+2025-08-07 00:10:16 - config - INFO - base.py:301 - register_agent() - Registered agent alias: analysis
+2025-08-07 00:10:16 - config - INFO - base.py:305 - register_agent() - Registered agent: AnalysisAgent
+2025-08-07 00:10:16 - config - INFO - base.py:307 - register_agent() - Registered agent alias: analysis
+2025-08-07 00:10:16 - config - INFO - base.py:301 - register_agent() - Registered agent alias: gapfinder
+2025-08-07 00:10:16 - config - INFO - base.py:305 - register_agent() - Registered agent: GapFinderAgent
+2025-08-07 00:10:16 - config - INFO - base.py:307 - register_agent() - Registered agent alias: gapfinder
+2025-08-07 00:10:16 - config - INFO - base.py:301 - register_agent() - Registered agent alias: builder
+2025-08-07 00:10:16 - config - INFO - base.py:305 - register_agent() - Registered agent: BuilderAgent
+2025-08-07 00:10:16 - config - INFO - base.py:307 - register_agent() - Registered agent alias: builder
+2025-08-07 00:10:16 - config - INFO - base.py:301 - register_agent() - Registered agent alias: writer
+2025-08-07 00:10:16 - config - INFO - base.py:305 - register_agent() - Registered agent: WriterAgent
+2025-08-07 00:10:16 - config - INFO - base.py:307 - register_agent() - Registered agent alias: writer
+2025-08-07 00:10:16 - config - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-07 00:10:16 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-07 00:10:16 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-07 00:10:16 - config - INFO - base.py:89 - __init__() - Initialized agent: None (71c72f3e-fba4-4cf1-9bc2-0af971bebac3)
+2025-08-07 00:10:16 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (bafa0ba2-247c-4b2f-8c12-1b87a4b8594d)
+2025-08-07 00:10:16 - config - INFO - base.py:89 - __init__() - Initialized agent: research (55dd1ddc-023e-419f-8598-e92d957ddb3e)
+2025-08-07 00:10:16 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-07 00:10:16 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-07 00:10:16 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-07 00:10:16 - config - INFO - base.py:89 - __init__() - Initialized agent: None (e047dd72-4392-4d6c-83c7-31205bb40388)
+2025-08-07 00:10:16 - config - INFO - base.py:89 - __init__() - Initialized agent: None (0debaeae-28b3-4a77-8a1f-7bac81636174)
+2025-08-07 00:10:16 - config - WARNING - service.py:877 - get_memory_service() - Could not access service registry: 'ServiceRegistry' object has no attribute 'register_instance'. Creating standalone instance.
+2025-08-07 00:10:16 - config - INFO - service.py:455 - _initialize() - Initializing memory service
+2025-08-07 00:10:16 - config - INFO - service.py:460 - _initialize() - Initializing memory service directly (no registry)
+2025-08-07 00:10:16 - config - INFO - service.py:193 - initialize() - Initialized file system backend with 26 memories
+2025-08-07 00:10:16 - config - INFO - service.py:554 - _start() - Starting memory service
+2025-08-07 00:10:16 - config - INFO - service.py:569 - _stop() - Stopping memory service
+2025-08-07 00:12:42 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-07 00:12:42 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-07 00:12:42 - config - INFO - base.py:301 - register_agent() - Registered agent alias: research
+2025-08-07 00:12:42 - config - INFO - base.py:305 - register_agent() - Registered agent: ResearchAgent
+2025-08-07 00:12:42 - config - INFO - base.py:307 - register_agent() - Registered agent alias: research
+2025-08-07 00:12:42 - config - INFO - base.py:301 - register_agent() - Registered agent alias: analysis
+2025-08-07 00:12:42 - config - INFO - base.py:305 - register_agent() - Registered agent: AnalysisAgent
+2025-08-07 00:12:42 - config - INFO - base.py:307 - register_agent() - Registered agent alias: analysis
+2025-08-07 00:12:42 - config - INFO - base.py:301 - register_agent() - Registered agent alias: gapfinder
+2025-08-07 00:12:42 - config - INFO - base.py:305 - register_agent() - Registered agent: GapFinderAgent
+2025-08-07 00:12:42 - config - INFO - base.py:307 - register_agent() - Registered agent alias: gapfinder
+2025-08-07 00:12:42 - config - INFO - base.py:301 - register_agent() - Registered agent alias: builder
+2025-08-07 00:12:42 - config - INFO - base.py:305 - register_agent() - Registered agent: BuilderAgent
+2025-08-07 00:12:42 - config - INFO - base.py:307 - register_agent() - Registered agent alias: builder
+2025-08-07 00:12:42 - config - INFO - base.py:301 - register_agent() - Registered agent alias: writer
+2025-08-07 00:12:42 - config - INFO - base.py:305 - register_agent() - Registered agent: WriterAgent
+2025-08-07 00:12:42 - config - INFO - base.py:307 - register_agent() - Registered agent alias: writer
+2025-08-07 00:12:42 - config - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-07 00:12:42 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-07 00:12:42 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-07 00:12:42 - config - INFO - base.py:89 - __init__() - Initialized agent: None (b8a7aab9-9ca5-4508-9537-c7971ea974c2)
+2025-08-07 00:12:42 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (7d0238bd-457c-42ad-b8f2-3661f585d74c)
+2025-08-07 00:12:42 - config - INFO - base.py:89 - __init__() - Initialized agent: research (8ac6985c-c8c2-46d8-a0d4-952abc31501d)
+2025-08-07 00:12:42 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-07 00:12:42 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-07 00:12:42 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-07 00:12:42 - config - INFO - base.py:89 - __init__() - Initialized agent: None (2adcb2e1-4e35-4d9e-8fae-3b9a00250ad0)
+2025-08-07 00:12:42 - config - INFO - base.py:89 - __init__() - Initialized agent: None (4e944353-05af-4ae5-b1aa-f4052070b9f2)
+2025-08-07 00:12:42 - config - WARNING - service.py:877 - get_memory_service() - Could not access service registry: 'ServiceRegistry' object has no attribute 'register_instance'. Creating standalone instance.
+2025-08-07 00:12:42 - config - INFO - service.py:455 - _initialize() - Initializing memory service
+2025-08-07 00:12:42 - config - INFO - service.py:460 - _initialize() - Initializing memory service directly (no registry)
+2025-08-07 00:12:42 - config - INFO - service.py:193 - initialize() - Initialized file system backend with 27 memories
+2025-08-07 00:12:42 - config - INFO - service.py:554 - _start() - Starting memory service
+2025-08-07 00:12:42 - config - INFO - service.py:569 - _stop() - Stopping memory service
+2025-08-07 00:25:08 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-07 00:25:08 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-07 00:25:08 - config - INFO - base.py:301 - register_agent() - Registered agent alias: research
+2025-08-07 00:25:08 - config - INFO - base.py:305 - register_agent() - Registered agent: ResearchAgent
+2025-08-07 00:25:08 - config - INFO - base.py:307 - register_agent() - Registered agent alias: research
+2025-08-07 00:25:08 - config - INFO - base.py:301 - register_agent() - Registered agent alias: analysis
+2025-08-07 00:25:08 - config - INFO - base.py:305 - register_agent() - Registered agent: AnalysisAgent
+2025-08-07 00:25:08 - config - INFO - base.py:307 - register_agent() - Registered agent alias: analysis
+2025-08-07 00:25:08 - config - INFO - base.py:301 - register_agent() - Registered agent alias: gapfinder
+2025-08-07 00:25:08 - config - INFO - base.py:305 - register_agent() - Registered agent: GapFinderAgent
+2025-08-07 00:25:08 - config - INFO - base.py:307 - register_agent() - Registered agent alias: gapfinder
+2025-08-07 00:25:08 - config - INFO - base.py:301 - register_agent() - Registered agent alias: builder
+2025-08-07 00:25:08 - config - INFO - base.py:305 - register_agent() - Registered agent: BuilderAgent
+2025-08-07 00:25:08 - config - INFO - base.py:307 - register_agent() - Registered agent alias: builder
+2025-08-07 00:25:08 - config - INFO - base.py:301 - register_agent() - Registered agent alias: writer
+2025-08-07 00:25:08 - config - INFO - base.py:305 - register_agent() - Registered agent: WriterAgent
+2025-08-07 00:25:08 - config - INFO - base.py:307 - register_agent() - Registered agent alias: writer
+2025-08-07 00:25:08 - config - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-07 00:25:08 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-07 00:25:08 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-07 00:25:08 - config - INFO - base.py:89 - __init__() - Initialized agent: None (031279d5-32ad-4eca-aefd-5c4fddecb246)
+2025-08-07 00:25:08 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (1714e0c5-1376-43c1-8be5-409dfeaf1ef6)
+2025-08-07 00:25:08 - config - INFO - base.py:89 - __init__() - Initialized agent: research (6358bd18-d7ee-4896-956b-9fca3c017381)
+2025-08-07 00:25:08 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-07 00:25:08 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-07 00:25:08 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-07 00:25:08 - config - INFO - base.py:89 - __init__() - Initialized agent: None (527d92cd-442b-442b-bc0d-0e1277c404f9)
+2025-08-07 00:25:08 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (a1c14c91-afed-4a00-8ca2-2fb1fca9299f)
+2025-08-07 00:25:08 - config - INFO - builder.py:153 - plan() - Planning solution building for 1 market gaps
+2025-08-07 00:25:08 - config - INFO - builder.py:157 - plan() - BuilderInput DEBUG: market_gaps=[{'gap_description': 'Simplified onboarding for SaaS tools', 'market_size': 25000000, 'competition_level': 'medium', 'opportunity_score': 85.5, 'target_segments': ['SMBs', 'Startups'], 'solution_ideas': ['Guided setup wizard', 'Template library'], 'barriers_to_entry': ['Technical complexity', 'User adoption'], 'estimated_tam': 50000000, 'estimated_sam': 25000000, 'estimated_som': 5000000, 'risk_factors': ['Competition', 'Market timing'], 'timeline_to_market': '6-12 months'}], type=<class 'list'>
+2025-08-07 00:25:08 - config - WARNING - builder.py:136 - _init_code_service() - Could not initialize code service: No instances of service 'code_execution' found
+2025-08-07 00:25:11 - config - INFO - openai.py:48 - initialize() - OpenAI backend initialized with model: gpt-4
+2025-08-07 00:25:11 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: openai
+2025-08-07 00:25:11 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-07 00:25:11 - config - INFO - manager.py:377 - initialize_llm_backends() - Initialized OpenAI backend
+2025-08-07 00:25:11 - config - ERROR - manager.py:395 - initialize_llm_backends() - Failed to initialize Claude backend: Anthropic library not available. Install with: pip install anthropic
+2025-08-07 00:25:11 - config - ERROR - manager.py:411 - initialize_llm_backends() - Failed to initialize Gemini backend: Google GenerativeAI library not available. Install with: pip install google-generativeai
+2025-08-07 00:25:14 - config - INFO - deepseek.py:50 - initialize() - DeepSeek backend initialized with model: deepseek-chat
+2025-08-07 00:25:14 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: deepseek
+2025-08-07 00:25:14 - config - INFO - manager.py:425 - initialize_llm_backends() - Initialized DeepSeek backend
+2025-08-07 00:25:15 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: phi4-mini:latest
+2025-08-07 00:25:15 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-07 00:25:15 - config - INFO - manager.py:442 - initialize_llm_backends() - Initialized Ollama backend
+2025-08-07 00:25:15 - config - INFO - manager.py:450 - initialize_llm_backends() - LLM initialization complete. Available backends: ['openai', 'deepseek', 'ollama']
+2025-08-07 00:25:15 - config - INFO - manager.py:451 - initialize_llm_backends() - Default backend: openai
+2025-08-07 00:25:34 - config - INFO - builder.py:204 - plan() - Plan generation completed in 26.46 seconds
+2025-08-07 00:25:34 - config - INFO - builder.py:230 - think() - Analyzing 1 market gaps for solution design
+2025-08-07 00:25:53 - config - INFO - builder.py:299 - think() - Gap analysis completed in 18.97 seconds
+2025-08-07 00:25:53 - config - INFO - base.py:89 - __init__() - Initialized agent: None (17570178-391c-4bd7-ac5f-cec9fa47bd30)
+2025-08-07 00:25:53 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (4f39355f-a8ab-463b-8bb2-1792c3f6bf19)
+2025-08-07 00:25:53 - config - INFO - writer.py:183 - plan() - Planning report structure...
+2025-08-07 00:25:53 - config - INFO - writer.py:187 - plan() - WriterInput DEBUG: report_type=comprehensive, target_audience=stakeholders
+2025-08-07 00:25:53 - config - INFO - writer.py:188 - plan() - workflow_data keys: ['scout', 'gap_finder', 'builder']
+2025-08-07 00:25:53 - config - ERROR - writer.py:220 - plan() - Error generating plan: 'include_recommendations'
+2025-08-07 00:25:53 - config - WARNING - service.py:877 - get_memory_service() - Could not access service registry: 'ServiceRegistry' object has no attribute 'register_instance'. Creating standalone instance.
+2025-08-07 00:25:53 - config - INFO - service.py:455 - _initialize() - Initializing memory service
+2025-08-07 00:25:53 - config - INFO - service.py:460 - _initialize() - Initializing memory service directly (no registry)
+2025-08-07 00:25:53 - config - INFO - service.py:193 - initialize() - Initialized file system backend with 28 memories
+2025-08-07 00:25:53 - config - INFO - service.py:554 - _start() - Starting memory service
+2025-08-07 00:25:53 - config - INFO - service.py:569 - _stop() - Stopping memory service
+2025-08-07 00:25:53 - config - WARNING - writer.py:133 - _init_services() - Could not initialize services: No instances of service 'memory' found
+2025-08-07 00:51:52 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-07 00:51:52 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-07 00:51:52 - config - INFO - base.py:301 - register_agent() - Registered agent alias: research
+2025-08-07 00:51:52 - config - INFO - base.py:305 - register_agent() - Registered agent: ResearchAgent
+2025-08-07 00:51:52 - config - INFO - base.py:307 - register_agent() - Registered agent alias: research
+2025-08-07 00:51:52 - config - INFO - base.py:301 - register_agent() - Registered agent alias: analysis
+2025-08-07 00:51:52 - config - INFO - base.py:305 - register_agent() - Registered agent: AnalysisAgent
+2025-08-07 00:51:52 - config - INFO - base.py:307 - register_agent() - Registered agent alias: analysis
+2025-08-07 00:51:52 - config - INFO - base.py:301 - register_agent() - Registered agent alias: gapfinder
+2025-08-07 00:51:52 - config - INFO - base.py:305 - register_agent() - Registered agent: GapFinderAgent
+2025-08-07 00:51:52 - config - INFO - base.py:307 - register_agent() - Registered agent alias: gapfinder
+2025-08-07 00:51:52 - config - INFO - base.py:301 - register_agent() - Registered agent alias: builder
+2025-08-07 00:51:52 - config - INFO - base.py:305 - register_agent() - Registered agent: BuilderAgent
+2025-08-07 00:51:52 - config - INFO - base.py:307 - register_agent() - Registered agent alias: builder
+2025-08-07 00:51:52 - config - INFO - base.py:301 - register_agent() - Registered agent alias: writer
+2025-08-07 00:51:52 - config - INFO - base.py:305 - register_agent() - Registered agent: WriterAgent
+2025-08-07 00:51:52 - config - INFO - base.py:307 - register_agent() - Registered agent alias: writer
+2025-08-07 00:51:52 - config - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-07 00:51:52 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-07 00:51:52 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-07 00:51:52 - config - INFO - base.py:89 - __init__() - Initialized agent: None (b7a5ceff-d0de-405a-8be3-01884de501cf)
+2025-08-07 00:51:52 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (d50cfac1-e969-4f34-bd65-8323569c5646)
+2025-08-07 00:51:52 - config - INFO - base.py:89 - __init__() - Initialized agent: research (9e3c38a8-e77c-4916-9c68-9900a9a77f98)
+2025-08-07 00:51:52 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-07 00:51:52 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-07 00:51:52 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-07 00:51:52 - config - INFO - base.py:89 - __init__() - Initialized agent: None (6c0aff9e-2950-4acb-afe4-43301a686576)
+2025-08-07 00:51:52 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (9d358de6-9286-4237-8e96-af2dd3cf37a9)
+2025-08-07 00:51:52 - config - INFO - builder.py:153 - plan() - Planning solution building for 1 market gaps
+2025-08-07 00:51:52 - config - INFO - builder.py:157 - plan() - BuilderInput DEBUG: market_gaps=[{'gap_description': 'Simplified onboarding for SaaS tools', 'market_size': 25000000, 'competition_level': 'medium', 'opportunity_score': 85.5, 'target_segments': ['SMBs', 'Startups'], 'solution_ideas': ['Guided setup wizard', 'Template library'], 'barriers_to_entry': ['Technical complexity', 'User adoption'], 'estimated_tam': 50000000, 'estimated_sam': 25000000, 'estimated_som': 5000000, 'risk_factors': ['Competition', 'Market timing'], 'timeline_to_market': '6-12 months'}], type=<class 'list'>
+2025-08-07 00:51:52 - config - WARNING - builder.py:136 - _init_code_service() - Could not initialize code service: No instances of service 'code_execution' found
+2025-08-07 00:51:53 - config - INFO - openai.py:48 - initialize() - OpenAI backend initialized with model: gpt-4
+2025-08-07 00:51:53 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: openai
+2025-08-07 00:51:53 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-07 00:51:53 - config - INFO - manager.py:377 - initialize_llm_backends() - Initialized OpenAI backend
+2025-08-07 00:51:53 - config - ERROR - manager.py:395 - initialize_llm_backends() - Failed to initialize Claude backend: Anthropic library not available. Install with: pip install anthropic
+2025-08-07 00:51:53 - config - ERROR - manager.py:411 - initialize_llm_backends() - Failed to initialize Gemini backend: Google GenerativeAI library not available. Install with: pip install google-generativeai
+2025-08-07 00:51:56 - config - INFO - deepseek.py:50 - initialize() - DeepSeek backend initialized with model: deepseek-chat
+2025-08-07 00:51:56 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: deepseek
+2025-08-07 00:51:56 - config - INFO - manager.py:425 - initialize_llm_backends() - Initialized DeepSeek backend
+2025-08-07 00:51:56 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: phi4-mini:latest
+2025-08-07 00:51:56 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-07 00:51:56 - config - INFO - manager.py:442 - initialize_llm_backends() - Initialized Ollama backend
+2025-08-07 00:51:56 - config - INFO - manager.py:450 - initialize_llm_backends() - LLM initialization complete. Available backends: ['openai', 'deepseek', 'ollama']
+2025-08-07 00:51:56 - config - INFO - manager.py:451 - initialize_llm_backends() - Default backend: openai
+2025-08-07 00:52:09 - config - WARNING - builder.py:225 - _extract_json() - Could not parse LLM response as JSON: Based on the provided input data, here is a compre...
+2025-08-07 00:52:09 - config - INFO - builder.py:204 - plan() - Plan generation completed in 17.36 seconds
+2025-08-07 00:52:09 - config - INFO - base.py:89 - __init__() - Initialized agent: None (488248b0-bfe3-4a93-a5b2-4d3986d1dc1a)
+2025-08-07 00:52:09 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (9b19e604-8458-47ff-8138-d291ba44f6da)
+2025-08-07 00:52:09 - config - INFO - writer.py:183 - plan() - Planning report structure...
+2025-08-07 00:52:09 - config - INFO - writer.py:187 - plan() - WriterInput DEBUG: report_type=comprehensive, target_audience=stakeholders
+2025-08-07 00:52:09 - config - INFO - writer.py:188 - plan() - workflow_data keys: ['scout', 'gap_finder', 'builder']
+2025-08-07 00:52:09 - config - ERROR - writer.py:220 - plan() - Error generating plan: 'include_recommendations'
+2025-08-07 00:52:09 - config - WARNING - service.py:877 - get_memory_service() - Could not access service registry: 'ServiceRegistry' object has no attribute 'register_instance'. Creating standalone instance.
+2025-08-07 00:52:09 - config - INFO - service.py:455 - _initialize() - Initializing memory service
+2025-08-07 00:52:09 - config - INFO - service.py:460 - _initialize() - Initializing memory service directly (no registry)
+2025-08-07 00:52:09 - config - INFO - service.py:193 - initialize() - Initialized file system backend with 29 memories
+2025-08-07 00:52:09 - config - INFO - service.py:554 - _start() - Starting memory service
+2025-08-07 00:52:09 - config - INFO - service.py:569 - _stop() - Stopping memory service
+2025-08-07 00:52:09 - config - WARNING - writer.py:133 - _init_services() - Could not initialize services: No instances of service 'memory' found
+2025-08-07 01:00:06 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-07 01:00:06 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-07 01:00:06 - config - INFO - base.py:301 - register_agent() - Registered agent alias: research
+2025-08-07 01:00:06 - config - INFO - base.py:305 - register_agent() - Registered agent: ResearchAgent
+2025-08-07 01:00:06 - config - INFO - base.py:307 - register_agent() - Registered agent alias: research
+2025-08-07 01:00:06 - config - INFO - base.py:301 - register_agent() - Registered agent alias: analysis
+2025-08-07 01:00:06 - config - INFO - base.py:305 - register_agent() - Registered agent: AnalysisAgent
+2025-08-07 01:00:06 - config - INFO - base.py:307 - register_agent() - Registered agent alias: analysis
+2025-08-07 01:00:06 - config - INFO - base.py:301 - register_agent() - Registered agent alias: gapfinder
+2025-08-07 01:00:06 - config - INFO - base.py:305 - register_agent() - Registered agent: GapFinderAgent
+2025-08-07 01:00:06 - config - INFO - base.py:307 - register_agent() - Registered agent alias: gapfinder
+2025-08-07 01:00:06 - config - INFO - base.py:301 - register_agent() - Registered agent alias: builder
+2025-08-07 01:00:06 - config - INFO - base.py:305 - register_agent() - Registered agent: BuilderAgent
+2025-08-07 01:00:06 - config - INFO - base.py:307 - register_agent() - Registered agent alias: builder
+2025-08-07 01:00:06 - config - INFO - base.py:301 - register_agent() - Registered agent alias: writer
+2025-08-07 01:00:06 - config - INFO - base.py:305 - register_agent() - Registered agent: WriterAgent
+2025-08-07 01:00:06 - config - INFO - base.py:307 - register_agent() - Registered agent alias: writer
+2025-08-07 01:00:06 - config - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-07 01:00:06 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-07 01:00:06 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-07 01:00:06 - config - INFO - base.py:89 - __init__() - Initialized agent: None (72ec6b5d-374b-474f-aa10-27fd0e8434ae)
+2025-08-07 01:00:06 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (3af46be0-ff3d-4dce-9272-49518dda0e36)
+2025-08-07 01:00:06 - config - INFO - base.py:89 - __init__() - Initialized agent: research (7a440042-7a7d-41d1-9079-55b8abbb07e9)
+2025-08-07 01:00:06 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-07 01:00:06 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-07 01:00:06 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-07 01:00:06 - config - INFO - base.py:89 - __init__() - Initialized agent: None (4e95bb43-ad94-455b-a0c7-d4fa30476750)
+2025-08-07 01:00:06 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (120aadff-989d-4ecb-a45f-1dbe823cacb4)
+2025-08-07 01:00:06 - config - INFO - builder.py:153 - plan() - Planning solution building for 1 market gaps
+2025-08-07 01:00:06 - config - INFO - builder.py:157 - plan() - BuilderInput DEBUG: market_gaps=[{'gap_description': 'Simplified onboarding for SaaS tools', 'market_size': 25000000, 'competition_level': 'medium', 'opportunity_score': 85.5, 'target_segments': ['SMBs', 'Startups'], 'solution_ideas': ['Guided setup wizard', 'Template library'], 'barriers_to_entry': ['Technical complexity', 'User adoption'], 'estimated_tam': 50000000, 'estimated_sam': 25000000, 'estimated_som': 5000000, 'risk_factors': ['Competition', 'Market timing'], 'timeline_to_market': '6-12 months'}], type=<class 'list'>
+2025-08-07 01:00:06 - config - WARNING - builder.py:136 - _init_code_service() - Could not initialize code service: No instances of service 'code_execution' found
+2025-08-07 01:00:09 - config - INFO - openai.py:48 - initialize() - OpenAI backend initialized with model: gpt-4
+2025-08-07 01:00:09 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: openai
+2025-08-07 01:00:09 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-07 01:00:09 - config - INFO - manager.py:377 - initialize_llm_backends() - Initialized OpenAI backend
+2025-08-07 01:00:09 - config - ERROR - manager.py:395 - initialize_llm_backends() - Failed to initialize Claude backend: Anthropic library not available. Install with: pip install anthropic
+2025-08-07 01:00:09 - config - ERROR - manager.py:411 - initialize_llm_backends() - Failed to initialize Gemini backend: Google GenerativeAI library not available. Install with: pip install google-generativeai
+2025-08-07 01:00:12 - config - INFO - deepseek.py:50 - initialize() - DeepSeek backend initialized with model: deepseek-chat
+2025-08-07 01:00:12 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: deepseek
+2025-08-07 01:00:12 - config - INFO - manager.py:425 - initialize_llm_backends() - Initialized DeepSeek backend
+2025-08-07 01:00:12 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: phi4-mini:latest
+2025-08-07 01:00:12 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-07 01:00:12 - config - INFO - manager.py:442 - initialize_llm_backends() - Initialized Ollama backend
+2025-08-07 01:00:12 - config - INFO - manager.py:450 - initialize_llm_backends() - LLM initialization complete. Available backends: ['openai', 'deepseek', 'ollama']
+2025-08-07 01:00:12 - config - INFO - manager.py:451 - initialize_llm_backends() - Default backend: openai
+2025-08-07 01:01:08 - config - INFO - builder.py:204 - plan() - Plan generation completed in 61.78 seconds
+2025-08-07 01:01:08 - config - INFO - builder.py:230 - think() - Analyzing 1 market gaps for solution design
+2025-08-07 01:02:09 - config - ERROR - manager.py:179 - generate() - Error generating response with ollama: Ollama request timed out after 60s
+2025-08-07 01:02:09 - config - ERROR - utils.py:203 - llm_generate() - Error in LLM generation: Ollama request timed out after 60s
+2025-08-07 01:02:09 - config - ERROR - builder.py:261 - think() - Error analyzing market gaps: Ollama request timed out after 60s
+2025-08-07 01:02:09 - config - INFO - builder.py:300 - think() - Gap analysis completed in 60.81 seconds
+2025-08-07 01:02:09 - config - INFO - builder.py:308 - act() - Creating solution prototypes for 1 market gaps
+2025-08-07 01:02:09 - config - INFO - builder.py:310 - act() - BuilderInput act DEBUG: {'market_gaps': [{'gap_description': 'Simplified onboarding for SaaS tools', 'market_size': 25000000, 'competition_level': 'medium', 'opportunity_score': 85.5, 'target_segments': ['SMBs', 'Startups'], 'solution_ideas': ['Guided setup wizard', 'Template library'], 'barriers_to_entry': ['Technical complexity', 'User adoption'], 'estimated_tam': 50000000, 'estimated_sam': 25000000, 'estimated_som': 5000000, 'risk_factors': ['Competition', 'Market timing'], 'timeline_to_market': '6-12 months'}], 'target_market': 'SMB SaaS market', 'solution_type': 'software', 'budget_range': 'moderate', 'timeline': '3-6 months', 'technical_complexity': 'moderate', 'context': None, 'metadata': {}}
+2025-08-07 01:02:41 - config - INFO - builder.py:401 - act() - Solution generation completed in 32.71 seconds
+2025-08-07 01:02:41 - config - INFO - base.py:89 - __init__() - Initialized agent: None (8da60d6a-efc0-49f5-9af5-aef1e7ce756d)
+2025-08-07 01:02:41 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (9dc74e44-a2d7-40ef-9533-d892559d37e7)
+2025-08-07 01:02:41 - config - INFO - writer.py:183 - plan() - Planning report structure...
+2025-08-07 01:02:41 - config - INFO - writer.py:187 - plan() - WriterInput DEBUG: report_type=comprehensive, target_audience=stakeholders
+2025-08-07 01:02:41 - config - INFO - writer.py:188 - plan() - workflow_data keys: ['scout', 'gap_finder', 'builder']
+2025-08-07 01:02:41 - config - ERROR - writer.py:220 - plan() - Error generating plan: 'include_recommendations'
+2025-08-07 01:02:41 - config - INFO - writer.py:304 - think() - Analyzing data for report creation...
+2025-08-07 01:02:41 - config - INFO - writer.py:309 - think() - WriterInput think DEBUG: report_type=comprehensive
+2025-08-07 01:02:41 - config - INFO - writer.py:310 - think() - WriterInput think DEBUG: target_audience=stakeholders
+2025-08-07 01:02:41 - config - INFO - writer.py:312 - think() - workflow_data keys: ['scout', 'gap_finder', 'builder']
+2025-08-07 01:02:41 - config - ERROR - writer.py:359 - think() - Error analyzing report structure: 'report_plan'
+2025-08-07 01:02:41 - config - WARNING - service.py:877 - get_memory_service() - Could not access service registry: 'ServiceRegistry' object has no attribute 'register_instance'. Creating standalone instance.
+2025-08-07 01:02:41 - config - INFO - service.py:455 - _initialize() - Initializing memory service
+2025-08-07 01:02:41 - config - INFO - service.py:460 - _initialize() - Initializing memory service directly (no registry)
+2025-08-07 01:02:41 - config - INFO - service.py:193 - initialize() - Initialized file system backend with 30 memories
+2025-08-07 01:02:41 - config - INFO - service.py:554 - _start() - Starting memory service
+2025-08-07 01:02:41 - config - INFO - service.py:569 - _stop() - Stopping memory service
+2025-08-07 01:02:41 - config - WARNING - writer.py:133 - _init_services() - Could not initialize services: No instances of service 'memory' found
+2025-08-07 01:09:27 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-07 01:09:27 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-07 01:09:27 - config - INFO - base.py:301 - register_agent() - Registered agent alias: research
+2025-08-07 01:09:27 - config - INFO - base.py:305 - register_agent() - Registered agent: ResearchAgent
+2025-08-07 01:09:27 - config - INFO - base.py:307 - register_agent() - Registered agent alias: research
+2025-08-07 01:09:27 - config - INFO - base.py:301 - register_agent() - Registered agent alias: analysis
+2025-08-07 01:09:27 - config - INFO - base.py:305 - register_agent() - Registered agent: AnalysisAgent
+2025-08-07 01:09:27 - config - INFO - base.py:307 - register_agent() - Registered agent alias: analysis
+2025-08-07 01:09:27 - config - INFO - base.py:301 - register_agent() - Registered agent alias: gapfinder
+2025-08-07 01:09:27 - config - INFO - base.py:305 - register_agent() - Registered agent: GapFinderAgent
+2025-08-07 01:09:27 - config - INFO - base.py:307 - register_agent() - Registered agent alias: gapfinder
+2025-08-07 01:09:27 - config - INFO - base.py:301 - register_agent() - Registered agent alias: builder
+2025-08-07 01:09:27 - config - INFO - base.py:305 - register_agent() - Registered agent: BuilderAgent
+2025-08-07 01:09:27 - config - INFO - base.py:307 - register_agent() - Registered agent alias: builder
+2025-08-07 01:09:27 - config - INFO - base.py:301 - register_agent() - Registered agent alias: writer
+2025-08-07 01:09:27 - config - INFO - base.py:305 - register_agent() - Registered agent: WriterAgent
+2025-08-07 01:09:27 - config - INFO - base.py:307 - register_agent() - Registered agent alias: writer
+2025-08-07 01:09:27 - config - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-07 01:09:27 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-07 01:09:27 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-07 01:09:27 - config - INFO - base.py:89 - __init__() - Initialized agent: None (27c01ca1-91ee-4154-9a69-1777e029afd4)
+2025-08-07 01:09:27 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (92754bb4-9161-48f2-8806-4a85216cd462)
+2025-08-07 01:09:27 - config - INFO - base.py:89 - __init__() - Initialized agent: research (63fe0bb9-89e9-482d-8c48-b0edcb3503ad)
+2025-08-07 01:09:27 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-07 01:09:27 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-07 01:09:27 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-07 01:09:27 - config - INFO - base.py:89 - __init__() - Initialized agent: None (07e7ec49-1282-488c-b1c5-bc3269039dc4)
+2025-08-07 01:09:27 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (43c213e1-621a-421b-9bd0-70ea56502f34)
+2025-08-07 01:09:27 - config - INFO - builder.py:153 - plan() - Planning solution building for 1 market gaps
+2025-08-07 01:09:27 - config - INFO - builder.py:157 - plan() - BuilderInput DEBUG: market_gaps=[{'gap_description': 'Simplified onboarding for SaaS tools', 'market_size': 25000000, 'competition_level': 'medium', 'opportunity_score': 85.5, 'target_segments': ['SMBs', 'Startups'], 'solution_ideas': ['Guided setup wizard', 'Template library'], 'barriers_to_entry': ['Technical complexity', 'User adoption'], 'estimated_tam': 50000000, 'estimated_sam': 25000000, 'estimated_som': 5000000, 'risk_factors': ['Competition', 'Market timing'], 'timeline_to_market': '6-12 months'}], type=<class 'list'>
+2025-08-07 01:09:27 - config - WARNING - builder.py:136 - _init_code_service() - Could not initialize code service: No instances of service 'code_execution' found
+2025-08-07 01:09:29 - config - INFO - openai.py:48 - initialize() - OpenAI backend initialized with model: gpt-4
+2025-08-07 01:09:29 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: openai
+2025-08-07 01:09:29 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-07 01:09:29 - config - INFO - manager.py:377 - initialize_llm_backends() - Initialized OpenAI backend
+2025-08-07 01:09:29 - config - ERROR - manager.py:395 - initialize_llm_backends() - Failed to initialize Claude backend: Anthropic library not available. Install with: pip install anthropic
+2025-08-07 01:09:29 - config - ERROR - manager.py:411 - initialize_llm_backends() - Failed to initialize Gemini backend: Google GenerativeAI library not available. Install with: pip install google-generativeai
+2025-08-07 01:09:33 - config - INFO - deepseek.py:50 - initialize() - DeepSeek backend initialized with model: deepseek-chat
+2025-08-07 01:09:33 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: deepseek
+2025-08-07 01:09:33 - config - INFO - manager.py:425 - initialize_llm_backends() - Initialized DeepSeek backend
+2025-08-07 01:09:33 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: phi4-mini:latest
+2025-08-07 01:09:33 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-07 01:09:33 - config - INFO - manager.py:442 - initialize_llm_backends() - Initialized Ollama backend
+2025-08-07 01:09:33 - config - INFO - manager.py:450 - initialize_llm_backends() - LLM initialization complete. Available backends: ['openai', 'deepseek', 'ollama']
+2025-08-07 01:09:33 - config - INFO - manager.py:451 - initialize_llm_backends() - Default backend: openai
+2025-08-07 01:09:43 - config - INFO - builder.py:204 - plan() - Plan generation completed in 15.52 seconds
+2025-08-07 01:09:43 - config - INFO - builder.py:230 - think() - Analyzing 1 market gaps for solution design
+2025-08-07 01:09:53 - config - INFO - builder.py:300 - think() - Gap analysis completed in 10.53 seconds
+2025-08-07 01:09:53 - config - INFO - base.py:89 - __init__() - Initialized agent: None (0f8f1e8b-f1ca-49b4-a4ec-cfe9afebb669)
+2025-08-07 01:09:53 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (1098fb0d-a34f-4364-a98f-7a26f9d4c3af)
+2025-08-07 01:09:53 - config - INFO - writer.py:183 - plan() - Planning report structure...
+2025-08-07 01:09:53 - config - INFO - writer.py:187 - plan() - WriterInput DEBUG: report_type=comprehensive, target_audience=stakeholders
+2025-08-07 01:09:53 - config - INFO - writer.py:188 - plan() - workflow_data keys: ['scout', 'gap_finder', 'builder']
+2025-08-07 01:09:53 - config - ERROR - writer.py:220 - plan() - Error generating plan: 'include_recommendations'
+2025-08-07 01:09:53 - config - INFO - writer.py:304 - think() - Analyzing data for report creation...
+2025-08-07 01:09:53 - config - INFO - writer.py:309 - think() - WriterInput think DEBUG: report_type=comprehensive
+2025-08-07 01:09:53 - config - INFO - writer.py:310 - think() - WriterInput think DEBUG: target_audience=stakeholders
+2025-08-07 01:09:53 - config - INFO - writer.py:312 - think() - workflow_data keys: ['scout', 'gap_finder', 'builder']
+2025-08-07 01:09:53 - config - ERROR - writer.py:359 - think() - Error analyzing report structure: 'report_plan'
+2025-08-07 01:09:53 - config - INFO - writer.py:398 - act() - Executing report generation using LLM...
+2025-08-07 01:09:53 - config - INFO - writer.py:402 - act() - WriterInput act DEBUG: {'workflow_data': {'scout': {'pain_points': [{'id': 'pp_001', 'description': 'Complex onboarding', 'severity': 'high'}, {'id': 'pp_002', 'description': 'Integration issues', 'severity': 'medium'}]}, 'gap_finder': {'market_gaps': [{'gap_description': 'SaaS onboarding gap', 'market_size': 25000000, 'opportunity_score': 85.5}]}, 'builder': {'solution_prototypes': [{'solution_name': 'EasyOnboard', 'estimated_cost': 150000, 'key_features': ['wizard', 'templates']}]}}, 'report_type': 'comprehensive', 'target_audience': 'stakeholders', 'include_recommendations': True, 'include_appendices': True, 'context': None, 'metadata': {}}
+2025-08-07 01:09:53 - config - INFO - writer.py:404 - act() - workflow_data keys: ['scout', 'gap_finder', 'builder']
+2025-08-07 01:09:53 - config - INFO - writer.py:405 - act() - workflow_data builder: {'solution_prototypes': [{'solution_name': 'EasyOnboard', 'estimated_cost': 150000, 'key_features': ['wizard', 'templates']}]}
+2025-08-07 01:09:53 - config - INFO - writer.py:406 - act() - workflow_data gap_finder: {'market_gaps': [{'gap_description': 'SaaS onboarding gap', 'market_size': 25000000, 'opportunity_score': 85.5}]}
+2025-08-07 01:09:53 - config - ERROR - writer.py:470 - act() - Error generating report: 'report_structure'
+2025-08-07 01:09:53 - config - WARNING - service.py:877 - get_memory_service() - Could not access service registry: 'ServiceRegistry' object has no attribute 'register_instance'. Creating standalone instance.
+2025-08-07 01:09:53 - config - INFO - service.py:455 - _initialize() - Initializing memory service
+2025-08-07 01:09:53 - config - INFO - service.py:460 - _initialize() - Initializing memory service directly (no registry)
+2025-08-07 01:09:53 - config - INFO - service.py:193 - initialize() - Initialized file system backend with 31 memories
+2025-08-07 01:09:53 - config - INFO - service.py:554 - _start() - Starting memory service
+2025-08-07 01:09:53 - config - INFO - service.py:569 - _stop() - Stopping memory service
+2025-08-07 01:09:53 - config - WARNING - writer.py:133 - _init_services() - Could not initialize services: No instances of service 'memory' found
+2025-08-07 01:19:14 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-07 01:19:14 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-07 01:19:14 - config - INFO - base.py:301 - register_agent() - Registered agent alias: research
+2025-08-07 01:19:14 - config - INFO - base.py:305 - register_agent() - Registered agent: ResearchAgent
+2025-08-07 01:19:14 - config - INFO - base.py:307 - register_agent() - Registered agent alias: research
+2025-08-07 01:19:14 - config - INFO - base.py:301 - register_agent() - Registered agent alias: analysis
+2025-08-07 01:19:14 - config - INFO - base.py:305 - register_agent() - Registered agent: AnalysisAgent
+2025-08-07 01:19:14 - config - INFO - base.py:307 - register_agent() - Registered agent alias: analysis
+2025-08-07 01:19:14 - config - INFO - base.py:301 - register_agent() - Registered agent alias: gapfinder
+2025-08-07 01:19:14 - config - INFO - base.py:305 - register_agent() - Registered agent: GapFinderAgent
+2025-08-07 01:19:14 - config - INFO - base.py:307 - register_agent() - Registered agent alias: gapfinder
+2025-08-07 01:19:14 - config - INFO - base.py:301 - register_agent() - Registered agent alias: builder
+2025-08-07 01:19:14 - config - INFO - base.py:305 - register_agent() - Registered agent: BuilderAgent
+2025-08-07 01:19:14 - config - INFO - base.py:307 - register_agent() - Registered agent alias: builder
+2025-08-07 01:19:14 - config - INFO - base.py:301 - register_agent() - Registered agent alias: writer
+2025-08-07 01:19:14 - config - INFO - base.py:305 - register_agent() - Registered agent: WriterAgent
+2025-08-07 01:19:14 - config - INFO - base.py:307 - register_agent() - Registered agent alias: writer
+2025-08-07 01:19:14 - config - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-07 01:19:14 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-07 01:19:14 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-07 01:19:14 - config - INFO - base.py:89 - __init__() - Initialized agent: None (9bb74c08-ed87-42da-aed8-a0561ef5279f)
+2025-08-07 01:19:14 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (0f575de3-d2ad-460f-9e76-59afd849cb90)
+2025-08-07 01:19:14 - config - INFO - base.py:89 - __init__() - Initialized agent: research (ed3cc4c8-c360-45ab-a1c3-34b55fff41ae)
+2025-08-07 01:19:14 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-07 01:19:14 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-07 01:19:14 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-07 01:19:14 - config - INFO - base.py:89 - __init__() - Initialized agent: None (42fbceb7-b4fc-4b10-926d-84286eabf70d)
+2025-08-07 01:19:14 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (f57c23e7-9c3a-4b02-829b-29d9b19a18ad)
+2025-08-07 01:19:14 - config - INFO - builder.py:153 - plan() - Planning solution building for 1 market gaps
+2025-08-07 01:19:14 - config - INFO - builder.py:157 - plan() - BuilderInput DEBUG: market_gaps=[{'gap_description': 'Simplified onboarding for SaaS tools', 'market_size': 25000000, 'competition_level': 'medium', 'opportunity_score': 85.5, 'target_segments': ['SMBs', 'Startups'], 'solution_ideas': ['Guided setup wizard', 'Template library'], 'barriers_to_entry': ['Technical complexity', 'User adoption'], 'estimated_tam': 50000000, 'estimated_sam': 25000000, 'estimated_som': 5000000, 'risk_factors': ['Competition', 'Market timing'], 'timeline_to_market': '6-12 months'}], type=<class 'list'>
+2025-08-07 01:19:14 - config - WARNING - builder.py:136 - _init_code_service() - Could not initialize code service: No instances of service 'code_execution' found
+2025-08-07 01:19:16 - config - INFO - openai.py:48 - initialize() - OpenAI backend initialized with model: gpt-4
+2025-08-07 01:19:16 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: openai
+2025-08-07 01:19:16 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-07 01:19:16 - config - INFO - manager.py:377 - initialize_llm_backends() - Initialized OpenAI backend
+2025-08-07 01:19:16 - config - ERROR - manager.py:395 - initialize_llm_backends() - Failed to initialize Claude backend: Anthropic library not available. Install with: pip install anthropic
+2025-08-07 01:19:16 - config - ERROR - manager.py:411 - initialize_llm_backends() - Failed to initialize Gemini backend: Google GenerativeAI library not available. Install with: pip install google-generativeai
+2025-08-07 01:19:20 - config - INFO - deepseek.py:50 - initialize() - DeepSeek backend initialized with model: deepseek-chat
+2025-08-07 01:19:20 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: deepseek
+2025-08-07 01:19:20 - config - INFO - manager.py:425 - initialize_llm_backends() - Initialized DeepSeek backend
+2025-08-07 01:19:20 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: phi4-mini:latest
+2025-08-07 01:19:20 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-07 01:19:20 - config - INFO - manager.py:442 - initialize_llm_backends() - Initialized Ollama backend
+2025-08-07 01:19:20 - config - INFO - manager.py:450 - initialize_llm_backends() - LLM initialization complete. Available backends: ['openai', 'deepseek', 'ollama']
+2025-08-07 01:19:20 - config - INFO - manager.py:451 - initialize_llm_backends() - Default backend: openai
+2025-08-07 01:19:43 - config - INFO - builder.py:204 - plan() - Plan generation completed in 29.43 seconds
+2025-08-07 01:19:43 - config - INFO - builder.py:239 - think() - Analyzing 1 market gaps for solution design
+2025-08-07 01:20:01 - config - INFO - builder.py:309 - think() - Gap analysis completed in 18.16 seconds
+2025-08-07 01:20:01 - config - INFO - builder.py:317 - act() - Creating solution prototypes for 1 market gaps
+2025-08-07 01:20:01 - config - INFO - builder.py:319 - act() - BuilderInput act DEBUG: {'market_gaps': [{'gap_description': 'Simplified onboarding for SaaS tools', 'market_size': 25000000, 'competition_level': 'medium', 'opportunity_score': 85.5, 'target_segments': ['SMBs', 'Startups'], 'solution_ideas': ['Guided setup wizard', 'Template library'], 'barriers_to_entry': ['Technical complexity', 'User adoption'], 'estimated_tam': 50000000, 'estimated_sam': 25000000, 'estimated_som': 5000000, 'risk_factors': ['Competition', 'Market timing'], 'timeline_to_market': '6-12 months'}], 'target_market': 'SMB SaaS market', 'solution_type': 'software', 'budget_range': 'moderate', 'timeline': '3-6 months', 'technical_complexity': 'moderate', 'context': None, 'metadata': {}}
+2025-08-07 01:20:47 - config - INFO - builder.py:410 - act() - Solution generation completed in 45.79 seconds
+2025-08-07 01:20:47 - config - INFO - base.py:89 - __init__() - Initialized agent: None (fdac2020-9fd7-45b9-8fb8-cfa68818d4e4)
+2025-08-07 01:20:47 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (aebf9ee5-0851-4fb3-8745-f0343c85b18f)
+2025-08-07 01:20:47 - config - INFO - writer.py:183 - plan() - Planning report structure...
+2025-08-07 01:20:47 - config - INFO - writer.py:187 - plan() - WriterInput DEBUG: report_type=comprehensive, target_audience=stakeholders
+2025-08-07 01:20:47 - config - INFO - writer.py:188 - plan() - workflow_data keys: ['scout', 'gap_finder', 'builder']
+2025-08-07 01:20:47 - config - ERROR - writer.py:220 - plan() - Error generating plan: 'include_recommendations'
+2025-08-07 01:20:47 - config - INFO - writer.py:304 - think() - Analyzing data for report creation...
+2025-08-07 01:20:47 - config - INFO - writer.py:309 - think() - WriterInput think DEBUG: report_type=comprehensive
+2025-08-07 01:20:47 - config - INFO - writer.py:310 - think() - WriterInput think DEBUG: target_audience=stakeholders
+2025-08-07 01:20:47 - config - INFO - writer.py:312 - think() - workflow_data keys: ['scout', 'gap_finder', 'builder']
+2025-08-07 01:20:47 - config - ERROR - writer.py:359 - think() - Error analyzing report structure: 'report_plan'
+2025-08-07 01:20:47 - config - INFO - writer.py:398 - act() - Executing report generation using LLM...
+2025-08-07 01:20:47 - config - INFO - writer.py:402 - act() - WriterInput act DEBUG: {'workflow_data': {'scout': {'pain_points': [{'id': 'pp_001', 'description': 'Complex onboarding', 'severity': 'high'}, {'id': 'pp_002', 'description': 'Integration issues', 'severity': 'medium'}]}, 'gap_finder': {'market_gaps': [{'gap_description': 'SaaS onboarding gap', 'market_size': 25000000, 'opportunity_score': 85.5}]}, 'builder': {'solution_prototypes': [{'solution_name': 'EasyOnboard', 'estimated_cost': 150000, 'key_features': ['wizard', 'templates']}]}}, 'report_type': 'comprehensive', 'target_audience': 'stakeholders', 'include_recommendations': True, 'include_appendices': True, 'context': None, 'metadata': {}}
+2025-08-07 01:20:47 - config - INFO - writer.py:404 - act() - workflow_data keys: ['scout', 'gap_finder', 'builder']
+2025-08-07 01:20:47 - config - INFO - writer.py:405 - act() - workflow_data builder: {'solution_prototypes': [{'solution_name': 'EasyOnboard', 'estimated_cost': 150000, 'key_features': ['wizard', 'templates']}]}
+2025-08-07 01:20:47 - config - INFO - writer.py:406 - act() - workflow_data gap_finder: {'market_gaps': [{'gap_description': 'SaaS onboarding gap', 'market_size': 25000000, 'opportunity_score': 85.5}]}
+2025-08-07 01:20:47 - config - ERROR - writer.py:470 - act() - Error generating report: 'report_structure'
+2025-08-07 01:20:47 - config - WARNING - service.py:877 - get_memory_service() - Could not access service registry: 'ServiceRegistry' object has no attribute 'register_instance'. Creating standalone instance.
+2025-08-07 01:20:47 - config - INFO - service.py:455 - _initialize() - Initializing memory service
+2025-08-07 01:20:47 - config - INFO - service.py:460 - _initialize() - Initializing memory service directly (no registry)
+2025-08-07 01:20:47 - config - INFO - service.py:193 - initialize() - Initialized file system backend with 32 memories
+2025-08-07 01:20:47 - config - INFO - service.py:554 - _start() - Starting memory service
+2025-08-07 01:20:47 - config - INFO - service.py:569 - _stop() - Stopping memory service
+2025-08-07 01:20:47 - config - WARNING - writer.py:133 - _init_services() - Could not initialize services: No instances of service 'memory' found
+2025-08-07 01:33:48 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-07 01:33:48 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-07 01:33:48 - config - INFO - base.py:301 - register_agent() - Registered agent alias: research
+2025-08-07 01:33:48 - config - INFO - base.py:305 - register_agent() - Registered agent: ResearchAgent
+2025-08-07 01:33:48 - config - INFO - base.py:307 - register_agent() - Registered agent alias: research
+2025-08-07 01:33:48 - config - INFO - base.py:301 - register_agent() - Registered agent alias: analysis
+2025-08-07 01:33:48 - config - INFO - base.py:305 - register_agent() - Registered agent: AnalysisAgent
+2025-08-07 01:33:48 - config - INFO - base.py:307 - register_agent() - Registered agent alias: analysis
+2025-08-07 01:33:48 - config - INFO - base.py:301 - register_agent() - Registered agent alias: gapfinder
+2025-08-07 01:33:48 - config - INFO - base.py:305 - register_agent() - Registered agent: GapFinderAgent
+2025-08-07 01:33:48 - config - INFO - base.py:307 - register_agent() - Registered agent alias: gapfinder
+2025-08-07 01:33:48 - config - INFO - base.py:301 - register_agent() - Registered agent alias: builder
+2025-08-07 01:33:48 - config - INFO - base.py:305 - register_agent() - Registered agent: BuilderAgent
+2025-08-07 01:33:48 - config - INFO - base.py:307 - register_agent() - Registered agent alias: builder
+2025-08-07 01:33:48 - config - INFO - base.py:301 - register_agent() - Registered agent alias: writer
+2025-08-07 01:33:48 - config - INFO - base.py:305 - register_agent() - Registered agent: WriterAgent
+2025-08-07 01:33:48 - config - INFO - base.py:307 - register_agent() - Registered agent alias: writer
+2025-08-07 01:33:48 - config - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-07 01:33:48 - config - INFO - config.py:207 - load_config() - Loading ScoutAgent configuration...
+2025-08-07 01:33:48 - config - INFO - config.py:241 - load_config() - Configuration loaded successfully
+2025-08-07 01:33:48 - config - INFO - base.py:89 - __init__() - Initialized agent: None (adc343e8-4072-4c43-878e-ce4ae48d8d71)
+2025-08-07 01:33:48 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (7cc67fb9-16fc-4aa7-9beb-33804390eeb9)
+2025-08-07 01:33:48 - config - INFO - base.py:89 - __init__() - Initialized agent: research (754324e2-d468-4cf5-a47b-68e9c70f9eab)
+2025-08-07 01:33:48 - config - INFO - gap_finder.py:97 - plan() - Planning market gap analysis for 2 pain points
+2025-08-07 01:33:48 - config - INFO - gap_finder.py:121 - think() - Analyzing market gaps and opportunities...
+2025-08-07 01:33:48 - config - INFO - gap_finder.py:146 - act() - Executing market gap analysis...
+2025-08-07 01:33:48 - config - INFO - base.py:89 - __init__() - Initialized agent: None (286b76a1-6080-4d90-bf2c-d53cb20bef07)
+2025-08-07 01:33:48 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (af63c1f2-5a15-420d-900e-bf8d55103930)
+2025-08-07 01:33:48 - config - INFO - builder.py:153 - plan() - Planning solution building for 1 market gaps
+2025-08-07 01:33:48 - config - INFO - builder.py:157 - plan() - BuilderInput DEBUG: market_gaps=[{'gap_description': 'Simplified onboarding for SaaS tools', 'market_size': 25000000, 'competition_level': 'medium', 'opportunity_score': 85.5, 'target_segments': ['SMBs', 'Startups'], 'solution_ideas': ['Guided setup wizard', 'Template library'], 'barriers_to_entry': ['Technical complexity', 'User adoption'], 'estimated_tam': 50000000, 'estimated_sam': 25000000, 'estimated_som': 5000000, 'risk_factors': ['Competition', 'Market timing'], 'timeline_to_market': '6-12 months'}], type=<class 'list'>
+2025-08-07 01:33:48 - config - WARNING - builder.py:136 - _init_code_service() - Could not initialize code service: No instances of service 'code_execution' found
+2025-08-07 01:33:49 - config - INFO - openai.py:48 - initialize() - OpenAI backend initialized with model: gpt-4
+2025-08-07 01:33:49 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: openai
+2025-08-07 01:33:49 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-07 01:33:49 - config - INFO - manager.py:377 - initialize_llm_backends() - Initialized OpenAI backend
+2025-08-07 01:33:50 - config - INFO - claude.py:48 - initialize() - Claude backend initialized with model: claude-3-5-sonnet-20241022
+2025-08-07 01:33:50 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: claude
+2025-08-07 01:33:50 - config - INFO - manager.py:393 - initialize_llm_backends() - Initialized Claude backend
+2025-08-07 01:33:52 - config - INFO - gemini.py:64 - initialize() - Gemini backend initialized with model: gemini-2.5-flash
+2025-08-07 01:33:52 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: gemini
+2025-08-07 01:33:52 - config - INFO - manager.py:409 - initialize_llm_backends() - Initialized Gemini backend
+2025-08-07 01:33:55 - config - INFO - deepseek.py:50 - initialize() - DeepSeek backend initialized with model: deepseek-chat
+2025-08-07 01:33:55 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: deepseek
+2025-08-07 01:33:55 - config - INFO - manager.py:425 - initialize_llm_backends() - Initialized DeepSeek backend
+2025-08-07 01:33:55 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: phi4-mini:latest
+2025-08-07 01:33:55 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-07 01:33:55 - config - INFO - manager.py:442 - initialize_llm_backends() - Initialized Ollama backend
+2025-08-07 01:33:55 - config - INFO - manager.py:450 - initialize_llm_backends() - LLM initialization complete. Available backends: ['openai', 'claude', 'gemini', 'deepseek', 'ollama']
+2025-08-07 01:33:55 - config - INFO - manager.py:451 - initialize_llm_backends() - Default backend: openai
+2025-08-07 01:34:16 - config - INFO - builder.py:204 - plan() - Plan generation completed in 28.32 seconds
+2025-08-07 01:34:16 - config - INFO - builder.py:239 - think() - Analyzing 1 market gaps for solution design
+2025-08-07 01:34:35 - config - INFO - builder.py:309 - think() - Gap analysis completed in 18.86 seconds
+2025-08-07 01:34:35 - config - INFO - builder.py:317 - act() - Creating solution prototypes for 1 market gaps
+2025-08-07 01:34:35 - config - INFO - builder.py:319 - act() - BuilderInput act DEBUG: {'market_gaps': [{'gap_description': 'Simplified onboarding for SaaS tools', 'market_size': 25000000, 'competition_level': 'medium', 'opportunity_score': 85.5, 'target_segments': ['SMBs', 'Startups'], 'solution_ideas': ['Guided setup wizard', 'Template library'], 'barriers_to_entry': ['Technical complexity', 'User adoption'], 'estimated_tam': 50000000, 'estimated_sam': 25000000, 'estimated_som': 5000000, 'risk_factors': ['Competition', 'Market timing'], 'timeline_to_market': '6-12 months'}], 'target_market': 'SMB SaaS market', 'solution_type': 'software', 'budget_range': 'moderate', 'timeline': '3-6 months', 'technical_complexity': 'moderate', 'context': None, 'metadata': {}}
+2025-08-07 01:35:15 - config - INFO - builder.py:410 - act() - Solution generation completed in 40.03 seconds
+2025-08-07 01:35:15 - config - INFO - base.py:89 - __init__() - Initialized agent: None (b950db33-8c9d-479f-a0a9-9f4ccc5ec430)
+2025-08-07 01:35:15 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (675b20ef-2925-4dea-a33f-a14c378814bb)
+2025-08-07 01:35:15 - config - INFO - writer.py:183 - plan() - Planning report structure...
+2025-08-07 01:35:15 - config - INFO - writer.py:187 - plan() - WriterInput DEBUG: report_type=comprehensive, target_audience=stakeholders
+2025-08-07 01:35:15 - config - INFO - writer.py:188 - plan() - workflow_data keys: ['scout', 'gap_finder', 'builder']
+2025-08-07 01:35:15 - config - ERROR - writer.py:220 - plan() - Error generating plan: 'include_recommendations'
+2025-08-07 01:35:15 - config - INFO - writer.py:304 - think() - Analyzing data for report creation...
+2025-08-07 01:35:15 - config - INFO - writer.py:309 - think() - WriterInput think DEBUG: report_type=comprehensive
+2025-08-07 01:35:15 - config - INFO - writer.py:310 - think() - WriterInput think DEBUG: target_audience=stakeholders
+2025-08-07 01:35:15 - config - INFO - writer.py:312 - think() - workflow_data keys: ['scout', 'gap_finder', 'builder']
+2025-08-07 01:35:15 - config - ERROR - writer.py:359 - think() - Error analyzing report structure: 'report_plan'
+2025-08-07 01:35:15 - config - INFO - writer.py:398 - act() - Executing report generation using LLM...
+2025-08-07 01:35:15 - config - INFO - writer.py:402 - act() - WriterInput act DEBUG: {'workflow_data': {'scout': {'pain_points': [{'id': 'pp_001', 'description': 'Complex onboarding', 'severity': 'high'}, {'id': 'pp_002', 'description': 'Integration issues', 'severity': 'medium'}]}, 'gap_finder': {'market_gaps': [{'gap_description': 'SaaS onboarding gap', 'market_size': 25000000, 'opportunity_score': 85.5}]}, 'builder': {'solution_prototypes': [{'solution_name': 'EasyOnboard', 'estimated_cost': 150000, 'key_features': ['wizard', 'templates']}]}}, 'report_type': 'comprehensive', 'target_audience': 'stakeholders', 'include_recommendations': True, 'include_appendices': True, 'context': None, 'metadata': {}}
+2025-08-07 01:35:15 - config - INFO - writer.py:404 - act() - workflow_data keys: ['scout', 'gap_finder', 'builder']
+2025-08-07 01:35:15 - config - INFO - writer.py:405 - act() - workflow_data builder: {'solution_prototypes': [{'solution_name': 'EasyOnboard', 'estimated_cost': 150000, 'key_features': ['wizard', 'templates']}]}
+2025-08-07 01:35:15 - config - INFO - writer.py:406 - act() - workflow_data gap_finder: {'market_gaps': [{'gap_description': 'SaaS onboarding gap', 'market_size': 25000000, 'opportunity_score': 85.5}]}
+2025-08-07 01:35:15 - config - ERROR - writer.py:470 - act() - Error generating report: 'report_structure'
+2025-08-07 01:35:15 - config - WARNING - service.py:877 - get_memory_service() - Could not access service registry: 'ServiceRegistry' object has no attribute 'register_instance'. Creating standalone instance.
+2025-08-07 01:35:15 - config - INFO - service.py:455 - _initialize() - Initializing memory service
+2025-08-07 01:35:15 - config - INFO - service.py:460 - _initialize() - Initializing memory service directly (no registry)
+2025-08-07 01:35:15 - config - INFO - service.py:193 - initialize() - Initialized file system backend with 33 memories
+2025-08-07 01:35:15 - config - INFO - service.py:554 - _start() - Starting memory service
+2025-08-07 01:35:15 - config - INFO - service.py:569 - _stop() - Stopping memory service
+2025-08-07 01:35:15 - config - WARNING - writer.py:133 - _init_services() - Could not initialize services: No instances of service 'memory' found

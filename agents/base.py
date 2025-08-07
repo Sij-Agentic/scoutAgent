@@ -293,10 +293,14 @@ class AgentRegistry:
         agent_name = agent_class.__name__
         self.agents[agent_name] = agent_class
         
-        # Also register lowercase version for convenience
-        lowercase_name = agent_name.lower().replace('agent', '')
-        if lowercase_name:
-            self.agents[lowercase_name] = agent_class
+        # Also register lowercase version for convenience - with safe handling of None
+        if agent_name:
+            lowercase_name = agent_name.lower().replace('agent', '') if isinstance(agent_name, str) else ''
+            if lowercase_name:
+                self.agents[lowercase_name] = agent_class
+            self.logger.info(f"Registered agent alias: {lowercase_name}")
+        else:
+            self.logger.warning("Agent name is None, skipping lowercase alias registration")
         
         self.logger.info(f"Registered agent: {agent_name}")
         if lowercase_name:

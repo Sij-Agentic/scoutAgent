@@ -1,0 +1,36 @@
+{
+  "memory_id": "2e4b3792-d27d-4342-a969-cf64a5de8f17",
+  "content": {
+    "scout": {
+      "pain_points": [
+        {
+          "id": "pp_001",
+          "description": "Complex onboarding",
+          "severity": "high",
+          "tags": [
+            "onboarding"
+          ]
+        }
+      ]
+    },
+    "gap_finder": {
+      "market_gaps": [
+        {
+          "gap_description": "SaaS onboarding gap",
+          "market_size": 25000000,
+          "opportunity_score": 85.5
+        }
+      ]
+    }
+  },
+  "memory_type": "text",
+  "metadata": {
+    "source": "validation_test"
+  },
+  "tags": [
+    "test",
+    "workflow"
+  ],
+  "timestamp": 1754521069.768308,
+  "embedding": null
+}

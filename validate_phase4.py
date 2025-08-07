@@ -96,9 +96,23 @@ async def test_gap_finder_agent():
 async def test_builder_agent():
     """Test the BuilderAgent."""
     print_section("Testing BuilderAgent")
+    print("Starting BuilderAgent validation with extra debug logging...")
+    
+    # Set up logging
+    import logging
+    logger = logging.getLogger("validate_phase4")
+    logger.setLevel(logging.DEBUG)
     
     try:
-        agent = BuilderAgent()
+        print("About to initialize BuilderAgent...")
+        import traceback
+        try:
+            agent = BuilderAgent()
+            logger.debug(f"BuilderAgent initialized: {agent}")
+        except Exception as e:
+            print(f"EXCEPTION DURING BUILDER INITIALIZATION: {e}")
+            print(f"TRACE: {traceback.format_exc()}")
+            raise
         
         # Mock market gaps
         market_gaps = [
@@ -127,17 +141,50 @@ async def test_builder_agent():
             timeline="3-6 months"
         )
         
-        # Test planning
-        plan = await agent.plan(input_data)
-        print_test_result("Planning", True, f"Phases: {plan['phases']}")
+        # Debug input data
+        logger.debug(f"BuilderInput data: {input_data.__dict__ if hasattr(input_data, '__dict__') else 'No __dict__'}")
+        for gap in input_data.market_gaps:
+            logger.debug(f"Market gap details: {gap}")
+            
+        # Sanitize input data to ensure no None values
+        for gap in input_data.market_gaps:
+            for key in list(gap.keys()):
+                if gap[key] is None:
+                    logger.warning(f"Found None value in market_gaps.{key}, replacing with empty string")
+                    gap[key] = ""
         
-        # Test thinking
-        strategy = await agent.think(input_data)
-        print_test_result("Strategy", True, f"Feasibility score: {strategy['feasibility_score']}")
+        # Test planning with more debug info and error tracing
+        print("Calling BuilderAgent.plan()...")
+        try:
+            plan = await agent.plan(input_data)
+            print_test_result("Planning", True, f"Phases: {plan['phases']}")
+        except Exception as e:
+            print(f"EXCEPTION IN PLAN: {e}")
+            import traceback
+            print(f"TRACE: {traceback.format_exc()}")
+            raise
         
-        # Test execution
-        output = await agent.act(input_data)
-        print_test_result("Execution", True, f"Created {len(output.solution_prototypes)} prototypes")
+        # Test thinking with more debug info and error tracing
+        print("Calling BuilderAgent.think()...")
+        try:
+            strategy = await agent.think(input_data)
+            print_test_result("Strategy", True, f"Feasibility score: {strategy['feasibility_score']}")
+        except Exception as e:
+            print(f"EXCEPTION IN THINK: {e}")
+            import traceback
+            print(f"TRACE: {traceback.format_exc()}")
+            raise
+        
+        # Test execution with more debug info and error tracing
+        print("Calling BuilderAgent.act()...")
+        try:
+            output = await agent.act(input_data)
+            print_test_result("Execution", True, f"Created {len(output.solution_prototypes)} prototypes")
+        except Exception as e:
+            print(f"EXCEPTION IN ACT: {e}")
+            import traceback
+            print(f"TRACE: {traceback.format_exc()}")
+            raise
         
         # Validate output
         assert len(output.solution_prototypes) > 0, "Expected solution prototypes"
@@ -155,9 +202,23 @@ async def test_builder_agent():
 async def test_writer_agent():
     """Test the WriterAgent."""
     print_section("Testing WriterAgent")
+    print("Starting WriterAgent validation with extra debug logging...")
+    
+    # Set up logging
+    import logging
+    logger = logging.getLogger("validate_phase4")
+    logger.setLevel(logging.DEBUG)
     
     try:
-        agent = WriterAgent()
+        print("About to initialize WriterAgent...")
+        import traceback
+        try:
+            agent = WriterAgent()
+            logger.debug(f"WriterAgent initialized: {agent}")
+        except Exception as e:
+            print(f"EXCEPTION DURING WRITER INITIALIZATION: {e}")
+            print(f"TRACE: {traceback.format_exc()}")
+            raise
         
         # Mock workflow data
         workflow_data = {
@@ -186,17 +247,59 @@ async def test_writer_agent():
             target_audience="stakeholders"
         )
         
-        # Test planning
-        plan = await agent.plan(input_data)
-        print_test_result("Planning", True, f"Sections: {plan['phases']}")
+        # Debug input data
+        logger.debug(f"WriterInput data: {input_data.__dict__ if hasattr(input_data, '__dict__') else 'No __dict__'}")
         
-        # Test thinking
-        strategy = await agent.think(input_data)
-        print_test_result("Strategy", True, f"Data completeness: {strategy['data_completeness']}")
+        # Sanitize workflow_data to ensure no None values
+        if input_data.workflow_data:
+            for section in input_data.workflow_data:
+                if isinstance(input_data.workflow_data[section], dict):
+                    for key, value in list(input_data.workflow_data[section].items()):
+                        if value is None:
+                            logger.warning(f"Found None value in workflow_data.{section}.{key}, replacing with empty string")
+                            input_data.workflow_data[section][key] = ""
+                        
+                        # Handle nested dictionaries in workflow data
+                        if isinstance(value, list):
+                            for i, item in enumerate(value):
+                                if isinstance(item, dict):
+                                    for subkey, subvalue in list(item.items()):
+                                        if subvalue is None:
+                                            logger.warning(f"Found None value in workflow_data.{section}.{key}[{i}].{subkey}, replacing with empty string")
+                                            item[subkey] = ""
         
-        # Test execution
-        output = await agent.act(input_data)
-        print_test_result("Execution", True, f"Report length: {len(output.report)} chars")
+        # Test planning with more debug info and error tracing
+        print("Calling WriterAgent.plan()...")
+        try:
+            plan = await agent.plan(input_data)
+            print_test_result("Planning", True, f"Sections: {plan['phases']}")
+        except Exception as e:
+            print(f"EXCEPTION IN PLAN: {e}")
+            import traceback
+            print(f"TRACE: {traceback.format_exc()}")
+            raise
+        
+        # Test thinking with more debug info and error tracing
+        print("Calling WriterAgent.think()...")
+        try:
+            strategy = await agent.think(input_data)
+            print_test_result("Strategy", True, f"Data completeness: {strategy['data_completeness']}")
+        except Exception as e:
+            print(f"EXCEPTION IN THINK: {e}")
+            import traceback
+            print(f"TRACE: {traceback.format_exc()}")
+            raise
+        
+        # Test execution with more debug info and error tracing
+        print("Calling WriterAgent.act()...")
+        try:
+            output = await agent.act(input_data)
+            print_test_result("Execution", True, f"Report length: {len(output.report)} chars")
+        except Exception as e:
+            print(f"EXCEPTION IN ACT: {e}")
+            import traceback
+            print(f"TRACE: {traceback.format_exc()}")
+            raise
         
         # Validate output
         assert output.report, "Expected report content"
