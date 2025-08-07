@@ -1,0 +1,36 @@
+# Example configuration for MCP servers
+# Copy this file to mcp_servers.yaml and edit as needed
+
+# Server configuration
+servers:
+  - id: main_tools                     # Optional unique identifier
+    name: Main Tools                   # Display name
+    url: http://localhost:8000         # Server URL
+    timeout: 30.0                      # Request timeout in seconds
+    headers:                           # Optional HTTP headers
+      Authorization: "Bearer YOUR_API_KEY_HERE"
+    prefix_tools: false                # Whether to prefix tool names with server ID
+
+  - id: search_tools
+    name: Search Tools
+    url: http://localhost:8001
+    timeout: 60.0
+    headers:
+      X-Api-Key: "YOUR_API_KEY_HERE"
+    prefix_tools: true                 # Will prefix tool names with 'search_tools.'
+
+# Security settings
+security:
+  validate_inputs: true                # Validate tool inputs against schemas
+  rate_limit:                          # Rate limiting settings
+    enabled: true                      # Enable rate limiting
+    max_requests: 100                  # Max requests per time period
+    period_seconds: 60                 # Time period for rate limiting
+
+# Performance settings
+performance:
+  connection_pooling: true             # Enable connection pooling
+  cache:                               # Cache settings
+    enabled: true                      # Enable result caching
+    ttl_seconds: 300                   # Time-to-live for cached results
+  parallel_execution: true             # Enable parallel execution of tools
