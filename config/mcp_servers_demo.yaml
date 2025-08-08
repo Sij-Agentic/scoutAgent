@@ -1,0 +1,32 @@
+# Configuration for MCP tools servers demonstration
+
+# Server configuration
+servers:
+  - id: web_search
+    name: Web Search Tools
+    url: http://localhost:8001
+    timeout: 30.0
+    headers: {}
+    prefix_tools: true                 # Will prefix tool names with 'web_search.'
+
+  - id: text_proc
+    name: Text Processing Tools
+    url: http://localhost:8002
+    timeout: 30.0
+    headers: {}
+    prefix_tools: true                 # Will prefix tool names with 'text_proc.'
+
+# Security settings
+security:
+  validate_inputs: true                # Validate tool inputs against schemas
+  rate_limit:
+    enabled: false                    # Disable rate limiting for demo
+    max_requests: 100
+    period_seconds: 60
+
+# Performance settings
+performance:
+  connection_pooling: true            # Enable connection pooling
+  cache:
+    enabled: true                     # Enable caching
+    ttl_seconds: 300                  # Cache TTL in seconds
