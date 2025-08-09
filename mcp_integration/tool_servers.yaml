@@ -1,0 +1,7 @@
+tool_servers:
+  - id: web-search
+    url: http://127.0.0.1:8002/sse
+    description: "Web search tools (DuckDuckGo HTML)"
+  - id: reddit-api
+    url: http://127.0.0.1:8001/sse
+    description: "Reddit API tools (public JSON)"
