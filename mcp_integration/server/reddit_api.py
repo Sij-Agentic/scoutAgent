@@ -6,7 +6,7 @@ from mcp.types import TextContent
 
 import httpx
 
-mcp = FastMCP("reddit-api")
+mcp = FastMCP("reddit-api", host="127.0.0.1", port=8001)
 
 
 async def _fetch_top(subreddit: str, limit: int = 5, t: str = "day") -> List[Dict[str, Any]]:

@@ -20,15 +20,17 @@ class MultiMCPClient:
         self.server_configs = server_configs
         self.tool_map: Dict[str, Dict[str, Any]] = {}
         self.server_tools: Dict[str, List[Any]] = {}
+        # Do not keep persistent clients created from a different loop.
+        # We'll create short-lived clients on demand in the active loop.
         self.client_cache: Dict[str, MCPClient] = {}
 
     async def initialize(self):
         for config in self.server_configs:
             try:
+                # Use a temporary client to discover tools, then close it.
                 client = MCPClient(server_url=config["url"])
-                self.client_cache[config["id"]] = client
-
                 tools = await client.list_tools()
+                await client.shutdown()
 
                 for tool in tools:
                     self.tool_map[tool.name] = {
@@ -44,14 +46,20 @@ class MultiMCPClient:
         if not entry:
             raise ValueError(f"Tool '{tool_name}' not found on any server.")
         cfg = entry["config"]
-        client = self.client_cache[cfg["id"]]
-        return await client.call_tool(tool_name, arguments)
+        # Create a short-lived client in the current loop to execute the call.
+        client = MCPClient(server_url=cfg["url"])
+        try:
+            result = await client.call_tool(tool_name, arguments)
+            return result
+        finally:
+            await client.shutdown()
 
     def get_all_tools(self) -> List[Any]:
         return [entry["tool"] for entry in self.tool_map.values()]
 
     async def shutdown(self):
-        for client in self.client_cache.values():
+        # No persistent clients by default; best-effort cleanup if any exist.
+        for client in list(self.client_cache.values()):
             try:
                 await client.shutdown()
             except asyncio.CancelledError:
