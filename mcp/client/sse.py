@@ -79,7 +79,11 @@ async def sse_client(
     
     # Default send URL
     if send_url is None:
-        send_url = urljoin(url, "/messages")
+        # Extract base URL (remove /sse from the end if present)
+        base_url = url
+        if base_url.endswith("/sse"):
+            base_url = base_url[:-4]  # Remove /sse
+        send_url = urljoin(base_url, "/messages")
     
     # Client session ID
     session_id = str(uuid.uuid4())
@@ -146,8 +150,9 @@ async def sse_client(
                 "message": message
             }
             
-            async with client.post(send_url, json=data) as response:
-                response.raise_for_status()
+            # Await the coroutine returned by client.post
+            response = await client.post(send_url, json=data)
+            response.raise_for_status()
         
         except httpx.HTTPError as e:
             logger.error(f"HTTP error sending message: {e}")
@@ -169,9 +174,10 @@ async def sse_client(
                 }
                 
                 try:
-                    async with client.post(send_url, json=data, timeout=10.0) as response:
-                        if response.status_code != 200:
-                            logger.warning(f"Heartbeat failed: {response.status_code}")
+                    # Await the coroutine returned by client.post
+                    response = await client.post(send_url, json=data, timeout=10.0)
+                    if response.status_code != 200:
+                        logger.warning(f"Heartbeat failed: {response.status_code}")
                 except Exception as e:
                     logger.warning(f"Error sending heartbeat: {e}")
         

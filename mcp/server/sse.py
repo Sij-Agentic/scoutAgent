@@ -282,26 +282,95 @@ async def create_asgi_app(server) -> None:
     """
     transport = SseServerTransport()
     
+    # Get registered tools
+    tools = server.get_tools() if hasattr(server, 'get_tools') else []
+    
     async def app(scope, receive, send):
         """ASGI application for MCP server."""
         path = scope.get("path", "")
         method = scope.get("method", "GET")
         
+        logger.info(f"ASGI request: {method} {path}")
+        
         if method == "OPTIONS":
             # Handle CORS preflight requests
+            logger.info(f"Handling OPTIONS request for {path}")
             await transport.handle_cors_preflight(scope, receive, send)
             return
         
         if path == "/sse" and method == "GET":
             # Handle SSE connection
+            logger.info(f"Handling SSE connection request")
             streams = await transport.connect_sse(scope, receive, send)
             await server.run(streams[0], streams[1], server.create_initialization_options())
             return
         
-        if path == transport.post_path and method == "POST":
-            # Handle POST messages
+        # Handle POST messages - be more lenient with path matching
+        if method == "POST" and (path == transport.post_path or path.endswith("/messages")):
+            logger.info(f"Handling POST message request for {path}")
             await transport.handle_post_message(scope, receive, send)
             return
+            
+        # Handle GET /tools endpoint
+        if path == "/tools" and method == "GET":
+            logger.info(f"Handling GET tools request")
+            await send({
+                "type": "http.response.start",
+                "status": 200,
+                "headers": [
+                    (b"content-type", b"application/json"),
+                    (b"access-control-allow-origin", b"*"),
+                ],
+            })
+            
+            await send({
+                "type": "http.response.body",
+                "body": json.dumps(tools).encode("utf-8"),
+            })
+            return
+            
+        # Handle POST /tools/{tool_name} endpoint
+        if method == "POST" and path.startswith("/tools/"):
+            logger.info(f"Handling tool invocation request for {path}")
+            tool_name = path.split("/")[-1]
+            
+            # Read request body
+            body = b""
+            more_body = True
+            
+            while more_body:
+                message = await receive()
+                if message["type"] == "http.request":
+                    body += message.get("body", b"")
+                    more_body = message.get("more_body", False)
+            
+            try:
+                # Parse arguments
+                arguments = json.loads(body)
+                
+                # Create a tool request
+                request_id = str(uuid.uuid4())
+                
+                # Send success response (will be updated with actual result)
+                await send({
+                    "type": "http.response.start",
+                    "status": 200,
+                    "headers": [
+                        (b"content-type", b"application/json"),
+                        (b"access-control-allow-origin", b"*"),
+                    ],
+                })
+                
+                await send({
+                    "type": "http.response.body",
+                    "body": json.dumps({"status": "processing", "request_id": request_id}).encode("utf-8"),
+                })
+                
+                return
+            except Exception as e:
+                logger.exception(f"Error handling tool invocation: {e}")
+                await transport._send_error_response(send, 500, f"Internal server error: {str(e)}")
+                return
         
         # Handle 404 for other routes
         await send({
