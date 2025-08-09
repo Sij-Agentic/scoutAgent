@@ -5,7 +5,7 @@ from mcp.server.fastmcp import FastMCP
 from mcp.types import TextContent
 
 # Create FastMCP server
-mcp = FastMCP("core-tools")
+mcp = FastMCP("core-tools", host="127.0.0.1", port=8003)
 
 
 @mcp.tool()

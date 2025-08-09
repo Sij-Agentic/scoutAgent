@@ -8,7 +8,7 @@ import httpx
 from urllib.parse import quote_plus
 from bs4 import BeautifulSoup  # Requires beautifulsoup4
 
-mcp = FastMCP("web-search")
+mcp = FastMCP("web-search", host="127.0.0.1", port=8002)
 
 
 async def _ddg_search(query: str, limit: int = 5) -> List[Dict[str, str]]:

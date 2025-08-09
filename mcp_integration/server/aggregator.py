@@ -27,6 +27,7 @@ def _register_proxy_tool(tool_name: str, description: str) -> None:
         # Back-compat: inspector will send {"kwargs": {...}} when our function has a single
         # parameter named 'kwargs'. Unwrap if present so backends receive proper args.
         arguments = kwargs.get("kwargs", kwargs)
+        print(f"[aggregator] proxy -> {tool_name} args={arguments}")
         # Forward the call and pass through content if available
         result = await _multi.call_tool(tool_name, arguments)
         try:
@@ -82,6 +83,7 @@ def _register_typed_proxy(tool: MCPTypedTool) -> None:
 
     # Shared proxy invocation helper
     async def __proxy_call__(name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
+        print(f"[aggregator] typed-proxy -> {name} args={arguments}")
         result = await _multi.call_tool(name, arguments)
         try:
             content = getattr(result, "content", None)
@@ -113,6 +115,11 @@ def initialize_aggregator() -> None:
 
     # Register a proxy tool for each discovered backend tool
     for tool in _multi.get_all_tools():
+        try:
+            name = getattr(tool, "name", None) or "tool"
+            print(f"[aggregator] discovered tool: {name}")
+        except Exception:
+            pass
         try:
             _register_typed_proxy(tool)
         except Exception:
