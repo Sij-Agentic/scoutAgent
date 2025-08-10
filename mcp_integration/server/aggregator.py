@@ -15,6 +15,62 @@ mcp = FastMCP("multi-tools")
 _multi: MultiMCPClient | None = None
 
 
+def _basic_type_check(value: Any, expected: str) -> bool:
+    """Very small subset of JSON Schema type checks.
+
+    Supported types: string, integer, number, boolean, object, array
+    """
+    mapping = {
+        "string": str,
+        "integer": int,
+        "number": (int, float),
+        "boolean": bool,
+        "object": dict,
+        "array": list,
+    }
+    py = mapping.get(expected)
+    if py is None:
+        return True  # unknown type -> skip strict check
+    return isinstance(value, py)
+
+
+def _validate_args(args: Dict[str, Any], schema: Dict[str, Any]) -> tuple[bool, str | None]:
+    """Dependency-free minimal validator against a JSON Schema-like dict.
+
+    - Ensures required fields are present
+    - Performs shallow 'type' checks on provided fields
+    """
+    try:
+        if not schema or not isinstance(schema, dict):
+            return True, None
+        props = schema.get("properties", {}) or {}
+        required = schema.get("required", []) or []
+
+        # Required keys present
+        missing = [k for k in required if k not in args]
+        if missing:
+            return False, f"Missing required fields: {', '.join(missing)}"
+
+        # Shallow type checks
+        for key, val in args.items():
+            prop = props.get(key)
+            if not isinstance(prop, dict):
+                continue
+            expected_type = prop.get("type")
+            if isinstance(expected_type, list):
+                # anyOf simple list of types
+                if not any(_basic_type_check(val, t) for t in expected_type if isinstance(t, str)):
+                    return False, f"Field '{key}' has wrong type"
+            elif isinstance(expected_type, str):
+                if not _basic_type_check(val, expected_type):
+                    return False, f"Field '{key}' must be of type {expected_type}"
+
+        return True, None
+    except Exception as e:
+        # On validator error, don't block calls – just allow
+        return True, None
+
+
 def _register_proxy_tool(tool_name: str, description: str) -> None:
     """Dynamically register a proxy tool that forwards to the underlying server tool.
 
@@ -28,6 +84,16 @@ def _register_proxy_tool(tool_name: str, description: str) -> None:
         # parameter named 'kwargs'. Unwrap if present so backends receive proper args.
         arguments = kwargs.get("kwargs", kwargs)
         print(f"[aggregator] proxy -> {tool_name} args={arguments}")
+        # Validate against discovered schema when available
+        # Find the schema via the tool map entry
+        try:
+            entry = _multi.tool_map.get(tool_name)
+            schema = getattr(entry["tool"], "inputSchema", {}) if entry else {}
+        except Exception:
+            schema = {}
+        ok, msg = _validate_args(arguments, schema)
+        if not ok:
+            return {"content": [TextContent(type="text", text=f"Invalid arguments: {msg}")]}
         # Forward the call and pass through content if available
         result = await _multi.call_tool(tool_name, arguments)
         try:
@@ -84,6 +150,15 @@ def _register_typed_proxy(tool: MCPTypedTool) -> None:
     # Shared proxy invocation helper
     async def __proxy_call__(name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
         print(f"[aggregator] typed-proxy -> {name} args={arguments}")
+        # Validate against backend schema
+        try:
+            entry = _multi.tool_map.get(name)
+            schema = getattr(entry["tool"], "inputSchema", {}) if entry else {}
+        except Exception:
+            schema = {}
+        ok, msg = _validate_args(arguments, schema)
+        if not ok:
+            return {"content": [TextContent(type="text", text=f"Invalid arguments: {msg}")]}
         result = await _multi.call_tool(name, arguments)
         try:
             content = getattr(result, "content", None)
