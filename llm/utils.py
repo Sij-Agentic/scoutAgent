@@ -9,6 +9,7 @@ from dataclasses import dataclass
 
 from .base import LLMRequest, LLMResponse, LLMBackendType
 from .manager import get_llm_manager, initialize_llm_backends
+from config import get_config
 from custom_logging import get_logger
 
 
@@ -60,6 +61,53 @@ class LLMAgentMixin:
         self.preferred_backend = preferred_backend
         self.task_backend_preferences = {}
         self._setup_agent_llm_preferences(preferred_backend)
+        # Config for routing
+        self._config = get_config()
+
+    def _agent_key(self) -> str:
+        """Normalized agent key for config lookups.
+        - Use instance name if available, else class name
+        - Lowercase
+        - Replace non-alnum with underscore
+        - Drop trailing 'agent' suffix if present
+        """
+        raw = getattr(self, 'name', None) or self.__class__.__name__
+        key = ''.join(ch if ch.isalnum() else '_' for ch in raw).lower()
+        if key.endswith('agent'):
+            key = key[:-5]
+        return key
+
+    def _resolve_backend_and_model(self, task_type: Optional[str], explicit_backend: Optional[str]) -> (Optional[str], Optional[str]):
+        """Resolve backend and optional model override using task prefs and config per-agent overrides."""
+        # 1) If explicitly provided, honor it
+        if explicit_backend:
+            return explicit_backend, None
+
+        # 2) Task-specific preference on the agent
+        if task_type and task_type in self.task_backend_preferences:
+            return self.task_backend_preferences[task_type], None
+
+        # 3) Per-agent override from config
+        try:
+            routing = getattr(self._config, 'llm_routing', None)
+            if routing:
+                agent_key = self._agent_key()
+                backend = routing.per_agent_backend.get(agent_key)
+                model = routing.per_agent_model.get(agent_key)
+                if backend or model:
+                    return backend, model
+                # 4) Global defaults from config
+                if routing.default_backend or routing.default_model:
+                    return routing.default_backend, routing.default_model
+        except Exception:
+            pass
+
+        # 5) Agent-level preferred backend
+        if self.preferred_backend:
+            return self.preferred_backend, None
+
+        # 6) Fall back to manager default (None here)
+        return None, None
     
     def _setup_agent_llm_preferences(self, preferred_backend: Optional[str] = None):
         """Setup agent-specific LLM backend preferences based on agent type if not already set."""
@@ -168,10 +216,9 @@ class LLMAgentMixin:
             Generated text content
         """
         await self._ensure_llm_initialized()
-        
-        # Intelligent backend selection
-        if backend_type is None:
-            backend_type = self.get_optimal_backend(task_type)
+
+        # Intelligent backend/model resolution
+        resolved_backend, model_override = self._resolve_backend_and_model(task_type, backend_type)
         
         # Convert prompt to messages
         if isinstance(prompt, str):
@@ -189,8 +236,16 @@ class LLMAgentMixin:
             extra_params=kwargs
         )
         
+        # Ensure initialized
+        await self._ensure_llm_initialized()
+
+        # Intelligent backend/model resolution
+        resolved_backend, model_override = self._resolve_backend_and_model(task_type, backend_type)
+        if model_override:
+            request.extra_params = {**(request.extra_params or {}), "model_name_override": model_override}
+
         try:
-            response = await self._llm_manager.generate(request, backend_type)
+            response = await self._llm_manager.generate(request, resolved_backend)
             
             if response.success:
                 self.llm_logger.debug(f"LLM generation successful with {backend_type or 'auto'}: {len(response.content)} chars in {response.response_time:.2f}s")
@@ -246,9 +301,11 @@ class LLMAgentMixin:
             stream=True,
             extra_params=kwargs
         )
+        if model_override:
+            request.extra_params = {**(request.extra_params or {}), "model_name_override": model_override}
         
         try:
-            async for chunk in self._llm_manager.stream_generate(request, backend_type):
+            async for chunk in self._llm_manager.stream_generate(request, resolved_backend):
                 yield chunk
                 
         except Exception as e:

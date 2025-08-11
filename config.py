@@ -7,6 +7,7 @@ import os
 import json
 from pathlib import Path
 from typing import Dict, Any, Optional, Union, List
+import re
 from dataclasses import dataclass, asdict
 
 # Try to import dotenv, but handle gracefully if not available
@@ -91,6 +92,21 @@ class APIConfig:
 
 
 @dataclass
+class LLMRoutingConfig:
+    """LLM routing configuration with global and per-agent overrides."""
+    default_backend: Optional[str] = None
+    default_model: Optional[str] = None
+    per_agent_backend: Dict[str, str] = None  # keys: agent name (lowercase)
+    per_agent_model: Dict[str, str] = None    # keys: agent name (lowercase)
+
+    def __post_init__(self):
+        if self.per_agent_backend is None:
+            self.per_agent_backend = {}
+        if self.per_agent_model is None:
+            self.per_agent_model = {}
+
+
+@dataclass
 class ScoutConfig:
     """Main configuration class for ScoutAgent."""
     
@@ -106,6 +122,7 @@ class ScoutConfig:
     search: SearchConfig = None
     memory: MemoryConfig = None
     api: APIConfig = None
+    llm_routing: LLMRoutingConfig = None
     
     # File paths
     config_file: Optional[str] = None
@@ -127,6 +144,8 @@ class ScoutConfig:
             self.memory = MemoryConfig()
         if self.api is None:
             self.api = APIConfig()
+        if self.llm_routing is None:
+            self.llm_routing = LLMRoutingConfig()
         
         self._validate_config()
         self._setup_directories()
@@ -304,7 +323,30 @@ class ConfigManager:
             value = os.getenv(env_var)
             if value is not None:
                 self._set_nested_value(env_config, path, self._convert_type(value))
-        
+
+        # LLM routing overrides
+        # Global defaults
+        default_backend = os.getenv(f"{prefix}LLM_DEFAULT_BACKEND")
+        if default_backend:
+            self._set_nested_value(env_config, ["llm_routing", "default_backend"], default_backend.lower())
+        default_model = os.getenv(f"{prefix}LLM_DEFAULT_MODEL")
+        if default_model:
+            self._set_nested_value(env_config, ["llm_routing", "default_model"], default_model)
+
+        # Per-agent overrides: SCOUT_LLM_AGENT_<AGENT>_BACKEND and _MODEL
+        # Normalize agent key to lowercase
+        pattern = re.compile(rf"^{re.escape(prefix)}LLM_AGENT_([A-Z0-9_]+)_(BACKEND|MODEL)$")
+        for key, value in os.environ.items():
+            m = pattern.match(key)
+            if not m or not value:
+                continue
+            agent_key = m.group(1).lower()
+            kind = m.group(2)
+            if kind == "BACKEND":
+                self._set_nested_value(env_config, ["llm_routing", "per_agent_backend", agent_key], value.lower())
+            elif kind == "MODEL":
+                self._set_nested_value(env_config, ["llm_routing", "per_agent_model", agent_key], value)
+
         return env_config
     
     def _convert_type(self, value: str) -> Union[str, int, float, bool]:
@@ -422,8 +464,19 @@ class ConfigManager:
             "SCOUT_DEEPSEEK_API_KEY=",
             "SCOUT_HUGGINGFACE_TOKEN=",
             "",
-            "# Add per-agent LLM overrides here if/when supported",
-            "# e.g., SCOUT_LLM_SCREENER_BACKEND=deepseek",
+            "# --- LLM Routing (global defaults) ---",
+            "# Choose a default backend and model when not specified by code.",
+            "# Supported backends: openai, claude, gemini, deepseek, ollama",
+            "SCOUT_LLM_DEFAULT_BACKEND=",
+            "SCOUT_LLM_DEFAULT_MODEL=",
+            "",
+            "# --- Per-Agent LLM overrides ---",
+            "# Set a specific backend or model per agent. Use agent name in UPPERCASE,",
+            "# non-alphanumeric replaced by underscores. Examples:",
+            "#   SCOUT_LLM_AGENT_SCREENER_BACKEND=ollama",
+            "#   SCOUT_LLM_AGENT_SCREENER_MODEL=phi4-mini:latest",
+            "#   SCOUT_LLM_AGENT_VALIDATOR_BACKEND=openai",
+            "#   SCOUT_LLM_AGENT_VALIDATOR_MODEL=gpt-4o",
         ]
         with open(path, "w") as f:
             f.write("\n".join(lines) + "\n")

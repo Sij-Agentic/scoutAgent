@@ -446,6 +446,15 @@ async def initialize_llm_backends():
         logger.error(f"Failed to initialize Ollama backend: {e}")
     
     available_backends = manager.get_available_backends()
+
+    # Respect configured default backend if specified and available
+    try:
+        routing = getattr(config, 'llm_routing', None)
+        if routing and routing.default_backend and routing.default_backend in available_backends:
+            manager.set_default_backend(routing.default_backend)
+            logger.info(f"Configured default backend set to: {routing.default_backend}")
+    except Exception as e:
+        logger.warning(f"Could not set configured default backend: {e}")
     if available_backends:
         logger.info(f"LLM initialization complete. Available backends: {available_backends}")
         logger.info(f"Default backend: {manager.get_default_backend()}")

@@ -75,12 +75,13 @@ class ClaudeBackend(LLMBackend):
                 else:
                     filtered_messages.append(msg)
             
-            # Build Claude request parameters
+            # Build Claude request parameters (allow per-request model override)
+            model_name = request.extra_params.get("model_name_override", self.config.model_name) if request and request.extra_params else self.config.model_name
             params = {
-                "model": self.config.model_name,
+                "model": model_name,
                 "messages": filtered_messages,
-                "max_tokens": config["max_tokens"],
                 "temperature": config["temperature"],
+                "max_tokens": config["max_tokens"],
                 "stream": False
             }
             
@@ -172,12 +173,13 @@ class ClaudeBackend(LLMBackend):
                 else:
                     filtered_messages.append(msg)
             
-            # Build Claude request parameters
+            # Build Claude request parameters (allow per-request model override)
+            model_name = request.extra_params.get("model_name_override", self.config.model_name) if request and request.extra_params else self.config.model_name
             params = {
-                "model": self.config.model_name,
+                "model": model_name,
                 "messages": filtered_messages,
-                "max_tokens": config["max_tokens"],
                 "temperature": config["temperature"],
+                "max_tokens": config["max_tokens"],
                 "stream": True
             }
             
