@@ -102,6 +102,81 @@ class ScreenerAgent(BaseAgent, LLMAgentMixin):
             "default": LLMBackendType.OLLAMA
         }
     
+    async def execute(self, agent_input: AgentInput) -> AgentOutput:
+        """Adapter: accept AgentInput, coerce to ScreenerInput, and run.
+
+        This keeps ScreenerAgent compatible with DAG executor passing a
+        standard AgentInput while allowing ScreenerAgent's methods to use
+        ScreenerInput-specific fields.
+        """
+        self.start_time = time.time()
+        try:
+            # Build criteria from context or defaults
+            ctx = agent_input.context or {}
+            crit = ctx.get("criteria") or {}
+            criteria = ScreeningCriteria(
+                min_severity=crit.get("min_severity", "medium"),
+                min_impact_score=crit.get("min_impact_score", 5.0),
+                min_frequency=crit.get("min_frequency", 3),
+                max_age_days=crit.get("max_age_days", 365),
+                required_tags=crit.get("required_tags"),
+                excluded_tags=crit.get("excluded_tags"),
+            )
+            market_focus = ctx.get("market_focus", "")
+            s_input = ScreenerInput(
+                data=agent_input.data,
+                metadata=agent_input.metadata,
+                context=agent_input.context,
+                market_focus=market_focus,
+                criteria=criteria,
+            )
+            # plan-think-act
+            self._update_status('planning')
+            plan = await self.plan(s_input)
+            self._update_status('thinking')
+            thoughts = await self.think(s_input)
+            self._update_status('acting')
+            result = await self.act(s_input)
+            exec_time = time.time() - self.start_time
+            # Build ScreenerOutput enriched object, then flatten to AgentOutput
+            filtered = result.get("filtered", []) if isinstance(result, dict) else []
+            rejected = result.get("rejected", []) if isinstance(result, dict) else []
+            categorization = result.get("categorization", {}) if isinstance(result, dict) else {}
+            summary = result.get("summary", "") if isinstance(result, dict) else ""
+            stats = result.get("stats", {}) if isinstance(result, dict) else {}
+            confidence = result.get("confidence", 0.0) if isinstance(result, dict) else 0.0
+            s_output = ScreenerOutput(
+                result=result,
+                metadata={
+                    'agent_id': self.agent_id,
+                    'agent_name': self.name,
+                    'plan': plan,
+                    'thoughts': thoughts,
+                },
+                logs=self.execution_logs,
+                execution_time=exec_time,
+                filtered_pain_points=filtered,
+                rejected_pain_points=rejected,
+                categorization=categorization,
+                summary=summary,
+                filtering_stats=stats,
+                confidence_score=confidence,
+                success=True,
+            )
+            self._update_status('completed')
+            return s_output.to_agent_output()
+        except Exception as e:
+            exec_time = time.time() - self.start_time
+            self._update_status('failed')
+            return AgentOutput(
+                result=None,
+                metadata={'agent_id': self.agent_id, 'agent_name': self.name},
+                logs=self.execution_logs,
+                execution_time=exec_time,
+                success=False,
+                error=str(e),
+            )
+    
     def extract_json_from_markdown(self, text):
         """Extract JSON from markdown code blocks or plain text with robust error handling."""
         import re

@@ -11,8 +11,9 @@ from datetime import datetime
 import traceback
 
 from .node import DAGNode, NodeStatus, NodeResult, NodeType
-from ..agents.base import AgentRegistry
+from ..agents.base import AgentRegistry, get_agent_class
 from ..custom_logging.logger import get_logger
+from ..agents.base import AgentInput
 
 
 class NodeExecutor:
@@ -76,7 +77,7 @@ class NodeExecutor:
         if not node.agent_name:
             raise ValueError("Agent node missing agent_name")
         
-        agent_class = self.registry.get_agent_class(node.agent_name)
+        agent_class = get_agent_class(node.agent_name)
         if not agent_class:
             raise ValueError(f"Unknown agent: {node.agent_name}")
         
@@ -84,15 +85,25 @@ class NodeExecutor:
         agent = agent_class()
         
         # Prepare agent inputs
-        agent_inputs = self._prepare_agent_inputs(inputs, node.inputs)
+        prepared = self._prepare_agent_inputs(inputs, node.inputs)
+        # Wrap into standard AgentInput expected by BaseAgent.execute
+        agent_input = AgentInput(
+            data=prepared,
+            metadata={
+                "source": "dag",
+                "node_id": node.node_id,
+                "agent_name": node.agent_name,
+            },
+            context=prepared.get("context") if isinstance(prepared, dict) else None,
+        )
         
         # Execute agent
         self.logger.info(f"Running agent: {node.agent_name}")
         
         # Use asyncio.wait_for for timeout handling
         return await asyncio.wait_for(
-            agent.execute(**agent_inputs),
-            timeout=node.config.timeout_seconds
+            agent.execute(agent_input),
+            timeout=node.config.timeout_seconds,
         )
     
     async def _execute_function_node(self, node: DAGNode, inputs: Dict[str, Any]) -> Any:

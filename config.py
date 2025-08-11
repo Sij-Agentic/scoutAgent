@@ -351,6 +351,84 @@ class ConfigManager:
         
         return result
     
+    def create_env_template(self, path: str = ".env.template"):
+        """Create a .env template file with expected SCOUT_* environment variables.
+
+        This writes commented guidance and placeholder values for keys consumed by
+        ConfigManager._load_from_env(). Existing file will be overwritten to keep
+        it up-to-date with the current schema.
+        """
+        self.logger.info(f"Writing environment template to: {path}")
+        lines = [
+            "# ScoutAgent environment template",
+            "# Copy to .env and fill in values as needed",
+            "",
+            "# --- Core ---",
+            "SCOUT_PROJECT_NAME=scout_agent",
+            "SCOUT_ENVIRONMENT=development",
+            "SCOUT_DEBUG=false",
+            "",
+            "# --- Logging ---",
+            "SCOUT_LOG_LEVEL=INFO",
+            "SCOUT_LOG_DIR=./logs",
+            "SCOUT_LOG_MAX_FILE_SIZE=10485760",
+            "SCOUT_LOG_BACKUP_COUNT=5",
+            "SCOUT_ENABLE_TRACING=true",
+            "SCOUT_TRACE_DIR=./logs/traces",
+            "",
+            "# --- DAG ---",
+            "SCOUT_DAG_MAX_DEPTH=10",
+            "SCOUT_DAG_MAX_AGENTS=50",
+            "SCOUT_DAG_TIMEOUT_SECONDS=300",
+            "SCOUT_DAG_ENABLE_PARALLEL=true",
+            "SCOUT_DAG_MAX_CONCURRENT=5",
+            "SCOUT_DAG_RETRY_ATTEMPTS=3",
+            "SCOUT_DAG_RETRY_DELAY=1",
+            "",
+            "# --- Agent ---",
+            "SCOUT_AGENT_MAX_ITERATIONS=10",
+            "SCOUT_AGENT_TIMEOUT_SECONDS=60",
+            "SCOUT_AGENT_MEMORY_LIMIT_MB=512",
+            "SCOUT_AGENT_ENABLE_CACHING=true",
+            "SCOUT_AGENT_CACHE_TTL=3600",
+            "",
+            "# --- Search ---",
+            "SCOUT_SEARCH_MAX_RESULTS=100",
+            "SCOUT_SEARCH_RATE_LIMIT_DELAY=1.0",
+            "SCOUT_SEARCH_USER_AGENT=ScoutAgent/1.0",
+            "SCOUT_SEARCH_TIMEOUT_SECONDS=30",
+            "SCOUT_SEARCH_MAX_RETRIES=3",
+            "SCOUT_SEARCH_BACKOFF_FACTOR=0.3",
+            "",
+            "# --- Memory ---",
+            "SCOUT_MEMORY_BACKEND=local",
+            "SCOUT_MEMORY_STORAGE_DIR=./memory",
+            "SCOUT_MEMORY_MAX_ENTRIES=10000",
+            "SCOUT_MEMORY_EMBEDDING_MODEL=all-MiniLM-L6-v2",
+            "SCOUT_MEMORY_CHUNK_SIZE=512",
+            "SCOUT_MEMORY_CHUNK_OVERLAP=50",
+            "",
+            "# --- Paths ---",
+            "SCOUT_PROMPTS_DIR=./prompts",
+            "SCOUT_DATA_DIR=./data",
+            "SCOUT_OUTPUT_DIR=./output",
+            "",
+            "# --- API Keys (leave blank if not used) ---",
+            "SCOUT_OPENAI_API_KEY=",
+            "SCOUT_ANTHROPIC_API_KEY=",
+            "SCOUT_SERPAPI_KEY=",
+            "SCOUT_BING_API_KEY=",
+            "SCOUT_GEMINI_API_KEY=",
+            "SCOUT_DEEPSEEK_API_KEY=",
+            "SCOUT_HUGGINGFACE_TOKEN=",
+            "",
+            "# Add per-agent LLM overrides here if/when supported",
+            "# e.g., SCOUT_LLM_SCREENER_BACKEND=deepseek",
+        ]
+        with open(path, "w") as f:
+            f.write("\n".join(lines) + "\n")
+        self.logger.info("Environment template written successfully")
+        
     def save_config(self, config: ScoutConfig, config_file: str):
         """Save configuration to JSON file."""
         self.logger.info(f"Saving configuration to: {config_file}")
