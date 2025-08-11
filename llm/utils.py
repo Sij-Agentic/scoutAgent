@@ -219,6 +219,7 @@ class LLMAgentMixin:
 
         # Intelligent backend/model resolution
         resolved_backend, model_override = self._resolve_backend_and_model(task_type, backend_type)
+        self.llm_logger.debug(f"Resolved LLM routing: backend={resolved_backend or 'manager_default'}, model={model_override or 'default'}, agent_key={self._agent_key()}, explicit_backend={bool(backend_type)}, task_type={task_type}")
         
         # Convert prompt to messages
         if isinstance(prompt, str):
@@ -280,11 +281,11 @@ class LLMAgentMixin:
             Text chunks as they are generated
         """
         await self._ensure_llm_initialized()
-        
-        # Intelligent backend selection
-        if backend_type is None:
-            backend_type = self.get_optimal_backend(task_type)
-        
+
+        # Intelligent backend/model resolution
+        resolved_backend, model_override = self._resolve_backend_and_model(task_type, backend_type)
+        self.llm_logger.debug(f"Resolved LLM routing (stream): backend={resolved_backend or 'manager_default'}, model={model_override or 'default'}, agent_key={self._agent_key()}, explicit_backend={bool(backend_type)}, task_type={task_type}")
+
         # Convert prompt to messages
         if isinstance(prompt, str):
             messages = [{"role": "user", "content": prompt}]
