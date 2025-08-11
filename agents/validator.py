@@ -86,6 +86,54 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
             "analysis": "ollama"
         }
     
+    async def execute(self, agent_input: AgentInput) -> AgentOutput:
+        """Adapter: accept AgentInput, coerce to ValidatorInput, and run.
+
+        Keeps a uniform DAG->Agent interface while using ValidatorInput internally.
+        """
+        try:
+            ctx = agent_input.context or {}
+            data = agent_input.data
+            # Determine pain_points shape: allow passing list directly or under key
+            pain_points = None
+            if isinstance(data, dict):
+                pain_points = data.get("pain_points") or data.get("filtered_pain_points") or data.get("items")
+            if pain_points is None:
+                pain_points = data if isinstance(data, list) else []
+            
+            v_input = ValidatorInput(
+                data=agent_input.data,
+                metadata=agent_input.metadata,
+                context=agent_input.context,
+                pain_points=pain_points,
+                validation_depth=ctx.get("validation_depth", "moderate"),
+                market_context=ctx.get("market_context", ""),
+                include_user_interviews=bool(ctx.get("include_user_interviews", True)),
+                include_competitor_analysis=bool(ctx.get("include_competitor_analysis", True)),
+            )
+            
+            self._update_status('planning')
+            plan = await self.plan(v_input)
+            self._update_status('thinking')
+            thoughts = await self.think(v_input)
+            self._update_status('acting')
+            output = await self.act(v_input)  # Expected ValidatorOutput (subclass of AgentOutput)
+            self._update_status('completed')
+            # Ensure metadata captures plan/thoughts for observability
+            if isinstance(output, AgentOutput):
+                output.metadata = {**(output.metadata or {}), 'plan': plan, 'thoughts': thoughts, 'agent_name': self.name, 'agent_id': self.agent_id}
+            return output
+        except Exception as e:
+            self._update_status('failed')
+            return AgentOutput(
+                result=None,
+                metadata={'agent_id': self.agent_id, 'agent_name': self.name},
+                logs=self.execution_logs,
+                execution_time=0.0,
+                success=False,
+                error=str(e),
+            )
+    
     async def plan(self, input_data: ValidatorInput) -> Dict[str, Any]:
         """Plan the validation process using LLM prompt."""
         self.logger.info(f"Planning validation for {len(input_data.pain_points)} pain points")
