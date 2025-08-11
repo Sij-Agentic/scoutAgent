@@ -84,21 +84,18 @@ class GeminiBackend(LLMBackend):
             # Convert messages to Gemini format
             prompt = self._messages_to_prompt(messages)
             
-            # Update generation config if needed
-            if config["temperature"] != self.config.temperature or config["max_tokens"] != self.config.max_tokens:
-                generation_config = genai.types.GenerationConfig(
-                    temperature=config["temperature"],
-                    max_output_tokens=config["max_tokens"],
-                )
-                
-                # Create a new model instance with updated config
-                model = genai.GenerativeModel(
-                    model_name=self.config.model_name,
-                    generation_config=generation_config,
-                    safety_settings=self._model._safety_settings
-                )
-            else:
-                model = self._model
+            # Determine model name (allow per-request override) and generation config
+            model_name = request.extra_params.get("model_name_override", self.config.model_name) if request and request.extra_params else self.config.model_name
+            generation_config = genai.types.GenerationConfig(
+                temperature=config["temperature"],
+                max_output_tokens=config["max_tokens"],
+            )
+            # Create a model instance with the effective model and config
+            model = genai.GenerativeModel(
+                model_name=model_name,
+                generation_config=generation_config,
+                safety_settings=self._model._safety_settings
+            )
             
             # Make the request with retry logic
             response = await self._retry_with_backoff(

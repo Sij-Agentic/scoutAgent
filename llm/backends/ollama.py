@@ -55,8 +55,9 @@ class OllamaBackend(LLMBackend):
             # Convert messages to Ollama format
             prompt = self._messages_to_prompt(messages)
             
+            model_name = request.extra_params.get("model_name_override", self.config.model_name) if request and request.extra_params else self.config.model_name
             payload = {
-                "model": self.config.model_name,
+                "model": model_name,
                 "prompt": prompt,
                 "stream": False,
                 "options": {
@@ -120,8 +121,9 @@ class OllamaBackend(LLMBackend):
             # Convert messages to Ollama format
             prompt = self._messages_to_prompt(messages)
             
+            model_name = request.extra_params.get("model_name_override", self.config.model_name) if request and request.extra_params else self.config.model_name
             payload = {
-                "model": self.config.model_name,
+                "model": model_name,
                 "prompt": prompt,
                 "stream": True,
                 "options": {

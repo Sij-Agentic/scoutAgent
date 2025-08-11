@@ -67,9 +67,10 @@ class DeepSeekBackend(LLMBackend):
             messages = self._prepare_messages(request)
             config = self._get_effective_config(request)
             
-            # Build DeepSeek request parameters
+            # Build DeepSeek request parameters (allow per-request model override)
+            model_name = request.extra_params.get("model_name_override", self.config.model_name) if request and request.extra_params else self.config.model_name
             params = {
-                "model": self.config.model_name,
+                "model": model_name,
                 "messages": messages,
                 "temperature": config["temperature"],
                 "max_tokens": config["max_tokens"],
@@ -152,9 +153,10 @@ class DeepSeekBackend(LLMBackend):
             messages = self._prepare_messages(request)
             config = self._get_effective_config(request)
             
-            # Build DeepSeek request parameters
+            # Build DeepSeek request parameters (allow per-request model override)
+            model_name = request.extra_params.get("model_name_override", self.config.model_name) if request and request.extra_params else self.config.model_name
             params = {
-                "model": self.config.model_name,
+                "model": model_name,
                 "messages": messages,
                 "temperature": config["temperature"],
                 "max_tokens": config["max_tokens"],
