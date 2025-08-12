@@ -12,8 +12,8 @@ from typing import Dict, List, Any, Optional
 from datetime import datetime
 from dataclasses import dataclass, asdict
 
-from agents.base import BaseAgent, AgentInput, AgentOutput, AgentState
-from agents.analysis_agent import AnalysisAgent
+from .base import BaseAgent, AgentInput, AgentOutput, AgentState
+from .analysis_agent import AnalysisAgent
 from config import get_config
 from llm.utils import LLMAgentMixin
 from llm.base import LLMRequest

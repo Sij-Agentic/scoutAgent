@@ -11,9 +11,9 @@ from typing import Dict, List, Any, Optional
 from datetime import datetime
 from dataclasses import dataclass, asdict
 
-from agents.base import BaseAgent, AgentInput, AgentOutput, AgentState
-from agents.analysis_agent import AnalysisAgent
-from agents.research_agent import ResearchAgent
+from .base import BaseAgent, AgentInput, AgentOutput, AgentState
+from .analysis_agent import AnalysisAgent
+from .research_agent import ResearchAgent
 from config import get_config
 
 

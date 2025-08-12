@@ -13,7 +13,7 @@ from datetime import datetime
 from typing import Dict, List, Any, Optional
 from dataclasses import dataclass, asdict
 
-from agents.base import BaseAgent, AgentInput, AgentOutput, AgentState
+from .base import BaseAgent, AgentInput, AgentOutput, AgentState
 from agents.gap_finder import MarketGap, GapFinderInput, GapFinderOutput
 from llm.utils import LLMAgentMixin, AgentPrompt, AgentPromptTemplates, load_prompt_template
 from llm.utils import LLMAgentMixin, AgentPrompt, AgentPromptTemplates
