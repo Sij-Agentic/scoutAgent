@@ -12,7 +12,6 @@ from datetime import datetime
 from dataclasses import dataclass, asdict
 
 from .base import BaseAgent, AgentInput, AgentOutput, AgentState
-from services.agents.code import get_code_execution_service
 from .analysis_agent import AnalysisAgent
 from config import get_config
 from llm.utils import LLMAgentMixin, load_prompt_template
@@ -94,7 +93,7 @@ class BuilderAgent(BaseAgent, LLMAgentMixin):
     
     def __init__(self, agent_id: str = None):
         BaseAgent.__init__(self, name="builder", agent_id=agent_id)
-        LLMAgentMixin.__init__(self)
+        LLMAgentMixin.__init__(self, preferred_backend='ollama')
         self.code_service = None  # Will initialize in _initialize
         self.analysis_agent = AnalysisAgent()
         self.config = get_config()
@@ -112,6 +111,48 @@ class BuilderAgent(BaseAgent, LLMAgentMixin):
             'default': 'ollama'
         }
     
+    async def execute(self, agent_input: AgentInput) -> AgentOutput:
+        """Adapter: accept AgentInput, coerce to BuilderInput, and run."""
+        try:
+            ctx = agent_input.context or {}
+            data = agent_input.data or {}
+            market_gaps = []
+            target_market = ctx.get("target_market", "")
+            if isinstance(data, dict):
+                market_gaps = data.get("market_gaps") or data.get("prioritized_opportunities") or data.get("gaps") or []
+                target_market = data.get("target_market", target_market)
+            b_input = BuilderInput(
+                market_gaps=market_gaps,
+                target_market=target_market or "general",
+                solution_type=ctx.get("solution_type", "software"),
+                budget_range=ctx.get("budget_range", "moderate"),
+                timeline=ctx.get("timeline", "3-6 months"),
+                technical_complexity=ctx.get("technical_complexity", "moderate"),
+                context=agent_input.context,
+                metadata=agent_input.metadata,
+            )
+            self._update_status('planning')
+            plan = await self.plan(b_input)
+            self._update_status('thinking')
+            thoughts = await self.think(b_input)
+            self._update_status('acting')
+            output = await self.act(b_input)
+            self._update_status('completed')
+            # Ensure metadata captures plan/thoughts for observability
+            if isinstance(output, AgentOutput):
+                output.metadata = {**(output.metadata or {}), 'plan': plan, 'thoughts': thoughts, 'agent_name': self.name, 'agent_id': self.agent_id}
+            return output
+        except Exception as e:
+            self._update_status('failed')
+            return AgentOutput(
+                result=None,
+                metadata={'agent_id': self.agent_id, 'agent_name': self.name},
+                logs=self.execution_logs,
+                execution_time=0.0,
+                success=False,
+                error=str(e),
+            )
+    
     async def _init_code_service(self):
         """Initialize the code execution service."""
         try:
@@ -124,7 +165,12 @@ class BuilderAgent(BaseAgent, LLMAgentMixin):
                 self.logger.info("Using code_execution service from registry")
             else:
                 # Fallback to factory method if not in registry
-                self.code_service = get_code_execution_service()
+                try:
+                    from services.agents.code import get_code_execution_service  # Lazy import to avoid hard dep
+                    self.code_service = get_code_execution_service()
+                except Exception as inner_e:
+                    self.logger.warning(f"Code execution service factory unavailable: {inner_e}")
+                    self.code_service = None
                 self.logger.info("Using code_execution service from factory")
                 
             # Initialize the service if it hasn't been already

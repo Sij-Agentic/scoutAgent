@@ -17,44 +17,44 @@ Analyze the pain points and market context to develop a comprehensive validation
 ## Output Format
 Return a JSON object with the following structure:
 ```json
-{
+{{
   "validation_approach": "detailed description of validation approach",
   "research_scope": "focused|moderate|broad",
   "competitor_analysis_needed": true_or_false,
   "user_research_needed": true_or_false,
   "expected_confidence_range": [min_confidence, max_confidence],
-  "market_analysis": {
+  "market_analysis": {{
     "key_segments": ["segment1", "segment2"],
     "market_size_estimate": "size description",
     "growth_trend": "trend description"
-  },
-  "validation_criteria": {
+  }},
+  "validation_criteria": {{
     "user_demand_threshold": float_value,
     "market_size_threshold": float_value,
     "competition_level_acceptable": "description"
-  }
-}
+  }}
+}}
 ```
 
 ## Example
 For analyzing 3 pain points with moderate validation depth in a SaaS market:
 
 ```json
-{
+{{
   "validation_approach": "balanced validation with standard market research and targeted user interviews",
   "research_scope": "focused",
   "competitor_analysis_needed": true,
   "user_research_needed": true,
   "expected_confidence_range": [0.7, 0.95],
-  "market_analysis": {
+  "market_analysis": {{
     "key_segments": ["small businesses", "mid-market companies"],
     "market_size_estimate": "$5-10B annually",
     "growth_trend": "15% YoY growth in cloud-based solutions"
-  },
-  "validation_criteria": {
+  }},
+  "validation_criteria": {{
     "user_demand_threshold": 7.5,
     "market_size_threshold": 1000000,
     "competition_level_acceptable": "medium to high if differentiation exists"
-  }
-}
+  }}
+}}
 ```

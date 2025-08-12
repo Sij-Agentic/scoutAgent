@@ -91,13 +91,14 @@ class ScreenerAgent(BaseAgent, LLMAgentMixin):
     
     def __init__(self, agent_id: str = None):
         BaseAgent.__init__(self, name="screener", agent_id=agent_id)
-        LLMAgentMixin.__init__(self)
+        LLMAgentMixin.__init__(self, preferred_backend='ollama')
         self.analysis_agent = AnalysisAgent()
         self.config = get_config()
         self.name = "screener"
         self.start_time = time.time()
         
         # Set backend preferences for this agent
+        self.preferred_backend = 'ollama'
         self.task_backend_preferences = {
             "default": LLMBackendType.OLLAMA
         }
@@ -330,7 +331,16 @@ class ScreenerAgent(BaseAgent, LLMAgentMixin):
             }
             
             try:
-                analysis_results = await self.analysis_agent.execute(analysis_input)
+                # Ensure AnalysisAgent receives an AgentInput, not a raw dict
+                from .base import AgentInput as _AgentInput
+                analysis_results_output = await self.analysis_agent.execute(
+                    _AgentInput(
+                        data=analysis_input,
+                        metadata={"source": "screener_fallback", "stage": "analysis"}
+                    )
+                )
+                # BaseAgent.execute returns AgentOutput; extract result safely
+                analysis_results = analysis_results_output.result if hasattr(analysis_results_output, "result") else {}
             except Exception:
                 analysis_results = {"categories": []}
                 

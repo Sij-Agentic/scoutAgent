@@ -1,0 +1,303 @@
+2025-08-13 00:21:31 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-13 00:21:31 - config - INFO - base.py:301 - register_agent() - Registered agent alias: research
+2025-08-13 00:21:31 - config - INFO - base.py:305 - register_agent() - Registered agent: ResearchAgent
+2025-08-13 00:21:31 - config - INFO - base.py:307 - register_agent() - Registered agent alias: research
+2025-08-13 00:21:31 - config - INFO - base.py:301 - register_agent() - Registered agent alias: analysis
+2025-08-13 00:21:31 - config - INFO - base.py:305 - register_agent() - Registered agent: AnalysisAgent
+2025-08-13 00:21:31 - config - INFO - base.py:307 - register_agent() - Registered agent alias: analysis
+2025-08-13 00:21:31 - config - INFO - base.py:301 - register_agent() - Registered agent alias: gapfinder
+2025-08-13 00:21:31 - config - INFO - base.py:305 - register_agent() - Registered agent: GapFinderAgent
+2025-08-13 00:21:31 - config - INFO - base.py:307 - register_agent() - Registered agent alias: gapfinder
+2025-08-13 00:21:31 - config - INFO - base.py:301 - register_agent() - Registered agent alias: builder
+2025-08-13 00:21:31 - config - INFO - base.py:305 - register_agent() - Registered agent: BuilderAgent
+2025-08-13 00:21:31 - config - INFO - base.py:307 - register_agent() - Registered agent alias: builder
+2025-08-13 00:21:31 - config - INFO - base.py:301 - register_agent() - Registered agent alias: writer
+2025-08-13 00:21:31 - config - INFO - base.py:305 - register_agent() - Registered agent: WriterAgent
+2025-08-13 00:21:31 - config - INFO - base.py:307 - register_agent() - Registered agent alias: writer
+2025-08-13 00:21:31 - config - INFO - base.py:301 - register_agent() - Registered agent alias: screener
+2025-08-13 00:21:31 - config - INFO - base.py:305 - register_agent() - Registered agent: ScreenerAgent
+2025-08-13 00:21:31 - config - INFO - base.py:307 - register_agent() - Registered agent alias: screener
+2025-08-13 00:21:31 - config - INFO - base.py:301 - register_agent() - Registered agent alias: validator
+2025-08-13 00:21:31 - config - INFO - base.py:305 - register_agent() - Registered agent: ValidatorAgent
+2025-08-13 00:21:31 - config - INFO - base.py:307 - register_agent() - Registered agent alias: validator
+2025-08-13 00:21:31 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-13 00:21:31 - config - INFO - base.py:301 - register_agent() - Registered agent alias: research
+2025-08-13 00:21:31 - config - INFO - base.py:305 - register_agent() - Registered agent: ResearchAgent
+2025-08-13 00:21:31 - config - INFO - base.py:307 - register_agent() - Registered agent alias: research
+2025-08-13 00:21:31 - config - INFO - base.py:301 - register_agent() - Registered agent alias: analysis
+2025-08-13 00:21:31 - config - INFO - base.py:305 - register_agent() - Registered agent: AnalysisAgent
+2025-08-13 00:21:31 - config - INFO - base.py:307 - register_agent() - Registered agent alias: analysis
+2025-08-13 00:21:31 - config - INFO - base.py:301 - register_agent() - Registered agent alias: gapfinder
+2025-08-13 00:21:31 - config - INFO - base.py:305 - register_agent() - Registered agent: GapFinderAgent
+2025-08-13 00:21:31 - config - INFO - base.py:307 - register_agent() - Registered agent alias: gapfinder
+2025-08-13 00:21:31 - config - INFO - base.py:301 - register_agent() - Registered agent alias: builder
+2025-08-13 00:21:31 - config - INFO - base.py:305 - register_agent() - Registered agent: BuilderAgent
+2025-08-13 00:21:31 - config - INFO - base.py:307 - register_agent() - Registered agent alias: builder
+2025-08-13 00:21:31 - config - INFO - base.py:301 - register_agent() - Registered agent alias: writer
+2025-08-13 00:21:31 - config - INFO - base.py:305 - register_agent() - Registered agent: WriterAgent
+2025-08-13 00:21:31 - config - INFO - base.py:307 - register_agent() - Registered agent alias: writer
+2025-08-13 00:21:31 - config - INFO - config.py:226 - load_config() - Loading ScoutAgent configuration...
+2025-08-13 00:21:31 - config - INFO - config.py:260 - load_config() - Configuration loaded successfully
+2025-08-13 00:21:31 - config - INFO - base.py:89 - __init__() - Initialized agent: screener (43a71cda-c78a-4c02-9a3b-4cb128c207b4)
+2025-08-13 00:21:31 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (358e81b4-9185-4c02-b901-c7fbf30a8741)
+2025-08-13 00:21:31 - config - INFO - base.py:89 - __init__() - Initialized agent: validator (88382f3b-e094-4e2b-b3d7-9af42729546f)
+2025-08-13 00:21:31 - config - INFO - base.py:89 - __init__() - Initialized agent: research (2333deac-8a8c-4875-b7e5-8b02a7337055)
+2025-08-13 00:21:31 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (0212967c-d2e2-4940-844f-045e2e0ebeef)
+2025-08-13 00:21:31 - config - INFO - base.py:89 - __init__() - Initialized agent: gap_finder (26d48156-ebd0-403c-900c-ab0fd098cd11)
+2025-08-13 00:21:31 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (66d11a3b-c59b-42d0-b202-4134cfa33f8e)
+2025-08-13 00:21:31 - config - INFO - base.py:89 - __init__() - Initialized agent: research (fe3b58bc-4152-43dc-8d51-9e002a9789be)
+2025-08-13 00:21:31 - config - INFO - base.py:89 - __init__() - Initialized agent: builder (5bf1035d-8337-4156-a66c-b0cc728e9f09)
+2025-08-13 00:21:31 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (5e73ffcf-06c5-41f2-8c94-b448ab417ab7)
+2025-08-13 00:21:31 - config - INFO - base.py:89 - __init__() - Initialized agent: writer (2844f883-de0a-46c5-905d-91b817252b4f)
+2025-08-13 00:21:31 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (057ee66b-b388-4ce4-9ba3-3c30c1cbc691)
+2025-08-13 00:21:31 - config - INFO - screener.py:245 - plan() - Planning screening for 1 pain points
+2025-08-13 00:21:31 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-13 00:21:31 - config - WARNING - service.py:720 - get_code_execution_service() - Could not access service registry: 'ServiceRegistry' object has no attribute 'register_instance'. Creating standalone instance.
+2025-08-13 00:21:31 - config - INFO - builder.py:174 - _init_code_service() - Using code_execution service from factory
+2025-08-13 00:21:31 - config - INFO - service.py:148 - _initialize() - Initializing code execution service
+2025-08-13 00:21:31 - config - INFO - service.py:153 - _initialize() - Initializing code execution service directly (no registry)
+2025-08-13 00:21:31 - config - INFO - service.py:157 - _initialize() - Created temporary working directory: /var/folders/xr/906dz5q10pn2z84_yvrz_j8w0000gn/T/code_exec_n2oe72sj
+2025-08-13 00:21:31 - config - INFO - service.py:228 - _start() - Starting code execution service
+2025-08-13 00:21:31 - config - INFO - service.py:248 - _start() - Python interpreter available: python
+2025-08-13 00:21:31 - config - INFO - service.py:248 - _start() - Javascript interpreter available: node
+2025-08-13 00:21:31 - config - INFO - service.py:248 - _start() - Bash interpreter available: bash
+2025-08-13 00:21:31 - config - INFO - service.py:252 - _start() - Code execution service started
+2025-08-13 00:21:31 - config - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-13 00:21:31 - config - WARNING - writer.py:170 - _init_services() - Could not initialize services: No instances of service 'memory' found
+2025-08-13 00:21:33 - config - INFO - openai.py:48 - initialize() - OpenAI backend initialized with model: gpt-4
+2025-08-13 00:21:33 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: openai
+2025-08-13 00:21:33 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-13 00:21:33 - config - INFO - manager.py:377 - initialize_llm_backends() - Initialized OpenAI backend
+2025-08-13 00:21:35 - config - INFO - claude.py:48 - initialize() - Claude backend initialized with model: claude-3-5-sonnet-20241022
+2025-08-13 00:21:35 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: claude
+2025-08-13 00:21:35 - config - INFO - manager.py:393 - initialize_llm_backends() - Initialized Claude backend
+2025-08-13 00:21:37 - config - INFO - gemini.py:64 - initialize() - Gemini backend initialized with model: gemini-2.5-flash
+2025-08-13 00:21:37 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: gemini
+2025-08-13 00:21:37 - config - INFO - manager.py:409 - initialize_llm_backends() - Initialized Gemini backend
+2025-08-13 00:21:41 - config - INFO - deepseek.py:50 - initialize() - DeepSeek backend initialized with model: deepseek-chat
+2025-08-13 00:21:41 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: deepseek
+2025-08-13 00:21:41 - config - INFO - manager.py:425 - initialize_llm_backends() - Initialized DeepSeek backend
+2025-08-13 00:21:41 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: phi4-mini:latest
+2025-08-13 00:21:41 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-13 00:21:41 - config - INFO - manager.py:442 - initialize_llm_backends() - Initialized Ollama backend
+2025-08-13 00:21:41 - config - INFO - manager.py:459 - initialize_llm_backends() - LLM initialization complete. Available backends: ['openai', 'claude', 'gemini', 'deepseek', 'ollama']
+2025-08-13 00:21:41 - config - INFO - manager.py:460 - initialize_llm_backends() - Default backend: openai
+2025-08-13 00:22:41 - config - ERROR - manager.py:179 - generate() - Error generating response with ollama: Ollama request timed out after 60s
+2025-08-13 00:22:41 - config - ERROR - utils.py:259 - llm_generate() - Error in LLM generation: Ollama request timed out after 60s
+2025-08-13 00:22:41 - config - ERROR - screener.py:275 - plan() - Error in ScreenerAgent plan: Ollama request timed out after 60s
+2025-08-13 00:22:41 - config - INFO - screener.py:295 - think() - Analyzing pain points for screening...
+2025-08-13 00:23:42 - config - ERROR - manager.py:179 - generate() - Error generating response with ollama: Ollama request timed out after 60s
+2025-08-13 00:23:42 - config - ERROR - utils.py:259 - llm_generate() - Error in LLM generation: Ollama request timed out after 60s
+2025-08-13 00:23:42 - config - ERROR - screener.py:325 - think() - Error in ScreenerAgent think: Ollama request timed out after 60s
+2025-08-13 00:23:42 - config - INFO - base.py:102 - execute() - Starting execution of agent analysis
+2025-08-13 00:23:42 - config - INFO - base.py:212 - log() - Generating analysis plan with LLM...
+2025-08-13 00:23:54 - config - INFO - base.py:212 - log() - Analysis plan created for structured data
+2025-08-13 00:23:54 - config - INFO - base.py:212 - log() - Generating data insights with LLM...
+2025-08-13 00:24:06 - config - INFO - base.py:212 - log() - Data analysis insights generated.
+2025-08-13 00:24:06 - config - INFO - base.py:212 - log() - Analysis completed - generated 0 insights
+2025-08-13 00:24:06 - config - INFO - base.py:136 - execute() - Agent analysis completed successfully in 23.71s
+2025-08-13 00:24:06 - config - INFO - screener.py:361 - act() - Executing pain point screening...
+2025-08-13 00:24:06 - config - INFO - screener.py:295 - think() - Analyzing pain points for screening...
+2025-08-13 00:24:33 - config - WARNING - screener.py:223 - extract_json_from_markdown() - JSON decode error: Expecting value: line 1 column 1 (char 0). Attempting further cleanup...
+2025-08-13 00:24:33 - config - ERROR - screener.py:240 - extract_json_from_markdown() - Failed to extract valid JSON from LLM response
+2025-08-13 00:24:33 - config - INFO - screener.py:321 - think() - Generated screening analysis with strategy: unknown
+2025-08-13 00:24:35 - config - WARNING - screener.py:223 - extract_json_from_markdown() - JSON decode error: Expecting value: line 1 column 1 (char 0). Attempting further cleanup...
+2025-08-13 00:24:35 - config - ERROR - screener.py:240 - extract_json_from_markdown() - Failed to extract valid JSON from LLM response
+2025-08-13 00:24:35 - config - INFO - screener.py:387 - act() - Generated screening results with 0 accepted pain points
+2025-08-13 00:24:35 - config - INFO - validator.py:140 - plan() - Planning validation for 1 pain points
+2025-08-13 00:24:52 - config - WARNING - validator.py:234 - _extract_json() - Could not parse LLM response as JSON: Based on the provided input, here is a JSON object...
+2025-08-13 00:24:52 - config - INFO - validator.py:176 - plan() - Plan generation completed in 17.15 seconds
+2025-08-13 00:24:52 - config - INFO - validator.py:239 - think() - Analyzing pain points for validation...
+2025-08-13 00:25:06 - config - WARNING - validator.py:234 - _extract_json() - Could not parse LLM response as JSON: Given the input provided, here is a JSON object wi...
+2025-08-13 00:25:06 - config - INFO - validator.py:275 - think() - Validation strategy analysis completed in 13.80 seconds
+2025-08-13 00:25:06 - config - INFO - validator.py:305 - act() - Validating 1 pain points
+2025-08-13 00:25:29 - config - ERROR - validator.py:364 - act() - Error executing validation: ValidatorOutput.__init__() missing 3 required positional arguments: 'result', 'metadata', and 'logs'
+2025-08-13 00:25:29 - config - INFO - gap_finder.py:150 - plan() - Planning market gap analysis for 1 pain points
+2025-08-13 00:25:29 - config - INFO - gap_finder.py:174 - think() - Analyzing market gaps and opportunities...
+2025-08-13 00:25:29 - config - INFO - gap_finder.py:199 - act() - Executing market gap analysis...
+2025-08-13 00:25:29 - config - INFO - builder.py:199 - plan() - Planning solution building for 1 market gaps
+2025-08-13 00:25:29 - config - INFO - builder.py:203 - plan() - BuilderInput DEBUG: market_gaps=[{'gap': 'CI speed', 'opportunity': 0.7}], type=<class 'list'>
+2025-08-13 00:25:32 - config - WARNING - builder.py:279 - _extract_json() - Could not parse LLM response as JSON: Objectives:
+
+1. To develop an effective time manag...
+2025-08-13 00:25:32 - config - INFO - builder.py:250 - plan() - Plan generation completed in 3.31 seconds
+2025-08-13 00:25:32 - config - INFO - builder.py:285 - think() - Analyzing 1 market gaps for solution design
+2025-08-13 00:26:33 - config - ERROR - manager.py:179 - generate() - Error generating response with ollama: Ollama request timed out after 60s
+2025-08-13 00:26:33 - config - ERROR - utils.py:259 - llm_generate() - Error in LLM generation: Ollama request timed out after 60s
+2025-08-13 00:26:33 - config - ERROR - builder.py:316 - think() - Error analyzing market gaps: Ollama request timed out after 60s
+2025-08-13 00:26:33 - config - INFO - builder.py:355 - think() - Gap analysis completed in 61.00 seconds
+2025-08-13 00:26:33 - config - INFO - builder.py:363 - act() - Creating solution prototypes for 1 market gaps
+2025-08-13 00:26:33 - config - INFO - builder.py:365 - act() - BuilderInput act DEBUG: {'market_gaps': [{'gap': 'CI speed', 'opportunity': 0.7}], 'target_market': 'general', 'solution_type': 'software', 'budget_range': 'moderate', 'timeline': '3-6 months', 'technical_complexity': 'moderate', 'context': None, 'metadata': {'source': 'smoke_dag', 'stage': 'builder'}}
+2025-08-13 00:27:34 - config - ERROR - manager.py:179 - generate() - Error generating response with ollama: Ollama request timed out after 60s
+2025-08-13 00:27:34 - config - ERROR - utils.py:259 - llm_generate() - Error in LLM generation: Ollama request timed out after 60s
+2025-08-13 00:27:34 - config - ERROR - builder.py:438 - act() - Error generating solution prototypes: Ollama request timed out after 60s
+2025-08-13 00:27:34 - config - INFO - writer.py:220 - plan() - Planning report structure...
+2025-08-13 00:27:34 - config - INFO - writer.py:224 - plan() - WriterInput DEBUG: report_type=comprehensive, target_audience=stakeholders
+2025-08-13 00:27:34 - config - INFO - writer.py:225 - plan() - workflow_data keys: ['workflow_data']
+2025-08-13 00:27:40 - config - INFO - writer.py:341 - think() - Analyzing data for report creation...
+2025-08-13 00:27:40 - config - INFO - writer.py:346 - think() - WriterInput think DEBUG: report_type=comprehensive
+2025-08-13 00:27:40 - config - INFO - writer.py:347 - think() - WriterInput think DEBUG: target_audience=stakeholders
+2025-08-13 00:27:40 - config - INFO - writer.py:349 - think() - workflow_data keys: ['workflow_data']
+2025-08-13 00:27:49 - config - INFO - writer.py:381 - think() - LLM response type: <class 'str'>
+2025-08-13 00:27:49 - config - INFO - writer.py:382 - think() - LLM response preview: Key Factors:
+
+1. Market Demand and Growth Potential - The demand is projected to grow exponentially 
+2025-08-13 00:27:49 - config - INFO - writer.py:435 - act() - Executing report generation using LLM...
+2025-08-13 00:27:49 - config - INFO - writer.py:439 - act() - WriterInput act DEBUG: {'workflow_data': {'workflow_data': {'summary': 'Demo'}}, 'report_type': 'comprehensive', 'target_audience': 'stakeholders', 'include_recommendations': True, 'include_appendices': False, 'context': None, 'metadata': {'source': 'smoke_dag', 'stage': 'writer'}}
+2025-08-13 00:27:49 - config - INFO - writer.py:441 - act() - workflow_data keys: ['workflow_data']
+2025-08-13 00:27:49 - config - INFO - writer.py:442 - act() - workflow_data builder: {}
+2025-08-13 00:27:49 - config - INFO - writer.py:443 - act() - workflow_data gap_finder: {}
+2025-08-13 00:27:53 - config - INFO - writer.py:481 - act() - Report generation completed in 4.72 seconds
+2025-08-13 00:27:53 - config - INFO - manager.py:309 - _stop_health_monitoring() - Stopped LLM backend health monitoring
+2025-08-13 00:31:23 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-13 00:31:23 - config - INFO - base.py:301 - register_agent() - Registered agent alias: research
+2025-08-13 00:31:23 - config - INFO - base.py:305 - register_agent() - Registered agent: ResearchAgent
+2025-08-13 00:31:23 - config - INFO - base.py:307 - register_agent() - Registered agent alias: research
+2025-08-13 00:31:23 - config - INFO - base.py:301 - register_agent() - Registered agent alias: analysis
+2025-08-13 00:31:23 - config - INFO - base.py:305 - register_agent() - Registered agent: AnalysisAgent
+2025-08-13 00:31:23 - config - INFO - base.py:307 - register_agent() - Registered agent alias: analysis
+2025-08-13 00:31:23 - config - INFO - base.py:301 - register_agent() - Registered agent alias: gapfinder
+2025-08-13 00:31:23 - config - INFO - base.py:305 - register_agent() - Registered agent: GapFinderAgent
+2025-08-13 00:31:23 - config - INFO - base.py:307 - register_agent() - Registered agent alias: gapfinder
+2025-08-13 00:31:23 - config - INFO - base.py:301 - register_agent() - Registered agent alias: builder
+2025-08-13 00:31:23 - config - INFO - base.py:305 - register_agent() - Registered agent: BuilderAgent
+2025-08-13 00:31:23 - config - INFO - base.py:307 - register_agent() - Registered agent alias: builder
+2025-08-13 00:31:23 - config - INFO - base.py:301 - register_agent() - Registered agent alias: writer
+2025-08-13 00:31:23 - config - INFO - base.py:305 - register_agent() - Registered agent: WriterAgent
+2025-08-13 00:31:23 - config - INFO - base.py:307 - register_agent() - Registered agent alias: writer
+2025-08-13 00:31:23 - config - INFO - base.py:301 - register_agent() - Registered agent alias: screener
+2025-08-13 00:31:23 - config - INFO - base.py:305 - register_agent() - Registered agent: ScreenerAgent
+2025-08-13 00:31:23 - config - INFO - base.py:307 - register_agent() - Registered agent alias: screener
+2025-08-13 00:31:23 - config - INFO - base.py:301 - register_agent() - Registered agent alias: validator
+2025-08-13 00:31:23 - config - INFO - base.py:305 - register_agent() - Registered agent: ValidatorAgent
+2025-08-13 00:31:23 - config - INFO - base.py:307 - register_agent() - Registered agent alias: validator
+2025-08-13 00:31:23 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-13 00:31:23 - config - INFO - base.py:301 - register_agent() - Registered agent alias: research
+2025-08-13 00:31:23 - config - INFO - base.py:305 - register_agent() - Registered agent: ResearchAgent
+2025-08-13 00:31:23 - config - INFO - base.py:307 - register_agent() - Registered agent alias: research
+2025-08-13 00:31:23 - config - INFO - base.py:301 - register_agent() - Registered agent alias: analysis
+2025-08-13 00:31:23 - config - INFO - base.py:305 - register_agent() - Registered agent: AnalysisAgent
+2025-08-13 00:31:23 - config - INFO - base.py:307 - register_agent() - Registered agent alias: analysis
+2025-08-13 00:31:23 - config - INFO - base.py:301 - register_agent() - Registered agent alias: gapfinder
+2025-08-13 00:31:23 - config - INFO - base.py:305 - register_agent() - Registered agent: GapFinderAgent
+2025-08-13 00:31:23 - config - INFO - base.py:307 - register_agent() - Registered agent alias: gapfinder
+2025-08-13 00:31:23 - config - INFO - base.py:301 - register_agent() - Registered agent alias: builder
+2025-08-13 00:31:23 - config - INFO - base.py:305 - register_agent() - Registered agent: BuilderAgent
+2025-08-13 00:31:23 - config - INFO - base.py:307 - register_agent() - Registered agent alias: builder
+2025-08-13 00:31:23 - config - INFO - base.py:301 - register_agent() - Registered agent alias: writer
+2025-08-13 00:31:23 - config - INFO - base.py:305 - register_agent() - Registered agent: WriterAgent
+2025-08-13 00:31:23 - config - INFO - base.py:307 - register_agent() - Registered agent alias: writer
+2025-08-13 00:31:23 - config - INFO - config.py:226 - load_config() - Loading ScoutAgent configuration...
+2025-08-13 00:31:23 - config - INFO - config.py:260 - load_config() - Configuration loaded successfully
+2025-08-13 00:31:23 - config - INFO - base.py:89 - __init__() - Initialized agent: screener (ade57110-a1fb-4d84-81ea-344c5df1c6f6)
+2025-08-13 00:31:23 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (2897f9be-9da4-4422-aeed-c9d2cc17077c)
+2025-08-13 00:31:23 - config - INFO - base.py:89 - __init__() - Initialized agent: validator (4ef14ea6-38ed-445b-8014-2e096153480f)
+2025-08-13 00:31:23 - config - INFO - base.py:89 - __init__() - Initialized agent: research (c7592817-162b-4b2a-be02-760a51b77f23)
+2025-08-13 00:31:23 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (f242f2ba-a593-4d8a-ba3c-37bccdd33512)
+2025-08-13 00:31:23 - config - INFO - base.py:89 - __init__() - Initialized agent: gap_finder (a3fcbe3a-bcc4-4830-b39e-1b54e18900a2)
+2025-08-13 00:31:23 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (41687913-b131-4516-96c5-c5c1857c0a64)
+2025-08-13 00:31:23 - config - INFO - base.py:89 - __init__() - Initialized agent: research (d4afa578-3d19-4968-8e52-023c83ac1cf0)
+2025-08-13 00:31:23 - config - INFO - base.py:89 - __init__() - Initialized agent: builder (13082cda-bde9-471b-a6a0-d5b6485415ef)
+2025-08-13 00:31:23 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (cf57eaa3-2f7e-4fea-b889-5ebe9f3a950a)
+2025-08-13 00:31:23 - config - INFO - base.py:89 - __init__() - Initialized agent: writer (e7aec8cb-498b-4b01-993f-1345a8e2cb84)
+2025-08-13 00:31:23 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (d527d4e5-1f7d-4826-ad16-0dba3a6e0366)
+2025-08-13 00:31:23 - config - INFO - screener.py:245 - plan() - Planning screening for 1 pain points
+2025-08-13 00:31:23 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-13 00:31:23 - config - WARNING - service.py:720 - get_code_execution_service() - Could not access service registry: 'ServiceRegistry' object has no attribute 'register_instance'. Creating standalone instance.
+2025-08-13 00:31:23 - config - INFO - builder.py:174 - _init_code_service() - Using code_execution service from factory
+2025-08-13 00:31:23 - config - INFO - service.py:148 - _initialize() - Initializing code execution service
+2025-08-13 00:31:23 - config - INFO - service.py:153 - _initialize() - Initializing code execution service directly (no registry)
+2025-08-13 00:31:23 - config - INFO - service.py:157 - _initialize() - Created temporary working directory: /var/folders/xr/906dz5q10pn2z84_yvrz_j8w0000gn/T/code_exec_d_udz8gx
+2025-08-13 00:31:23 - config - INFO - service.py:228 - _start() - Starting code execution service
+2025-08-13 00:31:23 - config - INFO - service.py:248 - _start() - Python interpreter available: python
+2025-08-13 00:31:23 - config - INFO - service.py:248 - _start() - Javascript interpreter available: node
+2025-08-13 00:31:23 - config - INFO - service.py:248 - _start() - Bash interpreter available: bash
+2025-08-13 00:31:23 - config - INFO - service.py:252 - _start() - Code execution service started
+2025-08-13 00:31:23 - config - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-13 00:31:23 - config - WARNING - writer.py:170 - _init_services() - Could not initialize services: No instances of service 'memory' found
+2025-08-13 00:31:25 - config - INFO - openai.py:48 - initialize() - OpenAI backend initialized with model: gpt-4
+2025-08-13 00:31:25 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: openai
+2025-08-13 00:31:25 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-13 00:31:25 - config - INFO - manager.py:377 - initialize_llm_backends() - Initialized OpenAI backend
+2025-08-13 00:31:26 - config - INFO - claude.py:48 - initialize() - Claude backend initialized with model: claude-3-5-sonnet-20241022
+2025-08-13 00:31:26 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: claude
+2025-08-13 00:31:26 - config - INFO - manager.py:393 - initialize_llm_backends() - Initialized Claude backend
+2025-08-13 00:31:28 - config - INFO - gemini.py:64 - initialize() - Gemini backend initialized with model: gemini-2.5-flash
+2025-08-13 00:31:28 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: gemini
+2025-08-13 00:31:28 - config - INFO - manager.py:409 - initialize_llm_backends() - Initialized Gemini backend
+2025-08-13 00:31:31 - config - INFO - deepseek.py:50 - initialize() - DeepSeek backend initialized with model: deepseek-chat
+2025-08-13 00:31:31 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: deepseek
+2025-08-13 00:31:31 - config - INFO - manager.py:425 - initialize_llm_backends() - Initialized DeepSeek backend
+2025-08-13 00:31:31 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: phi4-mini:latest
+2025-08-13 00:31:31 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-13 00:31:31 - config - INFO - manager.py:442 - initialize_llm_backends() - Initialized Ollama backend
+2025-08-13 00:31:31 - config - INFO - manager.py:459 - initialize_llm_backends() - LLM initialization complete. Available backends: ['openai', 'claude', 'gemini', 'deepseek', 'ollama']
+2025-08-13 00:31:31 - config - INFO - manager.py:460 - initialize_llm_backends() - Default backend: openai
+2025-08-13 00:31:37 - config - WARNING - screener.py:223 - extract_json_from_markdown() - JSON decode error: Expecting value: line 1 column 1 (char 0). Attempting further cleanup...
+2025-08-13 00:31:37 - config - ERROR - screener.py:240 - extract_json_from_markdown() - Failed to extract valid JSON from LLM response
+2025-08-13 00:31:37 - config - INFO - screener.py:270 - plan() - Generated plan with 0 phases
+2025-08-13 00:31:37 - config - INFO - screener.py:295 - think() - Analyzing pain points for screening...
+2025-08-13 00:32:28 - config - WARNING - screener.py:223 - extract_json_from_markdown() - JSON decode error: Expecting value: line 1 column 1 (char 0). Attempting further cleanup...
+2025-08-13 00:32:28 - config - ERROR - screener.py:240 - extract_json_from_markdown() - Failed to extract valid JSON from LLM response
+2025-08-13 00:32:28 - config - INFO - screener.py:321 - think() - Generated screening analysis with strategy: unknown
+2025-08-13 00:32:28 - config - INFO - screener.py:361 - act() - Executing pain point screening...
+2025-08-13 00:32:28 - config - INFO - screener.py:295 - think() - Analyzing pain points for screening...
+2025-08-13 00:33:28 - config - ERROR - manager.py:179 - generate() - Error generating response with ollama: Ollama request timed out after 60s
+2025-08-13 00:33:28 - config - ERROR - utils.py:259 - llm_generate() - Error in LLM generation: Ollama request timed out after 60s
+2025-08-13 00:33:28 - config - ERROR - screener.py:325 - think() - Error in ScreenerAgent think: Ollama request timed out after 60s
+2025-08-13 00:33:28 - config - INFO - base.py:102 - execute() - Starting execution of agent analysis
+2025-08-13 00:33:28 - config - INFO - base.py:212 - log() - Generating analysis plan with LLM...
+2025-08-13 00:33:39 - config - INFO - base.py:212 - log() - Analysis plan created for structured data
+2025-08-13 00:33:39 - config - INFO - base.py:212 - log() - Generating data insights with LLM...
+2025-08-13 00:33:50 - config - INFO - base.py:212 - log() - Data analysis insights generated.
+2025-08-13 00:33:50 - config - INFO - base.py:212 - log() - Analysis completed - generated 0 insights
+2025-08-13 00:33:50 - config - INFO - base.py:136 - execute() - Agent analysis completed successfully in 21.87s
+2025-08-13 00:33:52 - config - WARNING - screener.py:223 - extract_json_from_markdown() - JSON decode error: Expecting value: line 1 column 1 (char 0). Attempting further cleanup...
+2025-08-13 00:33:52 - config - ERROR - screener.py:240 - extract_json_from_markdown() - Failed to extract valid JSON from LLM response
+2025-08-13 00:33:52 - config - INFO - screener.py:387 - act() - Generated screening results with 0 accepted pain points
+2025-08-13 00:33:52 - config - INFO - validator.py:140 - plan() - Planning validation for 1 pain points
+2025-08-13 00:33:57 - config - INFO - validator.py:176 - plan() - Plan generation completed in 5.26 seconds
+2025-08-13 00:33:57 - config - INFO - validator.py:239 - think() - Analyzing pain points for validation...
+2025-08-13 00:34:14 - config - WARNING - validator.py:234 - _extract_json() - Could not parse LLM response as JSON: Based on the provided input, here is a JSON object...
+2025-08-13 00:34:14 - config - INFO - validator.py:275 - think() - Validation strategy analysis completed in 17.08 seconds
+2025-08-13 00:34:14 - config - INFO - validator.py:305 - act() - Validating 1 pain points
+2025-08-13 00:35:15 - config - ERROR - manager.py:179 - generate() - Error generating response with ollama: Ollama request timed out after 60s
+2025-08-13 00:35:15 - config - ERROR - utils.py:259 - llm_generate() - Error in LLM generation: Ollama request timed out after 60s
+2025-08-13 00:35:15 - config - ERROR - validator.py:376 - act() - Error executing validation: Ollama request timed out after 60s
+2025-08-13 00:35:15 - config - INFO - validator.py:427 - act() - Validation completed with fallback in 60.86 seconds
+2025-08-13 00:35:15 - config - INFO - gap_finder.py:150 - plan() - Planning market gap analysis for 1 pain points
+2025-08-13 00:35:15 - config - INFO - gap_finder.py:174 - think() - Analyzing market gaps and opportunities...
+2025-08-13 00:35:15 - config - INFO - gap_finder.py:199 - act() - Executing market gap analysis...
+2025-08-13 00:35:15 - config - INFO - builder.py:199 - plan() - Planning solution building for 1 market gaps
+2025-08-13 00:35:15 - config - INFO - builder.py:203 - plan() - BuilderInput DEBUG: market_gaps=[{'gap': 'CI speed', 'opportunity': 0.7}], type=<class 'list'>
+2025-08-13 00:35:17 - config - WARNING - builder.py:279 - _extract_json() - Could not parse LLM response as JSON: Objectives:
+
+1. Develop a comprehensive travel iti...
+2025-08-13 00:35:17 - config - INFO - builder.py:250 - plan() - Plan generation completed in 2.23 seconds
+2025-08-13 00:35:17 - config - INFO - builder.py:285 - think() - Analyzing 1 market gaps for solution design
+2025-08-13 00:35:26 - config - WARNING - builder.py:279 - _extract_json() - Could not parse LLM response as JSON: Key Factors:
+
+1. Market demand and competition - E...
+2025-08-13 00:35:26 - config - INFO - builder.py:355 - think() - Gap analysis completed in 8.83 seconds
+2025-08-13 00:35:26 - config - INFO - builder.py:363 - act() - Creating solution prototypes for 1 market gaps
+2025-08-13 00:35:26 - config - INFO - builder.py:365 - act() - BuilderInput act DEBUG: {'market_gaps': [{'gap': 'CI speed', 'opportunity': 0.7}], 'target_market': 'general', 'solution_type': 'software', 'budget_range': 'moderate', 'timeline': '3-6 months', 'technical_complexity': 'moderate', 'context': None, 'metadata': {'source': 'smoke_dag', 'stage': 'builder'}}
+2025-08-13 00:35:30 - config - WARNING - builder.py:279 - _extract_json() - Could not parse LLM response as JSON: **Action:** Search and summarize recent advances i...
+2025-08-13 00:35:30 - config - INFO - builder.py:456 - act() - Solution generation completed in 3.60 seconds
+2025-08-13 00:35:30 - config - INFO - writer.py:220 - plan() - Planning report structure...
+2025-08-13 00:35:30 - config - INFO - writer.py:224 - plan() - WriterInput DEBUG: report_type=comprehensive, target_audience=stakeholders
+2025-08-13 00:35:30 - config - INFO - writer.py:225 - plan() - workflow_data keys: ['workflow_data']
+2025-08-13 00:35:34 - config - INFO - writer.py:341 - think() - Analyzing data for report creation...
+2025-08-13 00:35:34 - config - INFO - writer.py:346 - think() - WriterInput think DEBUG: report_type=comprehensive
+2025-08-13 00:35:34 - config - INFO - writer.py:347 - think() - WriterInput think DEBUG: target_audience=stakeholders
+2025-08-13 00:35:34 - config - INFO - writer.py:349 - think() - workflow_data keys: ['workflow_data']
+2025-08-13 00:35:43 - config - INFO - writer.py:381 - think() - LLM response type: <class 'str'>
+2025-08-13 00:35:43 - config - INFO - writer.py:382 - think() - LLM response preview: Key Factors:
+
+1) Market demand and competition - Analyze consumer behavior data to identify trends i
+2025-08-13 00:35:43 - config - INFO - writer.py:435 - act() - Executing report generation using LLM...
+2025-08-13 00:35:43 - config - INFO - writer.py:439 - act() - WriterInput act DEBUG: {'workflow_data': {'workflow_data': {'summary': 'Demo'}}, 'report_type': 'comprehensive', 'target_audience': 'stakeholders', 'include_recommendations': True, 'include_appendices': False, 'context': None, 'metadata': {'source': 'smoke_dag', 'stage': 'writer'}}
+2025-08-13 00:35:43 - config - INFO - writer.py:441 - act() - workflow_data keys: ['workflow_data']
+2025-08-13 00:35:43 - config - INFO - writer.py:442 - act() - workflow_data builder: {}
+2025-08-13 00:35:43 - config - INFO - writer.py:443 - act() - workflow_data gap_finder: {}
+2025-08-13 00:35:47 - config - INFO - writer.py:481 - act() - Report generation completed in 3.62 seconds
+2025-08-13 00:35:47 - config - INFO - manager.py:309 - _stop_health_monitoring() - Stopped LLM backend health monitoring
