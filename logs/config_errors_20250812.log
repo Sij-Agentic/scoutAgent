@@ -1,1 +1,210 @@
 2025-08-12 13:12:21 - config - ERROR - utils.py:259 - llm_generate() - Error in LLM generation: Backend not available: default
+2025-08-12 16:13:28 - config - ERROR - screener.py:275 - plan() - Error in ScreenerAgent plan: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/plan.prompt
+2025-08-12 16:13:28 - config - ERROR - screener.py:325 - think() - Error in ScreenerAgent think: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/think.prompt
+2025-08-12 16:13:28 - config - ERROR - base.py:140 - execute() - Agent analysis failed: 'dict' object has no attribute 'data'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/screener.py", line 304, in think
+    prompt = load_prompt_template(
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/utils.py", line 611, in load_prompt_template
+    raise FileNotFoundError(f"Prompt template not found: {prompt_path}")
+FileNotFoundError: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/think.prompt
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/analysis_agent.py", line 70, in plan
+    data = agent_input.data
+           ^^^^^^^^^^^^^^^^
+AttributeError: 'dict' object has no attribute 'data'
+2025-08-12 16:13:28 - config - ERROR - validator.py:175 - plan() - Error generating validation plan: '\n  "phases"'
+2025-08-12 16:13:28 - config - ERROR - validator.py:270 - think() - Error generating validation strategy: '\n  "validation_approach"'
+2025-08-12 16:13:28 - config - ERROR - validator.py:352 - act() - Error executing validation: '\n  "validated_pain_points"'
+2025-08-12 16:13:28 - config - ERROR - base.py:140 - execute() - Agent gap_finder failed: 'AgentInput' object has no attribute 'validated_pain_points'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/gap_finder.py", line 101, in plan
+    self.logger.info(f"Planning market gap analysis for {len(input_data.validated_pain_points)} pain points")
+                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'AgentInput' object has no attribute 'validated_pain_points'
+2025-08-12 16:13:28 - config - ERROR - base.py:140 - execute() - Agent builder failed: 'AgentInput' object has no attribute 'market_gaps'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/builder.py", line 153, in plan
+    self.logger.info(f"Planning solution building for {len(input_data.market_gaps) if input_data and input_data.market_gaps else 0} market gaps")
+                                                                                                     ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'AgentInput' object has no attribute 'market_gaps'
+2025-08-12 16:13:28 - config - ERROR - base.py:140 - execute() - Agent writer failed: 'AgentInput' object has no attribute 'report_type'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/writer.py", line 187, in plan
+    self.logger.info(f"WriterInput DEBUG: report_type={input_data.report_type}, target_audience={input_data.target_audience}")
+                                                       ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'AgentInput' object has no attribute 'report_type'
+2025-08-12 16:21:02 - config - ERROR - screener.py:275 - plan() - Error in ScreenerAgent plan: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/plan.prompt
+2025-08-12 16:21:02 - config - ERROR - screener.py:325 - think() - Error in ScreenerAgent think: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/think.prompt
+2025-08-12 16:21:02 - config - ERROR - base.py:140 - execute() - Agent analysis failed: 'dict' object has no attribute 'data'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/screener.py", line 304, in think
+    prompt = load_prompt_template(
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/utils.py", line 611, in load_prompt_template
+    raise FileNotFoundError(f"Prompt template not found: {prompt_path}")
+FileNotFoundError: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/think.prompt
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/analysis_agent.py", line 70, in plan
+    data = agent_input.data
+           ^^^^^^^^^^^^^^^^
+AttributeError: 'dict' object has no attribute 'data'
+2025-08-12 16:21:02 - config - ERROR - validator.py:175 - plan() - Error generating validation plan: '\n  "phases"'
+2025-08-12 16:21:02 - config - ERROR - validator.py:270 - think() - Error generating validation strategy: '\n  "validation_approach"'
+2025-08-12 16:21:02 - config - ERROR - validator.py:352 - act() - Error executing validation: '\n  "validated_pain_points"'
+2025-08-12 16:21:02 - config - ERROR - builder.py:229 - plan() - Error generating plan: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/plan.prompt
+2025-08-12 16:21:02 - config - ERROR - builder.py:316 - think() - Error analyzing market gaps: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/think.prompt
+2025-08-12 16:21:02 - config - ERROR - builder.py:438 - act() - Error generating solution prototypes: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/act.prompt
+2025-08-12 16:21:02 - config - ERROR - writer.py:257 - plan() - Error generating plan: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/plan.prompt
+2025-08-12 16:21:02 - config - ERROR - writer.py:396 - think() - Error analyzing report structure: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/think.prompt
+2025-08-12 16:21:02 - config - ERROR - writer.py:507 - act() - Error generating report: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/act.prompt
+2025-08-12 16:22:06 - config - ERROR - screener.py:275 - plan() - Error in ScreenerAgent plan: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/plan.prompt
+2025-08-12 16:22:06 - config - ERROR - screener.py:325 - think() - Error in ScreenerAgent think: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/think.prompt
+2025-08-12 16:22:06 - config - ERROR - base.py:140 - execute() - Agent analysis failed: 'dict' object has no attribute 'data'
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/screener.py", line 304, in think
+    prompt = load_prompt_template(
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/utils.py", line 611, in load_prompt_template
+    raise FileNotFoundError(f"Prompt template not found: {prompt_path}")
+FileNotFoundError: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/think.prompt
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/analysis_agent.py", line 70, in plan
+    data = agent_input.data
+           ^^^^^^^^^^^^^^^^
+AttributeError: 'dict' object has no attribute 'data'
+2025-08-12 16:22:06 - config - ERROR - validator.py:175 - plan() - Error generating validation plan: '\n  "phases"'
+2025-08-12 16:22:06 - config - ERROR - validator.py:270 - think() - Error generating validation strategy: '\n  "validation_approach"'
+2025-08-12 16:22:06 - config - ERROR - validator.py:352 - act() - Error executing validation: '\n  "validated_pain_points"'
+2025-08-12 16:22:06 - config - ERROR - builder.py:229 - plan() - Error generating plan: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/plan.prompt
+2025-08-12 16:22:06 - config - ERROR - builder.py:316 - think() - Error analyzing market gaps: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/think.prompt
+2025-08-12 16:22:06 - config - ERROR - builder.py:438 - act() - Error generating solution prototypes: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/act.prompt
+2025-08-12 16:22:06 - config - ERROR - writer.py:257 - plan() - Error generating plan: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/plan.prompt
+2025-08-12 16:22:06 - config - ERROR - writer.py:396 - think() - Error analyzing report structure: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/think.prompt
+2025-08-12 16:22:06 - config - ERROR - writer.py:507 - act() - Error generating report: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/act.prompt
+2025-08-12 16:27:16 - config - ERROR - screener.py:240 - extract_json_from_markdown() - Failed to extract valid JSON from LLM response
+2025-08-12 16:28:17 - config - ERROR - manager.py:179 - generate() - Error generating response with ollama: Ollama request timed out after 60s
+2025-08-12 16:28:17 - config - ERROR - utils.py:259 - llm_generate() - Error in LLM generation: Ollama request timed out after 60s
+2025-08-12 16:28:17 - config - ERROR - screener.py:325 - think() - Error in ScreenerAgent think: Ollama request timed out after 60s
+2025-08-12 16:28:17 - config - ERROR - base.py:140 - execute() - Agent analysis failed: 'dict' object has no attribute 'data'
+Traceback (most recent call last):
+  File "/Users/sijpapi/miniconda3/envs/scoutagent/lib/python3.11/site-packages/aiohttp/client_reqrep.py", line 532, in start
+    message, payload = await protocol.read()  # type: ignore[union-attr]
+                       ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/miniconda3/envs/scoutagent/lib/python3.11/site-packages/aiohttp/streams.py", line 672, in read
+    await self._waiter
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/backends/ollama.py", line 76, in generate
+    async with self._session.post(
+  File "/Users/sijpapi/miniconda3/envs/scoutagent/lib/python3.11/site-packages/aiohttp/client.py", line 1488, in __aenter__
+    self._resp: _RetType = await self._coro
+                           ^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/miniconda3/envs/scoutagent/lib/python3.11/site-packages/aiohttp/client.py", line 770, in _request
+    resp = await handler(req)
+           ^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/miniconda3/envs/scoutagent/lib/python3.11/site-packages/aiohttp/client.py", line 748, in _connect_and_send_request
+    await resp.start(conn)
+  File "/Users/sijpapi/miniconda3/envs/scoutagent/lib/python3.11/site-packages/aiohttp/client_reqrep.py", line 527, in start
+    with self._timer:
+  File "/Users/sijpapi/miniconda3/envs/scoutagent/lib/python3.11/site-packages/aiohttp/helpers.py", line 685, in __exit__
+    raise asyncio.TimeoutError from exc_val
+TimeoutError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/screener.py", line 316, in think
+    response = await self.llm_generate(prompt, backend_type="ollama")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/utils.py", line 249, in llm_generate
+    response = await self._llm_manager.generate(request, resolved_backend)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/manager.py", line 168, in generate
+    response = await backend.generate(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/llm/backends/ollama.py", line 106, in generate
+    raise LLMTimeoutError(f"Ollama request timed out after {self.config.timeout}s")
+llm.base.LLMTimeoutError: Ollama request timed out after 60s
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/base.py", line 107, in execute
+    plan = await self.plan(agent_input)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/agents/analysis_agent.py", line 70, in plan
+    data = agent_input.data
+           ^^^^^^^^^^^^^^^^
+AttributeError: 'dict' object has no attribute 'data'
+2025-08-12 16:28:17 - config - ERROR - validator.py:175 - plan() - Error generating validation plan: '\n  "phases"'
+2025-08-12 16:28:17 - config - ERROR - validator.py:270 - think() - Error generating validation strategy: '\n  "validation_approach"'
+2025-08-12 16:28:17 - config - ERROR - validator.py:352 - act() - Error executing validation: '\n  "validated_pain_points"'
+2025-08-12 16:28:30 - config - ERROR - builder.py:438 - act() - Error generating solution prototypes: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/act.prompt
+2025-08-12 16:28:43 - config - ERROR - writer.py:507 - act() - Error generating report: Prompt template not found: /Users/sijpapi/codebase/eag/ScoutAgent/scout_agent/prompts/common/act.prompt
+2025-08-12 16:36:02 - config - ERROR - screener.py:240 - extract_json_from_markdown() - Failed to extract valid JSON from LLM response
+2025-08-12 16:36:47 - config - ERROR - screener.py:240 - extract_json_from_markdown() - Failed to extract valid JSON from LLM response
+2025-08-12 16:37:12 - config - ERROR - screener.py:240 - extract_json_from_markdown() - Failed to extract valid JSON from LLM response
+2025-08-12 16:37:15 - config - ERROR - screener.py:240 - extract_json_from_markdown() - Failed to extract valid JSON from LLM response
+2025-08-12 16:37:15 - config - ERROR - validator.py:175 - plan() - Error generating validation plan: '\n  "phases"'
+2025-08-12 16:37:15 - config - ERROR - validator.py:270 - think() - Error generating validation strategy: '\n  "validation_approach"'
+2025-08-12 16:37:15 - config - ERROR - validator.py:352 - act() - Error executing validation: '\n  "validated_pain_points"'
+2025-08-12 16:37:45 - config - ERROR - writer.py:507 - act() - Error generating report: name 'report_result' is not defined
+2025-08-12 16:40:26 - config - ERROR - screener.py:240 - extract_json_from_markdown() - Failed to extract valid JSON from LLM response
+2025-08-12 16:40:29 - config - ERROR - screener.py:240 - extract_json_from_markdown() - Failed to extract valid JSON from LLM response
+2025-08-12 16:40:33 - config - ERROR - screener.py:240 - extract_json_from_markdown() - Failed to extract valid JSON from LLM response
+2025-08-12 16:40:37 - config - ERROR - screener.py:240 - extract_json_from_markdown() - Failed to extract valid JSON from LLM response
+2025-08-12 16:40:37 - config - ERROR - validator.py:175 - plan() - Error generating validation plan: '\n  "phases"'
+2025-08-12 16:40:37 - config - ERROR - validator.py:270 - think() - Error generating validation strategy: '\n  "validation_approach"'
+2025-08-12 16:40:37 - config - ERROR - validator.py:352 - act() - Error executing validation: '\n  "validated_pain_points"'
+2025-08-12 16:57:29 - config - ERROR - screener.py:240 - extract_json_from_markdown() - Failed to extract valid JSON from LLM response
+2025-08-12 16:58:30 - config - ERROR - manager.py:179 - generate() - Error generating response with ollama: Ollama request timed out after 60s
+2025-08-12 16:58:30 - config - ERROR - utils.py:259 - llm_generate() - Error in LLM generation: Ollama request timed out after 60s
+2025-08-12 16:58:30 - config - ERROR - screener.py:325 - think() - Error in ScreenerAgent think: Ollama request timed out after 60s
+2025-08-12 16:59:00 - config - ERROR - screener.py:240 - extract_json_from_markdown() - Failed to extract valid JSON from LLM response
+2025-08-12 16:59:22 - config - ERROR - screener.py:240 - extract_json_from_markdown() - Failed to extract valid JSON from LLM response
+2025-08-12 16:59:45 - config - ERROR - validator.py:352 - act() - Error executing validation: '\n  "validated_pain_points"'
+2025-08-12 17:04:22 - config - ERROR - screener.py:240 - extract_json_from_markdown() - Failed to extract valid JSON from LLM response
+2025-08-12 17:05:22 - config - ERROR - manager.py:179 - generate() - Error generating response with ollama: Ollama request timed out after 60s
+2025-08-12 17:05:22 - config - ERROR - utils.py:259 - llm_generate() - Error in LLM generation: Ollama request timed out after 60s
+2025-08-12 17:05:22 - config - ERROR - screener.py:325 - think() - Error in ScreenerAgent think: Ollama request timed out after 60s
+2025-08-12 17:05:39 - config - ERROR - screener.py:240 - extract_json_from_markdown() - Failed to extract valid JSON from LLM response
+2025-08-12 17:05:43 - config - ERROR - screener.py:240 - extract_json_from_markdown() - Failed to extract valid JSON from LLM response
+2025-08-12 17:06:14 - config - ERROR - validator.py:352 - act() - Error executing validation: '\n  "validated_pain_points"'
+2025-08-12 17:07:18 - config - ERROR - manager.py:179 - generate() - Error generating response with ollama: Ollama request timed out after 60s
+2025-08-12 17:07:18 - config - ERROR - utils.py:259 - llm_generate() - Error in LLM generation: Ollama request timed out after 60s
+2025-08-12 17:07:18 - config - ERROR - builder.py:316 - think() - Error analyzing market gaps: Ollama request timed out after 60s
+2025-08-12 17:08:33 - config - ERROR - manager.py:179 - generate() - Error generating response with ollama: Ollama request timed out after 60s
+2025-08-12 17:08:33 - config - ERROR - utils.py:259 - llm_generate() - Error in LLM generation: Ollama request timed out after 60s
+2025-08-12 17:08:33 - config - ERROR - writer.py:396 - think() - Error analyzing report structure: unhashable type: 'slice'

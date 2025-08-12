@@ -99,7 +99,7 @@ class EnhancedGapFinderAgent(BaseAgent, LLMAgentMixin):
         
         # Initialize LLM capabilities
         from llm.utils import LLMAgentMixin
-        LLMAgentMixin.__init__(self, preferred_backend="claude")
+        LLMAgentMixin.__init__(self, preferred_backend="ollama")
         
         # Explicitly initialize LLM manager
         if not hasattr(self, '_llm_manager') or self._llm_manager is None:

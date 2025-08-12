@@ -18,7 +18,7 @@ For each pain point, perform a comprehensive validation to determine its validit
 ## Output Format
 Return a JSON object with the following structure:
 ```json
-{
+{{
   "validated_pain_points": [
     {{
       "pain_point_id": "id",
@@ -57,14 +57,14 @@ Return a JSON object with the following structure:
   "confidence_scores": {{ "pain_point_id": confidence_score }},
   "recommendations": ["recommendation1", "recommendation2"],
   "execution_time": float_seconds
-}
+}}
 ```
 
 ## Example
 For validating 2 pain points in the SaaS market:
 
 ```json
-{
+{{
   "validated_pain_points": [
     {{
       "pain_point_id": "pp1",
@@ -107,5 +107,5 @@ For validating 2 pain points in the SaaS market:
     "Prioritize ease-of-use in product development"
   ],
   "execution_time": 12.5
-}
+}}
 ```

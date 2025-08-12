@@ -16,25 +16,25 @@ Plan a comprehensive validation strategy for these pain points. Your plan should
 ## Output Format
 Return a JSON object with the following structure:
 ```json
-{
+{{
   "phases": ["phase1", "phase2", "phase3"],
   "validation_depth": "depth_level",
   "include_user_interviews": true_or_false,
   "include_competitor_analysis": true_or_false,
   "expected_duration": seconds_integer,
   "pain_point_count": integer,
-  "validation_strategy": {
+  "validation_strategy": {{
     "approach": "detailed explanation of approach",
     "key_validation_criteria": ["criteria1", "criteria2"]
-  }
-}
+  }}
+}}
 ```
 
 ## Example
 For a request to validate 3 pain points with moderate depth, including both user interviews and competitor analysis, your output might be:
 
 ```json
-{
+{{
   "phases": [
     "market_research",
     "competitor_analysis",
@@ -47,7 +47,7 @@ For a request to validate 3 pain points with moderate depth, including both user
   "include_competitor_analysis": true,
   "expected_duration": 600,
   "pain_point_count": 3,
-  "validation_strategy": {
+  "validation_strategy": {{
     "approach": "balanced validation with standard research methods focusing on market data verification and user feedback collection",
     "key_validation_criteria": [
       "market size verification", 
@@ -55,6 +55,6 @@ For a request to validate 3 pain points with moderate depth, including both user
       "competitive solution assessment", 
       "business viability"
     ]
-  }
-}
+  }}
+}}
 ```

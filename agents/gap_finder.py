@@ -89,11 +89,61 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
     
     def __init__(self, agent_id: str = None):
         BaseAgent.__init__(self, name="gap_finder", agent_id=agent_id)
-        LLMAgentMixin.__init__(self)
+        LLMAgentMixin.__init__(self, preferred_backend='ollama')
         self.analysis_agent = AnalysisAgent()
         self.research_agent = ResearchAgent()
         self.config = get_config()
         self.name = "gap_finder"
+        self.preferred_backend = 'ollama'
+    
+    async def execute(self, agent_input: AgentInput) -> AgentOutput:
+        """Adapter: accept AgentInput, coerce to GapFinderInput, and run."""
+        try:
+            ctx = agent_input.context or {}
+            data = agent_input.data or {}
+            validated = []
+            market_ctx = ""
+            if isinstance(data, dict):
+                validated = data.get("validated_pain_points") or data.get("pain_points") or []
+                market_ctx = data.get("market_context") or ctx.get("market_context", "")
+            gap_input = GapFinderInput(
+                validated_pain_points=validated,
+                market_context=market_ctx,
+                analysis_scope=ctx.get("analysis_scope", "comprehensive"),
+                include_competitive_analysis=bool(ctx.get("include_competitive_analysis", True)),
+                include_market_sizing=bool(ctx.get("include_market_sizing", True)),
+                context=agent_input.context,
+                metadata=agent_input.metadata,
+            )
+            self._update_status('planning')
+            plan = await self.plan(gap_input)
+            self._update_status('thinking')
+            thoughts = await self.think(gap_input)
+            self._update_status('acting')
+            result = await self.act(gap_input)
+            self._update_status('completed')
+            if isinstance(result, AgentOutput):
+                # Already AgentOutput-like
+                result.metadata = {**(result.metadata or {}), 'plan': plan, 'thoughts': thoughts, 'agent_name': self.name, 'agent_id': self.agent_id}
+                return result
+            # Wrap arbitrary result
+            return AgentOutput(
+                result=result,
+                metadata={'agent_id': self.agent_id, 'agent_name': self.name, 'plan': plan, 'thoughts': thoughts},
+                logs=self.execution_logs,
+                execution_time=0.0,
+                success=True,
+            )
+        except Exception as e:
+            self._update_status('failed')
+            return AgentOutput(
+                result=None,
+                metadata={'agent_id': self.agent_id, 'agent_name': self.name},
+                logs=self.execution_logs,
+                execution_time=0.0,
+                success=False,
+                error=str(e),
+            )
     
     async def plan(self, input_data: GapFinderInput) -> Dict[str, Any]:
         """Plan the market gap analysis process."""

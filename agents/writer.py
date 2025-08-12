@@ -84,7 +84,7 @@ class WriterAgent(BaseAgent, LLMAgentMixin):
     
     def __init__(self, agent_id: str = None):
         BaseAgent.__init__(self, name="writer", agent_id=agent_id)
-        LLMAgentMixin.__init__(self)
+        LLMAgentMixin.__init__(self, preferred_backend='ollama')
         self.analysis_agent = AnalysisAgent()
         self.config = get_config()
         self.name = "writer"  # Used for prompt directory name and routing
@@ -105,6 +105,43 @@ class WriterAgent(BaseAgent, LLMAgentMixin):
             'planning': 'ollama',
             'default': 'ollama'
         }
+    
+    async def execute(self, agent_input: AgentInput) -> AgentOutput:
+        """Adapter: accept AgentInput, coerce to WriterInput, and run."""
+        try:
+            ctx = agent_input.context or {}
+            data = agent_input.data or {}
+            workflow_data = data if isinstance(data, dict) else {"data": data}
+            w_input = WriterInput(
+                workflow_data=workflow_data,
+                report_type=ctx.get("report_type", "comprehensive"),
+                target_audience=ctx.get("target_audience", "stakeholders"),
+                include_recommendations=bool(ctx.get("include_recommendations", True)),
+                include_appendices=bool(ctx.get("include_appendices", False)),
+                context=agent_input.context,
+                metadata=agent_input.metadata,
+            )
+            self._update_status('planning')
+            plan = await self.plan(w_input)
+            self._update_status('thinking')
+            thoughts = await self.think(w_input)
+            self._update_status('acting')
+            output = await self.act(w_input)
+            self._update_status('completed')
+            # Ensure metadata captures plan/thoughts for observability
+            if isinstance(output, AgentOutput):
+                output.metadata = {**(output.metadata or {}), 'plan': plan, 'thoughts': thoughts, 'agent_name': self.name, 'agent_id': self.agent_id}
+            return output
+        except Exception as e:
+            self._update_status('failed')
+            return AgentOutput(
+                result=None,
+                metadata={'agent_id': self.agent_id, 'agent_name': self.name},
+                logs=self.execution_logs,
+                execution_time=0.0,
+                success=False,
+                error=str(e),
+            )
     
     async def _init_services(self):
         """Initialize required services"""
@@ -445,7 +482,7 @@ class WriterAgent(BaseAgent, LLMAgentMixin):
             
             # Process report sections
             report_sections = []
-            for section_data in report_result.get("report_sections", []):
+            for section_data in (report_data.get("report_sections", []) if isinstance(report_data, dict) else []):
                 report_sections.append(ReportSection(
                     title=section_data.get("title", ""),
                     content=section_data.get("content", ""),
@@ -455,14 +492,14 @@ class WriterAgent(BaseAgent, LLMAgentMixin):
                 ))
             
             return WriterOutput(
-                report=report_result.get("executive_summary", "") + "\n\n" + 
-                      "\n\n".join([s.content for s in report_sections]),
-                executive_summary=report_result.get("executive_summary", ""),
-                key_findings=report_result.get("key_findings", []),
-                recommendations=report_result.get("recommendations", []),
-                next_steps=report_result.get("next_steps", []),
+                report=(report_data.get("executive_summary", "") if isinstance(report_data, dict) else "") + "\n\n" + 
+                       "\n\n".join([s.content for s in report_sections]),
+                executive_summary=(report_data.get("executive_summary", "") if isinstance(report_data, dict) else ""),
+                key_findings=(report_data.get("key_findings", []) if isinstance(report_data, dict) else []),
+                recommendations=(report_data.get("recommendations", []) if isinstance(report_data, dict) else []),
+                next_steps=(report_data.get("next_steps", []) if isinstance(report_data, dict) else []),
                 report_sections=report_sections,
-                report_metadata=report_result.get("report_metadata", {}),
+                report_metadata=(report_data.get("report_metadata", {}) if isinstance(report_data, dict) else {}),
                 execution_time=execution_time
             )
             

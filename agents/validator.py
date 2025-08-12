@@ -73,7 +73,7 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
     def __init__(self, agent_id: str = None):
         # Ensure BaseAgent is initialized with proper args
         BaseAgent.__init__(self, name="validator", agent_id=agent_id)
-        LLMAgentMixin.__init__(self)
+        LLMAgentMixin.__init__(self, preferred_backend='ollama')
         self.research_agent = ResearchAgent()
         self.analysis_agent = AnalysisAgent()
         self.config = get_config()
@@ -151,8 +151,12 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
                 "include_competitor_analysis": str(input_data.include_competitor_analysis).lower()
             }
             
-            # Load prompt template with substitutions
-            prompt_content = load_prompt_template("plan.prompt", agent_name=self.name, substitutions=substitutions)
+            # Load prompt template with substitutions (fallback to common on formatting issues)
+            try:
+                prompt_content = load_prompt_template("plan.prompt", agent_name=self.name, substitutions=substitutions)
+            except KeyError as ke:
+                self.logger.warning(f"Template substitution KeyError in plan.prompt: {ke}. Falling back to common template.")
+                prompt_content = load_prompt_template("plan.prompt", agent_name=None, substitutions=substitutions)
             
             # Generate plan using LLM
             llm_response = await self.llm_generate(
@@ -250,8 +254,12 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
                 "include_competitor_analysis": str(input_data.include_competitor_analysis).lower()
             }
             
-            # Load prompt template with substitutions
-            prompt_content = load_prompt_template("think.prompt", agent_name=self.name, substitutions=substitutions)
+            # Load prompt template with substitutions (fallback to common on formatting issues)
+            try:
+                prompt_content = load_prompt_template("think.prompt", agent_name=self.name, substitutions=substitutions)
+            except KeyError as ke:
+                self.logger.warning(f"Template substitution KeyError in think.prompt: {ke}. Falling back to common template.")
+                prompt_content = load_prompt_template("think.prompt", agent_name=None, substitutions=substitutions)
             
             # Generate validation strategy using LLM
             llm_response = await self.llm_generate(
@@ -292,7 +300,7 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
         self.state.validation_strategy = validation_strategy
         return validation_strategy
     
-    async def act(self, input_data: ValidatorInput) -> ValidatorOutput:
+    async def act(self, input_data: ValidatorInput) -> AgentOutput:
         """Execute validation and return results using LLM prompt."""
         self.logger.info(f"Validating {len(input_data.pain_points)} pain points")
         start_time = datetime.now()
@@ -314,8 +322,12 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
                 "include_competitor_analysis": str(input_data.include_competitor_analysis).lower()
             }
             
-            # Load prompt template with substitutions
-            prompt_content = load_prompt_template("act.prompt", agent_name=self.name, substitutions=substitutions)
+            # Load prompt template with substitutions (fallback to common on formatting issues)
+            try:
+                prompt_content = load_prompt_template("act.prompt", agent_name=self.name, substitutions=substitutions)
+            except KeyError as ke:
+                self.logger.warning(f"Template substitution KeyError in act.prompt: {ke}. Falling back to common template.")
+                prompt_content = load_prompt_template("act.prompt", agent_name=None, substitutions=substitutions)
             
             # Generate validation results using LLM
             llm_response = await self.llm_generate(
@@ -335,15 +347,27 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
             confidence_scores = validation_results.get("confidence_scores", {})
             recommendations = validation_results.get("recommendations", [])
             
-            # Create and return output
-            output = ValidatorOutput(
-                validated_pain_points=validated_pain_points,
-                invalid_pain_points=invalid_pain_points,
-                validation_summary=validation_summary,
-                market_insights=market_insights,
-                confidence_scores=confidence_scores,
-                recommendations=recommendations,
-                execution_time=(datetime.now() - start_time).total_seconds()
+            # Package result payload
+            result_payload = {
+                "validated_pain_points": validated_pain_points,
+                "invalid_pain_points": invalid_pain_points,
+                "validation_summary": validation_summary,
+                "market_insights": market_insights,
+                "confidence_scores": confidence_scores,
+                "recommendations": recommendations,
+            }
+            # Create and return AgentOutput
+            output = AgentOutput(
+                result=result_payload,
+                metadata={
+                    "agent_id": self.agent_id,
+                    "agent_name": self.name,
+                    "plan": plan,
+                    "validation_strategy": validation_strategy,
+                },
+                logs=self.execution_logs,
+                execution_time=(datetime.now() - start_time).total_seconds(),
+                success=True,
             )
             
             self.logger.info(f"Validation completed in {output.execution_time:.2f} seconds")
@@ -376,15 +400,28 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
             # Create validation summary
             validation_summary = f"Validated {len(validated_points)} of {len(input_data.pain_points)} pain points"
             
-            # Create and return output
-            output = ValidatorOutput(
-                validated_pain_points=validated_points,
-                invalid_pain_points=invalid_points,
-                validation_summary=validation_summary,
-                market_insights=market_insights,
-                confidence_scores=confidence_scores,
-                recommendations=recommendations,
-                execution_time=(datetime.now() - start_time).total_seconds()
+            # Package result payload
+            result_payload = {
+                "validated_pain_points": validated_points,
+                "invalid_pain_points": invalid_points,
+                "validation_summary": validation_summary,
+                "market_insights": market_insights,
+                "confidence_scores": confidence_scores,
+                "recommendations": recommendations,
+            }
+            # Create and return AgentOutput
+            output = AgentOutput(
+                result=result_payload,
+                metadata={
+                    "agent_id": self.agent_id,
+                    "agent_name": self.name,
+                    "plan": plan,
+                    "validation_strategy": validation_strategy,
+                    "fallback": True,
+                },
+                logs=self.execution_logs,
+                execution_time=(datetime.now() - start_time).total_seconds(),
+                success=True,
             )
             
             self.logger.info(f"Validation completed with fallback in {output.execution_time:.2f} seconds")

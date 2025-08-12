@@ -73,7 +73,7 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
     
     def __init__(self, agent_id: str = None):
         BaseAgent.__init__(self, agent_id)
-        LLMAgentMixin.__init__(self)
+        LLMAgentMixin.__init__(self, preferred_backend='ollama')
         self.name = "scout_agent"  # Used for prompt template loading
         self.research_agent = ResearchAgent()
         self.config = get_config()
@@ -85,6 +85,7 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
             "think": [LLMBackendType.OLLAMA, LLMBackendType.OPENAI, LLMBackendType.CLAUDE],
             "act": [LLMBackendType.OLLAMA, LLMBackendType.OPENAI, LLMBackendType.CLAUDE]
         }
+        self.preferred_backend = 'ollama'
     
     async def plan(self, input_data: ScoutInput) -> Dict[str, Any]:
         """Plan the pain point discovery process."""

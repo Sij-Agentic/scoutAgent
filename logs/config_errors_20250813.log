@@ -1,0 +1,24 @@
+2025-08-13 00:22:41 - config - ERROR - manager.py:179 - generate() - Error generating response with ollama: Ollama request timed out after 60s
+2025-08-13 00:22:41 - config - ERROR - utils.py:259 - llm_generate() - Error in LLM generation: Ollama request timed out after 60s
+2025-08-13 00:22:41 - config - ERROR - screener.py:275 - plan() - Error in ScreenerAgent plan: Ollama request timed out after 60s
+2025-08-13 00:23:42 - config - ERROR - manager.py:179 - generate() - Error generating response with ollama: Ollama request timed out after 60s
+2025-08-13 00:23:42 - config - ERROR - utils.py:259 - llm_generate() - Error in LLM generation: Ollama request timed out after 60s
+2025-08-13 00:23:42 - config - ERROR - screener.py:325 - think() - Error in ScreenerAgent think: Ollama request timed out after 60s
+2025-08-13 00:24:33 - config - ERROR - screener.py:240 - extract_json_from_markdown() - Failed to extract valid JSON from LLM response
+2025-08-13 00:24:35 - config - ERROR - screener.py:240 - extract_json_from_markdown() - Failed to extract valid JSON from LLM response
+2025-08-13 00:25:29 - config - ERROR - validator.py:364 - act() - Error executing validation: ValidatorOutput.__init__() missing 3 required positional arguments: 'result', 'metadata', and 'logs'
+2025-08-13 00:26:33 - config - ERROR - manager.py:179 - generate() - Error generating response with ollama: Ollama request timed out after 60s
+2025-08-13 00:26:33 - config - ERROR - utils.py:259 - llm_generate() - Error in LLM generation: Ollama request timed out after 60s
+2025-08-13 00:26:33 - config - ERROR - builder.py:316 - think() - Error analyzing market gaps: Ollama request timed out after 60s
+2025-08-13 00:27:34 - config - ERROR - manager.py:179 - generate() - Error generating response with ollama: Ollama request timed out after 60s
+2025-08-13 00:27:34 - config - ERROR - utils.py:259 - llm_generate() - Error in LLM generation: Ollama request timed out after 60s
+2025-08-13 00:27:34 - config - ERROR - builder.py:438 - act() - Error generating solution prototypes: Ollama request timed out after 60s
+2025-08-13 00:31:37 - config - ERROR - screener.py:240 - extract_json_from_markdown() - Failed to extract valid JSON from LLM response
+2025-08-13 00:32:28 - config - ERROR - screener.py:240 - extract_json_from_markdown() - Failed to extract valid JSON from LLM response
+2025-08-13 00:33:28 - config - ERROR - manager.py:179 - generate() - Error generating response with ollama: Ollama request timed out after 60s
+2025-08-13 00:33:28 - config - ERROR - utils.py:259 - llm_generate() - Error in LLM generation: Ollama request timed out after 60s
+2025-08-13 00:33:28 - config - ERROR - screener.py:325 - think() - Error in ScreenerAgent think: Ollama request timed out after 60s
+2025-08-13 00:33:52 - config - ERROR - screener.py:240 - extract_json_from_markdown() - Failed to extract valid JSON from LLM response
+2025-08-13 00:35:15 - config - ERROR - manager.py:179 - generate() - Error generating response with ollama: Ollama request timed out after 60s
+2025-08-13 00:35:15 - config - ERROR - utils.py:259 - llm_generate() - Error in LLM generation: Ollama request timed out after 60s
+2025-08-13 00:35:15 - config - ERROR - validator.py:376 - act() - Error executing validation: Ollama request timed out after 60s
