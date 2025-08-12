@@ -507,3 +507,404 @@
 2025-08-12 13:04:46 - config - INFO - smoke_agents.py:58 - run_agent_stream() - [STREAM] Running ScreenerAgent.llm_stream_generate() ...
 2025-08-12 13:04:47 - config - INFO - smoke_agents.py:49 - run_agent_generate() - [GEN] Running ValidatorAgent.llm_generate() ...
 2025-08-12 13:04:49 - config - INFO - smoke_agents.py:58 - run_agent_stream() - [STREAM] Running ValidatorAgent.llm_stream_generate() ...
+2025-08-12 13:08:54 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-12 13:08:54 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-12 13:08:54 - config - INFO - base.py:301 - register_agent() - Registered agent alias: research
+2025-08-12 13:08:54 - config - INFO - base.py:305 - register_agent() - Registered agent: ResearchAgent
+2025-08-12 13:08:54 - config - INFO - base.py:307 - register_agent() - Registered agent alias: research
+2025-08-12 13:08:54 - config - INFO - base.py:301 - register_agent() - Registered agent alias: analysis
+2025-08-12 13:08:54 - config - INFO - base.py:305 - register_agent() - Registered agent: AnalysisAgent
+2025-08-12 13:08:54 - config - INFO - base.py:307 - register_agent() - Registered agent alias: analysis
+2025-08-12 13:08:54 - config - INFO - base.py:301 - register_agent() - Registered agent alias: gapfinder
+2025-08-12 13:08:54 - config - INFO - base.py:305 - register_agent() - Registered agent: GapFinderAgent
+2025-08-12 13:08:54 - config - INFO - base.py:307 - register_agent() - Registered agent alias: gapfinder
+2025-08-12 13:08:54 - config - INFO - base.py:301 - register_agent() - Registered agent alias: builder
+2025-08-12 13:08:54 - config - INFO - base.py:305 - register_agent() - Registered agent: BuilderAgent
+2025-08-12 13:08:54 - config - INFO - base.py:307 - register_agent() - Registered agent alias: builder
+2025-08-12 13:08:54 - config - INFO - base.py:301 - register_agent() - Registered agent alias: writer
+2025-08-12 13:08:54 - config - INFO - base.py:305 - register_agent() - Registered agent: WriterAgent
+2025-08-12 13:08:54 - config - INFO - base.py:307 - register_agent() - Registered agent alias: writer
+2025-08-12 13:08:54 - config - INFO - base.py:301 - register_agent() - Registered agent alias: screener
+2025-08-12 13:08:54 - config - INFO - base.py:305 - register_agent() - Registered agent: ScreenerAgent
+2025-08-12 13:08:54 - config - INFO - base.py:307 - register_agent() - Registered agent alias: screener
+2025-08-12 13:08:54 - config - INFO - base.py:301 - register_agent() - Registered agent alias: validator
+2025-08-12 13:08:54 - config - INFO - base.py:305 - register_agent() - Registered agent: ValidatorAgent
+2025-08-12 13:08:54 - config - INFO - base.py:307 - register_agent() - Registered agent alias: validator
+2025-08-12 13:08:54 - config - INFO - config.py:226 - load_config() - Loading ScoutAgent configuration...
+2025-08-12 13:08:54 - config - INFO - config.py:260 - load_config() - Configuration loaded successfully
+2025-08-12 13:08:54 - config - INFO - smoke_agents.py:74 - main() - Default backend from config: None
+2025-08-12 13:08:56 - config - INFO - openai.py:48 - initialize() - OpenAI backend initialized with model: gpt-4
+2025-08-12 13:08:56 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: openai
+2025-08-12 13:08:56 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-12 13:08:56 - config - INFO - manager.py:377 - initialize_llm_backends() - Initialized OpenAI backend
+2025-08-12 13:08:58 - config - INFO - claude.py:48 - initialize() - Claude backend initialized with model: claude-3-5-sonnet-20241022
+2025-08-12 13:08:58 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: claude
+2025-08-12 13:08:58 - config - INFO - manager.py:393 - initialize_llm_backends() - Initialized Claude backend
+2025-08-12 13:09:00 - config - INFO - gemini.py:64 - initialize() - Gemini backend initialized with model: gemini-2.5-flash
+2025-08-12 13:09:00 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: gemini
+2025-08-12 13:09:00 - config - INFO - manager.py:409 - initialize_llm_backends() - Initialized Gemini backend
+2025-08-12 13:09:04 - config - INFO - deepseek.py:50 - initialize() - DeepSeek backend initialized with model: deepseek-chat
+2025-08-12 13:09:04 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: deepseek
+2025-08-12 13:09:04 - config - INFO - manager.py:425 - initialize_llm_backends() - Initialized DeepSeek backend
+2025-08-12 13:09:04 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: phi4-mini:latest
+2025-08-12 13:09:04 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-12 13:09:04 - config - INFO - manager.py:442 - initialize_llm_backends() - Initialized Ollama backend
+2025-08-12 13:09:04 - config - INFO - manager.py:459 - initialize_llm_backends() - LLM initialization complete. Available backends: ['openai', 'claude', 'gemini', 'deepseek', 'ollama']
+2025-08-12 13:09:04 - config - INFO - manager.py:460 - initialize_llm_backends() - Default backend: openai
+2025-08-12 13:09:04 - config - INFO - base.py:89 - __init__() - Initialized agent: None (c9cf8ca0-bce2-475e-9759-a13778a73fcd)
+2025-08-12 13:09:04 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (ef490f96-8fc5-40db-8974-ffc0e0b53177)
+2025-08-12 13:09:04 - config - INFO - base.py:89 - __init__() - Initialized agent: validator (387c3dbb-e3c1-4efd-be2a-6de1bc69baf2)
+2025-08-12 13:09:04 - config - INFO - base.py:89 - __init__() - Initialized agent: research (88bce1ac-742b-40c2-a67f-045b20e0051d)
+2025-08-12 13:09:04 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (93225c02-4f97-4c6a-b6e4-f7ce74c59132)
+2025-08-12 13:09:04 - config - INFO - smoke_agents.py:49 - run_agent_generate() - [GEN] Running ScreenerAgent.llm_generate() ...
+2025-08-12 13:09:06 - config - INFO - smoke_agents.py:58 - run_agent_stream() - [STREAM] Running ScreenerAgent.llm_stream_generate() ...
+2025-08-12 13:09:07 - config - INFO - smoke_agents.py:49 - run_agent_generate() - [GEN] Running ValidatorAgent.llm_generate() ...
+2025-08-12 13:09:08 - config - INFO - smoke_agents.py:58 - run_agent_stream() - [STREAM] Running ValidatorAgent.llm_stream_generate() ...
+2025-08-12 13:12:07 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-12 13:12:07 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-12 13:12:07 - config - INFO - base.py:301 - register_agent() - Registered agent alias: research
+2025-08-12 13:12:07 - config - INFO - base.py:305 - register_agent() - Registered agent: ResearchAgent
+2025-08-12 13:12:07 - config - INFO - base.py:307 - register_agent() - Registered agent alias: research
+2025-08-12 13:12:07 - config - INFO - base.py:301 - register_agent() - Registered agent alias: analysis
+2025-08-12 13:12:07 - config - INFO - base.py:305 - register_agent() - Registered agent: AnalysisAgent
+2025-08-12 13:12:07 - config - INFO - base.py:307 - register_agent() - Registered agent alias: analysis
+2025-08-12 13:12:07 - config - INFO - base.py:301 - register_agent() - Registered agent alias: gapfinder
+2025-08-12 13:12:07 - config - INFO - base.py:305 - register_agent() - Registered agent: GapFinderAgent
+2025-08-12 13:12:07 - config - INFO - base.py:307 - register_agent() - Registered agent alias: gapfinder
+2025-08-12 13:12:07 - config - INFO - base.py:301 - register_agent() - Registered agent alias: builder
+2025-08-12 13:12:07 - config - INFO - base.py:305 - register_agent() - Registered agent: BuilderAgent
+2025-08-12 13:12:07 - config - INFO - base.py:307 - register_agent() - Registered agent alias: builder
+2025-08-12 13:12:07 - config - INFO - base.py:301 - register_agent() - Registered agent alias: writer
+2025-08-12 13:12:07 - config - INFO - base.py:305 - register_agent() - Registered agent: WriterAgent
+2025-08-12 13:12:07 - config - INFO - base.py:307 - register_agent() - Registered agent alias: writer
+2025-08-12 13:12:07 - config - INFO - base.py:301 - register_agent() - Registered agent alias: screener
+2025-08-12 13:12:07 - config - INFO - base.py:305 - register_agent() - Registered agent: ScreenerAgent
+2025-08-12 13:12:07 - config - INFO - base.py:307 - register_agent() - Registered agent alias: screener
+2025-08-12 13:12:07 - config - INFO - base.py:301 - register_agent() - Registered agent alias: validator
+2025-08-12 13:12:07 - config - INFO - base.py:305 - register_agent() - Registered agent: ValidatorAgent
+2025-08-12 13:12:07 - config - INFO - base.py:307 - register_agent() - Registered agent alias: validator
+2025-08-12 13:12:07 - config - INFO - config.py:226 - load_config() - Loading ScoutAgent configuration...
+2025-08-12 13:12:07 - config - INFO - config.py:260 - load_config() - Configuration loaded successfully
+2025-08-12 13:12:07 - config - INFO - smoke_agents.py:125 - main() - Default backend from config: None
+2025-08-12 13:12:09 - config - INFO - openai.py:48 - initialize() - OpenAI backend initialized with model: gpt-4
+2025-08-12 13:12:09 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: openai
+2025-08-12 13:12:09 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-12 13:12:09 - config - INFO - manager.py:377 - initialize_llm_backends() - Initialized OpenAI backend
+2025-08-12 13:12:11 - config - INFO - claude.py:48 - initialize() - Claude backend initialized with model: claude-3-5-sonnet-20241022
+2025-08-12 13:12:11 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: claude
+2025-08-12 13:12:11 - config - INFO - manager.py:393 - initialize_llm_backends() - Initialized Claude backend
+2025-08-12 13:12:12 - config - INFO - gemini.py:64 - initialize() - Gemini backend initialized with model: gemini-2.5-flash
+2025-08-12 13:12:12 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: gemini
+2025-08-12 13:12:12 - config - INFO - manager.py:409 - initialize_llm_backends() - Initialized Gemini backend
+2025-08-12 13:12:16 - config - INFO - deepseek.py:50 - initialize() - DeepSeek backend initialized with model: deepseek-chat
+2025-08-12 13:12:16 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: deepseek
+2025-08-12 13:12:16 - config - INFO - manager.py:425 - initialize_llm_backends() - Initialized DeepSeek backend
+2025-08-12 13:12:16 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: phi4-mini:latest
+2025-08-12 13:12:16 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-12 13:12:16 - config - INFO - manager.py:442 - initialize_llm_backends() - Initialized Ollama backend
+2025-08-12 13:12:16 - config - INFO - manager.py:459 - initialize_llm_backends() - LLM initialization complete. Available backends: ['openai', 'claude', 'gemini', 'deepseek', 'ollama']
+2025-08-12 13:12:16 - config - INFO - manager.py:460 - initialize_llm_backends() - Default backend: openai
+2025-08-12 13:12:16 - config - INFO - base.py:89 - __init__() - Initialized agent: None (b57ef1b1-8fe2-4b84-ac40-8efba8f3ad4a)
+2025-08-12 13:12:16 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (9440ab8a-723e-4846-b82a-56ed21ae329e)
+2025-08-12 13:12:16 - config - INFO - base.py:89 - __init__() - Initialized agent: validator (c00e7e1e-af19-4c26-9a23-237f006b9cf9)
+2025-08-12 13:12:16 - config - INFO - base.py:89 - __init__() - Initialized agent: research (3f39239b-1130-4fea-b5a6-0fb68f9660a9)
+2025-08-12 13:12:16 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (d908fa2f-47c5-441d-9760-9e055f86aa42)
+2025-08-12 13:12:16 - config - INFO - base.py:89 - __init__() - Initialized agent: research (d4182fa7-4647-404e-b9f6-8dcd3880d5bb)
+2025-08-12 13:12:16 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (47aa10b0-1685-48df-873e-4d87fa56f665)
+2025-08-12 13:12:16 - config - INFO - base.py:89 - __init__() - Initialized agent: None (805d592f-7752-47df-9e98-4d57ad3d1ffe)
+2025-08-12 13:12:16 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (fa649aca-fd39-4d80-a881-d7019ff20ff4)
+2025-08-12 13:12:16 - config - INFO - base.py:89 - __init__() - Initialized agent: research (8d705de9-443f-4c48-8a71-b0c8d76b6aff)
+2025-08-12 13:12:16 - config - INFO - base.py:89 - __init__() - Initialized agent: None (1d1e2460-e4be-4751-ad8c-e31397bfe12f)
+2025-08-12 13:12:16 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (be052ed7-c69b-4a76-9056-ea2b4f273104)
+2025-08-12 13:12:16 - config - INFO - base.py:89 - __init__() - Initialized agent: None (8294924e-4d44-4707-bb2d-07a8cbc6a0ba)
+2025-08-12 13:12:16 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (75773cc5-3237-430e-9150-d7da4117574e)
+2025-08-12 13:12:16 - config - INFO - smoke_agents.py:100 - run_agent_generate() - [GEN] Running ScreenerAgent.llm_generate() ...
+2025-08-12 13:12:16 - config - WARNING - builder.py:136 - _init_code_service() - Could not initialize code service: No instances of service 'code_execution' found
+2025-08-12 13:12:16 - config - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-12 13:12:16 - config - WARNING - writer.py:133 - _init_services() - Could not initialize services: No instances of service 'memory' found
+2025-08-12 13:12:18 - config - INFO - smoke_agents.py:109 - run_agent_stream() - [STREAM] Running ScreenerAgent.llm_stream_generate() ...
+2025-08-12 13:12:19 - config - INFO - smoke_agents.py:100 - run_agent_generate() - [GEN] Running ValidatorAgent.llm_generate() ...
+2025-08-12 13:12:20 - config - INFO - smoke_agents.py:109 - run_agent_stream() - [STREAM] Running ValidatorAgent.llm_stream_generate() ...
+2025-08-12 13:12:20 - config - INFO - smoke_agents.py:100 - run_agent_generate() - [GEN] Running ResearchAgent.llm_generate() ...
+2025-08-12 13:12:20 - config - INFO - smoke_agents.py:109 - run_agent_stream() - [STREAM] Running ResearchAgent.llm_stream_generate() ...
+2025-08-12 13:12:20 - config - INFO - smoke_agents.py:100 - run_agent_generate() - [GEN] Running AnalysisAgent.llm_generate() ...
+2025-08-12 13:12:21 - config - INFO - smoke_agents.py:109 - run_agent_stream() - [STREAM] Running AnalysisAgent.llm_stream_generate() ...
+2025-08-12 13:12:21 - config - INFO - smoke_agents.py:100 - run_agent_generate() - [GEN] Running GapFinderAgent.llm_generate() ...
+2025-08-12 13:12:21 - config - INFO - smoke_agents.py:109 - run_agent_stream() - [STREAM] Running GapFinderAgent.llm_stream_generate() ...
+2025-08-12 13:12:21 - config - INFO - smoke_agents.py:100 - run_agent_generate() - [GEN] Running BuilderAgent.llm_generate() ...
+2025-08-12 13:12:21 - config - INFO - smoke_agents.py:109 - run_agent_stream() - [STREAM] Running BuilderAgent.llm_stream_generate() ...
+2025-08-12 13:12:21 - config - INFO - smoke_agents.py:100 - run_agent_generate() - [GEN] Running WriterAgent.llm_generate() ...
+2025-08-12 13:12:21 - config - ERROR - utils.py:259 - llm_generate() - Error in LLM generation: Backend not available: default
+2025-08-12 13:12:21 - config - WARNING - writer.py:171 - llm_generate() - LLM generation failed for default: Backend not available: default. Using fallback response.
+2025-08-12 13:12:21 - config - INFO - smoke_agents.py:109 - run_agent_stream() - [STREAM] Running WriterAgent.llm_stream_generate() ...
+2025-08-12 13:15:16 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-12 13:15:16 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-12 13:15:16 - config - INFO - base.py:301 - register_agent() - Registered agent alias: research
+2025-08-12 13:15:16 - config - INFO - base.py:305 - register_agent() - Registered agent: ResearchAgent
+2025-08-12 13:15:16 - config - INFO - base.py:307 - register_agent() - Registered agent alias: research
+2025-08-12 13:15:16 - config - INFO - base.py:301 - register_agent() - Registered agent alias: analysis
+2025-08-12 13:15:16 - config - INFO - base.py:305 - register_agent() - Registered agent: AnalysisAgent
+2025-08-12 13:15:16 - config - INFO - base.py:307 - register_agent() - Registered agent alias: analysis
+2025-08-12 13:15:16 - config - INFO - base.py:301 - register_agent() - Registered agent alias: gapfinder
+2025-08-12 13:15:16 - config - INFO - base.py:305 - register_agent() - Registered agent: GapFinderAgent
+2025-08-12 13:15:16 - config - INFO - base.py:307 - register_agent() - Registered agent alias: gapfinder
+2025-08-12 13:15:16 - config - INFO - base.py:301 - register_agent() - Registered agent alias: builder
+2025-08-12 13:15:16 - config - INFO - base.py:305 - register_agent() - Registered agent: BuilderAgent
+2025-08-12 13:15:16 - config - INFO - base.py:307 - register_agent() - Registered agent alias: builder
+2025-08-12 13:15:16 - config - INFO - base.py:301 - register_agent() - Registered agent alias: writer
+2025-08-12 13:15:16 - config - INFO - base.py:305 - register_agent() - Registered agent: WriterAgent
+2025-08-12 13:15:16 - config - INFO - base.py:307 - register_agent() - Registered agent alias: writer
+2025-08-12 13:15:16 - config - INFO - base.py:301 - register_agent() - Registered agent alias: screener
+2025-08-12 13:15:16 - config - INFO - base.py:305 - register_agent() - Registered agent: ScreenerAgent
+2025-08-12 13:15:16 - config - INFO - base.py:307 - register_agent() - Registered agent alias: screener
+2025-08-12 13:15:16 - config - INFO - base.py:301 - register_agent() - Registered agent alias: validator
+2025-08-12 13:15:16 - config - INFO - base.py:305 - register_agent() - Registered agent: ValidatorAgent
+2025-08-12 13:15:16 - config - INFO - base.py:307 - register_agent() - Registered agent alias: validator
+2025-08-12 13:15:16 - config - INFO - config.py:226 - load_config() - Loading ScoutAgent configuration...
+2025-08-12 13:15:16 - config - INFO - config.py:260 - load_config() - Configuration loaded successfully
+2025-08-12 13:15:16 - config - INFO - smoke_agents.py:125 - main() - Default backend from config: None
+2025-08-12 13:15:17 - config - INFO - openai.py:48 - initialize() - OpenAI backend initialized with model: gpt-4
+2025-08-12 13:15:17 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: openai
+2025-08-12 13:15:17 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-12 13:15:17 - config - INFO - manager.py:377 - initialize_llm_backends() - Initialized OpenAI backend
+2025-08-12 13:15:19 - config - INFO - claude.py:48 - initialize() - Claude backend initialized with model: claude-3-5-sonnet-20241022
+2025-08-12 13:15:19 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: claude
+2025-08-12 13:15:19 - config - INFO - manager.py:393 - initialize_llm_backends() - Initialized Claude backend
+2025-08-12 13:15:20 - config - INFO - gemini.py:64 - initialize() - Gemini backend initialized with model: gemini-2.5-flash
+2025-08-12 13:15:20 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: gemini
+2025-08-12 13:15:20 - config - INFO - manager.py:409 - initialize_llm_backends() - Initialized Gemini backend
+2025-08-12 13:15:24 - config - INFO - deepseek.py:50 - initialize() - DeepSeek backend initialized with model: deepseek-chat
+2025-08-12 13:15:24 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: deepseek
+2025-08-12 13:15:24 - config - INFO - manager.py:425 - initialize_llm_backends() - Initialized DeepSeek backend
+2025-08-12 13:15:24 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: phi4-mini:latest
+2025-08-12 13:15:24 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-12 13:15:24 - config - INFO - manager.py:442 - initialize_llm_backends() - Initialized Ollama backend
+2025-08-12 13:15:24 - config - INFO - manager.py:459 - initialize_llm_backends() - LLM initialization complete. Available backends: ['openai', 'claude', 'gemini', 'deepseek', 'ollama']
+2025-08-12 13:15:24 - config - INFO - manager.py:460 - initialize_llm_backends() - Default backend: openai
+2025-08-12 13:15:24 - config - INFO - base.py:89 - __init__() - Initialized agent: None (93b2006b-a538-49d7-91f6-383f12466e5a)
+2025-08-12 13:15:24 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (db73c27f-b678-4b5d-a167-9a4a6fc2e242)
+2025-08-12 13:15:24 - config - INFO - base.py:89 - __init__() - Initialized agent: validator (dc97f9e2-9855-4f4c-b3ed-a1f62d889242)
+2025-08-12 13:15:24 - config - INFO - base.py:89 - __init__() - Initialized agent: research (417dec8b-98ba-4810-994d-eccd214f50e2)
+2025-08-12 13:15:24 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (860af4de-4d1a-4144-a98f-d2975138bc26)
+2025-08-12 13:15:24 - config - INFO - base.py:89 - __init__() - Initialized agent: research (b41052c4-e6ca-4f97-9f9b-705714be92f7)
+2025-08-12 13:15:24 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (a392d24f-7692-454a-ae28-9d223d2a1def)
+2025-08-12 13:15:24 - config - INFO - base.py:89 - __init__() - Initialized agent: gap_finder (aafb36d6-a9ac-45ef-ad0c-67dd6f8f4b79)
+2025-08-12 13:15:24 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (69a5aa29-3ff4-43db-a2e5-bbdc4901cda0)
+2025-08-12 13:15:24 - config - INFO - base.py:89 - __init__() - Initialized agent: research (d93f11d0-c795-453e-bd3a-d92e4fe56fed)
+2025-08-12 13:15:24 - config - INFO - base.py:89 - __init__() - Initialized agent: None (2665e183-e97e-440f-b5f9-ccb55bd5aafa)
+2025-08-12 13:15:24 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (39cf5f14-f98e-4793-938c-7bde33120ac7)
+2025-08-12 13:15:24 - config - INFO - base.py:89 - __init__() - Initialized agent: writer (44149fc5-6ba3-4f63-ba66-5a95c1d1ecc2)
+2025-08-12 13:15:24 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (88dc1930-7b7a-41d1-8596-8ebd29729ca1)
+2025-08-12 13:15:24 - config - INFO - smoke_agents.py:100 - run_agent_generate() - [GEN] Running ScreenerAgent.llm_generate() ...
+2025-08-12 13:15:24 - config - WARNING - builder.py:136 - _init_code_service() - Could not initialize code service: No instances of service 'code_execution' found
+2025-08-12 13:15:24 - config - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-12 13:15:24 - config - WARNING - writer.py:133 - _init_services() - Could not initialize services: No instances of service 'memory' found
+2025-08-12 13:15:26 - config - INFO - smoke_agents.py:109 - run_agent_stream() - [STREAM] Running ScreenerAgent.llm_stream_generate() ...
+2025-08-12 13:15:26 - config - INFO - smoke_agents.py:100 - run_agent_generate() - [GEN] Running ValidatorAgent.llm_generate() ...
+2025-08-12 13:15:28 - config - INFO - smoke_agents.py:109 - run_agent_stream() - [STREAM] Running ValidatorAgent.llm_stream_generate() ...
+2025-08-12 13:15:28 - config - INFO - smoke_agents.py:100 - run_agent_generate() - [GEN] Running ResearchAgent.llm_generate() ...
+2025-08-12 13:15:28 - config - INFO - smoke_agents.py:109 - run_agent_stream() - [STREAM] Running ResearchAgent.llm_stream_generate() ...
+2025-08-12 13:15:28 - config - INFO - smoke_agents.py:100 - run_agent_generate() - [GEN] Running AnalysisAgent.llm_generate() ...
+2025-08-12 13:15:29 - config - INFO - smoke_agents.py:109 - run_agent_stream() - [STREAM] Running AnalysisAgent.llm_stream_generate() ...
+2025-08-12 13:15:29 - config - INFO - smoke_agents.py:100 - run_agent_generate() - [GEN] Running GapFinderAgent.llm_generate() ...
+2025-08-12 13:15:30 - config - INFO - smoke_agents.py:109 - run_agent_stream() - [STREAM] Running GapFinderAgent.llm_stream_generate() ...
+2025-08-12 13:15:32 - config - INFO - smoke_agents.py:100 - run_agent_generate() - [GEN] Running BuilderAgent.llm_generate() ...
+2025-08-12 13:15:32 - config - INFO - smoke_agents.py:109 - run_agent_stream() - [STREAM] Running BuilderAgent.llm_stream_generate() ...
+2025-08-12 13:15:32 - config - INFO - smoke_agents.py:100 - run_agent_generate() - [GEN] Running WriterAgent.llm_generate() ...
+2025-08-12 13:15:33 - config - INFO - smoke_agents.py:109 - run_agent_stream() - [STREAM] Running WriterAgent.llm_stream_generate() ...
+2025-08-12 13:18:34 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-12 13:18:34 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-12 13:18:34 - config - INFO - base.py:301 - register_agent() - Registered agent alias: research
+2025-08-12 13:18:34 - config - INFO - base.py:305 - register_agent() - Registered agent: ResearchAgent
+2025-08-12 13:18:34 - config - INFO - base.py:307 - register_agent() - Registered agent alias: research
+2025-08-12 13:18:34 - config - INFO - base.py:301 - register_agent() - Registered agent alias: analysis
+2025-08-12 13:18:34 - config - INFO - base.py:305 - register_agent() - Registered agent: AnalysisAgent
+2025-08-12 13:18:34 - config - INFO - base.py:307 - register_agent() - Registered agent alias: analysis
+2025-08-12 13:18:34 - config - INFO - base.py:301 - register_agent() - Registered agent alias: gapfinder
+2025-08-12 13:18:34 - config - INFO - base.py:305 - register_agent() - Registered agent: GapFinderAgent
+2025-08-12 13:18:34 - config - INFO - base.py:307 - register_agent() - Registered agent alias: gapfinder
+2025-08-12 13:18:34 - config - INFO - base.py:301 - register_agent() - Registered agent alias: builder
+2025-08-12 13:18:34 - config - INFO - base.py:305 - register_agent() - Registered agent: BuilderAgent
+2025-08-12 13:18:34 - config - INFO - base.py:307 - register_agent() - Registered agent alias: builder
+2025-08-12 13:18:34 - config - INFO - base.py:301 - register_agent() - Registered agent alias: writer
+2025-08-12 13:18:34 - config - INFO - base.py:305 - register_agent() - Registered agent: WriterAgent
+2025-08-12 13:18:34 - config - INFO - base.py:307 - register_agent() - Registered agent alias: writer
+2025-08-12 13:18:34 - config - INFO - base.py:301 - register_agent() - Registered agent alias: screener
+2025-08-12 13:18:34 - config - INFO - base.py:305 - register_agent() - Registered agent: ScreenerAgent
+2025-08-12 13:18:34 - config - INFO - base.py:307 - register_agent() - Registered agent alias: screener
+2025-08-12 13:18:34 - config - INFO - base.py:301 - register_agent() - Registered agent alias: validator
+2025-08-12 13:18:34 - config - INFO - base.py:305 - register_agent() - Registered agent: ValidatorAgent
+2025-08-12 13:18:34 - config - INFO - base.py:307 - register_agent() - Registered agent alias: validator
+2025-08-12 13:18:34 - config - INFO - config.py:226 - load_config() - Loading ScoutAgent configuration...
+2025-08-12 13:18:34 - config - INFO - config.py:260 - load_config() - Configuration loaded successfully
+2025-08-12 13:18:34 - config - INFO - smoke_agents.py:125 - main() - Default backend from config: None
+2025-08-12 13:18:35 - config - INFO - openai.py:48 - initialize() - OpenAI backend initialized with model: gpt-4
+2025-08-12 13:18:35 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: openai
+2025-08-12 13:18:35 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-12 13:18:35 - config - INFO - manager.py:377 - initialize_llm_backends() - Initialized OpenAI backend
+2025-08-12 13:18:36 - config - INFO - claude.py:48 - initialize() - Claude backend initialized with model: claude-3-5-sonnet-20241022
+2025-08-12 13:18:36 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: claude
+2025-08-12 13:18:36 - config - INFO - manager.py:393 - initialize_llm_backends() - Initialized Claude backend
+2025-08-12 13:18:38 - config - INFO - gemini.py:64 - initialize() - Gemini backend initialized with model: gemini-2.5-flash
+2025-08-12 13:18:38 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: gemini
+2025-08-12 13:18:38 - config - INFO - manager.py:409 - initialize_llm_backends() - Initialized Gemini backend
+2025-08-12 13:18:42 - config - INFO - deepseek.py:50 - initialize() - DeepSeek backend initialized with model: deepseek-chat
+2025-08-12 13:18:42 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: deepseek
+2025-08-12 13:18:42 - config - INFO - manager.py:425 - initialize_llm_backends() - Initialized DeepSeek backend
+2025-08-12 13:18:42 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: phi4-mini:latest
+2025-08-12 13:18:42 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-12 13:18:42 - config - INFO - manager.py:442 - initialize_llm_backends() - Initialized Ollama backend
+2025-08-12 13:18:42 - config - INFO - manager.py:459 - initialize_llm_backends() - LLM initialization complete. Available backends: ['openai', 'claude', 'gemini', 'deepseek', 'ollama']
+2025-08-12 13:18:42 - config - INFO - manager.py:460 - initialize_llm_backends() - Default backend: openai
+2025-08-12 13:19:52 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-12 13:19:52 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-12 13:19:52 - config - INFO - base.py:301 - register_agent() - Registered agent alias: research
+2025-08-12 13:19:52 - config - INFO - base.py:305 - register_agent() - Registered agent: ResearchAgent
+2025-08-12 13:19:52 - config - INFO - base.py:307 - register_agent() - Registered agent alias: research
+2025-08-12 13:19:52 - config - INFO - base.py:301 - register_agent() - Registered agent alias: analysis
+2025-08-12 13:19:52 - config - INFO - base.py:305 - register_agent() - Registered agent: AnalysisAgent
+2025-08-12 13:19:52 - config - INFO - base.py:307 - register_agent() - Registered agent alias: analysis
+2025-08-12 13:19:52 - config - INFO - base.py:301 - register_agent() - Registered agent alias: gapfinder
+2025-08-12 13:19:52 - config - INFO - base.py:305 - register_agent() - Registered agent: GapFinderAgent
+2025-08-12 13:19:52 - config - INFO - base.py:307 - register_agent() - Registered agent alias: gapfinder
+2025-08-12 13:19:52 - config - INFO - base.py:301 - register_agent() - Registered agent alias: builder
+2025-08-12 13:19:52 - config - INFO - base.py:305 - register_agent() - Registered agent: BuilderAgent
+2025-08-12 13:19:52 - config - INFO - base.py:307 - register_agent() - Registered agent alias: builder
+2025-08-12 13:19:52 - config - INFO - base.py:301 - register_agent() - Registered agent alias: writer
+2025-08-12 13:19:52 - config - INFO - base.py:305 - register_agent() - Registered agent: WriterAgent
+2025-08-12 13:19:52 - config - INFO - base.py:307 - register_agent() - Registered agent alias: writer
+2025-08-12 13:19:52 - config - INFO - base.py:301 - register_agent() - Registered agent alias: screener
+2025-08-12 13:19:52 - config - INFO - base.py:305 - register_agent() - Registered agent: ScreenerAgent
+2025-08-12 13:19:52 - config - INFO - base.py:307 - register_agent() - Registered agent alias: screener
+2025-08-12 13:19:52 - config - INFO - base.py:301 - register_agent() - Registered agent alias: validator
+2025-08-12 13:19:52 - config - INFO - base.py:305 - register_agent() - Registered agent: ValidatorAgent
+2025-08-12 13:19:52 - config - INFO - base.py:307 - register_agent() - Registered agent alias: validator
+2025-08-12 13:19:52 - config - INFO - config.py:226 - load_config() - Loading ScoutAgent configuration...
+2025-08-12 13:19:52 - config - INFO - config.py:260 - load_config() - Configuration loaded successfully
+2025-08-12 13:19:52 - config - INFO - smoke_agents.py:125 - main() - Default backend from config: None
+2025-08-12 13:19:54 - config - INFO - openai.py:48 - initialize() - OpenAI backend initialized with model: gpt-4
+2025-08-12 13:19:54 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: openai
+2025-08-12 13:19:54 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-12 13:19:54 - config - INFO - manager.py:377 - initialize_llm_backends() - Initialized OpenAI backend
+2025-08-12 13:19:56 - config - INFO - claude.py:48 - initialize() - Claude backend initialized with model: claude-3-5-sonnet-20241022
+2025-08-12 13:19:56 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: claude
+2025-08-12 13:19:56 - config - INFO - manager.py:393 - initialize_llm_backends() - Initialized Claude backend
+2025-08-12 13:19:57 - config - INFO - gemini.py:64 - initialize() - Gemini backend initialized with model: gemini-2.5-flash
+2025-08-12 13:19:57 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: gemini
+2025-08-12 13:19:57 - config - INFO - manager.py:409 - initialize_llm_backends() - Initialized Gemini backend
+2025-08-12 13:20:01 - config - INFO - deepseek.py:50 - initialize() - DeepSeek backend initialized with model: deepseek-chat
+2025-08-12 13:20:01 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: deepseek
+2025-08-12 13:20:01 - config - INFO - manager.py:425 - initialize_llm_backends() - Initialized DeepSeek backend
+2025-08-12 13:20:01 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: phi4-mini:latest
+2025-08-12 13:20:01 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-12 13:20:01 - config - INFO - manager.py:442 - initialize_llm_backends() - Initialized Ollama backend
+2025-08-12 13:20:01 - config - INFO - manager.py:459 - initialize_llm_backends() - LLM initialization complete. Available backends: ['openai', 'claude', 'gemini', 'deepseek', 'ollama']
+2025-08-12 13:20:01 - config - INFO - manager.py:460 - initialize_llm_backends() - Default backend: openai
+2025-08-12 13:20:01 - config - INFO - base.py:89 - __init__() - Initialized agent: screener (4e6e05b7-ec36-47bb-9e79-19e2717d0b54)
+2025-08-12 13:20:01 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (95d85adb-b51e-4f7b-a3bd-2f1b05539a91)
+2025-08-12 13:20:01 - config - INFO - base.py:89 - __init__() - Initialized agent: validator (68f8bcbf-ea02-403a-8a79-5d49cfd02559)
+2025-08-12 13:20:01 - config - INFO - base.py:89 - __init__() - Initialized agent: research (7e94da59-10eb-4726-bc7d-3220fa6654a5)
+2025-08-12 13:20:01 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (598baf05-c21d-451e-ae6b-2d38af22fba7)
+2025-08-12 13:20:01 - config - INFO - base.py:89 - __init__() - Initialized agent: research (53fccfdd-d7bd-4269-a3a3-0bf72558a851)
+2025-08-12 13:20:01 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (db9781f2-e171-4784-b89e-dacd493a7bce)
+2025-08-12 13:20:01 - config - INFO - base.py:89 - __init__() - Initialized agent: gap_finder (5b7b19c2-9a68-4af0-ad3b-537f368116ed)
+2025-08-12 13:20:01 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (22f16def-4469-489e-a4ac-ea4321400c01)
+2025-08-12 13:20:01 - config - INFO - base.py:89 - __init__() - Initialized agent: research (0da017cd-0b81-4801-b22f-5fb09d362ca0)
+2025-08-12 13:20:01 - config - INFO - base.py:89 - __init__() - Initialized agent: builder (7fcfc264-9644-4fc5-a16c-2ed4bacd53a3)
+2025-08-12 13:20:01 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (70bc7a3d-c42e-44af-9e1f-5f704aabbd78)
+2025-08-12 13:20:01 - config - INFO - base.py:89 - __init__() - Initialized agent: writer (d0b79a96-7edc-4580-8f66-d2b7981088d4)
+2025-08-12 13:20:01 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (c528beab-767a-414e-ae26-171650be6c0a)
+2025-08-12 13:20:01 - config - INFO - smoke_agents.py:100 - run_agent_generate() - [GEN] Running ScreenerAgent.llm_generate() ...
+2025-08-12 13:20:01 - config - WARNING - builder.py:136 - _init_code_service() - Could not initialize code service: No instances of service 'code_execution' found
+2025-08-12 13:20:01 - config - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-12 13:20:01 - config - WARNING - writer.py:133 - _init_services() - Could not initialize services: No instances of service 'memory' found
+2025-08-12 13:20:02 - config - INFO - smoke_agents.py:109 - run_agent_stream() - [STREAM] Running ScreenerAgent.llm_stream_generate() ...
+2025-08-12 13:20:03 - config - INFO - smoke_agents.py:100 - run_agent_generate() - [GEN] Running ValidatorAgent.llm_generate() ...
+2025-08-12 13:20:05 - config - INFO - smoke_agents.py:109 - run_agent_stream() - [STREAM] Running ValidatorAgent.llm_stream_generate() ...
+2025-08-12 13:20:05 - config - INFO - smoke_agents.py:100 - run_agent_generate() - [GEN] Running ResearchAgent.llm_generate() ...
+2025-08-12 13:20:05 - config - INFO - smoke_agents.py:109 - run_agent_stream() - [STREAM] Running ResearchAgent.llm_stream_generate() ...
+2025-08-12 13:20:05 - config - INFO - smoke_agents.py:100 - run_agent_generate() - [GEN] Running AnalysisAgent.llm_generate() ...
+2025-08-12 13:20:06 - config - INFO - smoke_agents.py:109 - run_agent_stream() - [STREAM] Running AnalysisAgent.llm_stream_generate() ...
+2025-08-12 13:20:06 - config - INFO - smoke_agents.py:100 - run_agent_generate() - [GEN] Running GapFinderAgent.llm_generate() ...
+2025-08-12 13:20:09 - config - INFO - smoke_agents.py:109 - run_agent_stream() - [STREAM] Running GapFinderAgent.llm_stream_generate() ...
+2025-08-12 13:20:12 - config - INFO - smoke_agents.py:100 - run_agent_generate() - [GEN] Running BuilderAgent.llm_generate() ...
+2025-08-12 13:20:12 - config - INFO - smoke_agents.py:109 - run_agent_stream() - [STREAM] Running BuilderAgent.llm_stream_generate() ...
+2025-08-12 13:20:12 - config - INFO - smoke_agents.py:100 - run_agent_generate() - [GEN] Running WriterAgent.llm_generate() ...
+2025-08-12 13:20:13 - config - INFO - smoke_agents.py:109 - run_agent_stream() - [STREAM] Running WriterAgent.llm_stream_generate() ...
+2025-08-12 13:20:13 - config - INFO - manager.py:309 - _stop_health_monitoring() - Stopped LLM backend health monitoring
+2025-08-12 13:33:16 - config - INFO - base.py:304 - register_service() - Registered service: code_execution
+2025-08-12 13:33:16 - config - INFO - base.py:281 - __init__() - AgentRegistry initialized
+2025-08-12 13:33:16 - config - INFO - base.py:301 - register_agent() - Registered agent alias: research
+2025-08-12 13:33:16 - config - INFO - base.py:305 - register_agent() - Registered agent: ResearchAgent
+2025-08-12 13:33:16 - config - INFO - base.py:307 - register_agent() - Registered agent alias: research
+2025-08-12 13:33:16 - config - INFO - base.py:301 - register_agent() - Registered agent alias: analysis
+2025-08-12 13:33:16 - config - INFO - base.py:305 - register_agent() - Registered agent: AnalysisAgent
+2025-08-12 13:33:16 - config - INFO - base.py:307 - register_agent() - Registered agent alias: analysis
+2025-08-12 13:33:16 - config - INFO - base.py:301 - register_agent() - Registered agent alias: gapfinder
+2025-08-12 13:33:16 - config - INFO - base.py:305 - register_agent() - Registered agent: GapFinderAgent
+2025-08-12 13:33:16 - config - INFO - base.py:307 - register_agent() - Registered agent alias: gapfinder
+2025-08-12 13:33:16 - config - INFO - base.py:301 - register_agent() - Registered agent alias: builder
+2025-08-12 13:33:16 - config - INFO - base.py:305 - register_agent() - Registered agent: BuilderAgent
+2025-08-12 13:33:16 - config - INFO - base.py:307 - register_agent() - Registered agent alias: builder
+2025-08-12 13:33:16 - config - INFO - base.py:301 - register_agent() - Registered agent alias: writer
+2025-08-12 13:33:16 - config - INFO - base.py:305 - register_agent() - Registered agent: WriterAgent
+2025-08-12 13:33:16 - config - INFO - base.py:307 - register_agent() - Registered agent alias: writer
+2025-08-12 13:33:16 - config - INFO - base.py:301 - register_agent() - Registered agent alias: screener
+2025-08-12 13:33:16 - config - INFO - base.py:305 - register_agent() - Registered agent: ScreenerAgent
+2025-08-12 13:33:16 - config - INFO - base.py:307 - register_agent() - Registered agent alias: screener
+2025-08-12 13:33:16 - config - INFO - base.py:301 - register_agent() - Registered agent alias: validator
+2025-08-12 13:33:16 - config - INFO - base.py:305 - register_agent() - Registered agent: ValidatorAgent
+2025-08-12 13:33:16 - config - INFO - base.py:307 - register_agent() - Registered agent alias: validator
+2025-08-12 13:33:16 - config - INFO - config.py:226 - load_config() - Loading ScoutAgent configuration...
+2025-08-12 13:33:16 - config - INFO - config.py:260 - load_config() - Configuration loaded successfully
+2025-08-12 13:33:16 - config - INFO - smoke_agents.py:125 - main() - Default backend from config: None
+2025-08-12 13:33:17 - config - INFO - openai.py:48 - initialize() - OpenAI backend initialized with model: gpt-4
+2025-08-12 13:33:17 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: openai
+2025-08-12 13:33:17 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-12 13:33:17 - config - INFO - manager.py:377 - initialize_llm_backends() - Initialized OpenAI backend
+2025-08-12 13:33:20 - config - INFO - claude.py:48 - initialize() - Claude backend initialized with model: claude-3-5-sonnet-20241022
+2025-08-12 13:33:20 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: claude
+2025-08-12 13:33:20 - config - INFO - manager.py:393 - initialize_llm_backends() - Initialized Claude backend
+2025-08-12 13:33:22 - config - INFO - gemini.py:64 - initialize() - Gemini backend initialized with model: gemini-2.5-flash
+2025-08-12 13:33:22 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: gemini
+2025-08-12 13:33:22 - config - INFO - manager.py:409 - initialize_llm_backends() - Initialized Gemini backend
+2025-08-12 13:33:26 - config - INFO - deepseek.py:50 - initialize() - DeepSeek backend initialized with model: deepseek-chat
+2025-08-12 13:33:26 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: deepseek
+2025-08-12 13:33:26 - config - INFO - manager.py:425 - initialize_llm_backends() - Initialized DeepSeek backend
+2025-08-12 13:33:26 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: phi4-mini:latest
+2025-08-12 13:33:26 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-12 13:33:26 - config - INFO - manager.py:442 - initialize_llm_backends() - Initialized Ollama backend
+2025-08-12 13:33:26 - config - INFO - manager.py:459 - initialize_llm_backends() - LLM initialization complete. Available backends: ['openai', 'claude', 'gemini', 'deepseek', 'ollama']
+2025-08-12 13:33:26 - config - INFO - manager.py:460 - initialize_llm_backends() - Default backend: openai
+2025-08-12 13:33:26 - config - INFO - base.py:89 - __init__() - Initialized agent: screener (bcd2baf4-1706-4787-8749-9a763ee994fc)
+2025-08-12 13:33:26 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (ac243d12-494d-425f-a36f-7f4b1daa0486)
+2025-08-12 13:33:26 - config - INFO - base.py:89 - __init__() - Initialized agent: validator (0a771494-8ca2-4a54-9860-0ad318c6994b)
+2025-08-12 13:33:26 - config - INFO - base.py:89 - __init__() - Initialized agent: research (7abf1317-f516-478b-a319-04257cda6acc)
+2025-08-12 13:33:26 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (7a2f4783-42a1-4b4f-87eb-1176bbeb8e42)
+2025-08-12 13:33:26 - config - INFO - base.py:89 - __init__() - Initialized agent: research (da750899-7c96-46a8-862a-a1f8793ddd05)
+2025-08-12 13:33:26 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (cf93f09d-94bd-4558-a8c5-6114a5614112)
+2025-08-12 13:33:26 - config - INFO - base.py:89 - __init__() - Initialized agent: gap_finder (b58375d9-8dd9-4ffb-b67a-e9d9b0c1c723)
+2025-08-12 13:33:26 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (89ec904d-6705-4a53-9ce3-280d4e9d3a51)
+2025-08-12 13:33:26 - config - INFO - base.py:89 - __init__() - Initialized agent: research (59054787-30bf-46f9-930d-c825bc3813b4)
+2025-08-12 13:33:26 - config - INFO - base.py:89 - __init__() - Initialized agent: builder (3c96666d-6dde-43d9-bf1d-36783735141b)
+2025-08-12 13:33:26 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (d0471b08-d9c2-433c-96d9-be4c743f5beb)
+2025-08-12 13:33:26 - config - INFO - base.py:89 - __init__() - Initialized agent: writer (9bd1024e-07ab-44b1-9fbc-2e08a856e2dd)
+2025-08-12 13:33:26 - config - INFO - base.py:89 - __init__() - Initialized agent: analysis (2918d375-45ed-4ae9-8369-6e8e5a670bf7)
+2025-08-12 13:33:26 - config - INFO - smoke_agents.py:100 - run_agent_generate() - [GEN] Running ScreenerAgent.llm_generate() ...
+2025-08-12 13:33:26 - config - WARNING - builder.py:136 - _init_code_service() - Could not initialize code service: No instances of service 'code_execution' found
+2025-08-12 13:33:26 - config - INFO - base.py:304 - register_service() - Registered service: memory
+2025-08-12 13:33:26 - config - WARNING - writer.py:133 - _init_services() - Could not initialize services: No instances of service 'memory' found
+2025-08-12 13:33:27 - config - INFO - smoke_agents.py:109 - run_agent_stream() - [STREAM] Running ScreenerAgent.llm_stream_generate() ...
+2025-08-12 13:33:28 - config - INFO - smoke_agents.py:100 - run_agent_generate() - [GEN] Running ValidatorAgent.llm_generate() ...
+2025-08-12 13:33:31 - config - INFO - smoke_agents.py:109 - run_agent_stream() - [STREAM] Running ValidatorAgent.llm_stream_generate() ...
+2025-08-12 13:33:31 - config - INFO - smoke_agents.py:100 - run_agent_generate() - [GEN] Running ResearchAgent.llm_generate() ...
+2025-08-12 13:33:32 - config - INFO - smoke_agents.py:109 - run_agent_stream() - [STREAM] Running ResearchAgent.llm_stream_generate() ...
+2025-08-12 13:33:32 - config - INFO - smoke_agents.py:100 - run_agent_generate() - [GEN] Running AnalysisAgent.llm_generate() ...
+2025-08-12 13:33:32 - config - INFO - smoke_agents.py:109 - run_agent_stream() - [STREAM] Running AnalysisAgent.llm_stream_generate() ...
+2025-08-12 13:33:33 - config - INFO - smoke_agents.py:100 - run_agent_generate() - [GEN] Running GapFinderAgent.llm_generate() ...
+2025-08-12 13:33:35 - config - INFO - smoke_agents.py:109 - run_agent_stream() - [STREAM] Running GapFinderAgent.llm_stream_generate() ...
+2025-08-12 13:33:37 - config - INFO - smoke_agents.py:100 - run_agent_generate() - [GEN] Running BuilderAgent.llm_generate() ...
+2025-08-12 13:33:38 - config - INFO - smoke_agents.py:109 - run_agent_stream() - [STREAM] Running BuilderAgent.llm_stream_generate() ...
+2025-08-12 13:33:38 - config - INFO - smoke_agents.py:100 - run_agent_generate() - [GEN] Running WriterAgent.llm_generate() ...
+2025-08-12 13:33:38 - config - INFO - smoke_agents.py:109 - run_agent_stream() - [STREAM] Running WriterAgent.llm_stream_generate() ...
+2025-08-12 13:33:38 - config - INFO - manager.py:309 - _stop_health_monitoring() - Stopped LLM backend health monitoring

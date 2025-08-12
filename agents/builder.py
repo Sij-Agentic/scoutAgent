@@ -93,12 +93,12 @@ class BuilderAgent(BaseAgent, LLMAgentMixin):
     """
     
     def __init__(self, agent_id: str = None):
-        BaseAgent.__init__(self, agent_id)
+        BaseAgent.__init__(self, name="builder", agent_id=agent_id)
         LLMAgentMixin.__init__(self)
         self.code_service = None  # Will initialize in _initialize
         self.analysis_agent = AnalysisAgent()
         self.config = get_config()
-        self.name = "builder_agent"  # Used for prompt directory name
+        self.name = "builder"  # Used for prompt directory name
         
         # Initialize the code service asynchronously later
         asyncio.create_task(self._init_code_service())
