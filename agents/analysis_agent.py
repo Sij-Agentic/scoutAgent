@@ -14,7 +14,7 @@ from datetime import datetime
 import math
 
 import asyncio
-from agents.base import BaseAgent, AgentInput, AgentOutput
+from .base import BaseAgent, AgentInput, AgentOutput
 from config import get_config
 from llm.utils import LLMAgentMixin, load_prompt_template
 

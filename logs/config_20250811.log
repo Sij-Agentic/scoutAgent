@@ -1,0 +1,10 @@
+2025-08-11 23:18:10 - config - WARNING - config.py:211 - __init__() - python-dotenv not available, using system environment variables only
+2025-08-11 23:18:10 - config - INFO - config.py:226 - load_config() - Loading ScoutAgent configuration...
+2025-08-11 23:18:10 - config - INFO - config.py:260 - load_config() - Configuration loaded successfully
+2025-08-11 23:18:10 - config - INFO - smoke_agents.py:62 - main() - Default backend from config: None
+2025-08-11 23:18:11 - config - INFO - ollama.py:33 - initialize() - Ollama backend initialized with model: phi4-mini:latest
+2025-08-11 23:18:11 - config - INFO - manager.py:77 - register_backend() - Registered LLM backend: ollama
+2025-08-11 23:18:11 - config - INFO - manager.py:298 - _start_health_monitoring() - Started LLM backend health monitoring
+2025-08-11 23:18:11 - config - INFO - manager.py:442 - initialize_llm_backends() - Initialized Ollama backend
+2025-08-11 23:18:11 - config - INFO - manager.py:459 - initialize_llm_backends() - LLM initialization complete. Available backends: ['ollama']
+2025-08-11 23:18:11 - config - INFO - manager.py:460 - initialize_llm_backends() - Default backend: ollama

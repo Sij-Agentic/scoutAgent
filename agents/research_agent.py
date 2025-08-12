@@ -22,7 +22,7 @@ try:
 except ImportError:
     BS4_AVAILABLE = False
 
-from agents.base import BaseAgent, AgentInput, AgentOutput
+from .base import BaseAgent, AgentInput, AgentOutput
 from config import get_config
 from llm.utils import LLMAgentMixin
 

@@ -9,13 +9,13 @@ import asyncio
 import json
 from typing import Dict, List, Any, Optional
 from datetime import datetime
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 
 from .base import BaseAgent, AgentInput, AgentOutput, AgentState
 from .research_agent import ResearchAgent
 from .analysis_agent import AnalysisAgent
-from ..config import get_config
-from ..llm.utils import LLMAgentMixin, load_prompt_template
+from config import get_config
+from llm.utils import LLMAgentMixin, load_prompt_template
 
 
 @dataclass
@@ -39,7 +39,7 @@ class ValidationResult:
 @dataclass
 class ValidatorInput(AgentInput):
     """Input for ValidatorAgent."""
-    pain_points: List[Dict[str, Any]]  # From ScreenerAgent
+    pain_points: List[Dict[str, Any]] = field(default_factory=list)  # From ScreenerAgent
     validation_depth: str = "moderate"  # quick, moderate, deep
     market_context: str = ""
     include_user_interviews: bool = True
@@ -53,12 +53,12 @@ class ValidatorInput(AgentInput):
 @dataclass
 class ValidatorOutput(AgentOutput):
     """Output from ValidatorAgent."""
-    validated_pain_points: List[Dict[str, Any]]
-    invalid_pain_points: List[Dict[str, Any]]
-    validation_summary: str
-    market_insights: Dict[str, Any]
-    confidence_scores: Dict[str, float]
-    recommendations: List[str]
+    validated_pain_points: List[Dict[str, Any]] = field(default_factory=list)
+    invalid_pain_points: List[Dict[str, Any]] = field(default_factory=list)
+    validation_summary: str = ""
+    market_insights: Dict[str, Any] = field(default_factory=dict)
+    confidence_scores: Dict[str, float] = field(default_factory=dict)
+    recommendations: List[str] = field(default_factory=list)
 
 
 class ValidatorAgent(BaseAgent, LLMAgentMixin):
@@ -71,7 +71,8 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
     """
     
     def __init__(self, agent_id: str = None):
-        BaseAgent.__init__(self, agent_id)
+        # Ensure BaseAgent is initialized with proper args
+        BaseAgent.__init__(self, name="validator", agent_id=agent_id)
         LLMAgentMixin.__init__(self)
         self.research_agent = ResearchAgent()
         self.analysis_agent = AnalysisAgent()
@@ -606,4 +607,4 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
 
 # Register the agent
 from .base import register_agent
-register_agent("validator", ValidatorAgent)
+register_agent(ValidatorAgent)
