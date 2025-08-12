@@ -36,6 +36,57 @@ except Exception as e1:
         print(f"[IMPORT][validator via agents] failed: {e2}")
         ValidatorAgent = None
 
+# Additional agents
+try:
+    from scout_agent.agents.research_agent import ResearchAgent
+except Exception as e1:
+    print(f"[IMPORT][research via scout_agent.agents] failed: {e1}")
+    try:
+        from agents.research_agent import ResearchAgent
+    except Exception as e2:
+        print(f"[IMPORT][research via agents] failed: {e2}")
+        ResearchAgent = None
+
+try:
+    from scout_agent.agents.analysis_agent import AnalysisAgent
+except Exception as e1:
+    print(f"[IMPORT][analysis via scout_agent.agents] failed: {e1}")
+    try:
+        from agents.analysis_agent import AnalysisAgent
+    except Exception as e2:
+        print(f"[IMPORT][analysis via agents] failed: {e2}")
+        AnalysisAgent = None
+
+try:
+    from scout_agent.agents.gap_finder import GapFinderAgent
+except Exception as e1:
+    print(f"[IMPORT][gap_finder via scout_agent.agents] failed: {e1}")
+    try:
+        from agents.gap_finder import GapFinderAgent
+    except Exception as e2:
+        print(f"[IMPORT][gap_finder via agents] failed: {e2}")
+        GapFinderAgent = None
+
+try:
+    from scout_agent.agents.builder import BuilderAgent
+except Exception as e1:
+    print(f"[IMPORT][builder via scout_agent.agents] failed: {e1}")
+    try:
+        from agents.builder import BuilderAgent
+    except Exception as e2:
+        print(f"[IMPORT][builder via agents] failed: {e2}")
+        BuilderAgent = None
+
+try:
+    from scout_agent.agents.writer import WriterAgent
+except Exception as e1:
+    print(f"[IMPORT][writer via scout_agent.agents] failed: {e1}")
+    try:
+        from agents.writer import WriterAgent
+    except Exception as e2:
+        print(f"[IMPORT][writer via agents] failed: {e2}")
+        WriterAgent = None
+
 logger = get_logger("scripts.smoke_agents")
 
 
@@ -99,6 +150,41 @@ async def main():
         except Exception as e:
             print(f"[INIT][ValidatorAgent][ERROR] {e}")
 
+    if ResearchAgent is not None:
+        try:
+            research = ResearchAgent()
+            agents.append((research, "ResearchAgent"))
+        except Exception as e:
+            print(f"[INIT][ResearchAgent][ERROR] {e}")
+
+    if AnalysisAgent is not None:
+        try:
+            analysis = AnalysisAgent()
+            agents.append((analysis, "AnalysisAgent"))
+        except Exception as e:
+            print(f"[INIT][AnalysisAgent][ERROR] {e}")
+
+    if GapFinderAgent is not None:
+        try:
+            gapfinder = GapFinderAgent()
+            agents.append((gapfinder, "GapFinderAgent"))
+        except Exception as e:
+            print(f"[INIT][GapFinderAgent][ERROR] {e}")
+
+    if BuilderAgent is not None:
+        try:
+            builder = BuilderAgent()
+            agents.append((builder, "BuilderAgent"))
+        except Exception as e:
+            print(f"[INIT][BuilderAgent][ERROR] {e}")
+
+    if WriterAgent is not None:
+        try:
+            writer = WriterAgent()
+            agents.append((writer, "WriterAgent"))
+        except Exception as e:
+            print(f"[INIT][WriterAgent][ERROR] {e}")
+
     if not agents:
         print("No agents available to test. Ensure ScreenerAgent and ValidatorAgent exist and import paths are correct.")
         return
@@ -112,7 +198,14 @@ async def main():
         await run_agent_generate(agent, name, gen_prompt)
         await run_agent_stream(agent, name, stream_prompt)
 
-    print("Done.")
+    print("\nDone.")
+
+    # Cleanup LLM resources to avoid unclosed client session warnings
+    try:
+        mgr = get_llm_manager()
+        await mgr.cleanup()
+    except Exception as e:
+        logger.warning(f"LLM manager cleanup failed: {e}")
 
 
 if __name__ == "__main__":

@@ -83,11 +83,11 @@ class WriterAgent(BaseAgent, LLMAgentMixin):
     """
     
     def __init__(self, agent_id: str = None):
-        BaseAgent.__init__(self, agent_id)
+        BaseAgent.__init__(self, name="writer", agent_id=agent_id)
         LLMAgentMixin.__init__(self)
         self.analysis_agent = AnalysisAgent()
         self.config = get_config()
-        self.name = "writer_agent"  # Used for prompt directory name
+        self.name = "writer"  # Used for prompt directory name and routing
         self.preferred_backend = "ollama"  # Use ollama backend by default
         self.memory_service = None
         
@@ -166,11 +166,11 @@ class WriterAgent(BaseAgent, LLMAgentMixin):
         """Override llm_generate to handle potential NoneType errors"""
         try:
             # Try the standard LLM generation
-            return await super().llm_generate(prompt, task_type, **kwargs)
+            return await super().llm_generate(prompt, task_type=task_type, **kwargs)
         except Exception as e:
             self.logger.warning(f"LLM generation failed for {task_type}: {e}. Using fallback response.")
             # Return a fallback response based on task type
-            return self._fallback_responses.get(task_type, self._fallback_responses["default"])
+            return self._fallback_responses.get(task_type, self._fallback_responses["default"]) 
             
     def _safe_get(self, data_dict, key, default=None):
         """Safely get a value from a dictionary, handling None values"""

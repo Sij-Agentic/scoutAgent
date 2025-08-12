@@ -90,11 +90,11 @@ class ScreenerAgent(BaseAgent, LLMAgentMixin):
     """
     
     def __init__(self, agent_id: str = None):
-        BaseAgent.__init__(self, agent_id)
+        BaseAgent.__init__(self, name="screener", agent_id=agent_id)
         LLMAgentMixin.__init__(self)
         self.analysis_agent = AnalysisAgent()
         self.config = get_config()
-        self.name = "screener_agent"
+        self.name = "screener"
         self.start_time = time.time()
         
         # Set backend preferences for this agent

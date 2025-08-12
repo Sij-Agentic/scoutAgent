@@ -12,6 +12,7 @@ from datetime import datetime
 from dataclasses import dataclass, asdict
 
 from .base import BaseAgent, AgentInput, AgentOutput, AgentState
+from llm.utils import LLMAgentMixin
 from .analysis_agent import AnalysisAgent
 from .research_agent import ResearchAgent
 from config import get_config
@@ -78,7 +79,7 @@ class GapFinderOutput:
             self.logs = []
 
 
-class GapFinderAgent(BaseAgent):
+class GapFinderAgent(BaseAgent, LLMAgentMixin):
     """
     GapFinderAgent for analyzing market gaps and opportunities.
     
@@ -87,10 +88,12 @@ class GapFinderAgent(BaseAgent):
     """
     
     def __init__(self, agent_id: str = None):
-        super().__init__(agent_id)
+        BaseAgent.__init__(self, name="gap_finder", agent_id=agent_id)
+        LLMAgentMixin.__init__(self)
         self.analysis_agent = AnalysisAgent()
         self.research_agent = ResearchAgent()
         self.config = get_config()
+        self.name = "gap_finder"
     
     async def plan(self, input_data: GapFinderInput) -> Dict[str, Any]:
         """Plan the market gap analysis process."""

@@ -163,18 +163,25 @@ class OllamaBackend(LLMBackend):
     
     async def health_check(self) -> bool:
         """Check if Ollama is healthy and available."""
+        temp_session: Optional[aiohttp.ClientSession] = None
         try:
-            if not self._session:
-                self._session = aiohttp.ClientSession(
+            session = self._session
+            if session is None:
+                temp_session = aiohttp.ClientSession(
                     timeout=aiohttp.ClientTimeout(total=10)
                 )
-            
-            async with self._session.get(f"{self.base_url}/api/tags") as response:
+                session = temp_session
+            async with session.get(f"{self.base_url}/api/tags") as response:
                 return response.status == 200
-                
         except Exception as e:
             self.logger.debug(f"Ollama health check failed: {e}")
             return False
+        finally:
+            if temp_session is not None:
+                try:
+                    await temp_session.close()
+                except Exception:
+                    pass
     
     def get_available_models(self) -> List[str]:
         """Get list of available models from Ollama."""
