@@ -9,6 +9,7 @@ import os
 import glob
 import time
 from datetime import datetime, timedelta
+from ...sources.reddit_client import RedditClient
 
 mcp = FastMCP("reddit-api", host="127.0.0.1", port=8001)
 
@@ -184,6 +185,48 @@ async def reddit_search_and_fetch_threads(
                     break
 
         payload = {"results": results}
+    except Exception as e:
+        payload = {"error": str(e), "results": []}
+    return {"content": [TextContent(type="text", text=json.dumps(payload))]}
+
+
+@mcp.tool()
+async def reddit_api_search_and_fetch_threads(
+    keywords: List[str],
+    subreddits: List[str] = None,
+    per_query_limit: int = 20,
+    include_comments: bool = True,
+    comment_depth: int = 2,
+    comment_limit: int = 50,
+    use_cache: bool = True,
+) -> Dict[str, Any]:
+    """
+    API-backed fetch using RedditClient with on-disk cache. Mirrors scripts/fetch_reddit.py behavior.
+    """
+    try:
+        client = RedditClient()
+        results = client.fetch_conversations(
+            keywords=keywords,
+            subreddits=subreddits,
+            per_query_limit=per_query_limit,
+            include_comments=include_comments,
+            comment_depth=comment_depth,
+            comment_limit=comment_limit,
+            use_cache=use_cache,
+        )
+
+        normalized: List[Dict[str, Any]] = []
+        for r in results:
+            obj = {
+                "type": "reddit_thread" if include_comments else "reddit_post",
+                "source": r.get("post", {}).get("permalink"),
+                "post": r.get("post"),
+            }
+            if include_comments:
+                obj["comments"] = r.get("comments", [])
+            normalized.append(obj)
+
+        payload = {"results": normalized}
     except Exception as e:
         payload = {"error": str(e), "results": []}
     return {"content": [TextContent(type="text", text=json.dumps(payload))]}
