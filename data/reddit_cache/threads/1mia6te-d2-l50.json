@@ -1,0 +1,27 @@
+{
+  "post": {
+    "id": "1mia6te",
+    "subreddit": "productivity",
+    "title": "5 Simple Automation Workflows That Save 10+ Hours Per Week",
+    "author": "One-Flight-7894",
+    "created_utc": 1754402869.0,
+    "score": 0,
+    "num_comments": 1,
+    "url": "https://www.reddit.com/r/productivity/comments/1mia6te/5_simple_automation_workflows_that_save_10_hours/",
+    "permalink": "https://www.reddit.com/r/productivity/comments/1mia6te/5_simple_automation_workflows_that_save_10_hours/",
+    "selftext": "After helping dozens of small businesses streamline their operations, I've noticed the same time-wasting tasks everywhere. Here are 5 automations that consistently save the most time - no coding required.\n\n## 1. **Auto-Sort Incoming Emails (Saves ~3 hours/week)**\n\n**The Problem:** Spending 20-30 minutes daily organizing emails, missing important messages in the chaos.\n\n**Simple Solution:** Use Gmail filters or Outlook rules to automatically:\n- Send invoices to a \"Billing\" folder\n- Route support emails to a \"Customer Support\" label  \n- Flag emails from VIP clients\n- Auto-forward certain types to team members\n\n**Setup time:** 15 minutes **Weekly savings:** 3+ hours\n\n## 2. **Customer Inquiry Auto-Response System (Saves ~4 hours/week)**\n\n**The Problem:** Answering the same questions repeatedly, delayed response times hurting customer satisfaction.\n\n**Simple Solution:** Set up canned responses that:\n- Acknowledge receipt instantly\n- Answer common FAQs automatically\n- Route complex queries to the right person\n- Include relevant links/resources\n\n**Tools:** Gmail templates, Outlook Quick Parts, or any CRM with auto-responders\n**Setup time:** 30 minutes **Weekly savings:** 4+ hours\n\n## 3. **Automated Invoice Follow-ups (Saves ~2 hours/week)**\n\n**The Problem:** Manually tracking unpaid invoices, awkward follow-up conversations.\n\n**Simple Solution:** Automated email sequences that:\n- Send friendly reminders 3 days before due date\n- Follow up 7 days after due date\n- Escalate to a stronger tone after 14 days\n- CC your accounting team when needed\n\n**Setup time:** 45 minutes **Weekly savings:** 2+ hours\n\n## 4. **Social Media Cross-Posting (Saves ~2 hours/week)**\n\n**The Problem:** Manually posting the same content across multiple platforms.\n\n**Simple Solution:** Use tools like Buffer, Hootsuite, or Zapier to:\n- Post to all platforms simultaneously\n- Customize content for each platform automatically\n- Schedule posts in batches\n- Auto-share blog posts when published\n\n**Setup time:** 20 minutes **Weekly savings:** 2+ hours\n\n## 5. **Lead Data Auto-Collection (Saves ~3 hours/week)**\n\n**The Problem:** Manually entering contact form submissions into spreadsheets or CRMs.\n\n**Simple Solution:** Connect your forms directly to your database:\n- Contact forms → Google Sheets/CRM\n- Meeting bookings → Calendar + CRM\n- Newsletter signups → Email platform + CRM\n- Include automatic lead scoring\n\n**Setup time:** 30 minutes **Weekly savings:** 3+ hours\n\n---\n\n## **Getting Started:**\n\n**Week 1:** Pick ONE automation that addresses your biggest pain point\n**Week 2:** Test and refine it\n**Week 3:** Add the second automation\n**Week 4:** Continue building your stack\n\nThe key is starting small. Don't try to automate everything at once - focus on the tasks that genuinely waste your time daily.\n\n## **Tools I Recommend:**\n- **Free:** Gmail filters, Outlook rules, IFTTT\n- **Budget-friendly:** Zapier starter plan, Buffer free tier\n- **Growing business:** Monday.com, HubSpot, ActiveCampaign\n\n**What's your biggest time-waster that you think could be automated?** Drop it in the comments and I'll suggest a simple solution.\n\n---\n\n*I've been helping small businesses implement these types of automations for 3+ years. Happy to answer any specific questions about setup or troubleshooting.*"
+  },
+  "comments": [
+    {
+      "id": "n75dpq6",
+      "author": "Reuters-no-bias-lol",
+      "body": "After helping dozens of small businesses and then proceeds to write LLM slop. ",
+      "created_utc": 1754441618.0,
+      "score": 3,
+      "parent_id": "t3_1mia6te",
+      "depth": 0
+    }
+  ],
+  "fetched_at": 1755100807,
+  "schema": "v1"
+}

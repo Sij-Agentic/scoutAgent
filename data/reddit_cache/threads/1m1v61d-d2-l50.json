@@ -1,0 +1,225 @@
+{
+  "post": {
+    "id": "1m1v61d",
+    "subreddit": "SaaS",
+    "title": "Is Cold Emailing Dead? I started over with 27,000 emails in a month to figure it out.",
+    "author": "Far-Criticism-3181",
+    "created_utc": 1752717324.0,
+    "score": 4,
+    "num_comments": 28,
+    "url": "https://www.reddit.com/r/SaaS/comments/1m1v61d/is_cold_emailing_dead_i_started_over_with_27000/",
+    "permalink": "https://www.reddit.com/r/SaaS/comments/1m1v61d/is_cold_emailing_dead_i_started_over_with_27000/",
+    "selftext": "A few people have reached out to me over the past few months about how they are confused if they should start setting up an elaborate infrastructure for cold emailing especially when people are really tired of AI generated nonsense or even general cold emails. \n\nThe short answer is YES! Cold emailing is worth every penny if you know how to set it up and run it without running your cold emailing campaigns into spam oblivion. \n\n***Here are a few things to look out for when you set up your cold email infrastructure:***\n\n1. Email Deliverability Challenges\n\nSpam filters &amp; IP/domain reputation is no joke and ISPs increasingly enforce strict filtering based on IP\nhistory and domain authentication failures, so if you end up avoiding this it can lead to inbox blockages or promotion tab delivery.\n\n\n2. Crappy technical setup (SPF, DKIM, DMARC)\n\nMisconfigured authentication is a pretty common root cause for automatic rejections or spam classification. Most people don’t realise this until its too late. \n\n\n3. Shared IP blacklisting\n\nThe biggest mistake i’ve seen startups (even enterprises) make is sending a boat load of cold emails from shared IP pools without warm-up or reputation management and that reserves them a premium seat on blocklists. \n\n\n4. Low Open Rates\n\nYes, if your open rates are lower than usual (typically 25%) then weak or generic subject lines from overused templates are failing hard to pull your campaign together. \n\n\n5. Insufficient account/domain warm-up\n\nThis is the worst one of all, I see startups send a hundred emails feom one email ID in just a few hours of creating it, imagine what they’d do in a month! Fresh domains without progressive sending ramp-up\nWILL BE FLAGGED as suspicious and once they do your campaign goes belly up! \n\n\n6. Poor list hygiene &amp; outdated contact info\n\nUnverified or stale addresses lead to bounces\nthat damage sender reputation, pretty basic right but people just love to save money on free email and phone number tools that are unreliable and frankly outright disgusting. There is no real-time verification which makes it hard to run a campaign that actually reaches people. \n\n\n7. Personalisation Fatigue &amp; Robotic Tone\n\nWhen I say cold email majority of people immediately think “Spray and pray” templates without dynamic tokens or AI-driven variations that read as impersonal, believe me you wont get a single person out of it.\n\n\n8. Over-automation\n\nYes we have AI, N8N, Make, Zapier and every possible shit imaginable to human kind but that does not in any way mean you spam AI-generated copies without human oversight it honestly triggers prospects “robo-email” alarm. \n\n\n9. Spam Trigger Words &amp; Bad Structure\n\nCommon spam keywords (e.g., “free,” “guarantee,” “risk-free”) and poor HTML/text balance\ntrip filters. (60% text is ideal). Overuse of images/links increases spam score in most ESP’s. \n\n\n10. Ghosting After Initial Reply\n\nPeople who execute the above 9 steps properly somehow manage to mess up the nurture sequences because they have no idea about intent scoring or behavior-based triggers (look these up). \n\n\n11. Unverified Lead Data\n\nDo not rely on static databases (e.g., outdated LinkedIn exports) it tremendously reduces accuracy. And even with up to date databases make sure you have an enrichment pipeline. \n\n\n12. Mailbox Rotation &amp; Throttling Issues\n\nI covered this briefly above but I will reiterate it again single-mailbox overload is BAD. STOP sending high volumes from one inbox it triggers ISP rate limits.\n\n\n13. No domain management\n\nInability to distribute sending across warmed-up subdomains increases spam risk. Want to avoid this? Use at least 20-30 burner domains. \n\n\n14. Legal &amp; Compliance Risks\n\nGDPR and CAN-SPAM violations that rack up because startups and companies have virtually non-existent permission tracking, improper opt-out links, or missing sender identification. \n\n15. Poor Analytics &amp; No A/B Testing\n\nLimited real-time dashboards obscure performance trends and it’s not some secret that’s been guarded by the illuminati. No systematic experiment framework means you wont be continuously optimising your flows and that means low open rates. \n\nIf you need me to do a part 2 on what tools to use and how you can setup the perfect workflow in under $170 (I don’t charge this its just the general cost of the tools you would need) drop a comment down! \n\nCheers 🥂 "
+  },
+  "comments": [
+    {
+      "id": "n3kq4nv",
+      "author": "stopbsingman",
+      "body": "Appreciate the time you took to type this out. Very helpful info.\n\nFor those asking for more details or explanations. Here’s a tip: copy/paste the whole post into ChatGPT and ask it to explain each point further and provide examples. Not that hard to figure out if you’re interested in building a SaaS.",
+      "created_utc": 1752727087.0,
+      "score": 3,
+      "parent_id": "t3_1m1v61d",
+      "depth": 0
+    },
+    {
+      "id": "n3k8sok",
+      "author": "No_Molasses_1518",
+      "body": "More detail?",
+      "created_utc": 1752719856.0,
+      "score": 2,
+      "parent_id": "t3_1m1v61d",
+      "depth": 0
+    },
+    {
+      "id": "n3ksky6",
+      "author": "Street_Ad5729",
+      "body": "This is a super comprehensive breakdown of cold emailing pitfalls!\n\nI especially relate to point 7, \"Personalisation Fatigue &amp; Robotic Tone.\" It's so easy for AI-generated copies to sound impersonal and trigger that \"robo-email\" alarm, as you put it.\n\nI recently started working on a tool related to this, ColdCopy, which helps generate personalized, professional cold outreach messages to avoid sounding robotic. Great insights here, thanks for sharing!",
+      "created_utc": 1752728213.0,
+      "score": 2,
+      "parent_id": "t3_1m1v61d",
+      "depth": 0
+    },
+    {
+      "id": "n3k2yto",
+      "author": "hishammir",
+      "body": "Yes please",
+      "created_utc": 1752717689.0,
+      "score": 1,
+      "parent_id": "t3_1m1v61d",
+      "depth": 0
+    },
+    {
+      "id": "n3k5abp",
+      "author": "[deleted]",
+      "body": "This is an incredibly helpful guide, thank you for sharing your experience.\nI'm setting up my own system and would be glad to compare notes sometime.",
+      "created_utc": 1752718541.0,
+      "score": 1,
+      "parent_id": "t3_1m1v61d",
+      "depth": 0
+    },
+    {
+      "id": "n3ka2qy",
+      "author": "ComprehensiveChapter",
+      "body": "How do you check html to text ratio?",
+      "created_utc": 1752720341.0,
+      "score": 1,
+      "parent_id": "t3_1m1v61d",
+      "depth": 0
+    },
+    {
+      "id": "n3kqul8",
+      "author": "disorderunleashed",
+      "body": "Yes please",
+      "created_utc": 1752727418.0,
+      "score": 1,
+      "parent_id": "t3_1m1v61d",
+      "depth": 0
+    },
+    {
+      "id": "n3l0efb",
+      "author": "letthisonestick",
+      "body": "Yes please to part 2.",
+      "created_utc": 1752732050.0,
+      "score": 1,
+      "parent_id": "t3_1m1v61d",
+      "depth": 0
+    },
+    {
+      "id": "n3l3wa9",
+      "author": "Koyaanisquatsi_",
+      "body": "regarding Throttling Issues per mailbox, what would you think high volume is?",
+      "created_utc": 1752733828.0,
+      "score": 1,
+      "parent_id": "t3_1m1v61d",
+      "depth": 0
+    },
+    {
+      "id": "n3pgew2",
+      "author": "Aggravating-Koala315",
+      "body": "People underestimate how fast personalization tools like instantly can be. I’m sending out 100+ emails a day and still making each one feel custom.",
+      "created_utc": 1752787901.0,
+      "score": 1,
+      "parent_id": "t3_1m1v61d",
+      "depth": 0
+    },
+    {
+      "id": "n6qdnx0",
+      "author": "PRATEEK-ROCK93",
+      "body": "I have created an pc application to send 500+ mails per day without any spam issue all mails are going to inbox but it only works for Gmail.",
+      "created_utc": 1754244145.0,
+      "score": 1,
+      "parent_id": "t3_1m1v61d",
+      "depth": 0
+    },
+    {
+      "id": "n3k42py",
+      "author": "baudien321",
+      "body": "So how to succeed in cold email ?",
+      "created_utc": 1752718095.0,
+      "score": 0,
+      "parent_id": "t3_1m1v61d",
+      "depth": 0
+    },
+    {
+      "id": "n3lej07",
+      "author": "Far-Criticism-3181",
+      "body": "Will make an easy version on the steps above for everyone in the coming days for all you guys to use! Thanks for the positive feedback really appreciate it! 😊",
+      "created_utc": 1752739611.0,
+      "score": 2,
+      "parent_id": "t1_n3kq4nv",
+      "depth": 1
+    },
+    {
+      "id": "n3le6zq",
+      "author": "Far-Criticism-3181",
+      "body": "Will dive in depth on all these in part 2!",
+      "created_utc": 1752739421.0,
+      "score": 1,
+      "parent_id": "t1_n3k8sok",
+      "depth": 1
+    },
+    {
+      "id": "n3lephw",
+      "author": "Far-Criticism-3181",
+      "body": "Point 7 is especially relevant in todays time because there seems to be a lot of negative feedback to AI generated content and it makes sense if you can’t write a personal message to a client how can they expect you to be hands on with their projects!",
+      "created_utc": 1752739712.0,
+      "score": 1,
+      "parent_id": "t1_n3ksky6",
+      "depth": 1
+    },
+    {
+      "id": "n3le827",
+      "author": "Far-Criticism-3181",
+      "body": "Soon! 👍🏼",
+      "created_utc": 1752739438.0,
+      "score": 1,
+      "parent_id": "t1_n3k2yto",
+      "depth": 1
+    },
+    {
+      "id": "n3lelam",
+      "author": "Far-Criticism-3181",
+      "body": "Sure, dm me whenever you need help will be glad to!",
+      "created_utc": 1752739646.0,
+      "score": 1,
+      "parent_id": "t1_n3k5abp",
+      "depth": 1
+    },
+    {
+      "id": "n3lkz1z",
+      "author": "Far-Criticism-3181",
+      "body": "There are a lot of free tools to check that online. You can also make it a general rule not to oversaturate your emails with too many images and maintain healthy ratios.",
+      "created_utc": 1752743328.0,
+      "score": 1,
+      "parent_id": "t1_n3ka2qy",
+      "depth": 1
+    },
+    {
+      "id": "n3leclu",
+      "author": "Far-Criticism-3181",
+      "body": "Soon! 👍🏼",
+      "created_utc": 1752739510.0,
+      "score": 1,
+      "parent_id": "t1_n3kqul8",
+      "depth": 1
+    },
+    {
+      "id": "n3led1t",
+      "author": "Far-Criticism-3181",
+      "body": "Soon! 👍🏼",
+      "created_utc": 1752739516.0,
+      "score": 1,
+      "parent_id": "t1_n3l0efb",
+      "depth": 1
+    },
+    {
+      "id": "n3le4oa",
+      "author": "Far-Criticism-3181",
+      "body": "Ideally you should not create 3 email ID’s per domain and send 12-15 emails per email ID a day initially and you can progressively ramp-up to 90 emails a day, no more than that (always keep the max less than 100 so 90 is a sweet spot for me). This actually reduces you spam categorisation by a lot and boosts deliverability to maximum. Hope this helps :)",
+      "created_utc": 1752739385.0,
+      "score": 2,
+      "parent_id": "t1_n3l3wa9",
+      "depth": 1
+    },
+    {
+      "id": "n3lwuxc",
+      "author": "FOUNDER_",
+      "body": "For your question, I have built this \"**Modern outbound email playbook**\" check our here - [https://docs.google.com/document/d/1IE1Na\\_N1yzv4JMliCV-Xj3JM-ZVn-bQTCsEd5OQwLw8/edit?tab=t.0#heading=h.vsbspuitvtsh](https://docs.google.com/document/d/1IE1Na_N1yzv4JMliCV-Xj3JM-ZVn-bQTCsEd5OQwLw8/edit?tab=t.0#heading=h.vsbspuitvtsh)\n\nWe can connect on the same if you want any help!",
+      "created_utc": 1752749555.0,
+      "score": 2,
+      "parent_id": "t1_n3k42py",
+      "depth": 1
+    },
+    {
+      "id": "n3lebb9",
+      "author": "Far-Criticism-3181",
+      "body": "Its all written in the post, I will still explain each step in further posts so you can get an in depth insight!",
+      "created_utc": 1752739489.0,
+      "score": 1,
+      "parent_id": "t1_n3k42py",
+      "depth": 1
+    }
+  ],
+  "fetched_at": 1755100814,
+  "schema": "v1"
+}

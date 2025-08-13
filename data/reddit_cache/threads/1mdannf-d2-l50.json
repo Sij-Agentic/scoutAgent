@@ -1,0 +1,45 @@
+{
+  "post": {
+    "id": "1mdannf",
+    "subreddit": "growmybusiness",
+    "title": "After working on agency for over a year, I built a conversion rate auditor, looking for feedback",
+    "author": "adishkattel",
+    "created_utc": 1753891676.0,
+    "score": 3,
+    "num_comments": 3,
+    "url": "https://www.reddit.com/r/growmybusiness/comments/1mdannf/after_working_on_agency_for_over_a_year_i_built_a/",
+    "permalink": "https://www.reddit.com/r/growmybusiness/comments/1mdannf/after_working_on_agency_for_over_a_year_i_built_a/",
+    "selftext": "Hello Reddit,\n\nFor over a year I’ve performed dozens of manual Conversion Rate Optimization audits for B2B SaaS and e‑commerce businesses working on ads agency and during that time I noticed the some simple roadblocks recurring on most website:\n\n* **Trust gaps:** inconsistent social proof or missing badges\n* **UX friction:** confusing form flows that cost leads\n* **Messaging haze:** unclear value propositions leaving users unsure\n* **Performance drag:** slow page loads harming first impressions\n\nTo accelerate these insights, I developed **cro‑scan.com**: a lightweight platform that scans any landing page or homepage in minutes and delivers:\n\n1. **A CRO health score** benchmarking against best‑practice sites\n2. **Targeted insights** on trust signals, UX pinch‑points, messaging clarity, and load speed\n3. **Actionable recommendations** you can implement right away\n\nWe’re continuously refining industry‑specific tuning and I’d love to hear from the community:\n\n* Are the automated insights hitting the right pain‑points, or do they feel too generic?\n* How could we improve the application or what feature you think is missing??\n\nIf you’re up for it, test the software yourself at cro‑scan.com enter your URL for and scan and see whether the recommendations resonate. I’m grateful for any thoughts or critiques you can share?"
+  },
+  "comments": [
+    {
+      "id": "n60879v",
+      "author": "Thin_Rip8995",
+      "body": "this hits a real pain  \nmost sites die from death-by-friction and unclear messaging—not lack of traffic\n\nyour tool's value is in *speed + clarity*  \nCRO advice usually comes buried in jargon or behind paywalls  \nif you can keep it human and punchy, you win\n\nsuggestions:\n\n* add a “dumb it down” toggle—some users don’t speak UX\n* show examples of *what good looks like* per section\n* let users save scans + track fixes over time that turns a one-off audit into an optimization loop",
+      "created_utc": 1753893636.0,
+      "score": 2,
+      "parent_id": "t3_1mdannf",
+      "depth": 0
+    },
+    {
+      "id": "n60yhzm",
+      "author": "itsgediminas",
+      "body": "Cool project! While you're optimizing conversions, another big growth lever we've used is turning happy customers into promoters. There's a platform that handles all the referral tracking and payouts automatically, which is a game-changer for organic growth.",
+      "created_utc": 1753900790.0,
+      "score": 2,
+      "parent_id": "t3_1mdannf",
+      "depth": 0
+    },
+    {
+      "id": "n6078n2",
+      "author": "adishkattel",
+      "body": "Please test through [https://cro-scan.com/en](https://cro-scan.com/en) looking forward for your reedback :)",
+      "created_utc": 1753893365.0,
+      "score": 1,
+      "parent_id": "t3_1mdannf",
+      "depth": 0
+    }
+  ],
+  "fetched_at": 1755100829,
+  "schema": "v1"
+}

@@ -1,0 +1,36 @@
+{
+  "post": {
+    "id": "1iwbbmm",
+    "subreddit": "SideProject",
+    "title": "Built Automations for Lead Generation, Lead Scoring &amp; Appointment Booking.",
+    "author": "Celera-Tech",
+    "created_utc": 1740320910.0,
+    "score": 1,
+    "num_comments": 2,
+    "url": "https://www.reddit.com/r/SideProject/comments/1iwbbmm/built_automations_for_lead_generation_lead/",
+    "permalink": "https://www.reddit.com/r/SideProject/comments/1iwbbmm/built_automations_for_lead_generation_lead/",
+    "selftext": "Hey guys,  \n  \nJust sharing few automations. I built 2 separate automations for lead generation. One is for capturing incoming leads and the other is outbound by sending personalized cold emails to target audience at scale without using any outdated database like Apollo.  \n  \nThe first automation captures leads from website, social media, forms, landing pages etc. adds to a CRM, researches the company/person, gives a score based on the criteria set and information given by the lead.  \n  \nIt can also book appointments on the spot with reminders to reduce no shows and handle inquiries 24/7.  \n  \nWould love to hear your thoughts if business owners find automations like this useful."
+  },
+  "comments": [
+    {
+      "id": "mecj829",
+      "author": "Scoutreach",
+      "body": "Automations sound slick, but do they actually convert leads or just add more steps to the funnel?",
+      "created_utc": 1740322232.0,
+      "score": 1,
+      "parent_id": "t3_1iwbbmm",
+      "depth": 0
+    },
+    {
+      "id": "mecm5sm",
+      "author": "Celera-Tech",
+      "body": "Yes! The outreach system is crazy! Ofc at the end of day, it'll depend on your offer and sales skills but it can take you from zero leads to booked meetings.\n\nFor the other automation that capture leads, it all depends on the incoming traffic. A website that gets 50k visitors/month will see more results as compared to the one with 5k visitors/month for obvious reasons.\n\nThey do not add more steps but bring in more leads on autopilot.",
+      "created_utc": 1740323199.0,
+      "score": 1,
+      "parent_id": "t1_mecj829",
+      "depth": 1
+    }
+  ],
+  "fetched_at": 1755100812,
+  "schema": "v1"
+}

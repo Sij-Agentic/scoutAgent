@@ -1,0 +1,270 @@
+{
+  "post": {
+    "id": "1loxxfn",
+    "subreddit": "SideProject",
+    "title": "15 AI startup mistakes I did with my first product, Aiter.io (and how you can avoid them)",
+    "author": "MonkDi",
+    "created_utc": 1751364865.0,
+    "score": 371,
+    "num_comments": 50,
+    "url": "https://www.reddit.com/gallery/1loxxfn",
+    "permalink": "https://www.reddit.com/r/SideProject/comments/1loxxfn/15_ai_startup_mistakes_i_did_with_my_first/",
+    "selftext": "Hey, dear fellow side project hustlers! This is gonna be quite a long post (previous ones were shorter) because I will be sharing my experience from mistakes with my first side project and I made them a lot! 😁 \n\n**My first startup gave me grey hairs at 31**, yet I don’t regret a thing. I just wish someone had told me the things I’m about to share right at the beginning of my founder journey – maybe I could have avoided some of these costly startup mistakes. But hey, perhaps my story can save some time and stress for other entrepreneurs treading the same path? That's why I'm sharing it here\n\nA year and a half ago, my friend Val and I launched [Aiter.io](https://aiter.io/) – an AI MarTech startup designed to generate ads, social media content, and marketing strategy with a single click. We followed the classic MVP (Minimum Viable Product) playbook, building and launching it in just two weeks. It looked ugly as f\\*\\*k and was essentially just a one-click AI ad generator (screenshot 2 in the gallery).\n\nBut we got our first positive user feedback and early traction, so we decided to push forward. And that’s where my long journey of pain, joy, and crucial lessons began.\n\n# Mistake #1: We didn't implement signup and payments from Day 0 and lost out on 50,000 potential users\n\nAdding a simple email signup and basic Stripe integration is only 2-3 days of development work. Yet we didn't do it, deciding to go \"lean\" to test our core hypothesis. As we discovered, this was *too* lean.\n\nA French TikToker found our product and [posted a review](https://vm.tiktok.com/ZMSQywgum) (without us even knowing). It got 700k views overnight, driving 50,000 people to our website who wanted to try our AI tool. Because our product was free and didn't require a signup, we lost the massive opportunity to even collect their email addresses, not to mention any potential for monetisation. Of course, we added signups and Stripe later, but we've never had a viral traffic spike like that since.\n\n&gt;**Conclusion #1:** Don't be *too* lean. Always integrate basic user registration and a monetisation option (like Stripe) into your MVP from day one. This doesn't just prepare you for surprise traffic; it gives you much clearer data on whether users find your product valuable enough to pay for it.\n\n# Mistake #2: I resigned from my full-time job too early. It’s better to keep your side project a side one until you hit at least ~$5,000 in MRR\n\nAfter securing our first stable revenue (around $300-$500 a month 😁), I was convinced that scaling the business would be easy. I thought I just needed to invest X to get Y. After all, I’d spent 10 years in marketing! So, I switched to the full startup mode.\n\nGosh, that was a huge mistake. Because I only had savings for three months, growing a SaaS startup wasn’t as straightforward as I’d imagined. When my savings ran out, I had to start juggling multiple freelance jobs to pay the bills, which ended up taking even more time than my full-time role.\n\n&gt;**Conclusion #2:** If your main income is from a full-time job, don't quit to go all-in on your startup until its MRR is stable and can comfortably cover the salaries of all full-time founders/employees. Living in London, that benchmark for me would be at least $5,000 MRR (which we haven’t achieved yet 😁).\n\n# Mistake #3: I only had three months' worth of savings. It's better to have six, but the safest option is twelve. This is your startup runway\n\nWhen I ran out of savings, I fell into a vicious cycle: freelancing for my bread and butter, and only working on the startup with what little time was left. As a result, its MRR grew very slowly (we're currently at \\~$1,000-1,500), and we had no funds to reinvest in growth or marketing.\n\nThis meant we moved slower than the market and began to lose our competitive advantage. We’ve since course-corrected by bringing on an awesome new team member (more on that later), but if I’d had a longer financial runway, we could have scaled much faster.\n\n&gt;**Conclusion #3:** Before you go \"full-time founder\", make sure you have a financial safety net. Aim for at least six months of living expenses in savings. A year's worth is even better.\n\n# Mistake #4: We didn't set up product analytics (like Amplitude, GA4, and Clarity) from Day 0\n\nAnother of our \"too lean\" mistakes was neglecting to implement product analytics from launch. Because of this, we had no clear data on which features our users loved the most, which directly led to Mistake #5.\n\n&gt;**Conclusion #4:** Set up your product analytics *before* you launch. It might take a day, but it will give you invaluable insights into user behaviour and help you find product-market fit. I'm a fan of Amplitude for its flexibility. However, you could also try Mixpanel, or if these tools are too complex for your team, start with a basic event tracking setup in Google Analytics 4. Microsoft Clarity is a must-have – it’s free and shows you session recordings of your users, which will help you improve your UX and product.\n\n# Mistake #5: We went too broad with features instead of focusing on one core area and making it awesome\n\nInitially, Aiter only generated ad copy for Google, Facebook, and Instagram. I wish we’d stuck to that, focused on improving our product solely for the PPC market, and served that one niche audience.\n\nInstead, I fell into the classic trap of building a product \"for myself.\" As a full-stack marketer, over time, we added features for SMM, AI blog writing, email generation, and marketing strategy creation. As a result, our tool looks like this now (screenshot 3 in the gallery).\n\nSome might say it's cool that we have so many features. But this \"feature creep\" brings a whole bunch of problems:\n\n* The user onboarding process is more complex, which increases the learning curve and scares some potential customers away.\n* We now compete with much bigger, more established players than we should.\n* Managing and maintaining all these features is quite tiresome.\n* It's better to have one killer feature that stands out in the market than ten \"meh\" ones.\n* Marketing a broad, multi-feature tool is much harder than marketing a specialised solution.\n\nWe are now making changes to merge some features and make Aiter both more compact and useful. We are also considering launching a side project from our side project, just to test the hypothesis of how a more focused product might perform.\n\n&gt;**Conclusion #5:** Focus on a niche market segment and the core features that serve it. It is far better to be the best solution for a small group than an average one for a broad audience. This is the path to achieving true product-market fit.\n\n# Mistake #6: We went too broad with our marketing, too. It would have been better to focus on mastering just 1-2 channels\n\nWe wanted to discover what worked best for us, so we tried everything:\n\n* Startup and AI Directories\n* Google Ads\n* Meta Ads\n* Reddit Ads and organic posts\n* YouTube content marketing\n* Social Media Marketing (SMM) on LinkedIn\n* AI blogging for SEO\n* Email marketing\n\nAs a result, we achieved a little bit here and a little bit there – but mastered nothing. In hindsight, it would have been much better to stick to 1-2 primary acquisition channels and 1-2 supporting ones, and no more.\n\n**What worked well for our AI startup:**\n\n* **Startup and AI Directories.** We became the [\\#1 content generation tool on TAAFT](https://theresanaiforthat.com/s/aiter/), which consistently brings us high-quality leads and paying customers. Other directories also scraped our profile and listed us for free, which drove some good traffic.\n* **Organic Influencer Marketing.** A few influencers found our tool and reviewed it, which brought some good traffic spikes. However, proactively finding the right influencers proved to be a problem, as the outreach process is tiresome, complex, and can be expensive. (We are currently considering working with influencer marketing platforms – if you can recommend any, let me know!).\n* **YouTube Content Marketing** **(The Slow Burn).** We created [eight educational videos](https://www.youtube.com/@aiter_io) about Aiter and digital marketing and saw a small spike in sales. However, to get substantial results from a YouTube marketing strategy, you need to be very systematic. We are considering investing more time here.\n* **Google Ads Retargeting.** Showing ads to people who had already visited our website helped increase conversions. It was satisfying to use our own product to create ads that targeted different customer needs and objections.\n* **Email Marketing Workflows.** This works well for us in terms of converting users who signed up for our free version into paying customers.\n\n**What didn’t work for us:**\n\n* **Paid Ads (Meta, Google &amp; Reddit).** This doesn’t mean the channels are ineffective; it just means you need a much larger advertising budget and a highly optimised landing page than we had. Our $500/month budget wasn't sufficient to get anywhere near a positive ROI.\n* **Product Hunt.** More on this in Mistake #7.\n* **AI Blogging for SEO.** We found that purely AI-generated articles don't rank well. Writing and promoting genuine, high-quality articles takes a lot of time and is a mid- to long-term content strategy.\n* **SMM.** I can’t say it doesn’t work, but to get real results, it requires your full-time attention, which we couldn't afford. We are considering focusing more on LinkedIn or X (formerly Twitter), but I am more inclined to lean on YouTube.\n* **Conversion Rate Optimisation (CRO).** Our landing page isn’t bad, but it could be much better. Because we were spread too thin across so many marketing activities, we dedicated too little time to landing page optimisation. This is a critical oversight that takes time to fix.\n\n&gt;**Conclusion #6:** Identify the 1-2 marketing channels that bring you the best results and focus all your energy there. Ditch the rest. Support these primary channels with **e**mail automation workflows and retargeting ads to convert leads. And once you have a glimmer of product-market fit, make landing page optimisation your top priority.\n\n# Mistake #7: We dedicated a whole MONTH to our Product Hunt launch. It should have taken two days\n\nProduct Hunt used to be a cool place to launch a product, get your first clients, attract media attention, and maybe even find an investor. Now, many founders feel it’s full of bots, you can't guarantee you'll be featured on the main page, and the results in terms of actual sales or user acquisition are often minuscule.\n\nWe didn't know this when we decided to launch, so we spent a month preparing the campaign and building a network of contacts to support it. In the end, our tool wasn't even featured on the main page due to a bug that the Product Hunt team acknowledged later. [We got the most upvotes on the day](https://www.producthunt.com/products/aiter-io), but because we weren’t featured, it meant nothing.\n\nLater, talking to fellow founders in startup communities, I found out that this is a common story. Even becoming \"Product of the Day\" often gives you very little in terms of tangible results because, for many, the Product Hunt launch process has become a cargo cult.\n\n&gt;**Conclusion #7:** Don't get caught up in the hype of a Product Hunt launch. Create your launch page, ask your existing users and friends to subscribe to be notified, and if you get featured, post about it on your social channels. That’s it. Treat it as a good backlink for SEO and a small community announcement, nothing more.\n\n# Mistake #8: We wrote too many emails for our automation workflow (25 of them!)\n\nOur email onboarding sequence has over 25 emails. At least half of them were AI-generated. Surprisingly, they work and they do convert users. But having so many emails in the sequence makes it incredibly challenging and time-consuming to analyse and optimise them effectively.\n\n&gt;**Conclusion #8:** A well-designed and thoughtful email automation workflow with 7-10 high-quality emails is far better than a sequence of 25 average ones. It's easier to manage, test, and improve. And make no mistake: email marketing is still a fantastic channel for SaaS user conversion.\n\n# Mistake #9: We relied on the 'Lean Startup' principle too much. Instead, you should focus on quality right after validating demand\n\nI love the Lean Startup methodology – the cycle of creating an MVP, checking for traction, and then improving iteratively. I use it in both product development and marketing. But I used it *too much*.\n\nInstead of perfecting a feature or a marketing channel that was already working, I had a habit of saying, \"we'll improve this later\" while I chased other hypotheses. However, this creates significant technical debt and marketing debt. At some point, I realised I had to \"come back and improve\" far too many things, which was overwhelming.\n\nSo now, I'm a much bigger fan of the MLP (Minimum Lovable Product) principle. This means building a minimal product that is not just *viable*, but *lovable*. It means dedicating more time and care to whatever you do, whether it's building a new feature, recording a YouTube video, or writing a blog post.\n\n&gt;**Conclusion #9:** After you prove your key product hypothesis (i.e., you've got your first paying customers), switch from the pure \"lean\" mode to a more polished approach. One great, well-built feature works better than ten average ones. The same principle applies to your marketing content—quality always trumps quantity.\n\n# Mistake #10: Our landing page was part of the web app, which is terrible for SEO. Use Webflow or a similar platform for your static pages\n\nWe launched Aiter using a monolithic architecture, combining our public-facing landing page and the app itself. While this is fast for initial development, it hurts your technical SEO, and launching a blog becomes a complete pain in the arse.\n\nLater, we migrated our marketing site and blog to Webflow, which is a far more flexible and SEO-friendly option. I wish we had done so from the start – it would have saved us a lot of time.\n\n&gt;**Conclusion #10:** Your landing pages and blog should be static pages, separate from your app's code. The best way to do this is with a platform like Webflow or WordPress. Crucially, make sure both the app and the marketing site are on the same root domain (using subfolders like example.com/blog instead of subdomains like blog.example.com). It's a bit trickier to set up, but it's much better for SEO performance, as Google consolidates all ranking signals to one domain.\n\n# Mistake #11: Not having enough developers on your founding team\n\nAt the start, there were only two of us. My partner, Val, is a brilliant CTO, but he is also a full-time co-founder at another startup, so his involvement with Aiter is part-time. This was fine initially, but over time, we noticed that our limited development bandwidth, combined with the other strategic mistakes listed here, meant we couldn't always keep pace with the market.\n\nWe’ve since fixed this by bringing on another great developer and UX designer, Oleg, and we are also considering onboarding more developers. However, it's much better to have enough engineering firepower from day one.\n\n&gt;**Conclusion #11:** Your startup team should have at least one full-time developer completely dedicated to the product. Without it, your speed of iteration will suffer.\n\n# Mistake #12: Don't pitch for funding until you hit at least $3,000 MRR (unless your product is research-heavy or you're Sam Altman)\n\nI looked at the whole startup-investor world through rose-coloured glasses. I thought that because we were in a promising industry and had some early traction, securing a pre-seed funding round would be easy.\n\nWe had around twenty pitches, which was good practice. However, we quickly came to the conclusion (later verified by other founders I know) that until your product has at least $3,000 in Monthly Recurring Revenue, there is little point in pitching to most investors. We did find one interested party, but the term sheet they offered was not too good. We also applied for some startup grants, and while we've had some progress there, the process is incredibly tedious and long. It's an \"apply and forget\" kind of thing.\n\n&gt;**Conclusion #12:** Don't waste your time chasing investors until your product is generating at least $3,000 MRR. Hitting $5,000 is an even better benchmark. This advice doesn't apply to research-heavy products or serial entrepreneurs who have successfully raised funds before.\n\n# Mistake #13: We didn't set up a referral programme from Day 0\n\nWord-of-mouth is one of the most powerful growth channels (and it was the main one for us). However, we didn't implement a reward programme for users who invited others because we assumed it would be too complicated to build. We lost a lot of great opportunities this way, as users kept asking us for a referral scheme.\n\nWe were wrong – there are off-the-shelf solutions that allow you to set up a programme very quickly. We're in the process of integrating PromoteKit right now, and we also considered TrackDesk as an alternative.\n\n&gt;**Conclusion #13:** Launch a referral marketing programme from Day 0 using a dedicated tool. It’s much easier than it seems and creates a powerful, self-sustaining customer acquisition channel.\n\n# Mistake #14: We ignored collecting reviews on sites like G2 for too long\n\nG2 is a top website for B2B software reviews. If your product has positive reviews there, you get a powerful backlink, as well as high-intent traffic and new customers.\n\nWe thought setting up a profile would take too long, which is why we only did it a year and a half after launching. [It took us just half an hour](https://www.g2.com/products/aiter-io/reviews) 😁\n\n&gt;**Conclusion #14:** Set up your G2 and Capterra profiles right from the start. Ask your happy customers for reviews as soon as possible. This social proof is your online reputation and will boost growth at every stage of your marketing funnel.\n\n# Mistake #15: We ignored SEO for too long\n\nWe built up a decent Domain Authority organically through directory listings and word-of-mouth. However, we wasted this asset by neglecting to build a proper semantic core (keyword strategy) or strategically acquire backlinks. As a result, we get some organic traffic, but not nearly as much as we could.\n\n&gt;**Conclusion #15:** Think about your startup SEO strategy from Day 0. Identify relevant long-tail keywords to target and use them in your page titles, meta descriptions, and headings. Once you have product-market fit, aim to build at least one high-quality backlink per month. It's a long-term investment that really pays off.\n\n# Conclusion of conlusions: focus, have fun, talk to users, and set up infrastructure from Day 0\n\nIn a nutshell, I'd recommend:\n\n* **Focus on one core problem for one core audience.** Don't get distracted by building a tool for everyone. Master your niche first.\n* **Find the joy in building something** ***lovable*****, not just** ***viable*****.** Once you have early traction, shift your mindset from a scrappy MVP to a polished, high-quality product that users genuinely love.\n* **Build your foundational infrastructure from Day 0.** This includes product analytics, basic SEO, and a process for collecting reviews. Don't create technical and marketing debt you'll have to pay back later.\n* **Talk to your users constantly.** They are your ultimate source of truth and your best guide for finding product-market fit.\n\nI hope that sharing my **founder journey** – mistakes and all – helps other entrepreneurs on this path save some time, stress, and money. \n\nPlease share your tools, questions, feedback and mistakes – I will be happy to hear your story, discuss and exchange experiences. May the Force of all startup spirits be with you 😉"
+  },
+  "comments": [
+    {
+      "id": "n0qhhce",
+      "author": "Puzzled-Note5461",
+      "body": "Hey, thanks for sharing such a real, detailed founder story! This is exactly the kind of stuff you don’t learn from books, just straight-up, hard-earned lessons.\n\nThe “don’t be too lean” advice hits me hard. I’ve seen so many people skip basic stuff like signups or analytics to move fast, but then it bites them later. Those little things really matter.\n\nAlso, the focus part, both on product and marketing, is spot on. Trying to do everything at once just drains you. Finding that one niche, and owning it, is where the magic really starts.\n\nAnd that note about runway, and not quitting your job too soon? Such a solid reality check. So many founders overlook that, and get burned. (i quit my job after investment :D lol )\n\nIn my own journey building Sniff, we faced a lot of the same stuff, balancing focus, managing runway, picking the right channels to get early users. Starting community engagement early, and staying consistent, really helped us get a small but solid group before we even launched.\n\nWould love to know, after trying so many marketing channels, how did you decide where to really double down? What worked best for Aiter?\n\nReally appreciate you sharing all this, it’s super helpful and inspiring for anyone grinding through those early startup days! 🙌",
+      "created_utc": 1751366057.0,
+      "score": 11,
+      "parent_id": "t3_1loxxfn",
+      "depth": 0
+    },
+    {
+      "id": "n0qzdte",
+      "author": "Sure_Ad_6703",
+      "body": "Hey everyone! Co-founder Val here 👋 Confirming every lesson learned—the struggle is real, but so rewarding. If you’ve got questions or want deeper insights into the tech side of things, just ask. Thanks for sharing your stories too; we’re all growing together!",
+      "created_utc": 1751373795.0,
+      "score": 3,
+      "parent_id": "t3_1loxxfn",
+      "depth": 0
+    },
+    {
+      "id": "n0skjty",
+      "author": "Nope_Get_OFF",
+      "body": "Great breakdown, thank you , just a question.\n\nDid you run your frontend on dev server lol? I can see all the envs (stripe, firebase, amplittude) in the react code and pnpm modules used",
+      "created_utc": 1751390687.0,
+      "score": 2,
+      "parent_id": "t3_1loxxfn",
+      "depth": 0
+    },
+    {
+      "id": "n0t60yk",
+      "author": "anastasiia_g",
+      "body": "So much important information. Thank you",
+      "created_utc": 1751396639.0,
+      "score": 2,
+      "parent_id": "t3_1loxxfn",
+      "depth": 0
+    },
+    {
+      "id": "n0tz2ih",
+      "author": "Odeh13",
+      "body": "The number 1 mistake I'm doing with my site whatthefood .io\n\nI'll make sure to roll out a saas update as soon as possible.\n\nOverall, very inspiring bro",
+      "created_utc": 1751404994.0,
+      "score": 2,
+      "parent_id": "t3_1loxxfn",
+      "depth": 0
+    },
+    {
+      "id": "n0zjpob",
+      "author": "[deleted]",
+      "body": "[removed]",
+      "created_utc": 1751480663.0,
+      "score": 2,
+      "parent_id": "t3_1loxxfn",
+      "depth": 0
+    },
+    {
+      "id": "n13woh0",
+      "author": "TangerineFinancial56",
+      "body": "Thanks for all the information! I'm just curious if you tried building in public or if you have any thoughts on it?",
+      "created_utc": 1751541853.0,
+      "score": 2,
+      "parent_id": "t3_1loxxfn",
+      "depth": 0
+    },
+    {
+      "id": "n15zs9g",
+      "author": "itsgediminas",
+      "body": "Really appreciate you sharing these lessons! On Mistake #13, you're spot on about referral programs being easier than they seem. There are tools specifically designed for startups that handle all the tracking, payouts, and even help you find affiliates, making it simple to get that word-of-mouth going from day one.",
+      "created_utc": 1751565220.0,
+      "score": 2,
+      "parent_id": "t3_1loxxfn",
+      "depth": 0
+    },
+    {
+      "id": "n2o5chv",
+      "author": "Intelligent_Event623",
+      "body": "Really appreciate you sharing the missteps, most don’t talk about the messy parts. The “building too much before talking to users” one hits hard; it’s so common with AI tools.",
+      "created_utc": 1752291312.0,
+      "score": 2,
+      "parent_id": "t3_1loxxfn",
+      "depth": 0
+    },
+    {
+      "id": "n0rz3ep",
+      "author": "Outside_Abalone6917",
+      "body": "I am also scared am developing but am scared i dont have money ",
+      "created_utc": 1751384748.0,
+      "score": 1,
+      "parent_id": "t3_1loxxfn",
+      "depth": 0
+    },
+    {
+      "id": "n0s66tn",
+      "author": "[deleted]",
+      "body": "[removed]",
+      "created_utc": 1751386729.0,
+      "score": 1,
+      "parent_id": "t3_1loxxfn",
+      "depth": 0
+    },
+    {
+      "id": "n0sh3sp",
+      "author": "BIOffense",
+      "body": "Sounds like you didn't have a mentor?",
+      "created_utc": 1751389765.0,
+      "score": 1,
+      "parent_id": "t3_1loxxfn",
+      "depth": 0
+    },
+    {
+      "id": "n0qlu78",
+      "author": "fez_de",
+      "body": "Thank you for your insights and learnings... I shared the link on Bluesky so more people can see them ;-)\n\n  \n[https://bsky.app/profile/fez.world/post/3lsvkro3mu22p](https://bsky.app/profile/fez.world/post/3lsvkro3mu22p)",
+      "created_utc": 1751368213.0,
+      "score": 0,
+      "parent_id": "t3_1loxxfn",
+      "depth": 0
+    },
+    {
+      "id": "n0tck8v",
+      "author": "PUSH_AX",
+      "body": "Love how *both* op and cofounder seem to use the rarely used emdash (—), although we know ChatGPT *loves* emdashes...\n\nThanks for the AI writeup.",
+      "created_utc": 1751398526.0,
+      "score": 0,
+      "parent_id": "t3_1loxxfn",
+      "depth": 0
+    },
+    {
+      "id": "n0qlvnt",
+      "author": "MonkDi",
+      "body": "Hey, thanks for sharing your story!  \nWell, your strategy is smarter :D I mean, exiting job AFTER investment)\n\nWe decided to focus on directories, influencers and YouTube, as these channels have shown the best result for us. \n\nThank you for your feedback, it's invaluable!)",
+      "created_utc": 1751368232.0,
+      "score": 3,
+      "parent_id": "t1_n0qhhce",
+      "depth": 1
+    },
+    {
+      "id": "n0rczv3",
+      "author": "MonkDi",
+      "body": "Thanks for your comment, bro!)",
+      "created_utc": 1751378376.0,
+      "score": 1,
+      "parent_id": "t1_n0qzdte",
+      "depth": 1
+    },
+    {
+      "id": "n0tt8un",
+      "author": "MonkDi",
+      "body": "Oh, I suppose that's a mistake #16 :D  \nWill ping in DM if you don't mind",
+      "created_utc": 1751403286.0,
+      "score": 1,
+      "parent_id": "t1_n0skjty",
+      "depth": 1
+    },
+    {
+      "id": "n0ttag7",
+      "author": "MonkDi",
+      "body": "glad it's useful, thank you)",
+      "created_utc": 1751403299.0,
+      "score": 1,
+      "parent_id": "t1_n0t60yk",
+      "depth": 1
+    },
+    {
+      "id": "n0ua5mv",
+      "author": "MonkDi",
+      "body": "thanks a lot, it's a pleasure to receive feedback like this.\n\nGood luck with growing your food-Shazam, bro!)",
+      "created_utc": 1751408410.0,
+      "score": 2,
+      "parent_id": "t1_n0tz2ih",
+      "depth": 1
+    },
+    {
+      "id": "n11frdk",
+      "author": "MonkDi",
+      "body": "cool, open to contacts, but it's a tough time for calls)",
+      "created_utc": 1751501620.0,
+      "score": 1,
+      "parent_id": "t1_n0zjpob",
+      "depth": 1
+    },
+    {
+      "id": "n1mp9na",
+      "author": "MonkDi",
+      "body": "Hey mate, \n\nSorry for the slow response.   \nI occasionally shared the updates on my LinkedIn and Facebook.   \nThought about Twitter, but I have some aversion to Elon Musk products. Who knows, maybe I should've done it. \n\nI'm eyeing YouTube for that as well. \n\nI think it's a cool way to get more PR but I can't say that it was very successful. But also, I needed to share the updates moreoften as usually it was like once per 2-3 weeks.",
+      "created_utc": 1751807934.0,
+      "score": 2,
+      "parent_id": "t1_n13woh0",
+      "depth": 1
+    },
+    {
+      "id": "n1mpf5x",
+      "author": "MonkDi",
+      "body": "Thank you for your feedback.   \nYes, we are implementing either PromoteKit or Trackdesk, so it should be fast)",
+      "created_utc": 1751807992.0,
+      "score": 1,
+      "parent_id": "t1_n15zs9g",
+      "depth": 1
+    },
+    {
+      "id": "n3l64du",
+      "author": "MonkDi",
+      "body": "Thanks for your feedback ☺️",
+      "created_utc": 1752734983.0,
+      "score": 0,
+      "parent_id": "t1_n2o5chv",
+      "depth": 1
+    },
+    {
+      "id": "n0skh6r",
+      "author": "MonkDi",
+      "body": "It's better to have some savings, so I'd stick to the full-time job until you have enough)",
+      "created_utc": 1751390668.0,
+      "score": 1,
+      "parent_id": "t1_n0rz3ep",
+      "depth": 1
+    },
+    {
+      "id": "n0sk6xg",
+      "author": "MonkDi",
+      "body": "well, I had my fellow startupers to speak to (who launched successful businesses but didn't go to mentors specifically. For the next startups, I think of applying to incubators.",
+      "created_utc": 1751390591.0,
+      "score": 2,
+      "parent_id": "t1_n0sh3sp",
+      "depth": 1
+    },
+    {
+      "id": "n0qlyau",
+      "author": "MonkDi",
+      "body": "wow, this is very nice of you!  \nThank you a lot)",
+      "created_utc": 1751368266.0,
+      "score": 1,
+      "parent_id": "t1_n0qlu78",
+      "depth": 1
+    },
+    {
+      "id": "n0qlzj9",
+      "author": "MonkDi",
+      "body": "p.s. Followed!)",
+      "created_utc": 1751368282.0,
+      "score": 1,
+      "parent_id": "t1_n0qlu78",
+      "depth": 1
+    },
+    {
+      "id": "n0tr4zp",
+      "author": "MonkDi",
+      "body": "you are welcome but I f\\*cking love emdashes because they are dramatically correct.   \nI wrote this article with my hands, and just asked ChatGPT to check grammar, and those are my mistakes and experience. \n\n  \nAlso, ChatGPT uses this kind of emdash: \"focus—on\"  \nI use this kind of emdash: \"focus – on\". It's shorter and has two spaces around it.   \nSo, no, your take isn't kind or fair, I wrote it with my hands.",
+      "created_utc": 1751402693.0,
+      "score": 2,
+      "parent_id": "t1_n0tck8v",
+      "depth": 1
+    }
+  ],
+  "fetched_at": 1755100740,
+  "schema": "v1"
+}

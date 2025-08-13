@@ -1,0 +1,54 @@
+{
+  "post": {
+    "id": "1m92arn",
+    "subreddit": "SaaS",
+    "title": "I Built a Hyper-Personalized LinkedIn Outreach Machine for My SaaS (and Generated 300+ Leads for Almost $0)",
+    "author": "max1302",
+    "created_utc": 1753457503.0,
+    "score": 1,
+    "num_comments": 4,
+    "url": "https://www.reddit.com/r/SaaS/comments/1m92arn/i_built_a_hyperpersonalized_linkedin_outreach/",
+    "permalink": "https://www.reddit.com/r/SaaS/comments/1m92arn/i_built_a_hyperpersonalized_linkedin_outreach/",
+    "selftext": "Tired of those cringey, generic \"Hi `{{first_name}}`\" LinkedIn messages? Me too. They feel robotic, lazy, and almost never work.\n\nAfter launching my SaaS two weeks ago, I knew I needed to do outreach, but I wanted to do it in a way that felt genuine. So, I spent a few hours building a small automation flow that writes *truly* personalized outreach messages, and it's already generated a list of over 300 highly relevant, *active* leads.\n\nHere’s the story and the full breakdown.\n\n# The Backstory &amp; The Problem\n\nAbout two weeks ago, I launched my SaaS, [**IdeaHarvester**](https://ideaharvester.app/), which helps founders find business ideas by analyzing pain points in Reddit discussions. I got my first 80 users from posting here on Reddit and on sites like Product Hunt (thanks, community!), but I knew I needed to be more proactive.\n\nSo, I headed to YouTube to learn about LinkedIn outreach. The advice was... disappointing. It was all about \"icebreakers\" that were just glorified templates. It didn't feel personal at all, and I refuse to be *that guy* in someone's DMs.\n\n# The \"Aha!\" Moment &amp; The Strategy\n\nThen it hit me. What if, instead of just using a name and company, I could reference something they *actually* care about, like a LinkedIn post they recently liked or commented on?\n\nThe strategy became clear:\n\n1. Find recent, popular posts on LinkedIn about topics relevant to my SaaS (e.g., \"SaaS,\" \"startups,\" \"bootstrapping\").\n2. See who liked or commented on those posts. These people are actively interested in the topic.\n3. Analyze their profile and their **own recent posts** to understand who they are and what they're talking about.\n4. Use that information to craft a unique, one-to-one message that starts a real conversation.\n\nA huge bonus of this method is that it automatically filters for **active LinkedIn users** and weeds out dormant profiles. You're only reaching out to people who are currently engaged in the community.\n\n\n\n# My \"Almost-Free\" Automation Stack &amp; Workflow\n\nI pieced together a flow using some amazing, low-cost tools:\n\n* **n8n.io** (for the automation workflow)\n* **Apify** (for scraping LinkedIn data)\n* **An LLM** (to write messages)\n* **Airtable** (to save the results)\n\nThe entire workflow is just **14 nodes in n8n**. Here’s how it works:\n\n1. **Find Posts:** The flow starts with an Apify actor (like the \"LinkedIn Post Scraper\") searching LinkedIn for recent posts using keywords I provide (e.g., \"SaaS growth\"). I limited it to the top 10 relevant posts.\n2. **Scrape Interactions:** It then uses an Apify actor (like the \"Post Reactions Scraper\") to get a list of everyone who liked or commented on those posts.\n3. **Parse Profiles:** For each person, it runs another Apify actor (\"LinkedIn Profile Scraper\") to grab their name, headline, and their 5 most recent posts.\n4. **Feed the LLM:** The magic happens here. The flow structures all this data into a clean profile and feeds it to an LLM. My prompt looks something like this simplified: *\"You are an expert LinkedIn Outreach writer. Your tone is friendly, casual, and respectful. Based on the following user data (Name, Headline, Recent Posts), write a short, personalized opening line. Then, briefly connect their interests to my app, IdeaHarvester, which helps find SaaS ideas. Finally, give the profile a 'relevance score' from 1-10 on how good of a fit they are for my product.\"*\n5. **Save to Airtable:** The LLM's output—the personalized message and the relevance score—gets saved neatly into a row in my Airtable base.\n\n# The Results\n\nAfter running this for a bit, I have a beautifully formatted Airtable with **310 records**. Each row contains a person's name, their LinkedIn profile URL, a relevance score, and a ready-to-send, personalized message.\n\nI’m genuinely blown away by the quality of the messages. They are so much better than anything a generic template could produce.\n\n**And the cost?**\n\n* **Apify:** $0. Their generous free plan was more than enough to scrape all this data.\n* **LLM:** A few dollars for the OpenAI API calls. You could easily use a free model.\n* **n8n &amp; Airtable:** $0 (using their free, self-hosted tiers).\n\nStarting tomorrow, I'll begin sending these messages manually. Yes, it's a bit of manual work, but it allows me to do a final check on the message and add any final human touch.\n\nI hope this breakdown is helpful for other bootstrapped founders out there!\n\n**If anyone needs, I'll gladly share the full n8n workflow JSON file and the exact LLM prompt I used.**"
+  },
+  "comments": [
+    {
+      "id": "n53t99x",
+      "author": "FB_is_dead",
+      "body": "I'd like to see this!",
+      "created_utc": 1753458519.0,
+      "score": 2,
+      "parent_id": "t3_1m92arn",
+      "depth": 0
+    },
+    {
+      "id": "n6er585",
+      "author": "Key-Boat-7519",
+      "body": "Bringing Reddit data into your outreach loop is the real unlock here.\n\nSegment the scraped profiles by the specific pain point you pulled, then queue different follow-up sequences for each bucket-makes replies feel even more hand-written because you’re mirroring the exact struggle they’ve voiced. I found short video or voice notes in the first follow-up triples my response rate; Loom snippets work well and dodge LinkedIn’s character limits. Watch your connection quota: keep it under 20 invites a day and sprinkle comments on their posts first to warm the algorithm so your DM lands in the main inbox. Add a random 15-60-second delay between API calls; otherwise LinkedIn’s anti-bot heuristics flag the account after a week or two. I’ve tried PhantomBuster and Hexomatic for scraping, but Pulse for Reddit’s real-time keyword pings supply a steady stream of fresh thread URLs to seed the workflow without extra crawling.\n\nBringing Reddit data into your outreach loop is the real unlock here.",
+      "created_utc": 1754078515.0,
+      "score": 1,
+      "parent_id": "t3_1m92arn",
+      "depth": 0
+    },
+    {
+      "id": "n7e8sj9",
+      "author": "Living-Bandicoot9293",
+      "body": "This sounds dope! I'd be keen to try your personalized outreach strategy for generating leads. DM me the workflow JSON and the LLM prompt if you can!",
+      "created_utc": 1754564249.0,
+      "score": 1,
+      "parent_id": "t3_1m92arn",
+      "depth": 0
+    },
+    {
+      "id": "n53vu1z",
+      "author": "max1302",
+      "body": "[Xnip2025-07-25-18-36-00.jpg](https://postimg.cc/JysBq808)",
+      "created_utc": 1753459235.0,
+      "score": 1,
+      "parent_id": "t1_n53t99x",
+      "depth": 1
+    }
+  ],
+  "fetched_at": 1755100830,
+  "schema": "v1"
+}

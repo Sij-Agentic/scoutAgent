@@ -1,0 +1,54 @@
+{
+  "post": {
+    "id": "1mc9521",
+    "subreddit": "SideProject",
+    "title": "I hit limits with n8n, so I built my own workflow automation tool — Flowkit (open source, MIT)",
+    "author": "hirebarend",
+    "created_utc": 1753789323.0,
+    "score": 3,
+    "num_comments": 5,
+    "url": "https://www.reddit.com/r/SideProject/comments/1mc9521/i_hit_limits_with_n8n_so_i_built_my_own_workflow/",
+    "permalink": "https://www.reddit.com/r/SideProject/comments/1mc9521/i_hit_limits_with_n8n_so_i_built_my_own_workflow/",
+    "selftext": "Hey folks 👋\n\nThis started as a weekend rabbit hole...\n\nI was using **n8n** to automate some small business workflows — mostly scheduled jobs calling APIs, moving data around, etc. It’s a great tool, but when I looked closer at their **usage policy and license**, I realized it might not be the best fit long-term.\n\nEven self-hosted, there are \"sustainable use\" limits that made me nervous about scaling or relying on it too heavily. I just wanted a way to run a few simple jobs reliably, without worrying about exceeding execution quotas or hitting vendor walls.\n\nSo… I built my own thing.\n\n# 💡 Introducing [flowkit](https://github.com/useflowkit/flowkit-core)\n\nIt’s a developer-first, open source workflow engine — kind of like a stripped-down n8n or Zapier — but with:\n\n* **No usage limits**\n* **MIT license**\n* **Fully self-hostable and extendable**\n* Support for **dynamic expressions**, **custom nodes**, and **multiple inputs/outputs**\n\nIt’s designed to be a **foundation** for workflows you want to actually own, version, and test — not just drag-and-drop in a black box UI.\n\n🧠 Why I made this:\n\n* Wanted full control over workflows\n* Didn't want to be locked into someone else's runtime or limits\n* Needed something developer-friendly I could build on top of\n\n# 🚀 GitHub: [https://github.com/useflowkit/flowkit-core](https://github.com/useflowkit/flowkit-core)\n\nWould love your feedback:\n\n* Anything obvious I’m missing?\n* Would a visual editor be useful?\n* Would *you* use something like this?\n\nAppreciate any thoughts — happy to jam on ideas or directions to take this further 🙌"
+  },
+  "comments": [
+    {
+      "id": "n5scbky",
+      "author": "Bennetjs",
+      "body": "i highly doubt that it's fully type-safe so writing those out manually should be error prone. I would prefer a visual builder that valides inputs while building.",
+      "created_utc": 1753794530.0,
+      "score": 1,
+      "parent_id": "t3_1mc9521",
+      "depth": 0
+    },
+    {
+      "id": "n5tq8jd",
+      "author": "WesamMikhail",
+      "body": "Anything in this space gets an instant upvote from me. Cheering you on and hoping for this to get big! \n\nMy 2 cents: If you're going to make something that sticks out, let it be a JSON standar implementable in any language. That way a person can port/implement the standard in their own native language as JS isnt always the optimal choice for a lot of things, especially considering how difficult data sanitization and validation is in a loosely \"typed\" language. That also provides you an edge over what everyone else is doing. Just an idea so ignore me if you dont like it x)",
+      "created_utc": 1753809008.0,
+      "score": 1,
+      "parent_id": "t3_1mc9521",
+      "depth": 0
+    },
+    {
+      "id": "n5sd22e",
+      "author": "hirebarend",
+      "body": "It's developer-first, do you think JSON schema validation and good debugging features would help?",
+      "created_utc": 1753794775.0,
+      "score": 1,
+      "parent_id": "t1_n5scbky",
+      "depth": 1
+    },
+    {
+      "id": "n5tu9ft",
+      "author": "hirebarend",
+      "body": "Fair point, thank you, I have some ideas already and will probably post an update in a week or so",
+      "created_utc": 1753810091.0,
+      "score": 2,
+      "parent_id": "t1_n5tq8jd",
+      "depth": 1
+    }
+  ],
+  "fetched_at": 1755100797,
+  "schema": "v1"
+}

@@ -1,0 +1,81 @@
+{
+  "post": {
+    "id": "1lvgnxw",
+    "subreddit": "SideProject",
+    "title": "How I automated my YouTube learning workflow!",
+    "author": "Special-Wasabi-9029",
+    "created_utc": 1752061544.0,
+    "score": 2,
+    "num_comments": 10,
+    "url": "https://v.redd.it/uz7n3tul2ubf1",
+    "permalink": "https://www.reddit.com/r/SideProject/comments/1lvgnxw/how_i_automated_my_youtube_learning_workflow/",
+    "selftext": "I create a lot of content based on what I learn from YouTube, SEO content, marketing breakdowns, AI tutorials...But turning those into notes, let alone blog posts or tweets, used to mean hours of copying, pasting, and rewording transcripts manually.\n\nI ended up building a tool to automate that, it’s called TubeMemo. Summary, transcript, key quotes, generate SEO blog post based on video content\n\nIf you repurpose video content or take heavy notes, I’d love to hear what tools or tricks you use.   \n  \nI’m the founder and open to building in features if you’ve got ideas."
+  },
+  "comments": [
+    {
+      "id": "n25z5xy",
+      "author": "i_will-conquer",
+      "body": "I am also developing an extension for YouTube, it's a rag application, means anyone can chat with it and ask questions related to the video. Though yours look cool and have more features",
+      "created_utc": 1752064954.0,
+      "score": 2,
+      "parent_id": "t3_1lvgnxw",
+      "depth": 0
+    },
+    {
+      "id": "n26ili3",
+      "author": "muteki1982",
+      "body": "will try it out, thanks",
+      "created_utc": 1752071015.0,
+      "score": 2,
+      "parent_id": "t3_1lvgnxw",
+      "depth": 0
+    },
+    {
+      "id": "n25qfvx",
+      "author": "Special-Wasabi-9029",
+      "body": "here's the chrome extension if you want to try it  \n[https://chromewebstore.google.com/detail/tubememo-–-notes-summarie/gpjjjancadbdfphabcbkjpfciklolfal](https://chromewebstore.google.com/detail/tubememo-–-notes-summarie/gpjjjancadbdfphabcbkjpfciklolfal)",
+      "created_utc": 1752061779.0,
+      "score": 1,
+      "parent_id": "t3_1lvgnxw",
+      "depth": 0
+    },
+    {
+      "id": "n25qqs5",
+      "author": "Mission_Article483",
+      "body": "I usually use the Glasp app and I think it's really cool. It's great not just for YouTube summaries, but for all kinds of text on the internet, and it's free if you use it for personal stuff.",
+      "created_utc": 1752061894.0,
+      "score": 1,
+      "parent_id": "t3_1lvgnxw",
+      "depth": 0
+    },
+    {
+      "id": "n265cl0",
+      "author": "Special-Wasabi-9029",
+      "body": "just do what works for you, people would use it if it solve their problem too, thanks for your compliment",
+      "created_utc": 1752067012.0,
+      "score": 2,
+      "parent_id": "t1_n25z5xy",
+      "depth": 1
+    },
+    {
+      "id": "n26jrh5",
+      "author": "Special-Wasabi-9029",
+      "body": "I’m actively improving TubeMemo, so if you have any feedback or feature ideas, feel free to DM me or shoot me an email, happy to hear what would make it more useful for you",
+      "created_utc": 1752071351.0,
+      "score": 1,
+      "parent_id": "t1_n26ili3",
+      "depth": 1
+    },
+    {
+      "id": "n25sk9g",
+      "author": "Special-Wasabi-9029",
+      "body": "personally I tried it, but I don't get its UI/UX. I think TubeMemo just works better for me since it’s built specifically for the YouTube workflow",
+      "created_utc": 1752062578.0,
+      "score": 1,
+      "parent_id": "t1_n25qqs5",
+      "depth": 1
+    }
+  ],
+  "fetched_at": 1755100790,
+  "schema": "v1"
+}

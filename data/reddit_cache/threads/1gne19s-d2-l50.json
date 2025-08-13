@@ -1,0 +1,45 @@
+{
+  "post": {
+    "id": "1gne19s",
+    "subreddit": "SaaS",
+    "title": "List down Common problem of customer support and sales which can be automated",
+    "author": "iamma_00",
+    "created_utc": 1731170282.0,
+    "score": 1,
+    "num_comments": 4,
+    "url": "https://www.reddit.com/r/SaaS/comments/1gne19s/list_down_common_problem_of_customer_support_and/",
+    "permalink": "https://www.reddit.com/r/SaaS/comments/1gne19s/list_down_common_problem_of_customer_support_and/",
+    "selftext": "1)Frequently Asked Questions (FAQs)\n\n2)Order Processing and Tracking\n\n3)Customer Feedback Collection\n\n4)Lead Qualification\n\n5)Appointment Scheduling\n\n6)Customer Onboarding\n\n7)Follow-Up Communications\n\n8)Inventory Management\n\n9)Customer Support Ticketing\n\n10)Reporting and Analytics"
+  },
+  "comments": [
+    {
+      "id": "lw9sbol",
+      "author": "Radiant_Alana",
+      "body": "Great list! [OpenPay](https://www.getopenpay.com/) helps automate several areas that are critical for subscription-based businesses:\n\n1. **Payment Orchestration**: OpenPay’s automated payment orchestration routes transactions through multiple processors, reducing failed payments and ensuring revenue continuity without manual intervention. This helps lower churn and keeps payments running smoothly.\n2. **Subscription Management**: Automate the entire subscription lifecycle—from onboarding and billing to renewals and plan upgrades. OpenPay’s platform manages changes in real time, so customers can adjust plans or update billing seamlessly, reducing the need for support.\n3. **Analytics**: Access real-time, automated insights into key metrics like churn, MRR, and customer behavior. OpenPay’s analytics dashboard provides the data you need to make informed decisions quickly, without the need for complex reporting setups.\n\nBy automating these processes, OpenPay lets teams focus on growth rather than day-to-day admin.",
+      "created_utc": 1731170949.0,
+      "score": 1,
+      "parent_id": "t3_1gne19s",
+      "depth": 0
+    },
+    {
+      "id": "lw9sda9",
+      "author": "Soft_Count_8346",
+      "body": "I’ve been through this same list! Automating FAQs, customer onboarding, and follow-ups can seriously save time. For order tracking and ticketing, tools like Zendesk and Freshdesk are solid. Pulse for Reddit can help when it comes to engaging potential leads as well.",
+      "created_utc": 1731170963.0,
+      "score": 1,
+      "parent_id": "t3_1gne19s",
+      "depth": 0
+    },
+    {
+      "id": "lzfdsqp",
+      "author": "richexplorer_",
+      "body": "11. Subscription renewals   \n12. Order confirmation emails  \n13. Product reccos",
+      "created_utc": 1732811776.0,
+      "score": 1,
+      "parent_id": "t3_1gne19s",
+      "depth": 0
+    }
+  ],
+  "fetched_at": 1755100729,
+  "schema": "v1"
+}

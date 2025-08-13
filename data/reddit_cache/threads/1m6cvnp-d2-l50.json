@@ -1,0 +1,45 @@
+{
+  "post": {
+    "id": "1m6cvnp",
+    "subreddit": "SaaS",
+    "title": "How are you automating your blog post workflow ?",
+    "author": "Diplyzer",
+    "created_utc": 1753187654.0,
+    "score": 1,
+    "num_comments": 6,
+    "url": "https://www.reddit.com/r/SaaS/comments/1m6cvnp/how_are_you_automating_your_blog_post_workflow/",
+    "permalink": "https://www.reddit.com/r/SaaS/comments/1m6cvnp/how_are_you_automating_your_blog_post_workflow/",
+    "selftext": "I recently built my own AI-powered SEO Blog Writing Tool UndetectableContent after getting frustrated with the limitations of existing platforms.\n\nMy main goal was to create something that could handle blog post automation without sacrificing quality or SEO.\n\nThe result?\n\nA step-by-step writing flow that lets you customize everything tone, structure, messaging while still optimizing for search engines. It’s been a game-changer for my writing gigs.\n\nBut here’s the thing: I know a lot of us are skeptical about AI Blog Writing and SEO Blog generators. Some say they’re a shortcut to mediocrity, others swear by them for saving time.\n\nWhere do you stand? Have you tried automating your workflow, or do you prefer to keep things manual? What’s your biggest concern quality, originality, or something else?\n\nWould love to hear your honest takes."
+  },
+  "comments": [
+    {
+      "id": "n4ljqrl",
+      "author": "kevinbcarney42",
+      "body": "I've asked generative AI engines to write blog posts before. They weren't as good as I want. They seemed both a bit on the long winded side and lacked any original perspectives.\n\nI now use generative AI tools to help generate ideas, in that I interview the AI engine as if it was an expert, then mine the conversation for ideas.",
+      "created_utc": 1753218679.0,
+      "score": 2,
+      "parent_id": "t3_1m6cvnp",
+      "depth": 0
+    },
+    {
+      "id": "n4vtgjr",
+      "author": "remembermemories",
+      "body": "What I suggest is that, instead of building a task-based or status-based workflow, you go with a hybrid one that combines both ([example](https://www.semrush.com/blog/content-strategy-workflow/#:~:text=check%20on%20it.-,Hybrid%20Content%20Workflows,-A%20hybrid%20content))",
+      "created_utc": 1753357692.0,
+      "score": 2,
+      "parent_id": "t3_1m6cvnp",
+      "depth": 0
+    },
+    {
+      "id": "n4sariq",
+      "author": "Diplyzer",
+      "body": "and how do you keep your writing style ? \nI am building an AI blog writer and trying to optimize it for users need.\n\nyou can check it on https://undetectablecontent.com",
+      "created_utc": 1753304995.0,
+      "score": 0,
+      "parent_id": "t1_n4ljqrl",
+      "depth": 1
+    }
+  ],
+  "fetched_at": 1755100798,
+  "schema": "v1"
+}

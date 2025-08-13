@@ -1,0 +1,216 @@
+{
+  "post": {
+    "id": "1g4b5h2",
+    "subreddit": "SideProject",
+    "title": "I built an AI social monitoring that looks for relevant posts, not just keywords",
+    "author": "Chunky_Cheeze",
+    "created_utc": 1729007972.0,
+    "score": 130,
+    "num_comments": 36,
+    "url": "https://www.reddit.com/r/SideProject/comments/1g4b5h2/i_built_an_ai_social_monitoring_that_looks_for/",
+    "permalink": "https://www.reddit.com/r/SideProject/comments/1g4b5h2/i_built_an_ai_social_monitoring_that_looks_for/",
+    "selftext": "Hey everyone!\n\nI've been working on a side project that I'm excited to share with you all—it's called BillyBuzz  \n  \n**What is BillyBuzz?**  \n  \nBillyBuzz is an AI-powered social monitoring tool that helps businesses spot and analyze relevant conversations on social media platforms, starting with Reddit. It surfaces the most promising leads directly to your Slack channels, email, or Discord, so you don't have to spend hours scrolling through threads.  \n  \n**Why I Built It**  \n  \nI was spending a ton of time searching for relevant posts in niche subreddits for another product I was working to get off the ground. It was not only time-consuming but also distracting (you know how easy it is to fall into a Reddit rabbit hole). I couldn't find any existing tool that did more than basic keyword searches—which wasn't enough, especially if your brand name has multiple meanings (like \"Apple\").  \n  \nSo, I decided to build BillyBuzz. It uses AI to understand your business, products, target audience, and value proposition, alongside specific keywords you might want to include. This way, it finds posts where you can genuinely contribute by introducing your product.  \n  \nI used BillyBuzz for a previous product launch and managed to grow it to over $80k/month in volume within about 3 months, purely through Reddit engagement.  \n  \n**How It Works**\n\n1. **Add Information About Your Business**: Input details about your business and products.\n2. **Select Subreddits to Monitor**: Choose the subreddits relevant to your niche.\n3. **Receive Timely Alerts**: Get notified via Slack, email, or Discord when relevant posts are identified.\n\n**Features**\n\n* **AI-Powered Relevancy Scoring**: Goes beyond keywords by understanding the context to identify truly relevant opportunities.\n* **Subreddit Tracking**: Monitor specific subreddits with AI-recommended keywords tailored to your company's needs.\n* **Real-Time Alerts**: Checks for new relevant conversations every 15 minutes, so you can engage at the perfect time.\n* **Automated Categorization (Coming Soon)**: The AI will categorize conversations into topics like competitors, customer complaints, and more.\n\n**Who It's For**  \n  \nBillyBuzz is designed for startup founders, growth marketers, and small business owners who are tech-savvy and focused on scaling their operations. If you're looking to save time and engage more effectively with your target audience on social media, this might be up your alley.  \n  \n**Looking for Feedback**  \n  \nI'm sharing this here because I'd love to get your thoughts, feedback, or any suggestions you might have. If you're interested in checking it out, you can find more info here: [https://billybuzz.com](https://www.billybuzz.com).  \n  \nFeel free to ask me anything or share your experiences with similar challenges!"
+  },
+  "comments": [
+    {
+      "id": "ls2yzee",
+      "author": "herozorro",
+      "body": "&gt; I used BillyBuzz for a previous product launch and managed to grow it to over $80k/month in volume within about 3 months, purely through Reddit engagement.\n\nproof of claim please",
+      "created_utc": 1729018605.0,
+      "score": 3,
+      "parent_id": "t3_1g4b5h2",
+      "depth": 0
+    },
+    {
+      "id": "ls2dnb1",
+      "author": "InternalBadger1260",
+      "body": "Thanks @[Chunky\\_Cheeze](https://www.reddit.com/user/Chunky_Cheeze/) I signed up for 7 days trial. Let's see how it goes. I will post feedback here.",
+      "created_utc": 1729011933.0,
+      "score": 2,
+      "parent_id": "t3_1g4b5h2",
+      "depth": 0
+    },
+    {
+      "id": "ls392io",
+      "author": "JakubNowak_pl",
+      "body": "How much AI / LLM cost do you have overall and per lead?",
+      "created_utc": 1729021786.0,
+      "score": 2,
+      "parent_id": "t3_1g4b5h2",
+      "depth": 0
+    },
+    {
+      "id": "ls3jq8w",
+      "author": "ManureTaster",
+      "body": "One question about the subreddits: what if I don't know which communities to target in the first place? That's part of the problem for me",
+      "created_utc": 1729025121.0,
+      "score": 2,
+      "parent_id": "t3_1g4b5h2",
+      "depth": 0
+    },
+    {
+      "id": "ls70aqv",
+      "author": "metenev",
+      "body": "The tool looks solid! I'm trying it now, curious to see what it can find for me",
+      "created_utc": 1729083572.0,
+      "score": 2,
+      "parent_id": "t3_1g4b5h2",
+      "depth": 0
+    },
+    {
+      "id": "lsyrc8s",
+      "author": "MattiLehtinen",
+      "body": "Looks promising so I signed up to the 7-day free trial. I liked the startup wizard, it did it's job quite well.\n\nSome observations: \n\n- In recommended reddit channels there was also an empty one without name so that's probably something you may want to look into. \n\n- The project setup seems to take way longer than a minute. It wouldn't matter if the prompt wouldn't over-promise.\n\nI'll share more experiences after I start getting results.",
+      "created_utc": 1729489464.0,
+      "score": 2,
+      "parent_id": "t3_1g4b5h2",
+      "depth": 0
+    },
+    {
+      "id": "ls2odib",
+      "author": "Jealous-Catch-2040",
+      "body": "The text in the here section looks weird on a phone",
+      "created_utc": 1729015291.0,
+      "score": 1,
+      "parent_id": "t3_1g4b5h2",
+      "depth": 0
+    },
+    {
+      "id": "ls5egec",
+      "author": "No_Literature_7329",
+      "body": "what’s the stack? I assume you are leveraging APIs and asking for auth",
+      "created_utc": 1729050200.0,
+      "score": 1,
+      "parent_id": "t3_1g4b5h2",
+      "depth": 0
+    },
+    {
+      "id": "lu7chjh",
+      "author": "MiserableCheek9163",
+      "body": "Looks cool! How does this not violate Reddit's developer terms though, or do you have a commercial license for the API",
+      "created_utc": 1730134863.0,
+      "score": 1,
+      "parent_id": "t3_1g4b5h2",
+      "depth": 0
+    },
+    {
+      "id": "mi2xmqi",
+      "author": "Scubabum2782",
+      "body": "Social api",
+      "created_utc": 1742130282.0,
+      "score": 1,
+      "parent_id": "t3_1g4b5h2",
+      "depth": 0
+    },
+    {
+      "id": "ls8hknj",
+      "author": "patrickprunty1997",
+      "body": "Love the fake AI headshot photos",
+      "created_utc": 1729101242.0,
+      "score": 0,
+      "parent_id": "t3_1g4b5h2",
+      "depth": 0
+    },
+    {
+      "id": "ls8hu17",
+      "author": "patrickprunty1997",
+      "body": "And your post is nearly completely AI generated. Pro tip - next time, write it yourself. This way, you might manage to inject a little emotion into it.",
+      "created_utc": 1729101321.0,
+      "score": 0,
+      "parent_id": "t3_1g4b5h2",
+      "depth": 0
+    },
+    {
+      "id": "ls313ri",
+      "author": "Chunky_Cheeze",
+      "body": "[https://www.imghippo.com/i/rAHHc1729019212.png](https://www.imghippo.com/i/rAHHc1729019212.png) I'd like to keep the business itself anonymous which is  why I didn't mention it",
+      "created_utc": 1729019273.0,
+      "score": 1,
+      "parent_id": "t1_ls2yzee",
+      "depth": 1
+    },
+    {
+      "id": "ls5mq47",
+      "author": "Roberts2012pov9ow",
+      "body": "Lol, that is such an outlandish claim. I smell an exaggeration on the order of 10000x more than reality.\n\n  \nActually, the more I dig into this, the weirder it smells. Possible vote manipulation (115 upvotes to 18 comments is a much higher ratio than I would expect. Top comment only has 3 upvotes despite this long text post overall has 115 upvotes suggests that people read this long post, liked it enough to upvote it, but not enough to leave any thoughts or comments). Looking at other social listening tools posted on this subreddit, they generally perform much worse (&lt;5 upvotes, n=2). \n\n  \nMarginally funky poster account with high post and comment karma, but conveniently very small post history (purchased account?)",
+      "created_utc": 1729054381.0,
+      "score": 1,
+      "parent_id": "t1_ls2yzee",
+      "depth": 1
+    },
+    {
+      "id": "ls2ebpx",
+      "author": "Chunky_Cheeze",
+      "body": "Cool! Let me know if I can help with anything and what you think. I'll be making continuous improvements to the platform!",
+      "created_utc": 1729012147.0,
+      "score": 1,
+      "parent_id": "t1_ls2dnb1",
+      "depth": 1
+    },
+    {
+      "id": "ls7crfj",
+      "author": "Chunky_Cheeze",
+      "body": "I don't have the numbers on this just yet and it's variable based on the number of subreddits/posts that are monitored and analyzed, but I'm using more expensive models for the analysis as it produces better results. I'd rather build a product that has better results now to retain users even if it means making less money since the models will only get cheaper anyways.",
+      "created_utc": 1729088171.0,
+      "score": 2,
+      "parent_id": "t1_ls392io",
+      "depth": 1
+    },
+    {
+      "id": "ls5lcsd",
+      "author": "Roberts2012pov9ow",
+      "body": "Unfortunately, OP likely won't tell you because they might think that the cost knowledge would 1) cause some users to feel that instead of paying OP, they can build their own (which would reduce OP's customerbase), 2) cause some users to feel that OP is greedy and choose not to go with their product (if OP's cost is really low compared to the price they are charging), and 3) cause others to enter the market and build a competitor to it (even though a few already exist).\n\n  \nI would be thrilled to know the costing as well, but I won't be surprised if they aren't willing to share it.",
+      "created_utc": 1729053652.0,
+      "score": 1,
+      "parent_id": "t1_ls392io",
+      "depth": 1
+    },
+    {
+      "id": "ls3k5xz",
+      "author": "Chunky_Cheeze",
+      "body": "It will automatically suggest subreddits based on your website and information about your business. We are also adding a more comprehensive \"Suggested subreddits\" feature as well.",
+      "created_utc": 1729025256.0,
+      "score": 2,
+      "parent_id": "t1_ls3jq8w",
+      "depth": 1
+    },
+    {
+      "id": "ls7d1kr",
+      "author": "Chunky_Cheeze",
+      "body": "Thanks a lot! Would love to hear what you think and if you have any suggestions/feedback!",
+      "created_utc": 1729088268.0,
+      "score": 1,
+      "parent_id": "t1_ls70aqv",
+      "depth": 1
+    },
+    {
+      "id": "lsyrpcd",
+      "author": "Chunky_Cheeze",
+      "body": "Thank you for this feedback. That empty subreddit is a bug I’m looking into which is causing the initial results right when you sign in to take longer and likely fail. I’m looking into it to fix this now. Sorry about that. It won’t affect future posts it finds though. Please let me know if you have any other feedback or run into any other issues it’s much appreciated!",
+      "created_utc": 1729489680.0,
+      "score": 1,
+      "parent_id": "t1_lsyrc8s",
+      "depth": 1
+    },
+    {
+      "id": "ls31rhl",
+      "author": "Chunky_Cheeze",
+      "body": "thanks, fixed!",
+      "created_utc": 1729019481.0,
+      "score": 1,
+      "parent_id": "t1_ls2odib",
+      "depth": 1
+    },
+    {
+      "id": "ls7dbm9",
+      "author": "Chunky_Cheeze",
+      "body": "NextJS, Supabase, OpenAI, Anthropic, Slack API, social APIs",
+      "created_utc": 1729088366.0,
+      "score": 1,
+      "parent_id": "t1_ls5egec",
+      "depth": 1
+    }
+  ],
+  "fetched_at": 1755100819,
+  "schema": "v1"
+}

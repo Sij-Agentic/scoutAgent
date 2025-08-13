@@ -1,0 +1,63 @@
+{
+  "post": {
+    "id": "1lkibpx",
+    "subreddit": "Entrepreneur",
+    "title": "I’m building something simple to help with reviving cold leads, and it would mean a lot to get some early feedback.",
+    "author": "duke_sanj",
+    "created_utc": 1750887393.0,
+    "score": 2,
+    "num_comments": 9,
+    "url": "https://www.reddit.com/r/Entrepreneur/comments/1lkibpx/im_building_something_simple_to_help_with/",
+    "permalink": "https://www.reddit.com/r/Entrepreneur/comments/1lkibpx/im_building_something_simple_to_help_with/",
+    "selftext": "Hi everyone,\n\nI’m exploring a small idea based on a problem that comes up a lot, leads who show interest, then go quiet and never get followed up.\n\n**Companies invest serious money in generating leads, only to let them go cold. The missed revenue and wasted ad spend from this is likely massive and rarely tracked.**\n\nIt usually happens because sales teams get busy, forget, or don’t have a proper system in place. In many cases, if a lead doesn’t say yes on the first or second call, it gets marked as dead. But often, all it takes is a few well-timed follow-ups to turn that same lead into a real opportunity.\n\nMost tools focus on email sequences or CRM automation, but they rarely help with re-engaging cold leads in a personal, human way.\n\n# The idea I’m testing:\n\n* An AI assistant that revives cold leads.\n* It doesn’t just send preset messages. It uses a language model to speak like a real person.\n* If the lead replies, the assistant keeps the conversation going automatically.\n* The assistant is fully trained on your product or service, so it can answer questions accurately.\n* Simple tools will be available to help train it quickly.\n* It can qualify interest and even arrange a call or book a meeting.\n* You only get notified when a lead genuinely engages or shows interest, through a scoring system.\n* No CRM is needed; just upload a list or connect it to your email platform.\n* This runs quietly in the background, re-engaging leads while you focus on warm prospects.\n\nThis isn’t a launch. I’m just trying to figure out if this idea is genuinely useful or if I’m seeing the problem wrong.\n\n**If you’ve ever had a list of old leads, maybe even 10,000 or 20,000+ contacts, that you meant to follow up with but never did, I’d love your thoughts**:\n\n1. If a tool like this existed, one that could bring old leads back to life and move them from dead leads to booked appointments, would that make a real difference in your business?\n2. Imagine an assistant who quietly follows up, answers questions like a real team member, builds trust, and only notifies you once the lead is ready to talk or meet. No chasing, no back-and-forth. Just a confirmed appointment or scheduled call landing in your calendar.\n3. Now imagine the time and cost savings. No hiring or paying someone to call every lead again. No hours were spent writing follow-ups. Just the same list you already paid for, working for you in the background.\n4. Would something like this help in your world?\n5. Or do you feel cold leads aren’t worth reactivating?\n\nOpen to any thoughts, honest feedback is super helpful at this stage.\n\nThank you."
+  },
+  "comments": [
+    {
+      "id": "mzrup9c",
+      "author": "AutoModerator",
+      "body": "Welcome to /r/Entrepreneur and thank you for the post, /u/duke_sanj! Please make sure you read our [community rules](https://www.reddit.com/r/Entrepreneur/about/rules/) before participating here. As a quick refresher:  \n\n* Promotion of products and services is not allowed here. This includes dropping URLs, asking users to DM you, check your profile, job-seeking, and investor-seeking. *Unsanctioned promotion of any kind will lead to a permanent ban for all of your accounts.* \n* AI and GPT-generated posts and comments are unprofessional, and will be treated as spam, including a permanent ban for that account.   \n* If you have free offerings, please comment in our weekly Thursday stickied thread.\n* If you need feedback, please comment in our weekly Friday stickied thread. \n\n\n*I am a bot, and this action was performed automatically. Please [contact the moderators of this subreddit](/message/compose/?to=/r/Entrepreneur) if you have any questions or concerns.*",
+      "created_utc": 1750887395.0,
+      "score": 1,
+      "parent_id": "t3_1lkibpx",
+      "depth": 0
+    },
+    {
+      "id": "mzs2nxy",
+      "author": "6biz",
+      "body": "Hey!\n\nInteresting idea, i think there’s always market for that, people constantly buy, find and steal some lists and would love to spam those people, so this is the solution. I’m serious that’s the first thing you see with all sorts of systems that allow emailing multiple users, also great to abuse someone else’s SMTPs as those are often ‘out there’ \n\n1. Genuinely decent product IMO\n2. Sounds wonderful\n3. Even better \n4. Yes I would, but I have concerns with security as well as main thing - entrusting my leads to someone and have AI log everything not just on own company servers, but also on the service provider (you) servers. This is the reason I’d automate it myself, I actually have an auto-emailer with response checker in the inbox and updates in Telegram and a recap of the email, but never thought of going THAT deep as to implement full chats with leads \n5. Leads are always worth reactivating, can’t let them stay cold forever, just an extra nudge \n\nConclusion: sounds good and will defo alleviate tons of manual and mundane work, but.. have to spend time teaching it and validating the answers. With me - security and privacy concerns.",
+      "created_utc": 1750889876.0,
+      "score": 2,
+      "parent_id": "t3_1lkibpx",
+      "depth": 0
+    },
+    {
+      "id": "mzslt3q",
+      "author": "Formal-Blood-9002",
+      "body": "This sounds like one of the things GHL is selling. \n\nNice pitch",
+      "created_utc": 1750896141.0,
+      "score": 2,
+      "parent_id": "t3_1lkibpx",
+      "depth": 0
+    },
+    {
+      "id": "mzs9dc5",
+      "author": "duke_sanj",
+      "body": "Hi, really appreciate you taking the time to share all that, especially your concerns. This kind of feedback is genuinely helpful at this stage.\n\nYou're right, there's always the risk that tools like this can be misused if they’re too open. That’s not really what I’m aiming for with this.\n\nThe idea is to build this as a privacy-first tool. You could connect your own CRM or email platform, so the system wouldn’t send anything directly or store your leads. That means your data stays with you, and spam risk is reduced significantly.\n\nI am also exploring end-to-end encryption, so even if the AI handles replies, the system wouldn’t be able to read the messages or access any lead data. Everything would remain fully private between you and your contact.\n\nIt’s great that you’ve already built an auto-emailer with Telegram alerts. That shows how valuable this space is. The goal here is to go one step further by letting AI have helpful, human-like conversations and qualify interest before a human ever steps in.\n\nI completely agree, leads are always worth reactivating. It’s something a lot of companies underestimate. They focus on generating new leads and forget the silent cost of ignoring the ones they already paid for. That budget is already spent, and letting those contacts go cold without a proper reactivation plan is often a hidden leak in the funnel.\n\nThat said, I understand the hesitation around giving full control to AI. One option could be starting with a mode where the AI drafts replies but you approve them before they go out, or limiting it to only handle specific types of questions, like product details or availability. Then, once your assistant is better trained and you feel more confident, you could gradually let it take on more of the conversation.\n\nAlso, just to add, you’ve raised some really valid points that I didn’t include in the original post. That was intentional. I didn’t want to overwhelm people with too much detail straight away, but I am definitely thinking about all of this in the background. Your comment helps me know which things I might need to surface earlier next time.\n\nThanks again for such an honest and useful reply.",
+      "created_utc": 1750892066.0,
+      "score": 2,
+      "parent_id": "t1_mzs2nxy",
+      "depth": 1
+    },
+    {
+      "id": "mzspb8j",
+      "author": "duke_sanj",
+      "body": "Thank you for the reply, and appreciate the kind words. \n\nGHL is powerful, but the model I’m working on is quite different. It’s not a full CRM or automation suite, just a focused assistant trained on your product that can revive old leads in a natural, personal way. \n\nMore lightweight, privacy-first, and built for people who don’t want to set up complex systems. \n\nThanks again for reading my post.",
+      "created_utc": 1750897331.0,
+      "score": 2,
+      "parent_id": "t1_mzslt3q",
+      "depth": 1
+    }
+  ],
+  "fetched_at": 1755100826,
+  "schema": "v1"
+}

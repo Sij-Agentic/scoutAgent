@@ -1,0 +1,45 @@
+{
+  "post": {
+    "id": "1mn1y17",
+    "subreddit": "SaaS",
+    "title": "Seeking validation: I'm building an \"AI Librarian\" to proactively clean, update, and manage messy company knowledge (Confluence, GitHub, etc.). Is this a real problem for you?",
+    "author": "8FAX",
+    "created_utc": 1754881350.0,
+    "score": 1,
+    "num_comments": 5,
+    "url": "https://www.reddit.com/r/SaaS/comments/1mn1y17/seeking_validation_im_building_an_ai_librarian_to/",
+    "permalink": "https://www.reddit.com/r/SaaS/comments/1mn1y17/seeking_validation_im_building_an_ai_librarian_to/",
+    "selftext": "**(THERE IS NO PROMOTION IN THIS POST, JUST LOOKING FOR FEEDBACK)**\n\nHey everyone,\n\nI'm working on a startup idea and would love to get some honest feedback from people who deal with internal documentation and knowledge management daily. I am very passionate about knowledge systems. I have worked on several projects to address this issue in various companies, and I consistently encounter the same problems with internal knowledge bases, regardless of company size.\n\n**TL;DR:** I'm building a tool that acts like an AI librarian for your company's knowledge base. It doesn't just search; it proactively finds conflicting information, identifies knowledge gaps by \"listening\" to Slack &amp; GitHub, and helps keep docs up-to-date and trustworthy. This is built on top of a RAG layer, but the ability to search through data is just a side effect of the main problem I am trying to solve: having up-to-date, consistent, and easy-to-use internal knowledge bases.\n\n**The Problem I'm Trying to Solve**\n\nAt my last job, our Confluence was a wasteland. Searching for an answer to a simple question meant wading through a dozen pages, finding three conflicting versions of the truth, and having no idea which one was current. Essential knowledge was scattered across Slack threads, Google Docs, and GitHub READMEs. There was no single person responsible for keeping it all coherent (though many large companies do hire what are essentially wiki editors for their internal knowledge bases), so it slowly decayed. It felt like we were wasting hours every week just trying to find information we already had.\n\nA classic example: something isn't documented in the first place. \"Oops, we forgot to write down what tables the Fivetran migrations map to and from. I guess I'll now spend the next 20-30 minutes looking through the migrations and checking that against data in the database.\" (Forget it if the database is sharded, that's going to take forever to find the correct server the migration is coming from). After looking at Snowflake to see if the tables listed in the migration map match the data you expect, you can finally start doing the work you actually needed to do, and you most likely didn't update the docs to help your fellow developers.\n\n**My Proposed Solution: The AI Librarian**\n\nInstead of just another search tool that sits on top of the mess, I'm developing an \"AI Librarian\" that actively tends to the knowledge base. The core ideas are:\n\n* **Proactive Curation:** The system automatically detects and flags outdated documents, broken links, and conflicting information across platforms (e.g., a process described one way in Confluence, another in a GitHub README, and a third way in the code of a given repo that isn't even documented).\n* **Learns from Your Workflow:** It passively observes public Slack channels and GitHub PRs. If it sees the same question asked repeatedly, it suggests creating a new knowledge base article. If a PR changes how a feature works, it can suggest updating the corresponding documentation.\n* **Intelligent, Trustworthy Search:** It uses a RAG pipeline to provide direct answers to natural language questions, but crucially, **every answer comes with precise citations** and links back to the source documents or even the code so that you can trust the information.\n* **Data Sovereignty:** Recognizing that many companies can't use cloud-only tools, we're building a fully **self-hosted version** that can be deployed on-premises in an encrypted container. Hence, no data ever leaves the customer's network.\n\n**How is this different from tools like Guru, Slite, etc.?**\n\nMany existing tools are great knowledge bases, but they still rely heavily on manual curation. We're focused on being the proactive layer that works with your existing systems (like Confluence, Google Drive, or even Zoom) to keep them clean and reliable, reducing the manual maintenance burden.\n\n**I'd love your feedback on a few key questions:**\n\n1. **Is this a real pain point for you?** How much time do you or your team lose hunting for or validating information? How do you solve this now?\n2. **Does the \"AI Librarian\" concept resonate?** Is the idea of an AI proactively flagging outdated content and suggesting new articles useful, or does it sound too intrusive? Does the idea of a bot in Slack and GitHub responding to messages automatically (which would be configurable) seem helpful, assuming the information is accurate?\n3. **How important is self-hosting?** For your organization, is a secure, on-premises deployment option a \"nice-to-have\" or an absolute must?\n4. **What are your must-have integrations?** We're starting with Confluence, GitHub, Slack, Google Drive, YouTube, S3, Jira, and Zoom. What other tools are critical to your knowledge ecosystem (e.g., Trello, Notion, Gong)?\n5. **Pricing Gut Check:** Currently, I have a React-based demo with no backend, so we are far from being able to onboard new people. How much would you pay for this for yourself? How much would you pay per seat for an enterprise? If a product like this existed, would you recommend that your employer invest in it?\n6. **What am I missing?** What's the biggest flaw or potential risk you see with this idea?\n\nMy goal is not merely to capitalize on the AI hype by building another tool for a problem that doesn't exist. I am passionate about knowledge systems and want to solve real issues I've encountered in the past. I want to ensure I am not overlooking anything or creating something nobody wants.\n\nThank you so much for your time and insights. I'm here to listen and learn."
+  },
+  "comments": [
+    {
+      "id": "n81vaam",
+      "author": "Jaklite",
+      "body": "Your post is long so I skimmed it. \n\nJust wanted to chime in and say that this is definitely a pain point faced at my company (my experience as a dev mirrors yours). It's bad enough that the idea you're working on was something I was thinking of building myself. \n\nNotes based on your questions: my company does self host GitHub, but I'm not sure about the rest (slack, confluence, etc). \n\nOne thing you might be missing: one big problem is also outdated information that has no up to date version anywhere. This might be solveable by integrating into Slack (people typically ask in Slack and get up to date info from the team directly) but there might be cases where that doesn't work. One \"feature\" I thought of when I was thinking about this idea was a Slack bot that goes around and does the querying for you, asks people and tracks info down before relaying it back and remembering it for next time.",
+      "created_utc": 1754882487.0,
+      "score": 1,
+      "parent_id": "t3_1mn1y17",
+      "depth": 0
+    },
+    {
+      "id": "n82ki3w",
+      "author": "indiekit",
+      "body": "This is a real problem. Building this will be a huge undertaking maybe use \"Indie Kit\" or rely on internal dev teams and tools like Notion but how will you handle AI errors?",
+      "created_utc": 1754895405.0,
+      "score": 1,
+      "parent_id": "t3_1mn1y17",
+      "depth": 0
+    },
+    {
+      "id": "n81wi80",
+      "author": "8FAX",
+      "body": "Thanks for the insight, I appreciate it!",
+      "created_utc": 1754883021.0,
+      "score": 1,
+      "parent_id": "t1_n81vaam",
+      "depth": 1
+    }
+  ],
+  "fetched_at": 1755100770,
+  "schema": "v1"
+}

@@ -11,22 +11,47 @@ Your goal is to extract meaningful pain points, evaluate their severity and impa
 - Research Results: {research_results}
 
 # OUTPUT FORMAT
-Respond with a JSON object containing your analysis. Follow this format exactly:
+Respond with a STRICT JSON object (no prose) that collapses derive into think: per-thread summaries, pain extraction, and theme clustering with citations. Do not include markdown fences.
 
-```json
-{{
-  "total_sources_analyzed": 10,
-  "pain_points_found": 5,
-  "confidence_factors": ["factor1", "factor2", "factor3"],
-  "next_steps": ["step1", "step2", "step3"]
-}}
-```
+{
+  "per_thread_summaries": [
+    {
+      "post_id": "string",
+      "title": "string",
+      "subreddit": "string",
+      "permalink": "string",
+      "bullets": ["2-3 concise bullets"],
+      "pains": [
+        {
+          "statement": "short pain statement",
+          "evidence": ["citation strings (e.g., comment ids or quotes)"],
+          "severity": "low|medium|high|critical",
+          "tags": ["string"]
+        }
+      ]
+    }
+  ],
+  "pains": [
+    {
+      "statement": "normalized pain (deduped across threads)",
+      "support_count": 5,
+      "citations": ["permalinks or post_id#comment_id"],
+      "tags": ["string"]
+    }
+  ],
+  "themes": [
+    {
+      "theme": "cluster label",
+      "count": 3,
+      "example_citations": ["permalinks or ids"],
+      "related_pains": ["statements"]
+    }
+  ]
+}
 
 # INSTRUCTIONS
-1. Analyze the provided research results to identify patterns and themes
-2. Calculate the total number of distinct sources analyzed
-3. Count how many potential pain points you've identified
-4. List the factors that give you confidence in your findings
-5. Outline the next logical steps for validating and categorizing the pain points
-
-Your analysis should focus on extracting actionable insights from the research data that will lead to validated pain points.
+1. Read research_results which may include file paths (e.g., thread_glob) and/or hydrated items. Prefer citing exact permalinks or ids.
+2. Summarize each relevant thread into 2–3 bullets. Extract candidate pains with brief evidence snippets.
+3. Deduplicate pains across threads; aggregate support_count and citations.
+4. Cluster pains into themes; provide counts and example citations. Produce clear, short theme labels.
+5. Keep outputs concise and strongly evidence-backed. Avoid hallucinations; only cite provided content.

@@ -1,0 +1,378 @@
+{
+  "post": {
+    "id": "1m6h008",
+    "subreddit": "SaaS",
+    "title": "I made a lot of mistakes with my first SaaS startup. I'm sharing them here along with the solutions I have in mind – are they correct?",
+    "author": "MonkDi",
+    "created_utc": 1753197771.0,
+    "score": 340,
+    "num_comments": 74,
+    "url": "https://www.reddit.com/r/SaaS/comments/1m6h008/i_made_a_lot_of_mistakes_with_my_first_saas/",
+    "permalink": "https://www.reddit.com/r/SaaS/comments/1m6h008/i_made_a_lot_of_mistakes_with_my_first_saas/",
+    "selftext": "This is a longer post, but I believe in sharing experiences transparently. My first startup gave me grey hairs at 31, but I don’t regret the journey. Here I list the mistakes I made and possible solutions. Maybe it will help someone to avoid them, and I also'd be grateful if someone with more experience could tell me if the solutions I target are the right direction.\n\nA year and a half ago, my partner Val and I launched [Aiter.io](http://Aiter.io), an AI MarTech startup. The premise was simple: generate ads, content, and strategy with a single click. We followed the classic MVP playbook, building and launching in just two weeks. It was functionally basic and, frankly, looked terrible. But it worked. We got our first positive feedback and early traction, so we decided to push forward. That’s where my long journey of pain, joy, and crucial lessons began.\n\n# Mistake #1: We didn't implement signup and payments from Day 0 and lost out on 50,000 potential users.\n\nAdding a simple email signup and basic Stripe integration is only 2-3 days of development. Yet we didn't do it, deciding our \"lean\" approach meant testing only the core hypothesis. This was a critical error in judgement.\n\nA French TikToker found our product and posted a review without our knowledge. It generated 700k views overnight, driving 50,000 people to our site. Because our product was free with no signup, we lost the massive opportunity to even collect their email addresses, let alone monetise. We added the functionality later, but a viral traffic spike like that has never happened again.\n\n**Conclusion #1:** I shouldn't have been \"too lean.\" From now on, I will always integrate basic user registration and a monetisation option into your MVP from day one. It doesn't just prepare for surprise traffic; it provides much clearer data on whether users find my product valuable enough to exchange an email or money for it.\n\n# Mistake #2: I resigned from my full-time job too early. It’s better to keep your side project a side one until you hit at least ~$5,000 in MRR.\n\nAfter securing our first stable revenue (around 300 − 300− 500 a month), I was convinced that scaling would be straightforward. With 10 years in marketing, I thought I just needed to invest X to get Y. So, I switched to full-time startup mode. Gosh, that was a huge mistake. I only had savings for three months, and growing a SaaS business wasn't as linear as I’d imagined. When the savings ran out, I had to start juggling multiple freelance jobs to pay the bills, which ended up consuming even more time than my original full-time role.\n\n**Conclusion #2:** Quitting my job when I did was a massive miscalculation. My new rule for myself is to not go all-in on a startup until its MRR can comfortably cover my salary. Living in London, I've set that personal benchmark at a minimum of $5,000 MRR.\n\n# Mistake #3: I only had three months' worth of savings. It's better to have six, but the safest option is twelve. This is your startup runway.\n\nWhen my savings ran out, I fell into a vicious cycle: freelancing for survival, and working on the startup with what little energy was left. Consequently, our MRR growth was incredibly slow (we're currently at \\~$1,000-1,500), and we had no funds to reinvest. This meant we moved slower than the market and began to lose our competitive advantage. We’ve since corrected this by bringing on another great team member, but a longer financial runway would have enabled much faster scaling.\n\n**Conclusion #3:** I was completely unprepared for how long it would take to grow. Before I go \"full-time founder\" again, I will make sure I have a proper financial safety net, aiming for at least six months of living expenses in savings, with a year's worth being the ideal goal.\n\n# Mistake #4: We didn't set up product analytics (like Amplitude, GA4, and Clarity) from Day 0\n\nAnother of our \"too lean\" mistakes was neglecting to implement product analytics from launch. Because of this, we had no clear data on which features our users loved the most, which directly led to Mistake #5.\n\n**Conclusion #4:** Neglecting analytics was a \"too lean\" mistake I won't repeat. From now on, I'll set up my product analytics before I launch. It's a day of work that gives invaluable insights. For my future projects, I'll be using Amplitude for its flexibility, but at a minimum, I’d ensure basic GA4 event tracking and Microsoft Clarity are running.\n\n# Mistake #5: We went too broad with features instead of focusing on one core area and making it awesome.\n\nInitially, we only generated ad copy. I wish we’d stuck to that and perfected our product solely for the PPC market. Instead, I fell into the classic trap of building a product \"for myself.\" As a full-stack marketer, we added features for SMM, AI blogging, email generation, and strategy. This feature creep created a host of problems: complex onboarding, competing with much larger players, and a maintenance nightmare.\n\n**Conclusion #5:** I was wrong to go so broad instead of deep. My focus now is to serve a niche market segment with core features and be the best solution for that small group, rather than an average one for a broad audience. This is the path I believe leads to true product-market fit.\n\n# Mistake #6: We went too broad with our marketing, too. It would have been better to focus on mastering just 1-2 channels.\n\nWe wanted to discover what worked best, so we tried everything: Directories, Google Ads, Meta Ads, Reddit, YouTube, LinkedIn, SEO, and email. As a result, we achieved a little bit everywhere and mastered nothing. In hindsight, I should have stuck to 1-2 primary acquisition channels and 1-2 supporting ones.\n\n**Conclusion #6:** I learned that trying to do everything in marketing meant I was mastering nothing. My approach now is to identify the 1-2 channels that bring the best results and focus all my energy there, ditching the rest. I'll support these with email automation and retargeting and make landing page optimisation my top priority once I have a glimmer of PMF.\n\n# Mistake #7: We dedicated a whole MONTH to our Product Hunt launch. It should have taken two days.\n\nProduct Hunt used to be a powerful launchpad. Now, many founders feel its value is diminished. We didn't know this, so we spent a month preparing a campaign. In the end, our tool wasn't even featured on the main page due to a bug. I later learned this is a common story. Even \"Product of the Day\" often yields little in tangible results.\n\n**Conclusion #7:** I definitely won't get caught up in the Product Hunt hype again. My strategy now is to treat it simply as a good backlink and a community announcement. I'll create the page, notify users, post on social if featured, and move on.\n\n# Mistake #8: We wrote too many emails for our automation workflow (25 of them!).\n\nOur email onboarding sequence has over 25 emails. Surprisingly, they work and convert users. But having so many makes it incredibly challenging to analyse and optimise them effectively.\n\n**Conclusion #8:** I now believe a thoughtful workflow with 7-10 high-quality emails is far better than our sequence of 25 average ones. My future focus will be on quality over quantity, as it's easier to manage, test, and improve. Email marketing is still a fantastic channel I plan to leverage properly.\n\n# Mistake #9: We relied on the 'Lean Startup' principle too much. Instead, you should focus on quality right after validating demand.\n\nI love the Lean Startup methodology, but I used it as an excuse. Instead of perfecting a feature or a channel that was already working, I had a habit of saying, \"we'll improve this later\" while chasing other hypotheses. This created significant technical and marketing debt. I'm now a much bigger fan of the MLP (Minimum Lovable Product) principle.\n\n**Conclusion #9:** I now see that after proving my key product hypothesis (getting the first paying customers), I should have switched from pure \"lean\" mode to a more polished approach. My new philosophy is that one great, well-built feature works better than ten average ones.\n\n# Mistake #10: Our landing page was part of the web app, which is terrible for SEO.\n\nWe launched with a monolithic architecture. This is fast for initial development but hurts technical SEO and makes launching a blog a complete pain. We later migrated our marketing site to Webflow, which I wish we had done from the start – now it looks much better.\n\n**Conclusion #10:** I learned the hard way that landing pages and blogs should be static pages. For any future project, I'll use a platform like Webflow from day one and ensure everything is on the same root domain using subfolders for better SEO performance.\n\n# Mistake #11: Not having enough developers on your founding team\n\nAt the start, there were only two of us. My partner is a brilliant CTO but is part-time at another startup. Our limited development bandwidth, combined with other mistakes, meant we couldn't always keep pace. We’ve since fixed this by bringing on more help.\n\n**Conclusion #11:** I now understand that a startup team must have at least one full-time developer completely dedicated to the product. Without that, I've seen firsthand that the speed of iteration suffers immensely.\n\n# Mistake #12: Don't pitch for funding until you hit at least $3,000 MRR (unless you're Sam Altman).\n\nI looked at the startup-investor world through rose-coloured glasses. I thought because we were in a promising industry with early traction, securing pre-seed funding would be easy. After twenty pitches, we concluded that until your product has at least $3,000 MRR, there is little point in pitching to most investors.\n\n**Conclusion #12:** I wasted a lot of time chasing investors too early. My personal rule now is not to pitch seriously until the product is generating at least $3,000 MRR, with $5,000 being a much better benchmark to aim for.\n\n# Mistake #13: We didn't set up a referral programme from Day 0\n\nWord-of-mouth was our most powerful growth channel, yet we didn't implement a reward programme, assuming it would be too complicated to build. We were wrong. Off-the-shelf solutions like PromoteKit or TrackDesk exist.\n\n**Conclusion #13:** I was wrong to assume a referral program was complex. For any new product, I will launch a referral marketing programme from Day 0 using a dedicated tool. It’s much easier than I thought and can create a powerful acquisition channel.\n\n# Mistake #14: We ignored collecting reviews on sites like G2 for too long\n\nG2 provides a powerful backlink, high-intent traffic, and new customers. We thought setting up a profile would take too long, so we only did it a year and a half after launching. It took us just half an hour.\n\n**Conclusion #14:** I now see that setting up G2 and Capterra profiles early is crucial. In the future, I'll do this from the start and begin asking happy customers for reviews as soon as possible. This social proof is our online reputation.\n\n# Mistake #15: We ignored SEO for too long.\n\nWe built up a decent Domain Authority organically but wasted this asset by not building a proper keyword strategy or acquiring backlinks. As a result, we get some organic traffic, but not nearly as much as we could.\n\n**Conclusion #15:** I regret ignoring SEO for so long. My strategy from now on is to think about it from Day 0, identifying relevant long-tail keywords and aiming to build at least one high-quality backlink per month once I have PMF.\n\n# Final Thoughts: Focus, Quality, and Infrastructure\n\nIn a nutshell, my new philosophy, born from these mistakes, is:\n\n1. **Focus** on one core problem for one core audience.\n2. Find the joy in building something **lovable**, not just viable.\n3. Build foundational **infrastructure** from Day 0.\n4. **Talk to your users** constantly.\n\nI hope sharing this journey is useful. I'd be very interested to hear your own stories, feedback on my conclusions, and any mistakes I might still be making. I wish you wouldn't make mistakes like me :D"
+  },
+  "comments": [
+    {
+      "id": "n4o8pft",
+      "author": "Ambitious_Car_7118",
+      "body": "Incredible transparency. This reads like a real-time MBA in early-stage SaaS.\n\nBiggest throughline? Timing. Not just building the right things, but knowing when they matter.\n\n* Too lean early = missed inflection points (signup, Stripe, analytics)\n* Too polished late = slow iteration and broad sprawl (channels, features)\n* Too optimistic mid-game = job quit + investor chase without enough traction\n\nIt’s not just what you do, it’s sequencing. That’s the real founder skill.\n\nAnd +1 on MLP over MVP. Nobody remembers “viable”they remember “damn, this is exactly what I needed.”\n\nThanks for sharing this. More founders need to see the cost of default paths. You've earned those grey hairs.",
+      "created_utc": 1753255521.0,
+      "score": 15,
+      "parent_id": "t3_1m6h008",
+      "depth": 0
+    },
+    {
+      "id": "n4ly6f6",
+      "author": "gring10",
+      "body": "As a man who started his SaaS project few months ago and lost his job recently with only 3-4 months of runway, these are cruical info to have. I appreciate for the info! I would love to add one more thing to all of this. Especially for the ones who are coming from software engineering background. If the core of your SaaS logic contains relatively complex logic, add comprehensive test coverage from day one. We all know how it works. You are working on a product and emotions are telling you to push the MVP as fast as possible. Especially nowadays with all this AI hype FOMO is real. I also ended up in this trap which caused me to lose even more time than I expected. Then I started to do major refactoring with test coverage in each step. Now my Claude Code agent is also confident with development because solid test covarege is there and it is sticking with it by iterating through test results to correct itself. My project is for poker players, thus it is more complex than most of other projects probably but in any case, I believe that this approach is saving a lot of time in long run anyways.",
+      "created_utc": 1753223056.0,
+      "score": 8,
+      "parent_id": "t3_1m6h008",
+      "depth": 0
+    },
+    {
+      "id": "n4ksx9f",
+      "author": "SUPRVLLAN",
+      "body": "OP is using alternate accounts to fake engagement.",
+      "created_utc": 1753211133.0,
+      "score": 6,
+      "parent_id": "t3_1m6h008",
+      "depth": 0
+    },
+    {
+      "id": "n4qbsq7",
+      "author": "Important-Potato-100",
+      "body": "This is a goldmine of really helpful info! Just realised I'm making at least 10 of these 15 mistakes with the mvp I'm building. Not sure how im going to recover from these! ",
+      "created_utc": 1753285333.0,
+      "score": 4,
+      "parent_id": "t3_1m6h008",
+      "depth": 0
+    },
+    {
+      "id": "n4ndk0e",
+      "author": "KeyFew8866",
+      "body": "These are all great insights, well written.",
+      "created_utc": 1753240638.0,
+      "score": 3,
+      "parent_id": "t3_1m6h008",
+      "depth": 0
+    },
+    {
+      "id": "n4o4f5m",
+      "author": "InternationalSir5596",
+      "body": "Never read such a complete analysis. As a SaaS startupper myserv I'm always eager to gain new tips from others,  \nI appreciate your honesthy.   \nHope to exchange my feedback soon!",
+      "created_utc": 1753253166.0,
+      "score": 3,
+      "parent_id": "t3_1m6h008",
+      "depth": 0
+    },
+    {
+      "id": "n4jzojo",
+      "author": "Sure_Ad_6703",
+      "body": "Brutally honest and super actionable!",
+      "created_utc": 1753203108.0,
+      "score": 1,
+      "parent_id": "t3_1m6h008",
+      "depth": 0
+    },
+    {
+      "id": "n4py7xj",
+      "author": "Vincinis_96",
+      "body": "I do not think I can add much in the way of valuable perspective, but I do want to share my appraication for your post. I really enjoyed sharing your journey. And in an online world that is being dominated by mediocre AI insights, seeing genuine experiences is becoming ever more valuable.",
+      "created_utc": 1753281572.0,
+      "score": 2,
+      "parent_id": "t3_1m6h008",
+      "depth": 0
+    },
+    {
+      "id": "n4t0so0",
+      "author": "Most_Perspective2277",
+      "body": "Thank you ever so much for sharing. Very valuable information for someone who is about to embark this journey.",
+      "created_utc": 1753313115.0,
+      "score": 2,
+      "parent_id": "t3_1m6h008",
+      "depth": 0
+    },
+    {
+      "id": "n4vatex",
+      "author": "FluentosCom",
+      "body": "Some of your points hits very deep, learning the hard way is painfull. Thank you for sharing, i need to take your advice on couple immediately :)",
+      "created_utc": 1753348651.0,
+      "score": 2,
+      "parent_id": "t3_1m6h008",
+      "depth": 0
+    },
+    {
+      "id": "n4wdzj4",
+      "author": "sarsalanamin",
+      "body": "Amazing too much knowledge at one place.  \nThis could save us years wasting on things that would not scale.\n\nI totally agree with infrastructure if not managed properly could be a serious pain later.  \nYour last point is certainly the most ignored by most \"**Talk to your users** constantly.\"",
+      "created_utc": 1753364763.0,
+      "score": 2,
+      "parent_id": "t3_1m6h008",
+      "depth": 0
+    },
+    {
+      "id": "n4yzy6h",
+      "author": "secretlypsycho",
+      "body": "Incredible insights for this founder just over a week in. Thanks for sharing!",
+      "created_utc": 1753390967.0,
+      "score": 2,
+      "parent_id": "t3_1m6h008",
+      "depth": 0
+    },
+    {
+      "id": "n58rynx",
+      "author": "Professional_Day6268",
+      "body": "What did you find the best marketing channels were? SEO should be started as early as possible, no?",
+      "created_utc": 1753526030.0,
+      "score": 2,
+      "parent_id": "t3_1m6h008",
+      "depth": 0
+    },
+    {
+      "id": "n5am25y",
+      "author": "Acrobatic_Chart_611",
+      "body": "Thanks for sharing; sounds like im on the right track here; you have to focus on premium if you go after the entreprise folks, best not to rush things, take your time; i have been in the IT industry and i pretty much know what user's mentality for adapting a new tech; the worst scenario for them if the app is unstable (infrastructure) you lose audience faster than you can blink because, there is an old saying in marketing, one happy customer tell one person, one unhappy customer tell 20 people; get it right first time, go for premium. \n\n1. **Focus** on one core problem for one core audience.\n2. Find the joy in building something **lovable**, not just viable.\n3. Build foundational **infrastructure** from Day 0.\n4. **Talk to your users** constantly.",
+      "created_utc": 1753550049.0,
+      "score": 2,
+      "parent_id": "t3_1m6h008",
+      "depth": 0
+    },
+    {
+      "id": "n5annnf",
+      "author": "Acrobatic_Chart_611",
+      "body": "Yeah, before I forget, here’s a bit about my background and why I’m so passionate about solid infrastructure:\n\nI come from a Microsoft systems engineering background—I’m a former Microsoft Certified Systems Engineer, VMware‑certified in virtualization, Citrix‑certified, and Cisco‑certified. Nowadays I’m an AWS Solutions Architect, which is a lot more fun and, frankly, much easier to work with than the tools I used 10–15 years ago.\n\nInfrastructure has always been my bread and butter. With over 20 years in IT, I’ve learned you simply can’t rush it. If you build your infrastructure solidly, your applications will run reliably. On the other hand, a weak or unstable backend is a fast path to frustrated users and lost customers.\n\nThat’s why, when I decided to develop my own SaaS product, I focused first on the backend. If you want to scale or grow, you need rock‑solid infrastructure—and right now, AWS is the best platform for that. Sure, SEO and analytics are important, but none of that matters if your system crashes or feels sluggish.\n\nMost major banks, airlines, and government agencies trust AWS for exactly this reason. If you need help designing or building your backend infrastructure, I’m more than happy to lend a hand. I’ve spent two decades mastering the details—from Microsoft and virtualization platforms to AWS—so let me know, and we’ll get your foundation bulletproof.\n\nCheers!",
+      "created_utc": 1753550531.0,
+      "score": 2,
+      "parent_id": "t3_1m6h008",
+      "depth": 0
+    },
+    {
+      "id": "n5jah7y",
+      "author": "Jinho07310",
+      "body": "Nice post, taking VC money is a form of getting a job with a lump-sum. You basically work for them. Still better than a 9-5 though 🧐",
+      "created_utc": 1753666766.0,
+      "score": 2,
+      "parent_id": "t3_1m6h008",
+      "depth": 0
+    },
+    {
+      "id": "n5l3b5p",
+      "author": "LikeKlockwyrk",
+      "body": "This is such an honest breakdown of real startup mistakes way more valuable than the usual success story posts",
+      "created_utc": 1753699009.0,
+      "score": 2,
+      "parent_id": "t3_1m6h008",
+      "depth": 0
+    },
+    {
+      "id": "n5lffsj",
+      "author": "RobinYuga",
+      "body": "I printed your post (yes on paper) and your points mentioned´are spot on. The hardest thing for me is getting heard. Reddit will ban you in a heartbeat if you overstep and there is no playbook out there to follow when you start from scratch.  \nThank you for your post.",
+      "created_utc": 1753704468.0,
+      "score": 2,
+      "parent_id": "t3_1m6h008",
+      "depth": 0
+    },
+    {
+      "id": "n5rpkmj",
+      "author": "Material_Ad_8101",
+      "body": "Highly appreciated all the people comment on a pure experience... Reddit helps new people starting up",
+      "created_utc": 1753785316.0,
+      "score": 2,
+      "parent_id": "t3_1m6h008",
+      "depth": 0
+    },
+    {
+      "id": "n5szp0o",
+      "author": "Dataparrot",
+      "body": "This is great. Quick note that product analytics can be free - segment and posthog both have free tiers.\n\nPosthog for session replays. Segment for integrate once, push anywhere. But need a good taxonomy and for your devs to stay on top of it as they ship new features.",
+      "created_utc": 1753801609.0,
+      "score": 2,
+      "parent_id": "t3_1m6h008",
+      "depth": 0
+    },
+    {
+      "id": "n4mo0cn",
+      "author": "stopbsingman",
+      "body": "https://imgflip.com/i/a0yy3g",
+      "created_utc": 1753231544.0,
+      "score": 1,
+      "parent_id": "t3_1m6h008",
+      "depth": 0
+    },
+    {
+      "id": "n4se611",
+      "author": "AlexEnts",
+      "body": "This is incredibly insightful and serves as a great blueprint for launching an application and the key considerations.\nThanks a lot for sharing OP.\n\nIn my life, both personal and professional, I have found that we learn so much more from making mistakes than gaining instant success. \n\nThese things can be hard to take at the time, but all of this experience is priceless and will provide immense value to you in the future.\n\n ",
+      "created_utc": 1753305990.0,
+      "score": 1,
+      "parent_id": "t3_1m6h008",
+      "depth": 0
+    },
+    {
+      "id": "n5kjoek",
+      "author": "logical_mind121",
+      "body": "&gt;",
+      "created_utc": 1753687752.0,
+      "score": 1,
+      "parent_id": "t3_1m6h008",
+      "depth": 0
+    },
+    {
+      "id": "n4qql2k",
+      "author": "MonkDi",
+      "body": "Wow, that's nice feedback. You know your way with words, thank you! :)  \nI agree, timing is critical. I think knowing when is the part. No wonder ancient Greeks had two gods of time: Chronos (who just measures time) and Kairos – the god of the right moment to act. For a founder it's important to worship both :D",
+      "created_utc": 1753289433.0,
+      "score": 2,
+      "parent_id": "t1_n4o8pft",
+      "depth": 1
+    },
+    {
+      "id": "n5lvqht",
+      "author": "Conscious-Spray-5505",
+      "body": "That timing insight is brilliant",
+      "created_utc": 1753710253.0,
+      "score": 2,
+      "parent_id": "t1_n4o8pft",
+      "depth": 1
+    },
+    {
+      "id": "n4nwcr4",
+      "author": "BlossomWithMe",
+      "body": "Super solid advice about the test coverage. The temptation to skip tests early on is huge but you're right that it saves way more time long term",
+      "created_utc": 1753248921.0,
+      "score": 2,
+      "parent_id": "t1_n4ly6f6",
+      "depth": 1
+    },
+    {
+      "id": "n4qr7ob",
+      "author": "MonkDi",
+      "body": "Totally agree, testing is vital. Also, we had to refactor our code from scratch because of the MVP approach. At the start, we used the fastest solution, but in the long run,n it started to limit our dev capabilities and we had to rewrite our code from the square one. So picking the right tech stack from day 0 is another important rule.\n\nThanks for sharing your experience. I bet that writing a poker app is even more challenging, as you need to implement a lot of math models. Good luck!",
+      "created_utc": 1753289598.0,
+      "score": 1,
+      "parent_id": "t1_n4ly6f6",
+      "depth": 1
+    },
+    {
+      "id": "n5ras7o",
+      "author": "trainhasnobrakes",
+      "body": "3-4 months runway is tight though bro. Are you getting any early user feedback yet or still in development mode?",
+      "created_utc": 1753776927.0,
+      "score": 1,
+      "parent_id": "t1_n4ly6f6",
+      "depth": 1
+    },
+    {
+      "id": "n4m01nk",
+      "author": "MonkDi",
+      "body": "It's an account of my mate because I shared it in our chat",
+      "created_utc": 1753223654.0,
+      "score": 2,
+      "parent_id": "t1_n4ksx9f",
+      "depth": 1
+    },
+    {
+      "id": "n5rhw3c",
+      "author": "Bergut35",
+      "body": "Don't stress too much about it honestly most MVPs make these mistakes because you can't know what you don't know until you're in the thick of it",
+      "created_utc": 1753781093.0,
+      "score": 2,
+      "parent_id": "t1_n4qbsq7",
+      "depth": 1
+    },
+    {
+      "id": "n4qrw9r",
+      "author": "MonkDi",
+      "body": "That's alright, mate, everyone makes mistakes. The good news is that you can fix them early. Just keep building, analyzing and improving! :)",
+      "created_utc": 1753289782.0,
+      "score": 1,
+      "parent_id": "t1_n4qbsq7",
+      "depth": 1
+    },
+    {
+      "id": "n4on2sl",
+      "author": "MonkDi",
+      "body": "thanks a lot, appreciate it",
+      "created_utc": 1753263795.0,
+      "score": 1,
+      "parent_id": "t1_n4ndk0e",
+      "depth": 1
+    },
+    {
+      "id": "n4qrfdp",
+      "author": "MonkDi",
+      "body": "Thanks mate!   \nI've followed your account. Hope to see your post soon. And good luck with whatever you do!)",
+      "created_utc": 1753289656.0,
+      "score": 1,
+      "parent_id": "t1_n4o4f5m",
+      "depth": 1
+    },
+    {
+      "id": "n4qro3g",
+      "author": "MonkDi",
+      "body": "Thank you! I am glad if I save somebody time and neurons with my findings. And feedback like yours fuels to share more)",
+      "created_utc": 1753289721.0,
+      "score": 2,
+      "parent_id": "t1_n4py7xj",
+      "depth": 1
+    },
+    {
+      "id": "n4wt1jg",
+      "author": "MonkDi",
+      "body": "I am glad if it's useful, have a nice launch! :)",
+      "created_utc": 1753369131.0,
+      "score": 2,
+      "parent_id": "t1_n4t0so0",
+      "depth": 1
+    },
+    {
+      "id": "n4wt82b",
+      "author": "MonkDi",
+      "body": "Thank you for your kind feedback, it inspires to write more :)",
+      "created_utc": 1753369181.0,
+      "score": 2,
+      "parent_id": "t1_n4wdzj4",
+      "depth": 1
+    },
+    {
+      "id": "n5yjlto",
+      "author": "MonkDi",
+      "body": "Directories (TAAFT) but it could be a bit too late now.   \nSEO from the start – yes. \n\nYouTube videos if you do them consistently.   \nNative Reddit posts.   \nEmail marketing. \n\nThis stuff worked for us",
+      "created_utc": 1753874352.0,
+      "score": 2,
+      "parent_id": "t1_n58rynx",
+      "depth": 1
+    },
+    {
+      "id": "n5rqjpj",
+      "author": "MonkDi",
+      "body": "Wow, that's the highest level of appreciation for me, mate!  \nThanks a lot for your sincere feedback. I can't believe that my post was so useful)\n\nThanks, I wish you luck with whatever you're building. Also, you got me thinking about writing a similar post on marketing a product.",
+      "created_utc": 1753785808.0,
+      "score": 2,
+      "parent_id": "t1_n5lffsj",
+      "depth": 1
+    },
+    {
+      "id": "n4ohqv9",
+      "author": "MonkDi",
+      "body": "Well, I don't ignore comments and I focused on value first. Dropping a link is not forbidden and I shared real troubles I had to face and ways to solve. So, nothing bad here.",
+      "created_utc": 1753260738.0,
+      "score": 1,
+      "parent_id": "t1_n4mo0cn",
+      "depth": 1
+    },
+    {
+      "id": "n4oril3",
+      "author": "gojiberryAI",
+      "body": "He has the right to promote",
+      "created_utc": 1753266171.0,
+      "score": 1,
+      "parent_id": "t1_n4mo0cn",
+      "depth": 1
+    }
+  ],
+  "fetched_at": 1755100739,
+  "schema": "v1"
+}

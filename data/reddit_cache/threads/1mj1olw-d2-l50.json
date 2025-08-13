@@ -1,0 +1,468 @@
+{
+  "post": {
+    "id": "1mj1olw",
+    "subreddit": "Entrepreneur",
+    "title": "I spent $47k and 18 months building an \"AI startup.\" Here's the brutal truth about why 90% of AI businesses are doomed.",
+    "author": "Nipurn_1234",
+    "created_utc": 1754478474.0,
+    "score": 1404,
+    "num_comments": 399,
+    "url": "https://www.reddit.com/r/Entrepreneur/comments/1mj1olw/i_spent_47k_and_18_months_building_an_ai_startup/",
+    "permalink": "https://www.reddit.com/r/Entrepreneur/comments/1mj1olw/i_spent_47k_and_18_months_building_an_ai_startup/",
+    "selftext": "**TL;DR:** Burned through $47k building an AI tool that 12 people use. Here's what the \"AI gold rush\" really looks like from the trenches, and why most AI startups are just expensive tech demos.\n\n# The Setup (AKA How I Got Caught Up in the Hype)\n\n18 months ago, I was a perfectly happy software consultant making decent money. Then ChatGPT happened, and suddenly everyone was an \"AI entrepreneur.\" My LinkedIn feed was nothing but:\n\n* \"I built an AI that does X in 10 minutes!\"\n* \"Our AI startup just raised $2M!\"\n* \"$10k MRR with AI tools!\"\n\nI got FOMO and thought, \"How hard can it be?\"\n\n**Spoiler alert:** Very hard.\n\n# The Idea (That Seemed Brilliant at 2 AM)\n\nI decided to build an AI-powered content creation tool for small businesses. The pitch was simple: \"Input your business details, get professional marketing copy in seconds.\"\n\nWhy this seemed genius:\n\n* Small businesses suck at copywriting\n* They don't want to hire expensive agencies\n* AI can write decent copy\n* Subscription model = recurring revenue\n\nI spent weeks validating this idea by asking friends, \"Would you pay for this?\" Everyone said yes.\n\n**First mistake:** Asking people what they'd pay for instead of asking them to actually pay for it.\n\n# The Build (18 Months of \"Almost Done\")\n\n**Months 1-3: The MVP That Wasn't Minimum** I started building what I thought was an MVP. Ended up with:\n\n* Custom AI training pipeline\n* Beautiful UI with 47 different templates\n* User authentication system\n* Payment processing\n* Admin dashboard\n* Analytics suite\n\nCost so far: $12k (mostly my own development time valued at $100/hour)\n\n**Months 4-8: Feature Creep Hell** Beta users started asking for features:\n\n* \"Can it write in different tones?\"\n* \"What about social media posts?\"\n* \"Can it integrate with WordPress?\"\n* \"What about email templates?\"\n\nI said yes to everything. Each feature took 2-3x longer than expected.\n\nCost so far: $28k\n\n**Months 9-12: The Technical Debt Tsunami** Nothing worked together properly. The codebase was a nightmare. I spent 4 months just refactoring and fixing bugs.\n\nCost so far: $39k\n\n**Months 13-18: Desperation Marketing** Launched on Product Hunt (ranked #47 for the day). Posted in Facebook groups. Cold emailed 500 small business owners. Tried Reddit ads, Google ads, LinkedIn outreach.\n\nTotal additional marketing spend: $8k Total users acquired: 73 Paying customers: 12\n\n**Final tally: $47k spent, $340 revenue.**\n\n# What I Got Wrong (Pretty Much Everything)\n\n# 1. I Built a Solution Looking for a Problem\n\nSmall businesses don't actually want AI copywriting tools. They want customers. Big difference.\n\nWhen I actually talked to my target market (should've done this first), here's what I learned:\n\n* They're too busy to learn new tools\n* They don't trust AI for their brand voice\n* They'd rather hire their neighbor's kid for $50\n\n# 2. I Competed with ChatGPT\n\nWhy would someone pay me $29/month when ChatGPT Plus is $20/month and does way more?\n\nMy value proposition was \"it's easier than ChatGPT.\"\n\nReality: It wasn't. And even if it was 10% easier, that's not worth paying 45% more.\n\n# 3. I Underestimated Sales &amp; Marketing\n\nI'm a developer. I thought \"build it and they will come\" was a real strategy.\n\nBreakdown of my 18 months:\n\n* Building: 14 months\n* Marketing/Sales: 4 months\n\nShould have been:\n\n* Building: 4 months\n* Marketing/Sales: 14 months\n\n# 4. I Ignored Unit Economics Until Too Late\n\nMy customer acquisition cost: $650 per customer ($8k marketing spend ÷ 12 customers) My average revenue per customer: $28 (most churned after 1 month)\n\nEven a business school dropout could see this math doesn't work.\n\n# 5. I Built for Myself, Not Customers\n\nI made assumptions about what small businesses wanted based on what I thought they should want.\n\nTurns out, they just want more sales. They don't care how beautiful your UI is.\n\n# The Real AI Business Landscape (It's Not Pretty)\n\nAfter networking with other \"AI entrepreneurs\" for 18 months, here's what I've observed:\n\n# Tier 1: The Actually Successful Ones (5%)\n\n* Had domain expertise BEFORE AI\n* Solved real problems for specific industries\n* Focused on B2B with enterprise budgets\n* Examples: AI for radiology, legal document review, financial compliance\n\n# Tier 2: The Lifestyle Businesses (15%)\n\n* Simple wrappers around OpenAI API\n* Serve very specific niches\n* Make $5k-20k/month\n* Examples: AI email responder for dentists, AI job description generator\n\n# Tier 3: The Strugglers (30%)\n\n* Built cool tech demos\n* Can't find paying customers\n* Burning through savings/investor money\n* This is where I lived\n\n# Tier 4: The Delusional (50%)\n\n* Think they're going to replace Google\n* Have raised money based on PowerPoint slides\n* Will be out of business within 2 years\n\n# What Actually Works in AI Business\n\nAfter talking to the successful Tier 1 and Tier 2 folks, here are the patterns:\n\n# 1. Pick Boring Industries\n\nThe sexiest AI companies get all the attention and funding. But plumbing contractors also need software, and there's way less competition.\n\n# 2. Charge Enterprise Prices\n\nIf you're saving a company 40 hours/week, charge them for 40 hours/week. Don't charge $29/month because that's what consumer apps cost.\n\n# 3. Focus on Compliance/Risk Reduction\n\nCompanies will pay stupid money to avoid getting sued or fined. AI that helps with compliance is worth 10x more than AI that \"increases productivity.\"\n\n# 4. Become the Expert First\n\nLearn an industry for 2-3 years BEFORE building AI for it. The AI part is easy. Understanding the problem is hard.\n\n# My Pivot Strategy (What I'm Doing Now)\n\nI'm not giving up on entrepreneurship, but I'm definitely giving up on AI for now.\n\n**New approach:**\n\n1. Pick an industry where I have connections (web development agencies)\n2. Identify a specific, expensive problem ($10k+ problem)\n3. Build the simplest possible solution (no AI needed)\n4. Charge properly ($500-2000/month, not $29/month)\n5. Get 10 paying customers before building anything fancy\n\n**The business:** Project management tool specifically for web dev agencies that integrates with their existing stack and automates client reporting.\n\nNo AI. No fancy features. Just solving one expensive problem really well.\n\n# Hard Truths About the AI Gold Rush\n\n# Truth 1: Most AI Startups Are Just Expensive Consultants\n\nIf your business model is \"AI does the work faster,\" you're selling labor arbitrage, not technology. That's a consulting business with extra steps.\n\n# Truth 2: OpenAI/Google Will Eat Your Lunch\n\nIf your competitive advantage is \"we fine-tuned GPT for X,\" you don't have a competitive advantage. You have a 6-month head start, max.\n\n# Truth 3: Customers Don't Care About Your Technology\n\nThey care about outcomes. \"AI-powered\" is not a benefit. \"Saves you 10 hours per week\" is a benefit.\n\n# Truth 4: The Technical Barriers Are Lower Than Ever\n\nBuilding AI products is easier than it's ever been. Which means everyone's doing it. Which means you need actual business advantages, not just technical ones.\n\n# What I Wish Someone Had Told Me\n\n1. **Start with the market, not the technology.** Find people with expensive problems first. Then figure out how to solve them.\n2. **B2B &gt; B2C for AI.** Businesses have money and understand ROI. Consumers just want free stuff.\n3. **Niche down relentlessly.** \"AI for small businesses\" is not a niche. \"AI for orthodontist appointment scheduling\" is a niche.\n4. **Test with money, not words.** Don't ask if people would pay. Ask them to pay.\n5. **Budget 3x longer than you think.** Everything in AI takes longer because the technology is still figuring itself out.\n\n# The Question Everyone's Asking\n\n\"Should I still start an AI business?\"\n\n**My answer:** Only if you have deep domain expertise in a specific industry, access to that industry's decision-makers, and a problem that costs companies $100k+ per year.\n\nIf your plan is \"build cool AI thing, figure out customers later,\" just save yourself the time and money. Buy index funds instead.\n\n# Final Thoughts\n\nI don't regret this experience. I learned more about business in 18 months than I did in 5 years of consulting. But I definitely could have learned it for a lot less than $47k.\n\nThe AI opportunity is real, but it's not what the Twitter influencers are selling you. It's not about building the next ChatGPT wrapper. It's about understanding specific industries so well that you can apply AI to solve their most expensive problems.\n\nMost of us (myself included) jumped on AI because the technology was exciting. But technology doesn't build businesses. Understanding customer problems builds businesses.\n\nThe gold rush mentality is exactly what's wrong with entrepreneurship right now. Everyone's looking for the quick win, the magic bullet, the secret hack.\n\nThere isn't one. There's just doing the boring work of understanding customers and solving their problems.\n\n"
+  },
+  "comments": [
+    {
+      "id": "n77lusm",
+      "author": "AutoModerator",
+      "body": "Welcome to /r/Entrepreneur and thank you for the post, /u/Nipurn_1234! Please make sure you read our [community rules](https://www.reddit.com/r/Entrepreneur/about/rules/) before participating here. As a quick refresher:  \n\n* Promotion of products and services is not allowed here. This includes dropping URLs, asking users to DM you, check your profile, job-seeking, and investor-seeking. *Unsanctioned promotion of any kind will lead to a permanent ban for all of your accounts.* \n* AI and GPT-generated posts and comments are unprofessional, and will be treated as spam, including a permanent ban for that account.   \n* If you have free offerings, please comment in our weekly Thursday stickied thread.\n* If you need feedback, please comment in our weekly Friday stickied thread. \n\n\n*I am a bot, and this action was performed automatically. Please [contact the moderators of this subreddit](/message/compose/?to=/r/Entrepreneur) if you have any questions or concerns.*",
+      "created_utc": 1754478474.0,
+      "score": 1,
+      "parent_id": "t3_1mj1olw",
+      "depth": 0
+    },
+    {
+      "id": "n77x82b",
+      "author": "Joe-Eye-McElmury",
+      "body": "I love how this subreddit is filled with posts saying “I royally screwed up my business / lost a gazillion dollars, so now let me spew out a ton of AI-crappified advice from someone who has a track record that proves they don’t know what they’re talking about.”",
+      "created_utc": 1754483058.0,
+      "score": 973,
+      "parent_id": "t3_1mj1olw",
+      "depth": 0
+    },
+    {
+      "id": "n77wrfg",
+      "author": "imhereyourewhere",
+      "body": "You're really calculating your hourly cost as a loss... 🤦🏻",
+      "created_utc": 1754482890.0,
+      "score": 320,
+      "parent_id": "t3_1mj1olw",
+      "depth": 0
+    },
+    {
+      "id": "n77pokd",
+      "author": "datawazo",
+      "body": "You presumably know how to prompt AI and this still came out so overly AI created and hard to read. idk I'm just not convinced AI is in a spot to really punch out good copy. The more it tries the more it's obvious that AI is AI",
+      "created_utc": 1754480134.0,
+      "score": 281,
+      "parent_id": "t3_1mj1olw",
+      "depth": 0
+    },
+    {
+      "id": "n78397e",
+      "author": "JoyousGamer",
+      "body": "You didn't spend $48k. Your time is not spending anything. Additionally its doubtful you would have had billable hours 100% of the time you spend on this project.\n\nJust annoying when people throw a number on their hours for a personal project. Especially when you spent on average 1.3 hours per day on this project over the first 3 months who knows later what was actually spent vs your hours.\n\nFinally it seems like you did no actual market research before all of this. People being scare of AI or not wanting to take on a new tool or AI not being accurate enough for the companies message are all things you should have identified early.",
+      "created_utc": 1754485165.0,
+      "score": 183,
+      "parent_id": "t3_1mj1olw",
+      "depth": 0
+    },
+    {
+      "id": "n77o7z0",
+      "author": "Slapmeislapyou",
+      "body": "I mean, thanks for the warning, but, you're blaming it on a \"gold rush mentality\" when it just sounds like AI or no AI...you just came up with a bad, outdated idea and embarked on it for far longer than you should have. \n\n\nThis is also a result of jumping into a technology without fully understanding it's usefulness.\n\n\nIt's like, you're building a Chat Gpt business, but did you even ask Chat Gpt to run analytics on your business idea before hand? Doesn't sound like it. \n\n\nSorry for your bad luck but don't go knocking a SUPREMELY useful tool just because you had or have supremely bad business judgement.\n\n\nIf you spend 47k and make $400 bucks revenue, it's not an industry problem, that's a YOU problem.  ",
+      "created_utc": 1754479514.0,
+      "score": 42,
+      "parent_id": "t3_1mj1olw",
+      "depth": 0
+    },
+    {
+      "id": "n78rya9",
+      "author": "yupignome",
+      "body": "yet another useless chatgpt vomit",
+      "created_utc": 1754492703.0,
+      "score": 38,
+      "parent_id": "t3_1mj1olw",
+      "depth": 0
+    },
+    {
+      "id": "n781yue",
+      "author": "krkrkrneki",
+      "body": "If you are just a front for ChatGPT then yeah, you are gonna have a hard time differentiating.\n\nIn my country there is a wildly popular Math teaching AI service. It really works well and students love it. However, ChatGPT just introduced Study Mode, which does a very similar thing. We'll see how they do in the near future.",
+      "created_utc": 1754484732.0,
+      "score": 26,
+      "parent_id": "t3_1mj1olw",
+      "depth": 0
+    },
+    {
+      "id": "n78nnvk",
+      "author": "chemical_outcome213",
+      "body": "Lol, I couldn't finish reading this. I guess because you haven't paid me $100 an hour. This is an AI fever dream.",
+      "created_utc": 1754491482.0,
+      "score": 25,
+      "parent_id": "t3_1mj1olw",
+      "depth": 0
+    },
+    {
+      "id": "n79sucr",
+      "author": "EvensenFM",
+      "body": "&gt; I'm not giving up on entrepreneurship, but I'm definitely giving up on AI for now.\n\nJudging from [your recent submissions](https://old.reddit.com/user/Nipurn_1234/submitted/), you clearly *aren't* giving up on AI for now:\n\n* This post was clearly composed by AI\n\n* You have *no fewer than 5* AI composed posts submitted within the past 12 hours on a variety of subs.\n\n* You've refused to reply to any comments here - top kek\n\nCongratulations on getting your upvotes, OP.  If only there were some substance behind your ramble.",
+      "created_utc": 1754502963.0,
+      "score": 20,
+      "parent_id": "t3_1mj1olw",
+      "depth": 0
+    },
+    {
+      "id": "n79iop4",
+      "author": "UsualDue",
+      "body": "HELLO I CREATED SHITTY AI BUSINESS BASED ON SHITTY IDEA AND FAILED SO HERE IS SHIT WRITTEN BY AI HOW ALMOST EVERYONE FAILS\n\n  \nfuck you",
+      "created_utc": 1754500204.0,
+      "score": 13,
+      "parent_id": "t3_1mj1olw",
+      "depth": 0
+    },
+    {
+      "id": "n780j5s",
+      "author": "nilarrs",
+      "body": "I feel some of these comments are a bit harsh, clearly feedback from people who never took this journey.\n\nNo one gets it on their first shot. There is always a pivot.\n\nCommon Sense is a skill you gain from learning, you are not born with it.\n\nAllot of common sense was learned here and u/Nipurn_1234 has walked away 47k poorer but a hole bag of common sense for the next part of the journey.\n\nKeep pushing on and eventually you will overcome the blockers to your success.",
+      "created_utc": 1754484240.0,
+      "score": 11,
+      "parent_id": "t3_1mj1olw",
+      "depth": 0
+    },
+    {
+      "id": "n77nv91",
+      "author": "VoSkill",
+      "body": "We’ve all been there. Expensive lessons but you learned and will crush your next on.",
+      "created_utc": 1754479362.0,
+      "score": 6,
+      "parent_id": "t3_1mj1olw",
+      "depth": 0
+    },
+    {
+      "id": "n77vza0",
+      "author": "LizardKingTx",
+      "body": "🥱",
+      "created_utc": 1754482604.0,
+      "score": 6,
+      "parent_id": "t3_1mj1olw",
+      "depth": 0
+    },
+    {
+      "id": "n78pklt",
+      "author": "Miseryy",
+      "body": "tl;Dr - don't write LLM wrappers",
+      "created_utc": 1754492022.0,
+      "score": 6,
+      "parent_id": "t3_1mj1olw",
+      "depth": 0
+    },
+    {
+      "id": "n77zsq4",
+      "author": "Lokimir",
+      "body": "I just want to say thank you.\n\nThank you for actually sharing your knowledge and not gate keeping it and using this sub as a marketing platform.\n\nAlso, indeed, I had a very relatable experience, not with AI, but with a pretty solution nobody cares about, or are not willing to pay for it. Up\n\nNow, my thought process in new ventures looks like:\n1. Can I make sustainable revenue from it?\n2. If yes, what's the fastest way to prove that assumption and get my first clients?\n3. Try it and iterate.",
+      "created_utc": 1754483986.0,
+      "score": 5,
+      "parent_id": "t3_1mj1olw",
+      "depth": 0
+    },
+    {
+      "id": "n788w9z",
+      "author": "RandomBlokeFromMars",
+      "body": "this is a hard lesson to learn for all the \"ai startups\"\n\nfirst you will have to honestly ask and answer: is this something more than just chatgpt with a custom prompt\"?\n\nif not, you are selling an overpriced custom prompt.\n\n\"it's easier than ChatGPT.\" it is NEVER easier. whatever your startup does with AI, i can replicate with a good prompt i copy paste before my question.\n\nit has to add VALUE. like helping automating something, controlling actual API's, do something else then just spit back a response. that is what chatgpt, claude, etc does. there really is no need for a startup to do that.\n\nthat is just a low effort try at a slop service at best, a get rich quick attempt.",
+      "created_utc": 1754487016.0,
+      "score": 4,
+      "parent_id": "t3_1mj1olw",
+      "depth": 0
+    },
+    {
+      "id": "n78na23",
+      "author": "One-Big-Giraffe",
+      "body": "Vibe coded chatgpt wrapper. It doesn't fly. What could go wrong?",
+      "created_utc": 1754491373.0,
+      "score": 6,
+      "parent_id": "t3_1mj1olw",
+      "depth": 0
+    },
+    {
+      "id": "n78s3uw",
+      "author": "StaticDreams",
+      "body": "Stopped reading at \"mostly my own development time valued at $100/hour\" \n\nI value myself at $100,000/hour personally, so after I stopped working on a project after an hour I lost $100k on it",
+      "created_utc": 1754492747.0,
+      "score": 5,
+      "parent_id": "t3_1mj1olw",
+      "depth": 0
+    },
+    {
+      "id": "n79835k",
+      "author": "lunatuna215",
+      "body": "But you still wrote this post using ChatGPT right?",
+      "created_utc": 1754497236.0,
+      "score": 4,
+      "parent_id": "t3_1mj1olw",
+      "depth": 0
+    },
+    {
+      "id": "n79hqh5",
+      "author": "gatsby365",
+      "body": "What the fuck did you spend the $47,000 on???",
+      "created_utc": 1754499945.0,
+      "score": 6,
+      "parent_id": "t3_1mj1olw",
+      "depth": 0
+    },
+    {
+      "id": "n7a9isv",
+      "author": "FanBeginning4112",
+      "body": "What in the AI slop is this post.",
+      "created_utc": 1754507701.0,
+      "score": 6,
+      "parent_id": "t3_1mj1olw",
+      "depth": 0
+    },
+    {
+      "id": "n78hjk7",
+      "author": "ThatCuriousJ",
+      "body": "Might as well rename the sub to r/aitechstartups",
+      "created_utc": 1754489697.0,
+      "score": 122,
+      "parent_id": "t1_n77x82b",
+      "depth": 1
+    },
+    {
+      "id": "n78urz0",
+      "author": "zero0n3",
+      "body": "Except that in business, most thing fsil and the good businesses failed A LOT!\n\nReminds me of the quote from suits:\n\n&gt; Success is like being pregnant, everyone says congratulations but nobody knows how many times you were fucked.",
+      "created_utc": 1754493503.0,
+      "score": 56,
+      "parent_id": "t1_n77x82b",
+      "depth": 1
+    },
+    {
+      "id": "n78cb1t",
+      "author": "FantaNaranjat",
+      "body": "Bhwahahahah",
+      "created_utc": 1754488101.0,
+      "score": 52,
+      "parent_id": "t1_n77x82b",
+      "depth": 1
+    },
+    {
+      "id": "n78rucl",
+      "author": "The-Struggle-90806",
+      "body": "I was thinking they were in the delusional stage myself. Just money wise, $46k to say you have an “AI” app? I kept reading trying to figure out what these techies are saying. Most are charletons and shameless. Maybe it’s me but I find it offensive that someone knows the kid down the street can do a better job but still ask someone to pay you for your substandard product. All because you want to call yourself a winner. I just find it disgusting for so many reasons some personal some not so much.",
+      "created_utc": 1754492671.0,
+      "score": 30,
+      "parent_id": "t1_n77x82b",
+      "depth": 1
+    },
+    {
+      "id": "n7akw60",
+      "author": "nabokovian",
+      "body": "the sheer size (and formatting) of this post made my brain shutdown from the AI-slop.",
+      "created_utc": 1754510952.0,
+      "score": 21,
+      "parent_id": "t1_n77x82b",
+      "depth": 1
+    },
+    {
+      "id": "n7bfcnv",
+      "author": "Safe_Psychology_326",
+      "body": "What's interesting is for the folks who are older, this advice is a repeated pattern seen whenever something new comes into the market like the dotcom era - same story, then SaaS /cloud era same story, now the AI story. I think the important part I figure is the folks who make money are the ones selling the tools, the shovels and pickaxes and the asses for carrying the gold in every era.",
+      "created_utc": 1754520053.0,
+      "score": 13,
+      "parent_id": "t1_n77x82b",
+      "depth": 1
+    },
+    {
+      "id": "n78hu32",
+      "author": "LadyCEO2015",
+      "body": "I couldn’t have said it better 🤣",
+      "created_utc": 1754489784.0,
+      "score": 6,
+      "parent_id": "t1_n77x82b",
+      "depth": 1
+    },
+    {
+      "id": "n7gg2ji",
+      "author": "FullofLovingSpite",
+      "body": "\"I valued my time at extreme costs, so this is why I lost so much money.\"\n\nThat's just not how it works. This sub is full of fakes.",
+      "created_utc": 1754588817.0,
+      "score": 6,
+      "parent_id": "t1_n77x82b",
+      "depth": 1
+    },
+    {
+      "id": "n78tr0s",
+      "author": "Gold_Space8930",
+      "body": "Dude that’s what got me! 100 per hour I worked loss? Bonkers",
+      "created_utc": 1754493212.0,
+      "score": 124,
+      "parent_id": "t1_n77wrfg",
+      "depth": 1
+    },
+    {
+      "id": "n7aedm0",
+      "author": "papercup",
+      "body": "Yeah that threw me too. I'm working on an AI-based side project for an idea I had in Jan. I've spent hours upon hours working on it. \n\nMy loss is $12.54 to date. I've learned so much in those hours, that's not a loss... even if my project fails it was research",
+      "created_utc": 1754509101.0,
+      "score": 49,
+      "parent_id": "t1_n77wrfg",
+      "depth": 1
+    },
+    {
+      "id": "n79pnyi",
+      "author": "dontdxmebro",
+      "body": "Yeah I laughed out loud and stopped reading there. Alright, so you gave yourself the majority of the money you \"spent\" on starting this business. Great way to get the banks and any investors to never trust you again. So weird.",
+      "created_utc": 1754502096.0,
+      "score": 28,
+      "parent_id": "t1_n77wrfg",
+      "depth": 1
+    },
+    {
+      "id": "n78gett",
+      "author": "PMMePicsOfDogs141",
+      "body": "Could’ve been working at Burger King so I suppose it counts in that way lol",
+      "created_utc": 1754489360.0,
+      "score": 23,
+      "parent_id": "t1_n77wrfg",
+      "depth": 1
+    },
+    {
+      "id": "n7awj6n",
+      "author": "qyloo",
+      "body": "$100/hr to prompt engineer",
+      "created_utc": 1754514237.0,
+      "score": 24,
+      "parent_id": "t1_n77wrfg",
+      "depth": 1
+    },
+    {
+      "id": "n7b255t",
+      "author": "UltraAware",
+      "body": "I understand. Time should be measured in dollars. That’s how you really quantify how much you have put into a project.",
+      "created_utc": 1754515911.0,
+      "score": 7,
+      "parent_id": "t1_n77wrfg",
+      "depth": 1
+    },
+    {
+      "id": "n7cdddb",
+      "author": "hrrm",
+      "body": "Wait, why shouldn’t he include opportunity cost had he never started this in the first place and just worked a job?",
+      "created_utc": 1754531591.0,
+      "score": 7,
+      "parent_id": "t1_n77wrfg",
+      "depth": 1
+    },
+    {
+      "id": "n7cdf3p",
+      "author": "Noxvord",
+      "body": "I guess it's an opportunity cost calculation",
+      "created_utc": 1754531608.0,
+      "score": 6,
+      "parent_id": "t1_n77wrfg",
+      "depth": 1
+    },
+    {
+      "id": "n77x0s8",
+      "author": "AndreBerluc",
+      "body": "Being able to better train the AI for more humanized texts didn't happen here, the text actually became robotic!",
+      "created_utc": 1754482985.0,
+      "score": 41,
+      "parent_id": "t1_n77pokd",
+      "depth": 1
+    },
+    {
+      "id": "n799dmv",
+      "author": "millenialismistical",
+      "body": "Obviously AI-formatted, super easy to follow and read.",
+      "created_utc": 1754497604.0,
+      "score": 12,
+      "parent_id": "t1_n77pokd",
+      "depth": 1
+    },
+    {
+      "id": "n7c1mtt",
+      "author": "eiketsujinketsu",
+      "body": "The sheer fact that it’s a mile long is a dead giveaway too.",
+      "created_utc": 1754527529.0,
+      "score": 9,
+      "parent_id": "t1_n77pokd",
+      "depth": 1
+    },
+    {
+      "id": "n78l6d9",
+      "author": "longh0rnn",
+      "body": "Yeah i after i read “ $12k (mostly my own development time valued at $100/hour)” i just stopped reading and came to the comments lmao",
+      "created_utc": 1754490768.0,
+      "score": 64,
+      "parent_id": "t1_n78397e",
+      "depth": 1
+    },
+    {
+      "id": "n78nvkk",
+      "author": "NewShadowR",
+      "body": "Wait till you find out he spent 700 dollars on sleep every night (valued at $100 per hr). Shit's expensive.",
+      "created_utc": 1754491542.0,
+      "score": 41,
+      "parent_id": "t1_n78397e",
+      "depth": 1
+    },
+    {
+      "id": "n78krx1",
+      "author": "MaxRoofer",
+      "body": "Ironically, that’s one of the only things on here that made me think it was legit.  As a business owner, and an older one, I’m always thinking about my time as money.",
+      "created_utc": 1754490648.0,
+      "score": 20,
+      "parent_id": "t1_n78397e",
+      "depth": 1
+    },
+    {
+      "id": "n78scfp",
+      "author": "The-Struggle-90806",
+      "body": "That part seemed like common sense. I can’t imagine this is a real post. So much on the internet is just click bait crap to train the AI lol",
+      "created_utc": 1754492815.0,
+      "score": 6,
+      "parent_id": "t1_n78397e",
+      "depth": 1
+    },
+    {
+      "id": "n78w97i",
+      "author": "zero0n3",
+      "body": "The main issue IMO is copywriting is only one small part of the sales pipeline. \n\nEither you be the tool that helps glue all the tools into a unified pipeline single pane of glass or you better be the best tool in the toolbox.\n\nNeither seems to be the case in this project.",
+      "created_utc": 1754493924.0,
+      "score": 10,
+      "parent_id": "t1_n77o7z0",
+      "depth": 1
+    },
+    {
+      "id": "n79z7nc",
+      "author": "baummer",
+      "body": "“AI slop” I think is the preferred phrase",
+      "created_utc": 1754504766.0,
+      "score": 14,
+      "parent_id": "t1_n78rya9",
+      "depth": 1
+    },
+    {
+      "id": "n7d1ecf",
+      "author": "optimis344",
+      "body": "That's because it's just a karma farming bot. \n\nNone of this happened. This isn't a real person.",
+      "created_utc": 1754541035.0,
+      "score": 5,
+      "parent_id": "t1_n79sucr",
+      "depth": 1
+    },
+    {
+      "id": "n783pdi",
+      "author": "JoyousGamer",
+      "body": "They put in an hour a day basically and that was most of their cost. Example their 3 months was mostly their own time valued at $100/hr equating out to roughly 1.3 hours per day.\n\nSo hardly expensive unless the OP wants to write a genuine post show actual expenses not just inflating numbers by including their little amount of time they put in to the project each week.",
+      "created_utc": 1754485319.0,
+      "score": 4,
+      "parent_id": "t1_n77nv91",
+      "depth": 1
+    },
+    {
+      "id": "n7c1w8c",
+      "author": "DrDig1",
+      "body": "“His billable hours”",
+      "created_utc": 1754527619.0,
+      "score": 11,
+      "parent_id": "t1_n79hqh5",
+      "depth": 1
+    }
+  ],
+  "fetched_at": 1755100747,
+  "schema": "v1"
+}

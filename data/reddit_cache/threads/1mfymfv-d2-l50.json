@@ -1,0 +1,27 @@
+{
+  "post": {
+    "id": "1mfymfv",
+    "subreddit": "Business_Ideas",
+    "title": "Automating sales operations using AI during and post calls",
+    "author": "vibhinna_",
+    "created_utc": 1754161838.0,
+    "score": 5,
+    "num_comments": 1,
+    "url": "https://www.reddit.com/r/Business_Ideas/comments/1mfymfv/automating_sales_operations_using_ai_during_and/",
+    "permalink": "https://www.reddit.com/r/Business_Ideas/comments/1mfymfv/automating_sales_operations_using_ai_during_and/",
+    "selftext": "I have worked across B2B sales during my career and as a sales personnel there was lot of admin task like preparing for sales calls, effectively sell during the call and then enter data to CRM, send emails or messages and set up calls etc.\n\nThis is the exact problem I am trying to solve with a friend and are inching towards MVP.\n\nI want to hear from the community what would be more value add to users\n\n1. Have an effective sales copilot helping you during the call\n2. Completely automate post call ops like setting up meeting, creation of tasks etc\n3. Is there anything else?\n\nThis will really help me prioritize by taking in inputs from this community\n\n  \nPS: If anyone is looking to work on similar problem statement, happy to work together"
+  },
+  "comments": [
+    {
+      "id": "n6xmrtc",
+      "author": "Zealousideal_Hat8578",
+      "body": "Great initiative! Automating post-call ops is a huge time-saver, but a smart in-call copilot could be a real game changer especially if it helps with prompts, objections, or note-taking in real time.\n\nI’ve been exploring similar early-stage ideas and found mySaaSidea really helpful for shaping and validating them. It’s simple, not promotional, and keeps you focused on what actually matters.",
+      "created_utc": 1754339022.0,
+      "score": 1,
+      "parent_id": "t3_1mfymfv",
+      "depth": 0
+    }
+  ],
+  "fetched_at": 1755100756,
+  "schema": "v1"
+}

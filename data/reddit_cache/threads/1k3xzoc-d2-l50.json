@@ -1,0 +1,450 @@
+{
+  "post": {
+    "id": "1k3xzoc",
+    "subreddit": "SideProject",
+    "title": "Faceless YouTube channel? I automated the whole thing. 130K views so far.",
+    "author": "peppo-online",
+    "created_utc": 1745187308.0,
+    "score": 356,
+    "num_comments": 233,
+    "url": "https://www.reddit.com/r/SideProject/comments/1k3xzoc/faceless_youtube_channel_i_automated_the_whole/",
+    "permalink": "https://www.reddit.com/r/SideProject/comments/1k3xzoc/faceless_youtube_channel_i_automated_the_whole/",
+    "selftext": "**🆕 \\*\\*Edit (April 21):\\*\\***  \nThis started as a weekend experiment – now it’s generating 100K+ views across YouTube and TikTok.\n\n**The full system is now available on Gumroad — including all workflows, prompt templates, and database structures.**\n\n**✅ \\[Starter Edition\\](https://short.bons-ai.de/starter)**  \n**✅ \\[Pro Suite\\](https://short.bons-ai.de/pro)**  \n**✅ \\[Ultimate\\](https://short.bons-ai.de/ultimate)**\n\n\n\nhttps://preview.redd.it/je99b2c8rkve1.png?width=1920&amp;format=png&amp;auto=webp&amp;s=a3b1a55674ad431e96c84acdaf399809f2b5f481\n\n  \nThis started as a weekend experiment – now it’s generating 100K+ views across YouTube and TikTok.\n\nI started with **zero followers, zero views, zero knowledge**.  \nNow, after \\~3 weeks of posting **automated YouTube Shorts and TikToks**, I’ve passed **130,000 views**, and growth is steady – both in views and subscribers.\n\nEverything is powered by **n8n, JSON2VIDEO, Baserow, and a few other tools** I stitched together.  \nI’ll keep evolving this system (I’m currently working on affiliate funnels + monetization) — but here’s the current stack if you’re curious:\n\n# 🧠 1. Main Orchestrator Workflow\n\n* Central controller for all automations\n* Switches categories dynamically\n* Triggers the right LLM logic &amp; templates\n* Dispatches to different social media upload flows\n\n# 📤 2. Upload Workflow\n\n* Updates the Baserow DB\n* Uploads to Google Drive\n* Posts to YouTube (+ automatic playlisting)\n* Uploads to TikTok &amp; Instagram via [upload-post.com](https://upload-post.com/)\n* Easily extendable to other platforms\n\n# 🎬 3. Intro / Scene / Metadata Generator\n\n* Includes a Supervisor LLM layer + Postfilter → cleans up unsafe or overly long prompt output\n* Uses a master system prompt with dynamic Baserow variables for style, voice, tone, etc.\n* Scene count, duration, and content type all configurable per category\n\n# 💡 4. Automated Idea Generation\n\n* Scrapes trending content from niche sources\n* Picks random categories\n* Generates 10 raw ideas, then filters the top 5\n* Final idea JSON is stored in Baserow, ready for production\n\n# 📊 5. YouTube Metrics Collector\n\n* Pulls views, likes, copyright strikes, comment stats etc.\n* Ready for visualizations or trend detection\n\n# 🐿 6. Special: Reddit Video Scraper\n\n* Targets specific subreddits\n* Downloads, trims &amp; stores clips in local S3 (MiniO)\n* Uses yt-dlp + custom tools to generalize &amp; merge footage\n* Creates compilations from similar clips via metadata matching\n\n# 💬 7. YouTube Auto-Reply Bot\n\n* Triggered by email\n* Analyzes new comments, stores to DB, and replies automatically\n\n# 💸 8. Affiliate Promo System\n\n* Dynamically injects call-to-actions into descriptions &amp; comments\n* Supports rotating campaigns &amp; evergreen default content\n* All managed via Baserow\n\n# 🧷 9. Auto-Affiliate Comment Drop\n\n* First comment on every video is automatically posted\n* Uses clean formatting &amp; emoji-based bulletpoints\n\n# 📱 10. Shortform &amp; Longform Video Support\n\n* Two separate JSON2VIDEO templates (9:16 and 16:9)\n* Dynamically controlled scene count\n* Great for cinematic Shorts or long-form storytelling videos\n\nEverything is **100% automated** — once a video idea lands in Baserow, the rest is handled by the system.  \nI’m still improving and experimenting (and soon launching this as a product on Gumroad).\n\nAtm. I'll spend like 60 cents per shorts video!\n\nIf you’re building anything similar or want to chat about video automation / monetization, happy to connect!  \nLet me know if you'd like to get notified when the full version launches.\n\nExamples:  \n[https://www.youtube.com/watch?v=RyhsCeU\\_AsY](https://www.youtube.com/watch?v=RyhsCeU_AsY)  \n[https://www.youtube.com/shorts/IWUdHIOyYyA](https://www.youtube.com/shorts/IWUdHIOyYyA)\n\n💡 Feedback, suggestions, or questions welcome!"
+  },
+  "comments": [
+    {
+      "id": "mo5w4db",
+      "author": "Goldinferno",
+      "body": "And the dead internet theory grows",
+      "created_utc": 1745188334.0,
+      "score": 482,
+      "parent_id": "t3_1k3xzoc",
+      "depth": 0
+    },
+    {
+      "id": "mo602ck",
+      "author": "yes_no_very_good",
+      "body": "This post also looks AI generated",
+      "created_utc": 1745189793.0,
+      "score": 268,
+      "parent_id": "t3_1k3xzoc",
+      "depth": 0
+    },
+    {
+      "id": "mo5ygbo",
+      "author": "mathbbR",
+      "body": "130,000 views × 30s videos ≈ 1083 hours wasted watching slop.",
+      "created_utc": 1745189200.0,
+      "score": 218,
+      "parent_id": "t3_1k3xzoc",
+      "depth": 0
+    },
+    {
+      "id": "mo5wmrn",
+      "author": "YaBoiGPT",
+      "body": "see this is cool as a research concept, but to productize this is just lame",
+      "created_utc": 1745188525.0,
+      "score": 202,
+      "parent_id": "t3_1k3xzoc",
+      "depth": 0
+    },
+    {
+      "id": "mo5v2yi",
+      "author": "fancynotebookadorer",
+      "body": "This is honestly sad. If you don't care enough to say it yourself beyond a prompt... What value would anyone get from viewing it?\n\n\nEventually it'll be bots producing and bots reacting. Lovely.",
+      "created_utc": 1745187949.0,
+      "score": 75,
+      "parent_id": "t3_1k3xzoc",
+      "depth": 0
+    },
+    {
+      "id": "mo5zr56",
+      "author": "old-reddit-was-bette",
+      "body": "If it is truly profitable, then why would you be enabling others to compete against you. Seems to be a lot like those dudes selling courses.",
+      "created_utc": 1745189678.0,
+      "score": 72,
+      "parent_id": "t3_1k3xzoc",
+      "depth": 0
+    },
+    {
+      "id": "mo5xtay",
+      "author": "Mulchly",
+      "body": "Imagine if you put all this effort into something actually worthwhile...",
+      "created_utc": 1745188964.0,
+      "score": 53,
+      "parent_id": "t3_1k3xzoc",
+      "depth": 0
+    },
+    {
+      "id": "mo6m88x",
+      "author": "MantisMaestro",
+      "body": "YouTube really needs to ban this sort of slop, but of course they won't.",
+      "created_utc": 1745197703.0,
+      "score": 34,
+      "parent_id": "t3_1k3xzoc",
+      "depth": 0
+    },
+    {
+      "id": "mo6e8pn",
+      "author": "Street-Air-546",
+      "body": "thanks I loathe it. The second example is particularly heinous. The visuals are AI generated bs, not in the least realistic, and wrap a presumably true story. So now the internet gets a little more stupid. To have picked this as a showcase example of your pipeline makes me think the rest is even worse.",
+      "created_utc": 1745194899.0,
+      "score": 32,
+      "parent_id": "t3_1k3xzoc",
+      "depth": 0
+    },
+    {
+      "id": "mo6lpm5",
+      "author": "[deleted]",
+      "body": "[deleted]",
+      "created_utc": 1745197521.0,
+      "score": 25,
+      "parent_id": "t3_1k3xzoc",
+      "depth": 0
+    },
+    {
+      "id": "mo6vsyu",
+      "author": "GanonLovesPie",
+      "body": "Hey! This fucking sucks. Please stop polluting the internet with this trash.",
+      "created_utc": 1745201141.0,
+      "score": 23,
+      "parent_id": "t3_1k3xzoc",
+      "depth": 0
+    },
+    {
+      "id": "mo66s78",
+      "author": "djayci",
+      "body": "More AI slop",
+      "created_utc": 1745192218.0,
+      "score": 22,
+      "parent_id": "t3_1k3xzoc",
+      "depth": 0
+    },
+    {
+      "id": "mo6ne4p",
+      "author": "Zev18",
+      "body": "Congratulations, you are ruining the internet. Why would you want to make this. This is the worst thing I've seen on this sub.",
+      "created_utc": 1745198123.0,
+      "score": 21,
+      "parent_id": "t3_1k3xzoc",
+      "depth": 0
+    },
+    {
+      "id": "mo6ax34",
+      "author": "revolutionPanda",
+      "body": "More digital garbage. Awesome.",
+      "created_utc": 1745193713.0,
+      "score": 16,
+      "parent_id": "t3_1k3xzoc",
+      "depth": 0
+    },
+    {
+      "id": "mo5wxi0",
+      "author": "RelaxiTaxi_79",
+      "body": "What is your business model with this and how much revenue have you made with this? Or is the real business model selling your entire workflow tiered ??",
+      "created_utc": 1745188638.0,
+      "score": 13,
+      "parent_id": "t3_1k3xzoc",
+      "depth": 0
+    },
+    {
+      "id": "mo6ilu8",
+      "author": "niryou",
+      "body": "This is just disappointing.",
+      "created_utc": 1745196444.0,
+      "score": 13,
+      "parent_id": "t3_1k3xzoc",
+      "depth": 0
+    },
+    {
+      "id": "mo694hu",
+      "author": "hervalfreire",
+      "body": "Next up, make a bunch of bots to watch your content and give it likes",
+      "created_utc": 1745193058.0,
+      "score": 9,
+      "parent_id": "t3_1k3xzoc",
+      "depth": 0
+    },
+    {
+      "id": "mo6b71n",
+      "author": "StyleFree3085",
+      "body": "Youtube algo can easily identify this kind of garbage content and stop the traffic to your channel. Wrapping garbage tools with AI is not a good side project",
+      "created_utc": 1745193814.0,
+      "score": 9,
+      "parent_id": "t3_1k3xzoc",
+      "depth": 0
+    },
+    {
+      "id": "mo6f05a",
+      "author": "Blk_Ice_",
+      "body": "Open source it I just did the same thing https://github.com/Th3Ya0vi/ReelComp it’s a cool reach",
+      "created_utc": 1745195169.0,
+      "score": 2,
+      "parent_id": "t3_1k3xzoc",
+      "depth": 0
+    },
+    {
+      "id": "modh14r",
+      "author": "FactorResponsible609",
+      "body": "Bro; all is good but what is the runtime cost of this entire workflow?",
+      "created_utc": 1745292874.0,
+      "score": 3,
+      "parent_id": "t3_1k3xzoc",
+      "depth": 0
+    },
+    {
+      "id": "mo700t7",
+      "author": "DizzyBelt",
+      "body": "Wow, you are selling software for people to produce AI slop to pollute the internet. Wonderful.",
+      "created_utc": 1745202704.0,
+      "score": 2,
+      "parent_id": "t3_1k3xzoc",
+      "depth": 0
+    },
+    {
+      "id": "mo7djci",
+      "author": "OriginalRestaurant67",
+      "body": "How much coding knowledge do you need to build this?",
+      "created_utc": 1745208182.0,
+      "score": 2,
+      "parent_id": "t3_1k3xzoc",
+      "depth": 0
+    },
+    {
+      "id": "mo7gsws",
+      "author": "really_not_unreal",
+      "body": "What an awful product. How does it feel to be actively making the world a worse place?",
+      "created_utc": 1745209744.0,
+      "score": 2,
+      "parent_id": "t3_1k3xzoc",
+      "depth": 0
+    },
+    {
+      "id": "mo7hxsw",
+      "author": "StGerGer",
+      "body": "Feedback: This sucks. Destroy every trace of it.\n\nI try to only provide constructive feedback and I think in this case, that feedback is constructive.",
+      "created_utc": 1745210323.0,
+      "score": 2,
+      "parent_id": "t3_1k3xzoc",
+      "depth": 0
+    },
+    {
+      "id": "mokqgtt",
+      "author": "ghesak",
+      "body": "You are the cancer of the internet",
+      "created_utc": 1745396565.0,
+      "score": 2,
+      "parent_id": "t3_1k3xzoc",
+      "depth": 0
+    },
+    {
+      "id": "momjh3k",
+      "author": "logscc",
+      "body": "OP is in the race for most down votes in one thread /s",
+      "created_utc": 1745423102.0,
+      "score": 2,
+      "parent_id": "t3_1k3xzoc",
+      "depth": 0
+    },
+    {
+      "id": "mow0a2x",
+      "author": "call_me_venom",
+      "body": "How long until Dead internet theory is proven?",
+      "created_utc": 1745541743.0,
+      "score": 2,
+      "parent_id": "t3_1k3xzoc",
+      "depth": 0
+    },
+    {
+      "id": "mo76ih1",
+      "author": "Empty-Mulberry1047",
+      "body": "why? so you can earn a few dollars? ai generated crap with stock images is infuriating. thanks for automating the pollution of an already polluted system.",
+      "created_utc": 1745205156.0,
+      "score": 1,
+      "parent_id": "t3_1k3xzoc",
+      "depth": 0
+    },
+    {
+      "id": "mo7gobo",
+      "author": "GuruFungi",
+      "body": "Completely useless, no one watches those kind of videos",
+      "created_utc": 1745209681.0,
+      "score": 1,
+      "parent_id": "t3_1k3xzoc",
+      "depth": 0
+    },
+    {
+      "id": "mo7gu7e",
+      "author": "s-sujan",
+      "body": "I wish social media went back to its glory days when things were quirky, fun and educational. \nNow it's all just slop or porn, just mindless bullshit.\nIf only OP spent all this time building something worthwhile and meaningful for others.\nReally getting tired of this worthless zombie content. It's like we're collectively ruining our mentalities.",
+      "created_utc": 1745209763.0,
+      "score": 1,
+      "parent_id": "t3_1k3xzoc",
+      "depth": 0
+    },
+    {
+      "id": "mo7hb7r",
+      "author": "laughinbuddha2",
+      "body": "Remind me! In 2 days",
+      "created_utc": 1745210002.0,
+      "score": 1,
+      "parent_id": "t3_1k3xzoc",
+      "depth": 0
+    },
+    {
+      "id": "mo7hpwy",
+      "author": "LamineretPastasalat",
+      "body": "Basicly wasting peoples life for pennies. ",
+      "created_utc": 1745210210.0,
+      "score": 1,
+      "parent_id": "t3_1k3xzoc",
+      "depth": 0
+    },
+    {
+      "id": "mo7hyza",
+      "author": "Plus_Complaint6157",
+      "body": "You found the recipe, but instead of using it to the maximum - you took it to the people.\n\nThank you\n\nbut...\n\nAre you aware that because of your addiction to approval, you may have now deprived yourself of a brilliant future and financial independence?",
+      "created_utc": 1745210339.0,
+      "score": 1,
+      "parent_id": "t3_1k3xzoc",
+      "depth": 0
+    },
+    {
+      "id": "mo7kf5e",
+      "author": "BelgianGinger80",
+      "body": "Even this is AI generated",
+      "created_utc": 1745211631.0,
+      "score": 1,
+      "parent_id": "t3_1k3xzoc",
+      "depth": 0
+    },
+    {
+      "id": "mo6svff",
+      "author": "Snapple_22",
+      "body": "Right. Creators who did this for years without AI were awful slop machines, now OP is using a machine to just make trash and remove any human aspect. I hate it.",
+      "created_utc": 1745200100.0,
+      "score": 54,
+      "parent_id": "t1_mo5w4db",
+      "depth": 1
+    },
+    {
+      "id": "mo76bo0",
+      "author": "borntocooknow",
+      "body": "For sure it is.",
+      "created_utc": 1745205078.0,
+      "score": 46,
+      "parent_id": "t1_mo602ck",
+      "depth": 1
+    },
+    {
+      "id": "mo7r5o7",
+      "author": "PLTR60",
+      "body": "It is 100% AI generated. Sucks to see people not even trying to take out the dumbass emojis and random bolding of the words.",
+      "created_utc": 1745215509.0,
+      "score": 25,
+      "parent_id": "t1_mo602ck",
+      "depth": 1
+    },
+    {
+      "id": "mo7xkxo",
+      "author": "supersnorkel",
+      "body": "All posts longer than 2 paragraphs are ai generated nowadays",
+      "created_utc": 1745219541.0,
+      "score": 7,
+      "parent_id": "t1_mo602ck",
+      "depth": 1
+    },
+    {
+      "id": "mo63vbd",
+      "author": "Andreaspetersen12",
+      "body": "Yeah but at least he made 6$",
+      "created_utc": 1745191166.0,
+      "score": 140,
+      "parent_id": "t1_mo5ygbo",
+      "depth": 1
+    },
+    {
+      "id": "mo7knqm",
+      "author": "t_krett",
+      "body": "Don't worry. Most of these will also be from bots.",
+      "created_utc": 1745211762.0,
+      "score": 12,
+      "parent_id": "t1_mo5ygbo",
+      "depth": 1
+    },
+    {
+      "id": "mo672tp",
+      "author": "UsernameUsed",
+      "body": "The funny thing is for about maybe out of 1000 ( maybe more, maybe less) slop that an AI produces there is 1 or 2 that is surprisingly good and if they just cared enough/aren't lazy about things to curate they could have a decent channel but everyone just wants to automate and have free money.  All they need is to have some level of standard and care about something. Anything.",
+      "created_utc": 1745192323.0,
+      "score": 12,
+      "parent_id": "t1_mo5ygbo",
+      "depth": 1
+    },
+    {
+      "id": "mo6anhw",
+      "author": "Temporary_Quit_4648",
+      "body": "It's 100,000+ views \"across\" platforms, not per platform or per video.",
+      "created_utc": 1745193617.0,
+      "score": 7,
+      "parent_id": "t1_mo5ygbo",
+      "depth": 1
+    },
+    {
+      "id": "mo6f26t",
+      "author": "Blk_Ice_",
+      "body": "100% agree I just did the same just 24 hours ago https://github.com/Th3Ya0vi/ReelComp",
+      "created_utc": 1745195190.0,
+      "score": 21,
+      "parent_id": "t1_mo5wmrn",
+      "depth": 1
+    },
+    {
+      "id": "moaisly",
+      "author": "SirJilliumz",
+      "body": "yeah, Speeed just posted a good video essay on the rise of AI \"car\" channels, its pretty wild, hopefully they crack down on it but I doubt it",
+      "created_utc": 1745258124.0,
+      "score": 3,
+      "parent_id": "t1_mo6m88x",
+      "depth": 1
+    },
+    {
+      "id": "moakzhb",
+      "author": "goodpointbadpoint",
+      "body": "forget that. Google is not even banning stock market scam AI ads. those ads literally use known personalities from investing world, add their AI voices and scripts and points to shitty websites selling penny stocks.\n\nYoutube is going to become unusable like facebook if they don't stop doing this already",
+      "created_utc": 1745258759.0,
+      "score": 3,
+      "parent_id": "t1_mo6m88x",
+      "depth": 1
+    },
+    {
+      "id": "mo7qby2",
+      "author": "ZeBoyceman",
+      "body": "Well those 13k views did not come from nowhere. That's why people watch YouTube. It's shit but people like it that way",
+      "created_utc": 1745215008.0,
+      "score": 2,
+      "parent_id": "t1_mo6m88x",
+      "depth": 1
+    },
+    {
+      "id": "mo740rw",
+      "author": "Left-Excitement-836",
+      "body": "Even his replies are from ChatGPT!",
+      "created_utc": 1745204165.0,
+      "score": 8,
+      "parent_id": "t1_mo6lpm5",
+      "depth": 1
+    },
+    {
+      "id": "mo80d16",
+      "author": "Lia_the_nun",
+      "body": "Already done, given that this post has 141 likes as of now, but almost all comments are negative, and out of those that aren't, most seem AI generated.",
+      "created_utc": 1745221332.0,
+      "score": 2,
+      "parent_id": "t1_mo694hu",
+      "depth": 1
+    }
+  ],
+  "fetched_at": 1755100727,
+  "schema": "v1"
+}

@@ -1,0 +1,387 @@
+{
+  "post": {
+    "id": "1jtgpoh",
+    "subreddit": "microsaas",
+    "title": "After 20 Failures, I Finally Built A SaaS That Makes Money 😭 (Lessons + Playbook)",
+    "author": "FI_investor",
+    "created_utc": 1744016042.0,
+    "score": 323,
+    "num_comments": 78,
+    "url": "https://www.reddit.com/r/microsaas/comments/1jtgpoh/after_20_failures_i_finally_built_a_saas_that/",
+    "permalink": "https://www.reddit.com/r/microsaas/comments/1jtgpoh/after_20_failures_i_finally_built_a_saas_that/",
+    "selftext": "Years of hard work, struggle and pain. 20 failed projects 😭\n\nBuilt it in a few days using Ruby on Rails, PostgreSQL, Digital Ocean, OpenAI, Kamal, etc...\n\nLessons:\n\n* Solve real problems (e.g, save them time and effort, make them more money). Focus on the pain points of your target customers. Solve 1 problem and do it really well.\n* Prefer to use the tools that you already know. Don’t spend too much time thinking about what are the best tool to use. The best tool for you is the one you already know. Your customers won't care about the tools you used, what they care about is you're solving the problem that they have.\n* Start with the MVP. Don't get caught up in adding every feature you can think of. Start with a Minimum Viable Product (MVP) that solves the core problem, then iterate based on user feedback.\n* Know your customer. Deeply understand who your customer is and what they need. Tailor your messaging, product features, and support to meet those needs specifically.\n* Fail fast. Validate immediately to see if people will pay for it then move on if not. Don't over-engineer. It doesn't need to be scalable initially.\n* Be ready to pivot. If your initial idea isn't working, don't be afraid to pivot. Sometimes the market needs something different than what you originally envisioned.\n* Data-driven decisions. Use data to guide your decisions. Whether it's user behavior, market trends, or feedback, rely on data to inform your next steps.\n* Iterate quickly. Speed is your friend. The faster you can iterate on feedback and improve your product, the better you can stay ahead of the competition.\n* Do lots of marketing. This is a must! Build it and they will come rarely succeeds.\n* Keep on shipping 🚀 Many small bets instead of 1 big bet.\n\n**Playbook that what worked for me (will most likely work for you too)**\n\nThe great thing about this playbook is it will work even if you don't have an audience (e.g, close to 0 followers, no newsletter subscribers etc...).\n\n**1. Problem**\n\nCan be any of these:\n\n* Scratch your own itch.\n* Find problems worth solving. Read negative reviews + hang out on X, Reddit and Facebook groups.\n\n**2. MVP**\n\nSet an appetite (e.g, 1 day or 1 week to build your MVP).\n\nThis will force you to only build the core and really necessary features. Focus on things that will really benefit your users.\n\n**3. Validation**\n\n* Share your MVP on X, Reddit and Facebook groups.\n* Reply on posts complaining about your competitors, asking alternatives or recommendations.\n* Reply on posts where the author is encountering a problem that your product directly solves.\n* Do cold and warm DMs.\n\nOne of the best validation is when users pay for your MVP.\n\nWhen your product is free, when users subscribe using their email addresses and/or they keep on coming back to use it.\n\n**4. SEO**\n\nROI will take a while and this requires a lot of time and effort but this is still one of the most sustainable source of customers. 2 out of 3 of my projects are already benefiting from SEO. I'll start to do SEO on my latest project too.\n\nThat's it! Simple but not easy since it still requires a lot of effort but that's the reality when building a startup especially when you have no audience yet.\n\nLeave a comment if you have a question, I'll be happy to answer it.\n\nP.S. The SaaS that I built is a [tool that automates finding customers](https://customerfinderbot.com/) from social media. Basically saves companies time and effort since it works 24/7 for them. Built it to scratch my own itch and surprisingly companies started paying for it when I launched the MVP and it now grew to hundreds of customers from different countries, most are startups."
+  },
+  "comments": [
+    {
+      "id": "mlwt80l",
+      "author": "Ingodera",
+      "body": "I am a bit bored of reading ”solve real problems”. I think it is the most useless advice I have ever heard. Isn’t to solve a real problem everyone’s target? Of course it is",
+      "created_utc": 1744053103.0,
+      "score": 15,
+      "parent_id": "t3_1jtgpoh",
+      "depth": 0
+    },
+    {
+      "id": "mluqv0d",
+      "author": "da0_1",
+      "body": "+1 for using Rails. I am using it for my current project https://FlowMetr.com as well🤘",
+      "created_utc": 1744029432.0,
+      "score": 12,
+      "parent_id": "t3_1jtgpoh",
+      "depth": 0
+    },
+    {
+      "id": "mlxiifa",
+      "author": "iamzamek",
+      "body": "What's your MRR? Please attach proof.",
+      "created_utc": 1744061009.0,
+      "score": 7,
+      "parent_id": "t3_1jtgpoh",
+      "depth": 0
+    },
+    {
+      "id": "mlve28l",
+      "author": "3rdhope",
+      "body": "When you say \"making money\" what's your MRR vs Expenses? Also how long has it been running to determine churn rate?",
+      "created_utc": 1744037503.0,
+      "score": 6,
+      "parent_id": "t3_1jtgpoh",
+      "depth": 0
+    },
+    {
+      "id": "mlvvbf5",
+      "author": "TECHSALLTECHS",
+      "body": "If you want a great dev but cheap cuz I like building stuffs dm me G",
+      "created_utc": 1744042795.0,
+      "score": 1,
+      "parent_id": "t3_1jtgpoh",
+      "depth": 0
+    },
+    {
+      "id": "mlxd6u9",
+      "author": "iamzamek",
+      "body": "Why you don't build anything for stock market if you know it?",
+      "created_utc": 1744059295.0,
+      "score": 1,
+      "parent_id": "t3_1jtgpoh",
+      "depth": 0
+    },
+    {
+      "id": "mlxklyz",
+      "author": "DataWingAI",
+      "body": "A few questions if you don't mind.\n\nWhat did you do at launch:\n\nDid you have a waitlist ? \nDid you list your product on places like HackerNews, Product Hunt and App Sumo?\nDescribe your cold outreach strategy. (If you used one)",
+      "created_utc": 1744061702.0,
+      "score": 1,
+      "parent_id": "t3_1jtgpoh",
+      "depth": 0
+    },
+    {
+      "id": "mly0efv",
+      "author": "ThaisaGuilford",
+      "body": "No vibe coding?",
+      "created_utc": 1744067074.0,
+      "score": 1,
+      "parent_id": "t3_1jtgpoh",
+      "depth": 0
+    },
+    {
+      "id": "mlypbao",
+      "author": "Extra_Name_4596",
+      "body": "Where can we find the real.problems..I really want to.explore these things more..\n\nCan you share any rootmap\n\nSorry new to here.",
+      "created_utc": 1744076016.0,
+      "score": 1,
+      "parent_id": "t3_1jtgpoh",
+      "depth": 0
+    },
+    {
+      "id": "mlz9jnl",
+      "author": "Your_Dead_Man",
+      "body": "Congrats",
+      "created_utc": 1744083864.0,
+      "score": 1,
+      "parent_id": "t3_1jtgpoh",
+      "depth": 0
+    },
+    {
+      "id": "mlzim6u",
+      "author": "[deleted]",
+      "body": "I swear I have seen dozens of these social media signalling/ ai powered insights software for marketing",
+      "created_utc": 1744088189.0,
+      "score": 1,
+      "parent_id": "t3_1jtgpoh",
+      "depth": 0
+    },
+    {
+      "id": "mlzz7d3",
+      "author": "kornatzky",
+      "body": "Technical question : what is Kamal?",
+      "created_utc": 1744097637.0,
+      "score": 1,
+      "parent_id": "t3_1jtgpoh",
+      "depth": 0
+    },
+    {
+      "id": "mm0i5f8",
+      "author": "Tlaley",
+      "body": "Thank you for encouraging me. I'm gonna build 24 more apps to get where you are. \nPlus you made a cool app!",
+      "created_utc": 1744109596.0,
+      "score": 1,
+      "parent_id": "t3_1jtgpoh",
+      "depth": 0
+    },
+    {
+      "id": "mm0je2f",
+      "author": "SnarkBarkler",
+      "body": "Nice! Rails is the way to go.   \nI'm always up for some (non-vibe) coding if you need an extra hand.",
+      "created_utc": 1744110220.0,
+      "score": 1,
+      "parent_id": "t3_1jtgpoh",
+      "depth": 0
+    },
+    {
+      "id": "mm0jint",
+      "author": "Fickle_Bother9648",
+      "body": "lol more AI slop ",
+      "created_utc": 1744110282.0,
+      "score": 1,
+      "parent_id": "t3_1jtgpoh",
+      "depth": 0
+    },
+    {
+      "id": "mm0znz6",
+      "author": "[deleted]",
+      "body": "[removed]",
+      "created_utc": 1744117129.0,
+      "score": 1,
+      "parent_id": "t3_1jtgpoh",
+      "depth": 0
+    },
+    {
+      "id": "mm29yek",
+      "author": "No-Lead8915",
+      "body": "You have a real useful project. I think you need to launch on Product Hunt. My vote will be for you👍",
+      "created_utc": 1744131522.0,
+      "score": 1,
+      "parent_id": "t3_1jtgpoh",
+      "depth": 0
+    },
+    {
+      "id": "mm3hg2d",
+      "author": "emocanmimocan",
+      "body": "nice story for marketing",
+      "created_utc": 1744144072.0,
+      "score": 1,
+      "parent_id": "t3_1jtgpoh",
+      "depth": 0
+    },
+    {
+      "id": "mm3logs",
+      "author": "[deleted]",
+      "body": "[removed]",
+      "created_utc": 1744145252.0,
+      "score": 1,
+      "parent_id": "t3_1jtgpoh",
+      "depth": 0
+    },
+    {
+      "id": "mm6lh4q",
+      "author": "EnvironmentalBit1695",
+      "body": "I like the product you've built, but we used Beno AI and it does the same thing but only for Reddit. No Twitter integration yet. How's your product different? \n\nAlso, what are the limitations on usage? I like the idea but I'm just not sure about the execution. With Beno AI, we found that we couldn't add the keywords we want to add, but could only select from a list created by the app. \n\nWe also found that although the app doesn't technically have any limit on the number of conversations it finds to reply to, it would stop at 5-7. That's way too few. For our requirements, it'd have to be hundreds minimum.\n\nI also don't see a free trial for your tool. It's a bit too early in the journey to ask for payment -- most SaaS overpromise and underdeliver. I recommend you have a limited free trial to gain trust from potential buyers. \n\nFeel free to DM me if needed.",
+      "created_utc": 1744190367.0,
+      "score": 1,
+      "parent_id": "t3_1jtgpoh",
+      "depth": 0
+    },
+    {
+      "id": "mm7gv5d",
+      "author": "fatfridaylunch",
+      "body": "Here we go again",
+      "created_utc": 1744204775.0,
+      "score": 1,
+      "parent_id": "t3_1jtgpoh",
+      "depth": 0
+    },
+    {
+      "id": "mmca7o3",
+      "author": "sweetleo11",
+      "body": "Do you have any other projects in mind?  This is a fantastic project, but I also want to create something.",
+      "created_utc": 1744261813.0,
+      "score": 1,
+      "parent_id": "t3_1jtgpoh",
+      "depth": 0
+    },
+    {
+      "id": "mmcfpss",
+      "author": "duksen",
+      "body": "This is an exact resume of “The lean startup”.",
+      "created_utc": 1744264837.0,
+      "score": 1,
+      "parent_id": "t3_1jtgpoh",
+      "depth": 0
+    },
+    {
+      "id": "mmdpifb",
+      "author": "swapnil7711",
+      "body": "Congratulations, I am still in a struggle boat, hope to get paying customers soon...",
+      "created_utc": 1744289684.0,
+      "score": 1,
+      "parent_id": "t3_1jtgpoh",
+      "depth": 0
+    },
+    {
+      "id": "mme4xpn",
+      "author": "DizzyManager2408",
+      "body": "Super relatable. I was a PM responsible for product-market fit at a SaaS unicorn ($10M → $100M ARR), and still, doing early sales as a founder hit different — it’s *really* hard before PMF.\n\nEnded up building a free tool to make it easier (AI call recorder + follow-ups) and wrote down everything I wish I had when I started:  \n👉 [Founder-Led Sales: The Ultimate Early-Stage PM Guide](https://docs.google.com/document/d/1Wh4crHmPqGxzk1mbh6F5AKpQ0yNml0oFon6ECl3BUWw/edit?usp=sharing)\n\nMight be useful if you're at the “get first 10 customers” stage.",
+      "created_utc": 1744294832.0,
+      "score": 1,
+      "parent_id": "t3_1jtgpoh",
+      "depth": 0
+    },
+    {
+      "id": "mmejdjf",
+      "author": "swapnil7711",
+      "body": "Actively posting on x , haven't tried instagram yet, thanks for the suggestions",
+      "created_utc": 1744299129.0,
+      "score": 1,
+      "parent_id": "t3_1jtgpoh",
+      "depth": 0
+    },
+    {
+      "id": "mmiy6t1",
+      "author": "Lusper-mh",
+      "body": "Is a better alternative to utilise chatgpt to generate real problems for u that u can solve?",
+      "created_utc": 1744356105.0,
+      "score": 1,
+      "parent_id": "t3_1jtgpoh",
+      "depth": 0
+    },
+    {
+      "id": "mm0d84x",
+      "author": "Rdqp",
+      "body": "Start by solving unreal problems!",
+      "created_utc": 1744106845.0,
+      "score": 7,
+      "parent_id": "t1_mlwt80l",
+      "depth": 1
+    },
+    {
+      "id": "mmdfmxs",
+      "author": "XCSme",
+      "body": "And, to be honest, most people by products for problems they don't even have...\n\nMost human problems are solved nowadays (food, shelter, safety, etc.), all the other problems are mostly self-imposed.\n\nLook at the top grossing apps on PlayStore, what problems do they solve?\n\n* Google One – Cloud storage subscription (Google Drive, Gmail, Photos).\n* TikTok – Short-form video platform with in-app purchases.\n* Amazon Shopping – Online retail shopping with Prime subscriptions.\n* Disney+ – Streaming service for Disney content.\n* YouTube – Video platform; YouTube Premium removes ads and adds features.\n* HBO Max – Streaming service for HBO and Warner Bros content.\n* Netflix – Subscription-based streaming for movies and TV shows.\n* Pandora Music – Music streaming with premium plans.\n* Tinder – Dating app with premium features and boosts.\n* Bumble – Dating app where women message first; also offers premium tiers.\n\nIf anything, those apps create more problems than they solve...\n\nWhat about top 10 consumer companies in the US?\n\n* Procter &amp; Gamble (P&amp;G) – Household and personal care products (e.g. Tide, Pampers, Gillette).\n* PepsiCo – Beverages and snacks (Pepsi, Lay’s, Gatorade, Quaker).\n* Tyson Foods – Meat and poultry products (chicken, beef, pork).\n* The Coca-Cola Company – Non-alcoholic beverages (Coke, Sprite, Dasani).\n* Nike – Athletic footwear, apparel, and accessories.\n* Mondelez International – Snacks and confectionery (Oreo, Cadbury, Trident).\n* Colgate-Palmolive – Oral care, personal care, and pet nutrition (Colgate, Palmolive, Hill’s).\n* General Mills – Packaged foods (Cheerios, Haagen-Dazs, Nature Valley).\n* Kraft Heinz – Packaged foods and condiments (Kraft, Heinz, Velveeta).\n* Kimberly-Clark – Personal care products (Huggies, Kleenex, Scott).\n\nThose do seem to solve actual problems and needs.\n\nI doubt there are many software products that solve real problems, we live in a world where, for a small business, it's better if you can make someone lives better, improve it, easier, not to solve problems/needs.\n\nEnd of random rant...",
+      "created_utc": 1744285790.0,
+      "score": 3,
+      "parent_id": "t1_mlwt80l",
+      "depth": 1
+    },
+    {
+      "id": "mlx5m0e",
+      "author": "jakeStacktrace",
+      "body": "I like Ruby too",
+      "created_utc": 1744056958.0,
+      "score": 3,
+      "parent_id": "t1_mluqv0d",
+      "depth": 1
+    },
+    {
+      "id": "mlv24md",
+      "author": "FI_investor",
+      "body": "Rails is so great for rapid app development :)",
+      "created_utc": 1744033697.0,
+      "score": 2,
+      "parent_id": "t1_mluqv0d",
+      "depth": 1
+    },
+    {
+      "id": "mmbud6r",
+      "author": "Select_Bluejay8047",
+      "body": "UI seems sleek. Which CSS/JS framework is used?",
+      "created_utc": 1744254501.0,
+      "score": 1,
+      "parent_id": "t1_mluqv0d",
+      "depth": 1
+    },
+    {
+      "id": "mlwtx17",
+      "author": "lakimens",
+      "body": "Ah, you think he's really making money? This sub it's just a free advertising spot now",
+      "created_utc": 1744053319.0,
+      "score": 17,
+      "parent_id": "t1_mlve28l",
+      "depth": 1
+    },
+    {
+      "id": "mlzmu3m",
+      "author": "FI_investor",
+      "body": "will do",
+      "created_utc": 1744090450.0,
+      "score": 2,
+      "parent_id": "t1_mlvvbf5",
+      "depth": 1
+    },
+    {
+      "id": "mlzmvpk",
+      "author": "FI_investor",
+      "body": "what do you mean?",
+      "created_utc": 1744090476.0,
+      "score": 1,
+      "parent_id": "t1_mlxd6u9",
+      "depth": 1
+    },
+    {
+      "id": "mm31sml",
+      "author": "simmie-entrepreneur",
+      "body": "Good question",
+      "created_utc": 1744139531.0,
+      "score": 1,
+      "parent_id": "t1_mlxklyz",
+      "depth": 1
+    },
+    {
+      "id": "mlz5ior",
+      "author": "FI_investor",
+      "body": "check negative reviews on app stores or review websites",
+      "created_utc": 1744082168.0,
+      "score": 2,
+      "parent_id": "t1_mlypbao",
+      "depth": 1
+    },
+    {
+      "id": "mlzx1es",
+      "author": "FI_investor",
+      "body": "Thank you!",
+      "created_utc": 1744096221.0,
+      "score": 1,
+      "parent_id": "t1_mlz9jnl",
+      "depth": 1
+    },
+    {
+      "id": "mm0y8mb",
+      "author": "FI_investor",
+      "body": "Tool for deploying on production. It's great, check it out",
+      "created_utc": 1744116604.0,
+      "score": 1,
+      "parent_id": "t1_mlzz7d3",
+      "depth": 1
+    },
+    {
+      "id": "mm0xx9b",
+      "author": "FI_investor",
+      "body": "Good luck! You're gonna make it",
+      "created_utc": 1744116486.0,
+      "score": 2,
+      "parent_id": "t1_mm0i5f8",
+      "depth": 1
+    },
+    {
+      "id": "mm6euy2",
+      "author": "FI_investor",
+      "body": "actual coded solution. if you just focus on 1 core feature and utilize AI to help you build the MVP for a few days, it's really possible. Try it",
+      "created_utc": 1744186013.0,
+      "score": 2,
+      "parent_id": "t1_mm3logs",
+      "depth": 1
+    }
+  ],
+  "fetched_at": 1755100743,
+  "schema": "v1"
+}

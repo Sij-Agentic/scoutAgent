@@ -1,0 +1,54 @@
+{
+  "post": {
+    "id": "1m9ikbn",
+    "subreddit": "SaaS",
+    "title": "Is workflow automation overused? Or is it essential part of your daily productivity?",
+    "author": "EqualHat_91",
+    "created_utc": 1753498649.0,
+    "score": 4,
+    "num_comments": 7,
+    "url": "https://www.reddit.com/r/SaaS/comments/1m9ikbn/is_workflow_automation_overused_or_is_it/",
+    "permalink": "https://www.reddit.com/r/SaaS/comments/1m9ikbn/is_workflow_automation_overused_or_is_it/",
+    "selftext": "I’ve been noticing that more people automating everything. Starting from calendar to email sorting to even parts of creative process. Are we automating too much just for the sake of it or is it helping? Curios to know which one is genuinely saving the time and worthy?"
+  },
+  "comments": [
+    {
+      "id": "n57cica",
+      "author": "Its_Leo_",
+      "body": "Ive recently wrote about this on my LinkedIn. Automation only makes sense when you have access data, need to dig deeper, your team understand the technology here, you notice hours are wasted on low value efforts and youre burning cash on CS or specific department more than another. These are just high level items. Otherwise, not everything needs automation especially when trust in the workflow and system adoption is still raw",
+      "created_utc": 1753498878.0,
+      "score": 2,
+      "parent_id": "t3_1m9ikbn",
+      "depth": 0
+    },
+    {
+      "id": "n65zbck",
+      "author": "Pavel_at_Nimbus",
+      "body": "I think the question isn't really whether to automate, but what to automate. If tasks are repetitive and draining, let automation handle them. So you've got more energy and time for the stuff that actually needs your input like creative and high-value processes.\n\nThough if rigid automation doesn't work for you (when things change quickly or need context), you can use AI Agents. They still get things done, but they're more flexible and adjust based on what's happening. More like personal assistants.\n\nOr you can combine both approaches for maximum impact. If you need examples of tools for this, you can check out our platform FuseBase. It's got prebuilt agents, smart workspaces, and automation hubs. Everything's no-code and highly customizable. I'm happy to share more details if it's helpful!",
+      "created_utc": 1753970109.0,
+      "score": 1,
+      "parent_id": "t3_1m9ikbn",
+      "depth": 0
+    },
+    {
+      "id": "n7phsg1",
+      "author": "daphnegweneth",
+      "body": "I automate the boring stuff. Zapier moves client from responses into my tracker and sends a welcome email, saves me time for the creative work",
+      "created_utc": 1754703922.0,
+      "score": 1,
+      "parent_id": "t3_1m9ikbn",
+      "depth": 0
+    },
+    {
+      "id": "n57dcp2",
+      "author": "EqualHat_91",
+      "body": "Agreed. It’s great for repetitive works and low key tasks, but I stopped using it for meeting notes generation and writing. I noticed i wasn’t pushing my own ideas as much.",
+      "created_utc": 1753499226.0,
+      "score": 2,
+      "parent_id": "t1_n57cica",
+      "depth": 1
+    }
+  ],
+  "fetched_at": 1755100791,
+  "schema": "v1"
+}

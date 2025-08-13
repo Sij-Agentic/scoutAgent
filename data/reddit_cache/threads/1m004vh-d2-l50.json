@@ -1,0 +1,45 @@
+{
+  "post": {
+    "id": "1m004vh",
+    "subreddit": "SaaS",
+    "title": "General Workflow Automation",
+    "author": "No-Mycologist-9014",
+    "created_utc": 1752530833.0,
+    "score": 3,
+    "num_comments": 5,
+    "url": "https://www.reddit.com/r/SaaS/comments/1m004vh/general_workflow_automation/",
+    "permalink": "https://www.reddit.com/r/SaaS/comments/1m004vh/general_workflow_automation/",
+    "selftext": "What’s your go-to tech stack for automating content distribution across multiple platforms (blogs, social, newsletters, etc.)?"
+  },
+  "comments": [
+    {
+      "id": "n3bllpf",
+      "author": "abaumtro",
+      "body": "My go-to stack looks like this:\n\n* **ChatGPT** for generating content (social posts, scripts, summaries)\n* [**Make.com**](http://Make.com) as the automation engine to connect everything\n* [**bookoly**](https://bookoly.com) to turn content into videos with voice-over, subtitles, and music\n* **Google Sheets** or **Airtable** as the content hub\n* Then auto-publish to different platforms (social media, blog, etc.)\n\nIt’s been a huge time-saver. Once the initial setup is done, I can go from idea to multi-platform content in minutes. The key for me was keeping the system flexible — one good prompt in ChatGPT can feed the whole chain.\n\nWould love to hear how others are approaching this too!",
+      "created_utc": 1752609507.0,
+      "score": 2,
+      "parent_id": "t3_1m004vh",
+      "depth": 0
+    },
+    {
+      "id": "n3f4f1h",
+      "author": "fdezmero",
+      "body": "I'm using my own product. You can automate just about anything you want (in plain English, not flowcharts) and extend it using Zapier MCP.   \n  \nI've been focusing on automating some stuff for marketing agencies like:  \n[https://chatterkb.com/workflow-library/customer-journey-decision-simulator/](https://chatterkb.com/workflow-library/customer-journey-decision-simulator/)  \n[https://chatterkb.com/workflow-library/youtube-video-analysis-workflow/](https://chatterkb.com/workflow-library/youtube-video-analysis-workflow/)  \n[https://chatterkb.com/workflow-library/seo-keyword-discovery-workflow/](https://chatterkb.com/workflow-library/seo-keyword-discovery-workflow/)",
+      "created_utc": 1752659988.0,
+      "score": 1,
+      "parent_id": "t3_1m004vh",
+      "depth": 0
+    },
+    {
+      "id": "n5vs10t",
+      "author": "frevana",
+      "body": "I am using the content repurposing platform that I created myself: [https://www.frevana.com/homepage](https://www.frevana.com/homepage)  \nIt does help distribute your content to 5 different platforms.",
+      "created_utc": 1753830240.0,
+      "score": 1,
+      "parent_id": "t3_1m004vh",
+      "depth": 0
+    }
+  ],
+  "fetched_at": 1755100803,
+  "schema": "v1"
+}

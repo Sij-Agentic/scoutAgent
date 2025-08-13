@@ -1,0 +1,108 @@
+{
+  "post": {
+    "id": "1l1bg31",
+    "subreddit": "SideProject",
+    "title": "I curated 50+ Automation Tools to automate your marketing and development workflows",
+    "author": "Then-Focus-2157",
+    "created_utc": 1748847727.0,
+    "score": 17,
+    "num_comments": 12,
+    "url": "https://i.redd.it/btr4srzulg4f1.png",
+    "permalink": "https://www.reddit.com/r/SideProject/comments/1l1bg31/i_curated_50_automation_tools_to_automate_your/",
+    "selftext": ""
+  },
+  "comments": [
+    {
+      "id": "mvjsyaq",
+      "author": "[deleted]",
+      "body": "[removed]",
+      "created_utc": 1748848216.0,
+      "score": 2,
+      "parent_id": "t3_1l1bg31",
+      "depth": 0
+    },
+    {
+      "id": "mvjtrip",
+      "author": "abdulmannans",
+      "body": "how can we visit this?",
+      "created_utc": 1748848707.0,
+      "score": 2,
+      "parent_id": "t3_1l1bg31",
+      "depth": 0
+    },
+    {
+      "id": "mvjuq2t",
+      "author": "Then-Focus-2157",
+      "body": "Checkout directory here: [https://www.automationtools.directory/](https://www.automationtools.directory/)",
+      "created_utc": 1748849294.0,
+      "score": 1,
+      "parent_id": "t3_1l1bg31",
+      "depth": 0
+    },
+    {
+      "id": "mvlkj1f",
+      "author": "[deleted]",
+      "body": "[removed]",
+      "created_utc": 1748876471.0,
+      "score": 1,
+      "parent_id": "t3_1l1bg31",
+      "depth": 0
+    },
+    {
+      "id": "mvluaw4",
+      "author": "SUPRVLLAN",
+      "body": "Thanks brah.",
+      "created_utc": 1748879288.0,
+      "score": 1,
+      "parent_id": "t3_1l1bg31",
+      "depth": 0
+    },
+    {
+      "id": "mwmxygr",
+      "author": "Hocrux9",
+      "body": "You should try Usedash  it’s made for non-devs. Super user-friendly, no-code interface, and easy to integrate with tools like Notion, OpenAI, and Google Sheets. Free and open-source, too!",
+      "created_utc": 1749380046.0,
+      "score": 1,
+      "parent_id": "t3_1l1bg31",
+      "depth": 0
+    },
+    {
+      "id": "mvjt7fk",
+      "author": "Then-Focus-2157",
+      "body": "Thanks!",
+      "created_utc": 1748848369.0,
+      "score": 1,
+      "parent_id": "t1_mvjsyaq",
+      "depth": 1
+    },
+    {
+      "id": "mvjusy4",
+      "author": "Then-Focus-2157",
+      "body": "You can visit here: [https://www.automationtools.directory/](https://www.automationtools.directory/)\n\nWould love to know feedback/suggestion to make this better.",
+      "created_utc": 1748849344.0,
+      "score": 1,
+      "parent_id": "t1_mvjtrip",
+      "depth": 1
+    },
+    {
+      "id": "mvlltsm",
+      "author": "Then-Focus-2157",
+      "body": "Thanks, feel free to comment here. Will try my best to implement them",
+      "created_utc": 1748876853.0,
+      "score": 2,
+      "parent_id": "t1_mvlkj1f",
+      "depth": 1
+    },
+    {
+      "id": "mvlyv2i",
+      "author": "Then-Focus-2157",
+      "body": "Glad you like it",
+      "created_utc": 1748880599.0,
+      "score": 1,
+      "parent_id": "t1_mvluaw4",
+      "depth": 1
+    }
+  ],
+  "fetched_at": 1755100794,
+  "schema": "v1"
+}

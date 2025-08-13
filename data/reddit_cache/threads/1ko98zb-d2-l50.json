@@ -1,0 +1,63 @@
+{
+  "post": {
+    "id": "1ko98zb",
+    "subreddit": "SaaS",
+    "title": "What are you using as an enterprise sales team to automate research?",
+    "author": "ShoddyPut8089",
+    "created_utc": 1747422900.0,
+    "score": 2,
+    "num_comments": 5,
+    "url": "https://www.reddit.com/r/SaaS/comments/1ko98zb/what_are_you_using_as_an_enterprise_sales_team_to/",
+    "permalink": "https://www.reddit.com/r/SaaS/comments/1ko98zb/what_are_you_using_as_an_enterprise_sales_team_to/",
+    "selftext": "We’re looking to become more efficient as a sales team and don’t really believe in AI generated messages. But AI to help us with prospecting would be a huge time saver. \n\n\n\nSo we’re currently looking for tools that can search the web for information on a particular person, their company and provide insights that would help us frame better cold outbound campaigns suited to their current pain points. \n\n\n\nIf you’ve built internal tools as a sales team, would love to hear how you guys did it. \n\n\n\nThanks in advance!"
+  },
+  "comments": [
+    {
+      "id": "msoi272",
+      "author": "BlackberryPleasant10",
+      "body": "We have an enterprise client who has done the exact use case in our platform and they are very happy and close more deals due to AI automated research, pain points, solution proposal etc. Leave me a message and we can discuss more to explain how they automated this",
+      "created_utc": 1747424695.0,
+      "score": 1,
+      "parent_id": "t3_1ko98zb",
+      "depth": 0
+    },
+    {
+      "id": "msqi21l",
+      "author": "Ramosisend",
+      "body": "\n\nTools you can use to build your own platform: Crustdata - API of realtime B2B data, Lindy AI - platform to build your own AI agents, Exa - web research API.\n\nReady-made platforms to help you out: Amplemarket, Aomni, CommonRoom.\n\nHope this helps.",
+      "created_utc": 1747450769.0,
+      "score": 1,
+      "parent_id": "t3_1ko98zb",
+      "depth": 0
+    },
+    {
+      "id": "n1acucn",
+      "author": "Simple_Paper_4526",
+      "body": "Totally agree, AI-generated messages can feel off, but using AI to automate research and gather insights is a huge win.  \nThe place where I work started using Kubiya to build internal workflows that pull company and prospect info from multiple sources (news, LinkedIn, funding data, etc.), then summarize it into usable insights. It doesn’t write the message for us, but it gives us exactly what we need to craft better outreach, fast.",
+      "created_utc": 1751627261.0,
+      "score": 1,
+      "parent_id": "t3_1ko98zb",
+      "depth": 0
+    },
+    {
+      "id": "n2izexg",
+      "author": "SidLais351",
+      "body": "We ran into the same issue. Tons of scraped info, but not always clear next steps. Ended up stitching together some lightweight research workflows using Kubiya, mostly to summarize leads and feed into our CRM. It doesn’t generate outreach, but it cuts down a bunch of the prep work.",
+      "created_utc": 1752230954.0,
+      "score": 1,
+      "parent_id": "t3_1ko98zb",
+      "depth": 0
+    },
+    {
+      "id": "muo9nqs",
+      "author": "Key-Boat-7519",
+      "body": "I've dabbled in Amplemarket, Exa, and even Lindy AI with mixed results, but what pushed the needle for me was setting up with DreamFactory. It let us create secure APIs to access prospect data straight from our databases, which was a game-changer. Automating research got way more efficient.",
+      "created_utc": 1748427168.0,
+      "score": 1,
+      "parent_id": "t1_msqi21l",
+      "depth": 1
+    }
+  ],
+  "fetched_at": 1755100767,
+  "schema": "v1"
+}

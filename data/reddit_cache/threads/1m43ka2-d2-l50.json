@@ -1,0 +1,63 @@
+{
+  "post": {
+    "id": "1m43ka2",
+    "subreddit": "SaaS",
+    "title": "Failed business and my plan for pivot",
+    "author": "searchdogai",
+    "created_utc": 1752950295.0,
+    "score": 1,
+    "num_comments": 6,
+    "url": "https://www.reddit.com/r/SaaS/comments/1m43ka2/failed_business_and_my_plan_for_pivot/",
+    "permalink": "https://www.reddit.com/r/SaaS/comments/1m43ka2/failed_business_and_my_plan_for_pivot/",
+    "selftext": "Hi everyone, \n\n  \nI know there's a lot of posts in this area but I figured I would share my experience. I set out around 5 months ago to create a SaaS and build a business of my own. I did what everyone does wrong on their first time and I focused more on the product than on my customers - or the lack thereof.\n\nI built a booking platform for golf simulators which was filled with all the features I look for as a customer. I had assumed sales would be easy-ish because I can google for simulators in certain areas and get my leads this way. Not until I cold called about 100+ did I realize my target customers were **not** golf simulators already established. These owners don't spend much as-is on any booking platform solution, and the 20$ a month savings is not worth the hassle of overhauling their system.\n\nMy customers were **new simulator builds** \\- and finding them is incredibly difficult and time consuming. The better way is **to be found** \\- in forums, search engine ranking etc. From here I learned about the change occurring on the web with search engines: the slow decline of traditional SEO (Search Engine Optimization) and the rise of AEO (Answer Engine Optimization). As search engines—especially Google—shift toward AI-driven, answer-focused models (like featured snippets and generative results), being “searchable” isn’t just about ranking keywords anymore. \n\nI found, over **58% of all searches now end without a click**, because users get their answers directly from the search engine results page. At the same time, platforms like Google’s Search Generative Experience (SGE) are reshaping the way businesses get discovered. Content that directly answers user intent is prioritized, and that's where AEO comes in. Optimizing for clear, concise, helpful answers—on your website or elsewhere—can be more impactful than traditional keyword-heavy blog posts.\n\n  \nThat's why I am pivoting to help businesses get discovered more easily as we see the rise of customers only relying on AI engine responses over traditional search.\n\n  \nI built [https://www.searchdogai.com](https://www.searchdogai.com) which at the moment has a **free AEO scoring tool** which relies on research-proven methodology powered by a multi-agent architecture to provide a quick ranking for how your website fares against your competition in AI engine responses. \n\n  \nWe are close to completion of our full product which comes with a full dashboard, advanced tracking, automated AEO optimization, insights and more. \n\nGive it a shot and let me know how it works - or doesn't work for you!"
+  },
+  "comments": [
+    {
+      "id": "n41frm5",
+      "author": "Sea-Barracuda-6421",
+      "body": "&gt;*\"Application error: a client-side exception has occurred while loading www.searchdogai.com (see the browser console for more information).\"*\n\nAnd the info from the console:\n\n&gt;*Failed to load resource: the server responded with a status of 429 ()*\n\n&gt;*page-8a162f2eb970e357.js:1 API call took 439ms*\n\n&gt;*page-8a162f2eb970e357.js:1 Uncaught TypeError: Cannot read properties of undefined (reading 'length')*\n\nSo the free tool didn't provide me with any results..\n\n#",
+      "created_utc": 1752950939.0,
+      "score": 1,
+      "parent_id": "t3_1m43ka2",
+      "depth": 0
+    },
+    {
+      "id": "n41hkwl",
+      "author": "[deleted]",
+      "body": "[deleted]",
+      "created_utc": 1752951519.0,
+      "score": 1,
+      "parent_id": "t3_1m43ka2",
+      "depth": 0
+    },
+    {
+      "id": "n45abt2",
+      "author": "AirPulse",
+      "body": "With the shift to answer engines, tracking AI bot responses is key now. I used AICarma to see how different LLMs describe my SaaS, which helped spot gaps in how my brand appears in AI answers. Their weekly digests show visibility trends versus competitors, which is useful for tweaking messaging. Since you're focusing on AEO, this might help with your pivot too.",
+      "created_utc": 1753009022.0,
+      "score": 1,
+      "parent_id": "t3_1m43ka2",
+      "depth": 0
+    },
+    {
+      "id": "n41h5s4",
+      "author": "searchdogai",
+      "body": "I believe the daily usage limit was invoked incorrectly - if you are able to try again please do! Thanks.",
+      "created_utc": 1752951385.0,
+      "score": 1,
+      "parent_id": "t1_n41frm5",
+      "depth": 1
+    },
+    {
+      "id": "n43w1bq",
+      "author": "searchdogai",
+      "body": "Yes!",
+      "created_utc": 1752982314.0,
+      "score": 1,
+      "parent_id": "t1_n41hkwl",
+      "depth": 1
+    }
+  ],
+  "fetched_at": 1755100825,
+  "schema": "v1"
+}

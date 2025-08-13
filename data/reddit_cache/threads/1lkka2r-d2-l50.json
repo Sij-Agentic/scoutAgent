@@ -1,0 +1,45 @@
+{
+  "post": {
+    "id": "1lkka2r",
+    "subreddit": "microsaas",
+    "title": "Is B2B Rocket the Stronger Sales Automation Solution?",
+    "author": "colerncandy",
+    "created_utc": 1750892353.0,
+    "score": 2,
+    "num_comments": 10,
+    "url": "https://www.reddit.com/r/microsaas/comments/1lkka2r/is_b2b_rocket_the_stronger_sales_automation/",
+    "permalink": "https://www.reddit.com/r/microsaas/comments/1lkka2r/is_b2b_rocket_the_stronger_sales_automation/",
+    "selftext": "Currently using Reply io but looking for better automation. Researching alternatives to Reply io with more comprehensive capabilities. Anyone compared B2B Rocket's automation features?"
+  },
+  "comments": [
+    {
+      "id": "n0wet8y",
+      "author": "lildiez5000",
+      "body": "Reply io sends emails, but we still had to find and upload contacts. B2B Rocket does both, so no manual list building. Our SDRs reclaimed 25+ hours weekly while increasing meetings by 63%.",
+      "created_utc": 1751438240.0,
+      "score": 1,
+      "parent_id": "t3_1lkka2r",
+      "depth": 0
+    },
+    {
+      "id": "n1357em",
+      "author": "silversamurai047",
+      "body": "Our conversion rates jumped once the AI wrote and personalized each follow-up. Reply io felt too templated. Response rates increased from 1.8% to 4.6% after switching platforms.",
+      "created_utc": 1751526752.0,
+      "score": 1,
+      "parent_id": "t3_1lkka2r",
+      "depth": 0
+    },
+    {
+      "id": "n1st3bo",
+      "author": "dinamojo",
+      "body": "Reply io is just one piece of the sales tech stack. B2B Rocket replaced it plus three other tools we were using. The comprehensive platform increased our pipeline by 67% while reducing our total technology spend by 28%.",
+      "created_utc": 1751892887.0,
+      "score": 1,
+      "parent_id": "t3_1lkka2r",
+      "depth": 0
+    }
+  ],
+  "fetched_at": 1755100750,
+  "schema": "v1"
+}

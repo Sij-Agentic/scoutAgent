@@ -1,0 +1,459 @@
+{
+  "post": {
+    "id": "1fap8jq",
+    "subreddit": "SaaS",
+    "title": "Do NOT use Stripe. They will ruin your business.",
+    "author": "lead-indicator",
+    "created_utc": 1725654734.0,
+    "score": 334,
+    "num_comments": 255,
+    "url": "https://www.reddit.com/r/SaaS/comments/1fap8jq/do_not_use_stripe_they_will_ruin_your_business/",
+    "permalink": "https://www.reddit.com/r/SaaS/comments/1fap8jq/do_not_use_stripe_they_will_ruin_your_business/",
+    "selftext": "I am leaving this message here because they removed it from r/stripe. If you are currently using Stripe or plan on using Stripe, I strongly encourage you to consider an alternate option as they will shut down your account for no legitimate reason and hold your funds indefinitely.\n\nI currently have over $25k in Stripe and they have closed my account, paused payouts, and they have literally gone as far as telling me they are keeping the money. I even had a payout due on August 20th for $9.5k, which was the day they closed my account. They paid it out into my business account, and then withdrew it back out of my account after it was paid! \n\nHere is exactly what happened..\n\nI run a lead generation company that does SEO, paid ads, etc for home service businesses. We have been with Stripe for over 2 years now. We just started incorporating conversational ai into our package so we can use “speed-to-lead” booking bots and reactivation campaigns. The AI stuff has been going great - so much that it’s become my main focus over the past 6 months. \n\nJust last month, a buddy of mine who runs a course/program that teaches students how to do SEO for home service businesses approached me about the idea of creating a separate course regarding conversational AI and teaching students how to set that up. We decide to go 50:50 on the course - he will endorse the course to his students and I will teach it. We create a separate Stripe account so that each of us can have full access to it and have visibility on the course sales. \n\nAfter just 3 days of launching the course, Stripe shuts down our account because they said, “After conducting a routine review of your business, we’ve found that it presents a higher level or risk than we can currently support”.I have provided them ALL of the information. All my LLC information, the websites, everything. Every student that joined signed an agreement. Not a single chargeback. \n\nStripe won’t give me the time of day. Nothing but automated emails. I ask to speak with someone on the phone. They refuse. Here is the automated email.\n\n# They say, “Based on the information available to us, including documents submitted via your dashboard appeal your decision, we’ve determined that your account still presents an unacceptable level of risk. As a result, any funds in your account balance, and any pending charges, will be reversed within 5 days of the account closure data. If a balance still remains in your account after all reversales have been processed, it will not be made available to you, in accordance with Section 5.6 of Service Terms for Stripe Payment..”\n\n\n\nWTF?! The balance will not be made available to me? Here is the thing, they only refunded 2 of the students. There is still $5k sitting in that account that they are just keeping! Stripe won’t even acknowledge me. They just send automated emails, refuse to pay me out, and keep the account shut down while they keep the money. \n\nHere is the part where it gets worse, and where I feel extra stupid. We had just launched the course and promoted it. So we had a calendar full of booked appointments with students who were interested in the course but no way to accept the payments. I had the bright idea of “Why don’t we just use my primary Stripe account until we get this whole thing sorted out”. So we started accepting payments in my primary Stripe account - the one that I use for my main lead gen customers.  After just a few days, Stripe shut that down too. And now they are holding over $20k in that account because it’s “high-risk”. Let me remind you that I did not have a single chargeback. \n\nThere is absolutely **NO WAY FORWARD WITH THEM**. I have explained everything to them. Provided every document. All I get is automated responses that say, “Thank you for bringing your concerns to our attention. Stripe determined that your account was too high risk to support. As such, it closed your account.”\n\nThey will NOT talk to you. They will not work with you at all. As far as I can tell, they are keen on keeping my funds in there forever unless I take legal action."
+  },
+  "comments": [
+    {
+      "id": "lluvj1u",
+      "author": "gboostlabs",
+      "body": "Stripe made an update a few months back that affects content like this. I don’t understand it in full detail, but here’s a summary from an [article](https://directpaynet.com/stripe-bans-content-creation/) I found: “Essentially, Stripe wants to avoid being used as a middleman for transactions where the value is primarily in the form of exclusive access, rather than the transfer of ownership of digital goods.“ I find it pretty confusing, but maybe this new policy has something to do with the issue you ran into.\n\nSorry to hear about your situation though, that REALLY sucks. Not sure what you can do in this case :/ try calling them out on Twitter or something?",
+      "created_utc": 1725656803.0,
+      "score": 82,
+      "parent_id": "t3_1fap8jq",
+      "depth": 0
+    },
+    {
+      "id": "llv6go2",
+      "author": "Single_Efficiency509",
+      "body": "Yep.\n\nMy pal has like $80k locked on stripe but he talked with someone inside &amp; he made it work.\n\nPain in the butt.",
+      "created_utc": 1725660517.0,
+      "score": 63,
+      "parent_id": "t3_1fap8jq",
+      "depth": 0
+    },
+    {
+      "id": "llw984k",
+      "author": "JmoneyBS",
+      "body": "Folks need to remember that when no proof is presented, every post can be a guerrilla marketing campaign.",
+      "created_utc": 1725675137.0,
+      "score": 50,
+      "parent_id": "t3_1fap8jq",
+      "depth": 0
+    },
+    {
+      "id": "llv6fi1",
+      "author": "DogecoinArtists",
+      "body": "Scary and worrying. I’ll consider switching.",
+      "created_utc": 1725660505.0,
+      "score": 32,
+      "parent_id": "t3_1fap8jq",
+      "depth": 0
+    },
+    {
+      "id": "llvyp7o",
+      "author": "BakGikHung",
+      "body": "* why are you using a throwaway account ?\n* why are you not posting your website url ?",
+      "created_utc": 1725670992.0,
+      "score": 33,
+      "parent_id": "t3_1fap8jq",
+      "depth": 0
+    },
+    {
+      "id": "llvz1v5",
+      "author": "VirginiaBarExamTutor",
+      "body": "So I’ve had only good experiences with stripe in the over 8 years I’ve been using them.  But of course, your post was concerning. So, as a lawyer myself, I went straight to their service terms for stipe payment and was not able to locate a section 5.6.  Their tos goes from 5.4 to 6.  Perhaps OP had an innocent explanation for this and can just link to or screenshot the relevant TOS section?  Or post a screenshot of the entire email from Stripe, including the headers?",
+      "created_utc": 1725671133.0,
+      "score": 27,
+      "parent_id": "t3_1fap8jq",
+      "depth": 0
+    },
+    {
+      "id": "llvqmhl",
+      "author": "Engineer_5983",
+      "body": "This doesn't sound right.  Stripe doesn't have a 5.6 section in their service agreement.  It isn't the way they work anyway.  They will however cancel if they feel it represents a high risk of money laundering, embezzlement, illegal trafficking, tax fraud, mail fraud, chargeback risk, etc...  I'm not an agent or employee for Stripe, and I use a different payment processor, but this sounds like an online vent.  If you've had a recent rash of chargebacks, they can hold money until the risk is over but they can't hold it forever.",
+      "created_utc": 1725667974.0,
+      "score": 21,
+      "parent_id": "t3_1fap8jq",
+      "depth": 0
+    },
+    {
+      "id": "llvmnka",
+      "author": "LimpAd4773",
+      "body": "This is their automated system kicking in for an LLC. I made an LLC and tried to register for Stripe but each time they'd close my account after just one day mentioning the same reason. Then when I contacted their support they'd say that I'm on MATCH list, a list of blocked merchants made by MasterCard. They said they can't tell me who placed me on the list and to contact any previous payment companies I used. I contacted Payoneer and Wise since I had accounts on them but they would say that they didn't place me on any list. Finally, after months of back and forth support emails with Stripe and threatening to sue them they finally paid attention and realized that they had made a mistake and I wasn't really on any list at all and my account was finally approved and active. However my trust in Stripe has eroded and I don't trust them that much anymore but we don't have too many options sadly. All competitors are worse than Stripe and Stripe has a monopoly.",
+      "created_utc": 1725666447.0,
+      "score": 18,
+      "parent_id": "t3_1fap8jq",
+      "depth": 0
+    },
+    {
+      "id": "llwytvl",
+      "author": "Top_Half_6308",
+      "body": "For everyone having trouble finding section 5.6, here’s a great thread about the contents of it and why you may not be able to find 5.6 in your terms of service.\n[Reddit thread about section 5.6 in the ToS.](https://www.reddit.com/r/stripe/s/heYksDHOxB)",
+      "created_utc": 1725687128.0,
+      "score": 8,
+      "parent_id": "t3_1fap8jq",
+      "depth": 0
+    },
+    {
+      "id": "llw3pip",
+      "author": "Neither_Factor_5296",
+      "body": "I'm so sorry to hear that this happened to you, especially because a very similar thing happened to me this morning but with Paddle. I woke up to an email stating that my account is scheduled for closure following an in-depth review of my offerings by their risk team. I'm running an AI business that utilizes various generative AI models. Users who upgrade their accounts will unlock additional features inside the application. None of my customers requested a charge back on their transaction. When I asked support about the nature of the issue that warranted such an action, I was told they're unable to provide any more information beyond what was stated in the email. Thankfully, I won't be losing a bundle of revenue, but I'm still upset about the whole situation. I'm now in the process of migrating to a different payment processor and am saddened to see that Stripe could also pull something like this on me.",
+      "created_utc": 1725672936.0,
+      "score": 4,
+      "parent_id": "t3_1fap8jq",
+      "depth": 0
+    },
+    {
+      "id": "llxiuj3",
+      "author": "PurpleEsskay",
+      "body": "Sorry but I don’t buy this story at all. For starters an almost identical story keeps getting posted on various subreddits every month or so. And just like in this case, it’s from a fresh account and any attempt to get them to share their domain is ignored. \n\nI’m calling bullshit and this is some sort of vendetta or attempt at badmouthing a competitor.\n\nIt’s also not the first one to say they now use authorize.net which is a super odd choice for SaaS products.",
+      "created_utc": 1725700380.0,
+      "score": 3,
+      "parent_id": "t3_1fap8jq",
+      "depth": 0
+    },
+    {
+      "id": "lm07xpl",
+      "author": "dhamaniasad",
+      "body": "Had this happen with me. I kept pestering them for a few months, a dozen times, and they eventually unblocked my account without explanation but by then I’d went with paddle instead. Avoided lemonsqueezy since it’s just stripe in disguise and their support is just like as bad.",
+      "created_utc": 1725739836.0,
+      "score": 6,
+      "parent_id": "t3_1fap8jq",
+      "depth": 0
+    },
+    {
+      "id": "lm0so4k",
+      "author": "FuShiLu",
+      "body": "Always amusing when someone starts yelling but only sharing part of the story, especially the part(s) where they triggered the clause. Been using Stripe for over a decade across several of our companies across industries without issue. We must be the anomoly. For those looking to ‘run’ to something other, you’re still going to have to read and understand the terms/usage agreements. Also curious why people are leaving funds in Stripe? This seems a weird approach as they are not bank.",
+      "created_utc": 1725747101.0,
+      "score": 4,
+      "parent_id": "t3_1fap8jq",
+      "depth": 0
+    },
+    {
+      "id": "llve42w",
+      "author": "[deleted]",
+      "body": "[deleted]",
+      "created_utc": 1725663255.0,
+      "score": 3,
+      "parent_id": "t3_1fap8jq",
+      "depth": 0
+    },
+    {
+      "id": "llwfc48",
+      "author": "PcisT",
+      "body": "I’m in the exact same situation with $50k they are holding. It’s quite unbelievable and sad",
+      "created_utc": 1725677642.0,
+      "score": 3,
+      "parent_id": "t3_1fap8jq",
+      "depth": 0
+    },
+    {
+      "id": "llwqeuf",
+      "author": "coopmaster123",
+      "body": "Genuinely asking then where are people shifting instead?",
+      "created_utc": 1725682584.0,
+      "score": 3,
+      "parent_id": "t3_1fap8jq",
+      "depth": 0
+    },
+    {
+      "id": "llxax3b",
+      "author": "Ok-Slip-290",
+      "body": "Gets one account shut down. Decides to move payments to main account.\n\nWhy? You were literally told “no” and went and did it anyway.",
+      "created_utc": 1725694824.0,
+      "score": 3,
+      "parent_id": "t3_1fap8jq",
+      "depth": 0
+    },
+    {
+      "id": "llxcttb",
+      "author": "__VenomSnake__",
+      "body": "There is a guy on this sub who is making stripe competitor and launching next year.",
+      "created_utc": 1725696146.0,
+      "score": 3,
+      "parent_id": "t3_1fap8jq",
+      "depth": 0
+    },
+    {
+      "id": "llvy9as",
+      "author": "JakeRedditYesterday",
+      "body": "Someone really should build a Stripe competitor.",
+      "created_utc": 1725670820.0,
+      "score": 2,
+      "parent_id": "t3_1fap8jq",
+      "depth": 0
+    },
+    {
+      "id": "llw9oqx",
+      "author": "Beginning-Comedian-2",
+      "body": "It seems like Stripe is great until there’s a problem.\n\nThen they go for the nuclear option and cut off all access. ",
+      "created_utc": 1725675322.0,
+      "score": 2,
+      "parent_id": "t3_1fap8jq",
+      "depth": 0
+    },
+    {
+      "id": "llwvp2x",
+      "author": "anonthe4th",
+      "body": "Repost",
+      "created_utc": 1725685332.0,
+      "score": 2,
+      "parent_id": "t3_1fap8jq",
+      "depth": 0
+    },
+    {
+      "id": "llwvtit",
+      "author": "DullAd6899",
+      "body": "Thanks for this. I was about to use it for my new business, I'll consider using something else. 🙌🏻",
+      "created_utc": 1725685400.0,
+      "score": 2,
+      "parent_id": "t3_1fap8jq",
+      "depth": 0
+    },
+    {
+      "id": "llwxla7",
+      "author": "DataNerdling",
+      "body": "what are the alternatives?",
+      "created_utc": 1725686406.0,
+      "score": 2,
+      "parent_id": "t3_1fap8jq",
+      "depth": 0
+    },
+    {
+      "id": "llxs7z3",
+      "author": "clickyspinny",
+      "body": "How many accounts do you have OP? \nu/Steelsixactual\n\nu/lead-indicator\n\nu/Sad-Percentage4353",
+      "created_utc": 1725706806.0,
+      "score": 2,
+      "parent_id": "t3_1fap8jq",
+      "depth": 0
+    },
+    {
+      "id": "llxy7kc",
+      "author": "FunctionFunk",
+      "body": "I have used Stripe for 6 years now and love it. I have nothing but good things to say about it",
+      "created_utc": 1725710174.0,
+      "score": 2,
+      "parent_id": "t3_1fap8jq",
+      "depth": 0
+    },
+    {
+      "id": "lly0ety",
+      "author": "[deleted]",
+      "body": "Alright   \nHands off! Wont use stipe ever in my life  \nBut what are the better alternatives?",
+      "created_utc": 1725711293.0,
+      "score": 2,
+      "parent_id": "t3_1fap8jq",
+      "depth": 0
+    },
+    {
+      "id": "llyy412",
+      "author": "Philosophy136",
+      "body": "This is like 100th time I am reading a about money being stuck arbitrarily, I wonder how they have gotten away with this so far without any class action.",
+      "created_utc": 1725724397.0,
+      "score": 2,
+      "parent_id": "t3_1fap8jq",
+      "depth": 0
+    },
+    {
+      "id": "llz496j",
+      "author": "bubble-gum-rider",
+      "body": "Thanks for sharing this! Hope you find a good lawyer and kick their asses",
+      "created_utc": 1725726485.0,
+      "score": 2,
+      "parent_id": "t3_1fap8jq",
+      "depth": 0
+    },
+    {
+      "id": "llzgrmo",
+      "author": "boudydegeer",
+      "body": "I think that you should not state this!\n\nI understand your concerns, but probably they have their reasons god or bad, but they have!\n\n\nI don’t think this is good for any new user who never used stripe, I would recommend you change the title to : The issues I had with stripe, or something similar.\n\n\nBecause there are thousands of clients who never had issues with Stripe like me!\n\nAnd just that is very clear I have no personal interest, I just don’t like when someone takes his personal experience and tells everyone to NOT or to DO something.\n\nEvery one should be aware about this, yes, but also this is your personal experience, with a lot of uncertainty and variables that we all are not aware of!",
+      "created_utc": 1725730589.0,
+      "score": 2,
+      "parent_id": "t3_1fap8jq",
+      "depth": 0
+    },
+    {
+      "id": "llznrv5",
+      "author": "vgwicker1",
+      "body": "Remember Stripe is “backed” by Wells Fargo and is bound by their risk profile.  So it’s a combo plate when you dig deep",
+      "created_utc": 1725732927.0,
+      "score": 2,
+      "parent_id": "t3_1fap8jq",
+      "depth": 0
+    },
+    {
+      "id": "lm09p53",
+      "author": "No_Willingness7596",
+      "body": "Alright so where is the constructive conversation. What are we using instead of Stripe? ESPECIALLY for courses, subscriptions, and “transactions that do not include the transfer of ownership of physical or digital goods”?",
+      "created_utc": 1725740442.0,
+      "score": 2,
+      "parent_id": "t3_1fap8jq",
+      "depth": 0
+    },
+    {
+      "id": "lm401lz",
+      "author": "Neither_Excitement31",
+      "body": "Usually this is where I upgrade to LI premium and message all the big wigs. Find the Sr. folks in the right department and in the department of those who have to care. I’ve gotten a lot resolved this way.",
+      "created_utc": 1725802182.0,
+      "score": 2,
+      "parent_id": "t3_1fap8jq",
+      "depth": 0
+    },
+    {
+      "id": "llv3l3b",
+      "author": "AICulture",
+      "body": "\"where the value is primarily in the form of exclusive access, rather than the transfer of ownership of digital goods.\"\n\nSounds like this could potentially include any Saas business with payed tiers subscriptions... What?! What am I missing?",
+      "created_utc": 1725659531.0,
+      "score": 61,
+      "parent_id": "t1_lluvj1u",
+      "depth": 1
+    },
+    {
+      "id": "llv6upl",
+      "author": "lead-indicator",
+      "body": "Even if I am considered a banned category, fine! Stop doing business with me. At least pay me out what my customers already paid me!\n\nOr if they aren't going to do that, at least refund the customers!!! They aren't even refunding the customers!!! They are just keeping the money and shutting down the account!\n\nThat's not to mention my primary account has been in good standing for 2 years with customers that I have on auto-pay. That has NOTHING to do contact creation. Why the hell do they think they can keep that money!",
+      "created_utc": 1725660652.0,
+      "score": 38,
+      "parent_id": "t1_lluvj1u",
+      "depth": 1
+    },
+    {
+      "id": "lluws10",
+      "author": "SatoshiReport",
+      "body": "For that amount of money it sounds like it is lawyer time.",
+      "created_utc": 1725657214.0,
+      "score": 34,
+      "parent_id": "t1_lluvj1u",
+      "depth": 1
+    },
+    {
+      "id": "llvwakr",
+      "author": "meaowgi",
+      "body": "Whatever excuse they're making for not doing business with this guy, they stole his money and aren't returning it.  That's straight up theft; I'm just about to launch a SaaS with stripe, i'm looking for alternatives now.",
+      "created_utc": 1725670081.0,
+      "score": 32,
+      "parent_id": "t1_lluvj1u",
+      "depth": 1
+    },
+    {
+      "id": "llxikc3",
+      "author": "[deleted]",
+      "body": "[deleted]",
+      "created_utc": 1725700183.0,
+      "score": 5,
+      "parent_id": "t1_lluvj1u",
+      "depth": 1
+    },
+    {
+      "id": "llzd01v",
+      "author": "MedalofHonour15",
+      "body": "Yea I sold a lot of my course since 2020 using Stripe. It’s always been a one time payment and my customers keep it. Always better to use a high risk merchant account like Authorize or EasyPayDirect.",
+      "created_utc": 1725729352.0,
+      "score": 3,
+      "parent_id": "t1_lluvj1u",
+      "depth": 1
+    },
+    {
+      "id": "llvzufo",
+      "author": "Andrewofredstone",
+      "body": "Why would anyone leave that much in stripe? Do daily payouts!",
+      "created_utc": 1725671438.0,
+      "score": 37,
+      "parent_id": "t1_llv6go2",
+      "depth": 1
+    },
+    {
+      "id": "llxsysg",
+      "author": "clickyspinny",
+      "body": "Op has at least 3 accounts posting the same. Probably more.  If this gets legal, stripe lawyers will see and use all of these posts. Not sure what OP thinks these rants will accomplish. It seems to me like they’re trying to prove they’re right to a group of strangers. We don’t have any context op, nor are we hearing stripe’s side of the story.\n\nu/Steelsixactual\n\nu/lead-indicator\n\nu/Sad-Percentage4353",
+      "created_utc": 1725707259.0,
+      "score": 9,
+      "parent_id": "t1_llw984k",
+      "depth": 1
+    },
+    {
+      "id": "llwxaox",
+      "author": "kurucu83",
+      "body": "What options will you consider?",
+      "created_utc": 1725686234.0,
+      "score": 7,
+      "parent_id": "t1_llv6fi1",
+      "depth": 1
+    },
+    {
+      "id": "llx8d59",
+      "author": "half_man_half_cat",
+      "body": "I swear this keeps getting spammed here",
+      "created_utc": 1725693079.0,
+      "score": 5,
+      "parent_id": "t1_llvyp7o",
+      "depth": 1
+    },
+    {
+      "id": "llwiuy3",
+      "author": "kueball87",
+      "body": "I question the credibility of this story since multiple people have now mentioned this 5.6 issue, and OP isn’t answering them. OP stated the emboldened section is a copy/paste, but I don’t believe a formal message of this nature would cite a TOS section which doesn’t exist.\n\nMaybe this whole post is just… a lie?",
+      "created_utc": 1725679141.0,
+      "score": 9,
+      "parent_id": "t1_llvz1v5",
+      "depth": 1
+    },
+    {
+      "id": "llwi6ld",
+      "author": "tertain",
+      "body": "Could easily be an automated bot that hallucinated. Can’t reach a real person at a lot of tech companies today. Don’t know if that’s the case for Stripe or not.",
+      "created_utc": 1725678845.0,
+      "score": 5,
+      "parent_id": "t1_llvz1v5",
+      "depth": 1
+    },
+    {
+      "id": "llvz8mx",
+      "author": "VirginiaBarExamTutor",
+      "body": "Hi there 👋🏻 single-member LLC owner here. Using stripe for over 8 years with zero problems.",
+      "created_utc": 1725671203.0,
+      "score": 12,
+      "parent_id": "t1_llvmnka",
+      "depth": 1
+    },
+    {
+      "id": "llyyfcb",
+      "author": "sfall",
+      "body": "LLC is not the issue",
+      "created_utc": 1725724502.0,
+      "score": 4,
+      "parent_id": "t1_llvmnka",
+      "depth": 1
+    },
+    {
+      "id": "llwjfu1",
+      "author": "xasdfxx",
+      "body": "&gt; But at least admit that it was a stupid decision, to just use your working primary agreement, thinking that everything was gonna be fine.\n\nIt screams scammer.  Getting one account shut down and migrating to another with the same product.",
+      "created_utc": 1725679398.0,
+      "score": 3,
+      "parent_id": "t1_llve42w",
+      "depth": 1
+    },
+    {
+      "id": "lm3s4xe",
+      "author": "carbon_dry",
+      "body": "I know and with the other guy making his own internet I'm excited",
+      "created_utc": 1725799169.0,
+      "score": 3,
+      "parent_id": "t1_llxcttb",
+      "depth": 1
+    },
+    {
+      "id": "lm0qu2b",
+      "author": "lead-indicator",
+      "body": "I was one of the Stripe clients who never had any issues for years.....until I did.",
+      "created_utc": 1725746432.0,
+      "score": 3,
+      "parent_id": "t1_llzgrmo",
+      "depth": 1
+    }
+  ],
+  "fetched_at": 1755100737,
+  "schema": "v1"
+}

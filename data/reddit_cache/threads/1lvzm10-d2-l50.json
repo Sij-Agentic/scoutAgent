@@ -1,0 +1,63 @@
+{
+  "post": {
+    "id": "1lvzm10",
+    "subreddit": "productivity",
+    "title": "How to automate sales emails directly from Gmail or HubSpot?",
+    "author": "tiktakt0w",
+    "created_utc": 1752109124.0,
+    "score": 2,
+    "num_comments": 7,
+    "url": "https://www.reddit.com/r/productivity/comments/1lvzm10/how_to_automate_sales_emails_directly_from_gmail/",
+    "permalink": "https://www.reddit.com/r/productivity/comments/1lvzm10/how_to_automate_sales_emails_directly_from_gmail/",
+    "selftext": "Trying to streamline my outreach without adding another huge platform to the mix. Ideally want something that works right from Gmail or integrates with HubSpot, so I don’t have to jump between a bunch of tools.  \nLooking to automate sequences and follow-ups but still keep it feeling personal."
+  },
+  "comments": [
+    {
+      "id": "n2ej14n",
+      "author": "ChapoSymon",
+      "body": "Mixmax does this really well, runs inside gmail and makes sequences super easy.",
+      "created_utc": 1752169869.0,
+      "score": 5,
+      "parent_id": "t3_1lvzm10",
+      "depth": 0
+    },
+    {
+      "id": "n2achen",
+      "author": "iwantboringtimes",
+      "body": "(googles zapier gmail hubspot)\n\nThe third result says:\n\n&gt; Feb 22, 2024 — In this article, I'll show you how to set up a HubSpot Gmail integration so you can automatically create records in HubSpot every time you receive a new Gmail .\n\nWarning - it's been ages since I used Zapier, so I don't know if it's still as good as I remember it.",
+      "created_utc": 1752111346.0,
+      "score": 1,
+      "parent_id": "t3_1lvzm10",
+      "depth": 0
+    },
+    {
+      "id": "n2aj0nt",
+      "author": "sk7070",
+      "body": "Use N8N.",
+      "created_utc": 1752113638.0,
+      "score": 1,
+      "parent_id": "t3_1lvzm10",
+      "depth": 0
+    },
+    {
+      "id": "n2g9rz3",
+      "author": "SaicoSandwich",
+      "body": "I use hubspot for tracking contacts but do all my emailing through mixmax. It’s cleaner, faster, and i don’t have to leave gmail.",
+      "created_utc": 1752188342.0,
+      "score": 1,
+      "parent_id": "t3_1lvzm10",
+      "depth": 0
+    },
+    {
+      "id": "n2t1do3",
+      "author": "Sea_sociate",
+      "body": "I was bouncing between platforms for a while until someone showed me mixmax, it basically turns gmail into a proper outbound tool",
+      "created_utc": 1752361002.0,
+      "score": 1,
+      "parent_id": "t3_1lvzm10",
+      "depth": 0
+    }
+  ],
+  "fetched_at": 1755100753,
+  "schema": "v1"
+}

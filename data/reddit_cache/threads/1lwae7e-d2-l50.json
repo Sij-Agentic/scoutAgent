@@ -1,0 +1,45 @@
+{
+  "post": {
+    "id": "1lwae7e",
+    "subreddit": "SaaS",
+    "title": "New to the whole shabang. Sharing my journey of creating fully automated CRM system for everyone",
+    "author": "Candid_Reality71",
+    "created_utc": 1752147187.0,
+    "score": 3,
+    "num_comments": 12,
+    "url": "https://www.reddit.com/r/SaaS/comments/1lwae7e/new_to_the_whole_shabang_sharing_my_journey_of/",
+    "permalink": "https://www.reddit.com/r/SaaS/comments/1lwae7e/new_to_the_whole_shabang_sharing_my_journey_of/",
+    "selftext": "Hi guys. \n\nUsing GHL i created a snapshot that uses custom properties in the complete system making it easy to set up for first times. Its jot niched down per say but any profession can use it easily eg lawyers, dentist, real estate agents, coaches. Basically anyone who doesn't sell their product directly on their website. \n\nHere is what it consists of: \n\nThis system provides fully automated lead management from initial contact to post-conversion feedback, designed to maximize efficiency and follow-through.\nIt starts with instant lead follow-ups when a form is filled. If the lead responds, an AI chatbot engages, answering general questions and encouraging appointment bookings, carefully avoiding sensitive information. Should a lead become unresponsive, a 3-email follow-up sequence is automatically initiated over four days.\nFor booked appointments, automated reminders are sent to both the customer and the call attendant. After calls, the attendant uses a quick form to determine the next steps, triggering specific follow-up paths based on pre-defined rules (e.g., lost, nurture, close).\nFinally, for all closed/won leads, a feedback automation is triggered after a set period. An integrated AI detects negative feedback and alerts you, while positive feedback prompts a request for a public review. Throughout the entire process, you can monitor each lead's stage and engagement score within the system.\n\n\nTakes about an 1-1.5 hour for a complete newbie to set up for a business. I was thinking of selling it as a white label saas. \n\nSubscribe -&gt; niche it down yourself -&gt; sell with your own Branding. \n\nNot sure how to tap into that market right now but I'll figure it out. any tips are greatly welcomed, what do you guys think about the system. \nI kept the technical details short for the sake of posts but I'm really proud of the paths covered by every automation. Since its on GHL thats already like Saving thousands for the businesses considering how it connects with almost everything and is super easy to use. "
+  },
+  "comments": [
+    {
+      "id": "n2cln96",
+      "author": "[deleted]",
+      "body": "[removed]",
+      "created_utc": 1752149315.0,
+      "score": 1,
+      "parent_id": "t3_1lwae7e",
+      "depth": 0
+    },
+    {
+      "id": "n2f1zut",
+      "author": "Key-Boat-7519",
+      "body": "Getting the first wins inside one narrow vertical matters way more than perfect tech. I picked multi-location dentists, recorded a 3-min Loom walk-through of the pipeline, then cold-DM’d owners on LinkedIn and posted the video in a dental ops Facebook group; five trials in 48 h. Charge a flat “per location per month” fee so they know costs while you get usage upside. Once live, track booked-appointments per lead and flash the ROI number in every weekly report-referrals follow. For reach, I used Apollo to pull contacts, AppSumo to dangle an early lifetime deal, and Pulse for Reddit to catch threads where dentists complain about no-shows; each channel fed warmer leads than paid ads. Getting those niche proof-points unlocks everything else.",
+      "created_utc": 1752175219.0,
+      "score": 2,
+      "parent_id": "t1_n2cln96",
+      "depth": 1
+    },
+    {
+      "id": "n2d1w0f",
+      "author": "Candid_Reality71",
+      "body": "I want to be more on the back end tech side of it. If I niche down I'll have a lot of limitations and nitty gritty details. Besides my business knowledge is not that good anyway. \n\nI'm thinking of leaving hefty profit margins and white labeling the whole thing so the details can be taken care of by the people who actually know the insides of the business while creating a win win for everyone.",
+      "created_utc": 1752154907.0,
+      "score": 1,
+      "parent_id": "t1_n2cln96",
+      "depth": 1
+    }
+  ],
+  "fetched_at": 1755100821,
+  "schema": "v1"
+}

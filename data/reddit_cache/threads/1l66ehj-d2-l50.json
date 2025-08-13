@@ -1,0 +1,126 @@
+{
+  "post": {
+    "id": "1l66ehj",
+    "subreddit": "SaaS",
+    "title": "I built an ICP Scoring + LinkedIn Lead Automation tool — should I turn it into a SaaS?",
+    "author": "Excellent_Tea2042",
+    "created_utc": 1749367698.0,
+    "score": 0,
+    "num_comments": 18,
+    "url": "https://www.reddit.com/r/SaaS/comments/1l66ehj/i_built_an_icp_scoring_linkedin_lead_automation/",
+    "permalink": "https://www.reddit.com/r/SaaS/comments/1l66ehj/i_built_an_icp_scoring_linkedin_lead_automation/",
+    "selftext": "Hey everyone 👋\n\nI recently built an automated system that takes a LinkedIn profile and scores it based on how closely it matches your Ideal Customer Profile (ICP). It uses:\n- n8n for workflow automation\n- Google Gemini (or ChatGPT) for smart analysis\n- Airtop to enrich profile data from LinkedIn\n- Supabase for backend structure\n\n✅ No scraping  \n✅ No forms  \n✅ Just a URL → score + smart action\n\nBuilt originally to automate my own lead qualification process… but now I’m wondering:\n\n- Would this solve a real pain for others?  \n- What kind of people would actually pay for this?  \n- Should this stay a private stack or evolve into a full public product?\n\nCurious what you think.\n\n#SaaS #LeadGeneration #B2BMarketing #Automation #n8n #ChatGPT #GoogleGemini #AItools #LinkedInGrowth #NoCode"
+  },
+  "comments": [
+    {
+      "id": "mwmhv9z",
+      "author": "Jolly_Principle5215",
+      "body": "Wow, congrats! 🤘🏻\n\nI saw you're using Supabase. Feel free to check out Supadex, the Supabase mobile dashboard used by developers and teams around the world. Manage databases, track metrics, and monitor projects seamlessly, anytime, anywhere.\n\n[supadex.app](https://www.supadex.app)",
+      "created_utc": 1749370459.0,
+      "score": 2,
+      "parent_id": "t3_1l66ehj",
+      "depth": 0
+    },
+    {
+      "id": "mwmo0qp",
+      "author": "Savings-Passenger-37",
+      "body": "We have build similar platform for LinkedIn outreach\n\nIts - www.postpress.ai",
+      "created_utc": 1749374214.0,
+      "score": 2,
+      "parent_id": "t3_1l66ehj",
+      "depth": 0
+    },
+    {
+      "id": "mwwty5j",
+      "author": "LiveGenie",
+      "body": "Really impressive project!\n\nI’ve tackled similar lead automation problems and know how tricky it can be to streamline everything from LinkedIn.\n\nI recently started working on a tool related to this, focused on building custom automations for sales teams. Happy to swap notes or share what we’ve learned on the product side.",
+      "created_utc": 1749507035.0,
+      "score": 2,
+      "parent_id": "t3_1l66ehj",
+      "depth": 0
+    },
+    {
+      "id": "mx0ukh6",
+      "author": "wasayybuildz",
+      "body": "Love that you’re building out actual lead scoring automation and thinking about productizing it. Figuring out the real pain points that drive SaaS adoption can be tough in the early days. I’ve been working on something that might help founders test/validate ideas against actual user needs in real time. Would be happy to swap insights if that helps.",
+      "created_utc": 1749566071.0,
+      "score": 2,
+      "parent_id": "t3_1l66ehj",
+      "depth": 0
+    },
+    {
+      "id": "mx1w3ud",
+      "author": "thankjupiter",
+      "body": "Really cool project and solid approach! I’ve seen a lot of SaaS founders talk about this same ICP scoring and lead automation challenge. Our team is building something around this challenge at the moment too. Curious how you’re finding the balance between automation and real results. Happy to swap notes if that’s helpful!",
+      "created_utc": 1749576631.0,
+      "score": 2,
+      "parent_id": "t3_1l66ehj",
+      "depth": 0
+    },
+    {
+      "id": "mwmfnyf",
+      "author": "[deleted]",
+      "body": "[removed]",
+      "created_utc": 1749369168.0,
+      "score": 1,
+      "parent_id": "t3_1l66ehj",
+      "depth": 0
+    },
+    {
+      "id": "mwmid75",
+      "author": "Excellent_Tea2042",
+      "body": "Appreciate you sharing that — hadn’t come across Supadex before.  \nStill in the testing and architecture phase, but good to know there’s a mobile dashboard option for Supabase out there.  \nI’ll keep it in mind as the system matures — thanks again.",
+      "created_utc": 1749370760.0,
+      "score": 2,
+      "parent_id": "t1_mwmhv9z",
+      "depth": 1
+    },
+    {
+      "id": "mwmoe6j",
+      "author": "Excellent_Tea2042",
+      "body": "Great to know others are working on similar problems! Our approach is built on real-time ICP scoring without scraping or forms — just a URL in, and smart action out. Would love to compare notes sometime!”",
+      "created_utc": 1749374441.0,
+      "score": 2,
+      "parent_id": "t1_mwmo0qp",
+      "depth": 1
+    },
+    {
+      "id": "mwyunou",
+      "author": "Excellent_Tea2042",
+      "body": "Sure, here is a suitable reply in English that conveys professionalism and openness to ideas and challenges, while subtly avoiding an immediate commitment to a deep collaboration.\n\"Thanks a lot for the kind words about the project!\nI definitely agree, streamlining lead automation from LinkedIn can be quite tricky. It's interesting to hear you've been tackling similar problems and are building a tool for custom sales automations.\nI'm always open to hearing about different approaches and challenges in this space, especially from the product side. Feel free to share any high-level insights or interesting problems you've encountered if you'd like. Always good to learn from others' experiences.\"",
+      "created_utc": 1749533429.0,
+      "score": 1,
+      "parent_id": "t1_mwwty5j",
+      "depth": 1
+    },
+    {
+      "id": "mx179sf",
+      "author": "Excellent_Tea2042",
+      "body": "Thanks a lot! That means a lot coming from someone who’s also building in this space.\nI completely agree — real-time validation and mapping actual pain points is often the missing link in early-stage SaaS.\nOut of curiosity:\n\t•\tHow are you currently capturing user intent signals or validating assumptions dynamically?\n\t•\tAre you focusing on qualitative input (like user interviews) or automated behavioral indicators?\n\t•\tAnd how do you decide what “pain” is worth solving before committing to a full build?\n\nThese are the kinds of blind spots I’m trying to engineer around in my automation models",
+      "created_utc": 1749569706.0,
+      "score": 1,
+      "parent_id": "t1_mx0ukh6",
+      "depth": 1
+    },
+    {
+      "id": "mx2id68",
+      "author": "Excellent_Tea2042",
+      "body": "Thanks! Appreciate you sharing that — sounds like we’re navigating very similar terrain.\n\nBalancing automation with real outcomes is exactly where the complexity lies.\nWe’re currently engineering a multi-layered scoring mechanism that blends behavioral triggers, firmographics, and contextual signals — trying to move beyond static lead lists toward dynamic qualification in real time.\n\nWould love to hear more about your approach.\nAre you leaning toward full automation, or keeping a human-in-the-loop element for validation and adjustments?\n\nAlways up for swapping ideas with builders tackling the same pain",
+      "created_utc": 1749582849.0,
+      "score": 1,
+      "parent_id": "t1_mx1w3ud",
+      "depth": 1
+    },
+    {
+      "id": "mwmgmdt",
+      "author": "Excellent_Tea2042",
+      "body": "\nThanks for the thoughtful breakdown — your point on real-time intent vs static ICP is spot on.\nI agree: too many teams still rely on manual SDR work or rigid filters. That’s what sparked this build in the first place.\n\nWe’re in late testing now, validating system stability before opening up broader access.\nLet’s see how it holds under real conditions, then explore deeper synergies if it aligns.\n\nAppreciate your input 👊",
+      "created_utc": 1749369716.0,
+      "score": 1,
+      "parent_id": "t1_mwmfnyf",
+      "depth": 1
+    }
+  ],
+  "fetched_at": 1755100811,
+  "schema": "v1"
+}

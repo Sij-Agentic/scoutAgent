@@ -1,0 +1,72 @@
+{
+  "post": {
+    "id": "1klsz8k",
+    "subreddit": "Entrepreneur",
+    "title": "Feedback on my idea: An innovative knowledge management system to help you master any topic in less time.",
+    "author": "SatisfactionDry3508",
+    "created_utc": 1747159783.0,
+    "score": 0,
+    "num_comments": 7,
+    "url": "https://www.reddit.com/r/Entrepreneur/comments/1klsz8k/feedback_on_my_idea_an_innovative_knowledge/",
+    "permalink": "https://www.reddit.com/r/Entrepreneur/comments/1klsz8k/feedback_on_my_idea_an_innovative_knowledge/",
+    "selftext": "# An innovative knowledge management system to help you master any topic in less time.\n\n✅ Save hours of effort trying to understand a complex topic by breaking it down into key concepts.\n\n✅ Further break down each concept into bits of information.\n\n✅ Visualize information in a graph neural network to understand relationships between information.\n\n✅ Let A.I. summarize information for you for each concept or generate your own insights from the visualization.\n\n✅ Further visualize relationships between concepts to better understand the entire topic.\n\n✅ Find inconsistencies or lies in a body of knowledge or system which is based on a set of principles.\n\n**This is for you if you are**\n\n=&gt; An entrepreneur who needs to master multiple topics quickly to make informed business decisions.  \n=&gt; A scholar or researcher who wants to gain deeper insight into a concept or idea.  \n=&gt; A content creator who wants to produce thorough and detailed content on a topic.\n\n=&gt; A lawyer who wants to study every case without missing any details.  \n=&gt; A student who wants to master any subject in a relatively short amount of time.\n\nlet me know if you want to see a basic example of this system.\n\nThanks."
+  },
+  "comments": [
+    {
+      "id": "ms4rjsn",
+      "author": "AutoModerator",
+      "body": "Welcome to /r/Entrepreneur and thank you for the post, /u/SatisfactionDry3508! Please make sure you read our [community rules](https://www.reddit.com/r/Entrepreneur/about/rules/) before participating here. As a quick refresher:  \n\n* Promotion of products and services is not allowed here. This includes dropping URLs, asking users to DM you, check your profile, job-seeking, and investor-seeking. *Unsanctioned promotion of any kind will lead to a permanent ban for all of your accounts.* \n* AI and GPT-generated posts and comments are unprofessional, and will be treated as spam, including a permanent ban for that account.   \n* If you have free offerings, please comment in our weekly Thursday stickied thread.\n* If you need feedback, please comment in our weekly Friday stickied thread. \n\n\n*I am a bot, and this action was performed automatically. Please [contact the moderators of this subreddit](/message/compose/?to=/r/Entrepreneur) if you have any questions or concerns.*",
+      "created_utc": 1747159783.0,
+      "score": 1,
+      "parent_id": "t3_1klsz8k",
+      "depth": 0
+    },
+    {
+      "id": "ms4uary",
+      "author": "HomeboyGbhdj",
+      "body": "Hi there, always happy to see entrepreneurs sharing their ideas. \n\nA bit of advice: you need to be careful about replicating features that ultimately most people are already using one of the big model providers to accomplish. For example, ChatGPT has it's Deep Research function. When it comes to trying to understand complicated topics quickly, most people will probably just use Deep Research (or just o3/o4-mini-high) to attempt to summarize, break down, and explain. Your idea would need to be 10x better than what ChatGPT offers, otherwise people will just fall back to what they know. \n\nI recently authored a blog post breaking down this idea in more detail, check it out here: https://losangelesaiapps.com/layers-of-the-ai-stack-explained-simply/. The advice is under the \"Thick Wrappers\" section.\n\nI would say you have to focus more on your main differentiator here, which is probably going to be the visualization aspect. ChatGPT can't (yet) help you visualize complex topics. Honing in on this differentiator can lead to success, if done right.\n\nBest of luck!",
+      "created_utc": 1747160576.0,
+      "score": 1,
+      "parent_id": "t3_1klsz8k",
+      "depth": 0
+    },
+    {
+      "id": "ms4y7dc",
+      "author": "TroubleM4ker_",
+      "body": "hey,\n\nThanks for sharing the idea.\n\nMy mental representation of your product is something like an AI agent + deep research + Obsidian-like graphs. The main questions crossing my mind while reading it is:\n\n\\- What is the ROI?\n\n\\- why should I pay you to do what AI can do in seconds? Your pitch doesn't answer the objection",
+      "created_utc": 1747161686.0,
+      "score": 1,
+      "parent_id": "t3_1klsz8k",
+      "depth": 0
+    },
+    {
+      "id": "ms7a88z",
+      "author": "DataWingAI",
+      "body": "More people would have responded to this if you had not dumped some straight ChatGPT rubbish.\n\nFrom the first impression itself you are cancelled.",
+      "created_utc": 1747188805.0,
+      "score": 1,
+      "parent_id": "t3_1klsz8k",
+      "depth": 0
+    },
+    {
+      "id": "ms4uyqf",
+      "author": "SatisfactionDry3508",
+      "body": "Thanks, mate!",
+      "created_utc": 1747160764.0,
+      "score": 2,
+      "parent_id": "t1_ms4uary",
+      "depth": 1
+    },
+    {
+      "id": "ms51jjw",
+      "author": "SatisfactionDry3508",
+      "body": "It's not heavily dependent on AI. The main purpose of this tool is to make you learn things faster than conventional methods, generate deeper insights for yourself so that you can talk about the topic confidently without missing any detail. The app will include a guide on how to use it effectively. It's for your own growth.",
+      "created_utc": 1747162643.0,
+      "score": 1,
+      "parent_id": "t1_ms4y7dc",
+      "depth": 1
+    }
+  ],
+  "fetched_at": 1755100778,
+  "schema": "v1"
+}

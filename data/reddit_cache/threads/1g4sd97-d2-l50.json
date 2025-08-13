@@ -1,0 +1,36 @@
+{
+  "post": {
+    "id": "1g4sd97",
+    "subreddit": "SideProject",
+    "title": "I made an AI-powered first line customer support automation tool",
+    "author": "Narrotapp",
+    "created_utc": 1729057514.0,
+    "score": 0,
+    "num_comments": 2,
+    "url": "https://www.narrot.org",
+    "permalink": "https://www.reddit.com/r/SideProject/comments/1g4sd97/i_made_an_aipowered_first_line_customer_support/",
+    "selftext": ""
+  },
+  "comments": [
+    {
+      "id": "ls5ugc5",
+      "author": "JouniFlemming",
+      "body": "In plain English, you did an AI chatbot. An idea that was hot two years ago.\n\nThe price is modest $199 per month and no live demo to even see how well this works. Why doesn't your own website use this? Also, not a word about your privacy policy.",
+      "created_utc": 1729058913.0,
+      "score": 3,
+      "parent_id": "t3_1g4sd97",
+      "depth": 0
+    },
+    {
+      "id": "ls5zj2s",
+      "author": "Narrotapp",
+      "body": "Hey! It is a side project, of course I don't have everything perfectly lined up :)\n\nAs to your points:\n\n1. It is a chatbot, yes, but there are different types. Same as sports car and truck are both cars, but for completely different purposes and with completely different capabilities. But actually it is an AI agent, which is a quite a new category and is fairly different than just a chatbot.\n2. there is a free trial for the purposes of testing\n3. For my website using it - actually it is a great idea, I haven't thought of that",
+      "created_utc": 1729062208.0,
+      "score": -2,
+      "parent_id": "t1_ls5ugc5",
+      "depth": 1
+    }
+  ],
+  "fetched_at": 1755100733,
+  "schema": "v1"
+}

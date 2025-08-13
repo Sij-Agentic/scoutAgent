@@ -1,0 +1,441 @@
+{
+  "post": {
+    "id": "1jn7rau",
+    "subreddit": "SaaS",
+    "title": "After 20 Failures, I Finally Built A SaaS That Makes Money 😭 (Lessons + Playbook)",
+    "author": "FI_investor",
+    "created_utc": 1743321970.0,
+    "score": 434,
+    "num_comments": 120,
+    "url": "https://www.reddit.com/r/SaaS/comments/1jn7rau/after_20_failures_i_finally_built_a_saas_that/",
+    "permalink": "https://www.reddit.com/r/SaaS/comments/1jn7rau/after_20_failures_i_finally_built_a_saas_that/",
+    "selftext": "Years of hard work, struggle and pain. 20 failed projects 😭\n\nBuilt it in a few days using Ruby on Rails, PostgreSQL, Digital Ocean, OpenAI, Kamal, etc...\n\nLessons:\n\n* Solve real problems (e.g, save them time and effort, make them more money). Focus on the pain points of your target customers. Solve 1 problem and do it really well.\n* Prefer to use the tools that you already know. Don’t spend too much time thinking about what are the best tool to use. The best tool for you is the one you already know. Your customers won't care about the tools you used, what they care about is you're solving the problem that they have.\n* Start with the MVP. Don't get caught up in adding every feature you can think of. Start with a Minimum Viable Product (MVP) that solves the core problem, then iterate based on user feedback.\n* Know your customer. Deeply understand who your customer is and what they need. Tailor your messaging, product features, and support to meet those needs specifically.\n* Fail fast. Validate immediately to see if people will pay for it then move on if not. Don't over-engineer. It doesn't need to be scalable initially.\n* Be ready to pivot. If your initial idea isn't working, don't be afraid to pivot. Sometimes the market needs something different than what you originally envisioned.\n* Data-driven decisions. Use data to guide your decisions. Whether it's user behavior, market trends, or feedback, rely on data to inform your next steps.\n* Iterate quickly. Speed is your friend. The faster you can iterate on feedback and improve your product, the better you can stay ahead of the competition.\n* Do lots of marketing. This is a must! Build it and they will come rarely succeeds.\n* Keep on shipping 🚀 Many small bets instead of 1 big bet.\n\n**Playbook that what worked for me (will most likely work for you too)**\n\nThe great thing about this playbook is it will work even if you don't have an audience (e.g, close to 0 followers, no newsletter subscribers etc...).\n\n**1. Problem**\n\nCan be any of these:\n\n* Scratch your own itch.\n* Find problems worth solving. Read negative reviews + hang out on X, Reddit and Facebook groups.\n\n**2. MVP**\n\nSet an appetite (e.g, 1 day or 1 week to build your MVP).\n\nThis will force you to only build the core and really necessary features. Focus on things that will really benefit your users.\n\n**3. Validation**\n\n* Share your MVP on X, Reddit and Facebook groups.\n* Reply on posts complaining about your competitors, asking alternatives or recommendations.\n* Reply on posts where the author is encountering a problem that your product directly solves.\n* Do cold and warm DMs.\n\nOne of the best validation is when users pay for your MVP.\n\nWhen your product is free, when users subscribe using their email addresses and/or they keep on coming back to use it.\n\n**4. SEO**\n\nROI will take a while and this requires a lot of time and effort but this is still one of the most sustainable source of customers. 2 out of 3 of my projects are already benefiting from SEO. I'll start to do SEO on my latest project too.\n\nThat's it! Simple but not easy since it still requires a lot of effort but that's the reality when building a startup especially when you have no audience yet.\n\nLeave a comment if you have a question, I'll be happy to answer it.\n\nP.S. The SaaS that I built is a [tool that automates finding customers](https://customerfinderbot.com/) from social media. Basically saves companies time and effort since it works 24/7 for them. Built it to scratch my own itch and surprisingly companies started paying for it when I launched the MVP and it now grew to hundreds of customers from different countries, most are startups."
+  },
+  "comments": [
+    {
+      "id": "mkib29m",
+      "author": "roiseeker",
+      "body": "This is the best, no BS, straight to the point advice on SaaS startups I've ever seen. Thanks for the post!",
+      "created_utc": 1743337698.0,
+      "score": 24,
+      "parent_id": "t3_1jn7rau",
+      "depth": 0
+    },
+    {
+      "id": "mkj30xw",
+      "author": "Important_Word_4026",
+      "body": "this is so GPT generated",
+      "created_utc": 1743348027.0,
+      "score": 15,
+      "parent_id": "t3_1jn7rau",
+      "depth": 0
+    },
+    {
+      "id": "mkhtz6i",
+      "author": "[deleted]",
+      "body": "[deleted]",
+      "created_utc": 1743328106.0,
+      "score": 8,
+      "parent_id": "t3_1jn7rau",
+      "depth": 0
+    },
+    {
+      "id": "mkiv4du",
+      "author": "Pizza_Samurai88",
+      "body": "Can this be applied to LinkedIn ?",
+      "created_utc": 1743345438.0,
+      "score": 3,
+      "parent_id": "t3_1jn7rau",
+      "depth": 0
+    },
+    {
+      "id": "mkhqr59",
+      "author": "Dani99M",
+      "body": "Congrats! What did you build now? What problem do you solve?",
+      "created_utc": 1743325984.0,
+      "score": 1,
+      "parent_id": "t3_1jn7rau",
+      "depth": 0
+    },
+    {
+      "id": "mkinr56",
+      "author": "sachitatious",
+      "body": "For a saas, is adding a blog a main component of SEO? What other strategies do you rely on in SEO?",
+      "created_utc": 1743342889.0,
+      "score": 1,
+      "parent_id": "t3_1jn7rau",
+      "depth": 0
+    },
+    {
+      "id": "mkj20yq",
+      "author": "[deleted]",
+      "body": "[deleted]",
+      "created_utc": 1743347707.0,
+      "score": 1,
+      "parent_id": "t3_1jn7rau",
+      "depth": 0
+    },
+    {
+      "id": "mkj3r47",
+      "author": "No_Date4855",
+      "body": "Thanks for the playbook!\n\n\nIn your social media scraping product, what tool or framework did you use for this? And how do you set it up to run on multiple posts? Like what server etc are you using for this",
+      "created_utc": 1743348259.0,
+      "score": 1,
+      "parent_id": "t3_1jn7rau",
+      "depth": 0
+    },
+    {
+      "id": "mkj4ihl",
+      "author": "learnwithparam",
+      "body": "Great man, does your SaaS work for B2C one time learning platform like mine https://backendchallenges.com",
+      "created_utc": 1743348502.0,
+      "score": 1,
+      "parent_id": "t3_1jn7rau",
+      "depth": 0
+    },
+    {
+      "id": "mkj6o00",
+      "author": "GrowthMarketingPro88",
+      "body": "\"Fail fast\" is the one. On an infinite timeline you can pivot indefinitely into a great business",
+      "created_utc": 1743349177.0,
+      "score": 1,
+      "parent_id": "t3_1jn7rau",
+      "depth": 0
+    },
+    {
+      "id": "mkj7cyl",
+      "author": "[deleted]",
+      "body": "[removed]",
+      "created_utc": 1743349391.0,
+      "score": 1,
+      "parent_id": "t3_1jn7rau",
+      "depth": 0
+    },
+    {
+      "id": "mkj7n94",
+      "author": "knighto05",
+      "body": "How did you pull up the Twitter/X while keeping pricing affordable for end users? I mean, last time I checked, their APIs were so expensive.",
+      "created_utc": 1743349479.0,
+      "score": 1,
+      "parent_id": "t3_1jn7rau",
+      "depth": 0
+    },
+    {
+      "id": "mkj8vm0",
+      "author": "Connect-Idea-1944",
+      "body": "how do people promote their SaaS",
+      "created_utc": 1743349861.0,
+      "score": 1,
+      "parent_id": "t3_1jn7rau",
+      "depth": 0
+    },
+    {
+      "id": "mkj9sv1",
+      "author": "ProgrammerPlus",
+      "body": "I mean no shit. This is all just common sense",
+      "created_utc": 1743350149.0,
+      "score": 1,
+      "parent_id": "t3_1jn7rau",
+      "depth": 0
+    },
+    {
+      "id": "mkjia0g",
+      "author": "JustSomeGuy2b",
+      "body": "Congrats man! I really like the idea, and would probably use it at some point. One thing I don't understand about it is that your site says it \"generates reply ideas\", so does it post the replies automatically or just find the posts and suggest replies? And if for example it finds 100 posts do I have to manually send all 100 replies?",
+      "created_utc": 1743352811.0,
+      "score": 1,
+      "parent_id": "t3_1jn7rau",
+      "depth": 0
+    },
+    {
+      "id": "mkjjcp4",
+      "author": "Ok-Row5310",
+      "body": "Thanks for sharing this",
+      "created_utc": 1743353146.0,
+      "score": 1,
+      "parent_id": "t3_1jn7rau",
+      "depth": 0
+    },
+    {
+      "id": "mkjl6ih",
+      "author": "8bitcompany",
+      "body": "This is spot on and after creating successful and not so successful SaaS apps over the years I have pretty much come to the same conclusion. Do not spend too much time making your product perfect and validate with strangers who have no problem telling you your product stinks.",
+      "created_utc": 1743353711.0,
+      "score": 1,
+      "parent_id": "t3_1jn7rau",
+      "depth": 0
+    },
+    {
+      "id": "mkjnauj",
+      "author": "semprena",
+      "body": "I've  checked your page subscription, I think you should add more channel. Or even newsletter platform like substack. Do u think it's a good idea to expand the target?",
+      "created_utc": 1743354357.0,
+      "score": 1,
+      "parent_id": "t3_1jn7rau",
+      "depth": 0
+    },
+    {
+      "id": "mkk2bt8",
+      "author": "tremendouskitty",
+      "body": "How did you determine your pricing?",
+      "created_utc": 1743358876.0,
+      "score": 1,
+      "parent_id": "t3_1jn7rau",
+      "depth": 0
+    },
+    {
+      "id": "mkk7qd0",
+      "author": "Motor_Peanut_3849",
+      "body": "¿What marketing thid you use to promote your Saas? What ads did you pay?",
+      "created_utc": 1743360526.0,
+      "score": 1,
+      "parent_id": "t3_1jn7rau",
+      "depth": 0
+    },
+    {
+      "id": "mkk7us9",
+      "author": "LegitGamesTM",
+      "body": "Can you expand on finding problems to solve? This is my biggest road block at the moment.",
+      "created_utc": 1743360563.0,
+      "score": 1,
+      "parent_id": "t3_1jn7rau",
+      "depth": 0
+    },
+    {
+      "id": "mkkkjri",
+      "author": "cypher206",
+      "body": "Which all tools did u use in making of this ?  , and was it all no code or did u knew how to code",
+      "created_utc": 1743364483.0,
+      "score": 1,
+      "parent_id": "t3_1jn7rau",
+      "depth": 0
+    },
+    {
+      "id": "mkkoeva",
+      "author": "[deleted]",
+      "body": "[removed]",
+      "created_utc": 1743365667.0,
+      "score": 1,
+      "parent_id": "t3_1jn7rau",
+      "depth": 0
+    },
+    {
+      "id": "mkl9s7v",
+      "author": "Responsible_Mail_649",
+      "body": "Appreciate the link to your Saas, so we can see it for ourselves :)",
+      "created_utc": 1743372566.0,
+      "score": 1,
+      "parent_id": "t3_1jn7rau",
+      "depth": 0
+    },
+    {
+      "id": "mklfbo8",
+      "author": "Clemotime",
+      "body": "Can’t anyone just copy this idea? Are you not concerned about that when you post what the service does?",
+      "created_utc": 1743374537.0,
+      "score": 1,
+      "parent_id": "t3_1jn7rau",
+      "depth": 0
+    },
+    {
+      "id": "mkmexto",
+      "author": "Signal-Spray-182",
+      "body": "What do you use to build the website? Did you subscribe to anything? Like firebase. \nAnd what is the initial cost of building it?",
+      "created_utc": 1743387681.0,
+      "score": 1,
+      "parent_id": "t3_1jn7rau",
+      "depth": 0
+    },
+    {
+      "id": "mkmr6z9",
+      "author": "DryPass5907",
+      "body": "Thanks man! Honest one",
+      "created_utc": 1743392872.0,
+      "score": 1,
+      "parent_id": "t3_1jn7rau",
+      "depth": 0
+    },
+    {
+      "id": "mkmrfxv",
+      "author": "sockerx",
+      "body": "This looks like the general advice that's been put out for years... With a plug for a service that this audience might like... So it's an advertising post?",
+      "created_utc": 1743392987.0,
+      "score": 1,
+      "parent_id": "t3_1jn7rau",
+      "depth": 0
+    },
+    {
+      "id": "mkmurnr",
+      "author": "ankitherocker",
+      "body": "It's an excellent playbook if played well! I appreciate your resilience and attitude. Keep building and sharing your learnings.",
+      "created_utc": 1743394555.0,
+      "score": 1,
+      "parent_id": "t3_1jn7rau",
+      "depth": 0
+    },
+    {
+      "id": "mkn4tg1",
+      "author": "Fit_Broccoli6045",
+      "body": "Thanks for sharing! The validation part was super helpful.",
+      "created_utc": 1743399843.0,
+      "score": 1,
+      "parent_id": "t3_1jn7rau",
+      "depth": 0
+    },
+    {
+      "id": "mkn83ro",
+      "author": "[deleted]",
+      "body": "[removed]",
+      "created_utc": 1743401770.0,
+      "score": 1,
+      "parent_id": "t3_1jn7rau",
+      "depth": 0
+    },
+    {
+      "id": "mkn9o6v",
+      "author": "Western_Society8934",
+      "body": "How much you made from this SaaS?",
+      "created_utc": 1743402723.0,
+      "score": 1,
+      "parent_id": "t3_1jn7rau",
+      "depth": 0
+    },
+    {
+      "id": "mknaxru",
+      "author": "ExtremeWeak1644",
+      "body": "To the point, gonna follow the suggestion!",
+      "created_utc": 1743403504.0,
+      "score": 1,
+      "parent_id": "t3_1jn7rau",
+      "depth": 0
+    },
+    {
+      "id": "mkncd3h",
+      "author": "shay25255",
+      "body": "Hi!   \nThanks for all the knowledge (:  \nHow did you validate your idea? what was the process? How did you choose which business will be part of the validation (from what I understand your target audience could basically be any business)  \nThank you!",
+      "created_utc": 1743404389.0,
+      "score": 1,
+      "parent_id": "t3_1jn7rau",
+      "depth": 0
+    },
+    {
+      "id": "mkndycm",
+      "author": "randomInterest92",
+      "body": "Did you really just generate cookie cutter advice and a clickbait title to promote your software? 😅",
+      "created_utc": 1743405415.0,
+      "score": 1,
+      "parent_id": "t3_1jn7rau",
+      "depth": 0
+    },
+    {
+      "id": "mkngq5n",
+      "author": "iamzamek",
+      "body": "Feel free to post a verification of your MRR here",
+      "created_utc": 1743407253.0,
+      "score": 1,
+      "parent_id": "t3_1jn7rau",
+      "depth": 0
+    },
+    {
+      "id": "mkij0uw",
+      "author": "FI_investor",
+      "body": "Thanks! You're welcome",
+      "created_utc": 1743341093.0,
+      "score": 6,
+      "parent_id": "t1_mkib29m",
+      "depth": 1
+    },
+    {
+      "id": "mklv7zq",
+      "author": "OmarFromBK",
+      "body": "I was wondering why no one else was picking up on that",
+      "created_utc": 1743380165.0,
+      "score": 13,
+      "parent_id": "t1_mkj30xw",
+      "depth": 1
+    },
+    {
+      "id": "mkmlk5k",
+      "author": "hippynox",
+      "body": "What are the tells?",
+      "created_utc": 1743390377.0,
+      "score": 3,
+      "parent_id": "t1_mkj30xw",
+      "depth": 1
+    },
+    {
+      "id": "mkhu8rs",
+      "author": "FI_investor",
+      "body": "I used gumroad subscriptions. Can you explain further on what you mean by client area?",
+      "created_utc": 1743328279.0,
+      "score": 6,
+      "parent_id": "t1_mkhtz6i",
+      "depth": 1
+    },
+    {
+      "id": "mkiw1rj",
+      "author": "FI_investor",
+      "body": "Yes. Especially for B2B, lots of potential customers from LinkedIn. What's the SaaS you're planning to market?",
+      "created_utc": 1743345753.0,
+      "score": 5,
+      "parent_id": "t1_mkiv4du",
+      "depth": 1
+    },
+    {
+      "id": "mkht6h9",
+      "author": "FI_investor",
+      "body": "Thank you! A [tool that automates finding customers](https://customerfinderbot.com/) from social media. Basically saves companies time and effort since it works 24/7 for them. Built it to scratch my own itch and surprisingly companies started paying for it when I launched the MVP.",
+      "created_utc": 1743327585.0,
+      "score": 9,
+      "parent_id": "t1_mkhqr59",
+      "depth": 1
+    },
+    {
+      "id": "mkj51a1",
+      "author": "FI_investor",
+      "body": "Not if you're using the X API. And there's a lot of workarounds too when scraping. Did you already tried scanning X? If yes, what issues you encountered?",
+      "created_utc": 1743348665.0,
+      "score": 2,
+      "parent_id": "t1_mkj20yq",
+      "depth": 1
+    },
+    {
+      "id": "mkluakg",
+      "author": "Hazy_Fantayzee",
+      "body": "By making a post exactly like this on reddit. I swear I’ve read this kind of post like 20+times on here in the last few months",
+      "created_utc": 1743379821.0,
+      "score": 2,
+      "parent_id": "t1_mkj8vm0",
+      "depth": 1
+    },
+    {
+      "id": "mkm25nu",
+      "author": "FI_investor",
+      "body": "tip: you can read negative customer reviews from app stores, social media and review websites.",
+      "created_utc": 1743382777.0,
+      "score": 2,
+      "parent_id": "t1_mkk7us9",
+      "depth": 1
+    },
+    {
+      "id": "mkllvn9",
+      "author": "FI_investor",
+      "body": "Anyone can copy an idea. Most of the time it’s the execution that matters. Also not worried because the market is really big and i only want to grab a slice of the pie.",
+      "created_utc": 1743376811.0,
+      "score": 2,
+      "parent_id": "t1_mklfbo8",
+      "depth": 1
+    },
+    {
+      "id": "mkncuqs",
+      "author": "FI_investor",
+      "body": "good luck! happy to share more if you have questions",
+      "created_utc": 1743404700.0,
+      "score": 2,
+      "parent_id": "t1_mknaxru",
+      "depth": 1
+    }
+  ],
+  "fetched_at": 1755100735,
+  "schema": "v1"
+}
