@@ -73,28 +73,17 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
     
     def __init__(self, agent_id: str = None):
         BaseAgent.__init__(self, agent_id)
-        LLMAgentMixin.__init__(self, preferred_backend='ollama')
+        # Do not force a backend here; honor global/per-agent config in LLMAgentMixin
+        LLMAgentMixin.__init__(self, preferred_backend=None)
         self.name = "scout_agent"  # Used for prompt template loading
         self.research_agent = ResearchAgent()
         self.config = get_config()
-        
-        # Set default backend preferences
-        self.task_backend_preferences = {
-            "default": [LLMBackendType.OLLAMA, LLMBackendType.OPENAI, LLMBackendType.CLAUDE],
-            "plan": [LLMBackendType.OLLAMA, LLMBackendType.OPENAI],
-            "think": [LLMBackendType.OLLAMA, LLMBackendType.OPENAI, LLMBackendType.CLAUDE],
-            "act": [LLMBackendType.OLLAMA, LLMBackendType.OPENAI, LLMBackendType.CLAUDE]
-        }
-        self.preferred_backend = 'ollama'
     
     async def plan(self, input_data: ScoutInput) -> Dict[str, Any]:
         """Plan the pain point discovery process."""
         self.logger.info(f"Planning pain point discovery for market: {input_data.target_market}")
         
         try:
-            # Load the planning prompt template
-            prompt_template = load_prompt_template(agent_name=self.name, prompt_name="plan")
-            
             # Prepare prompt substitutions
             substitutions = {
                 "target_market": input_data.target_market,
@@ -103,24 +92,21 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
                 "sources": json.dumps(input_data.sources),
                 "keywords": json.dumps(input_data.keywords)
             }
-            
-            # Generate plan using LLM
-            llm_response = await self.llm_generate(
-                prompt_template=prompt_template,
-                substitutions=substitutions,
-                task="plan"
-            )
-            
-            if llm_response and llm_response.success:
-                # Parse the JSON response
-                plan = self._extract_json(llm_response.content)
-                self.logger.info(f"Generated pain point discovery plan with {len(plan.get('phases', []))} phases")
-            else:
+
+            # Load and render the planning prompt template
+            prompt_text = load_prompt_template(template_name="plan.prompt", agent_name=self.name, substitutions=substitutions)
+
+            # Generate plan using LLM (returns string)
+            try:
+                llm_text = await self.llm_generate(prompt=prompt_text, task_type="plan")
+                plan = self._extract_json(llm_text)
+                self.logger.info(f"Generated plan with keys: {list(plan.keys())}")
+            except Exception:
                 # Fallback if LLM fails
                 self.logger.warning("LLM plan generation failed, using fallback plan")
                 plan = {
                     "phases": [
-                        "market_research",
+                        {"name": "collect", "source": "reddit"},
                         "pain_point_extraction", 
                         "evidence_collection",
                         "validation",
@@ -165,9 +151,6 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
             # Use research agent to gather market data
             research_results = await self.research_agent.execute(research_input)
             
-            # Load the thinking prompt template
-            prompt_template = load_prompt_template(agent_name=self.name, prompt_name="think")
-            
             # Prepare prompt substitutions
             substitutions = {
                 "target_market": input_data.target_market,
@@ -176,18 +159,15 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
                 "research_results": json.dumps(research_results)
             }
             
-            # Generate analysis using LLM
-            llm_response = await self.llm_generate(
-                prompt_template=prompt_template,
-                substitutions=substitutions,
-                task="think"
-            )
-            
-            if llm_response and llm_response.success:
-                # Parse the JSON response
-                analysis = self._extract_json(llm_response.content)
-                self.logger.info(f"Generated analysis found {analysis.get('pain_points_found', 0)} pain points")
-            else:
+            # Load and render the thinking prompt template
+            prompt_text = load_prompt_template(template_name="think.prompt", agent_name=self.name, substitutions=substitutions)
+
+            # Generate analysis using LLM (returns string)
+            try:
+                llm_text = await self.llm_generate(prompt=prompt_text, task_type="think")
+                analysis = self._extract_json(llm_text)
+                self.logger.info("Generated analysis via LLM")
+            except Exception:
                 # Fallback if LLM fails
                 self.logger.warning("LLM analysis generation failed, using fallback analysis")
                 analysis = {
@@ -225,7 +205,14 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
         
         try:
             # Load the action prompt template
-            prompt_template = load_prompt_template(agent_name=self.name, prompt_name="act")
+            prompt_text = load_prompt_template(template_name="act.prompt", agent_name=self.name, substitutions={
+                "target_market": input_data.target_market,
+                "research_scope": input_data.research_scope,
+                "max_pain_points": input_data.max_pain_points,
+                "plan": json.dumps(self.state.plan),
+                "analysis": json.dumps(analysis),
+                "research_results": json.dumps(research_results)
+            })
             
             # Get research results and analysis from state
             research_results = getattr(self.state, 'research_results', {})
@@ -243,26 +230,10 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
                     ]
                 }
             
-            # Prepare prompt substitutions
-            substitutions = {
-                "target_market": input_data.target_market,
-                "research_scope": input_data.research_scope,
-                "max_pain_points": input_data.max_pain_points,
-                "plan": json.dumps(self.state.plan),
-                "analysis": json.dumps(analysis),
-                "research_results": json.dumps(research_results)
-            }
-            
-            # Generate action result using LLM
-            llm_response = await self.llm_generate(
-                prompt_template=prompt_template,
-                substitutions=substitutions,
-                task="act"
-            )
-            
-            if llm_response and llm_response.success:
-                # Parse the JSON response
-                act_result = self._extract_json(llm_response.content)
+            # Generate action result using LLM (returns string)
+            try:
+                llm_text = await self.llm_generate(prompt=prompt_text, task_type="act")
+                act_result = self._extract_json(llm_text)
                 
                 # Create pain point objects from the response
                 pain_points = []
@@ -291,7 +262,7 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
                     sources_used=act_result.get("sources_used", []),
                     research_duration=(datetime.now() - start_time).total_seconds()
                 )
-            else:
+            except Exception:
                 # Fallback if LLM fails
                 self.logger.warning("LLM action generation failed, using fallback method")
                 
