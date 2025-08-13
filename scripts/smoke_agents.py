@@ -91,9 +91,11 @@ logger = get_logger("scripts.smoke_agents")
 
 
 def ensure_env_defaults():
-    # Do not override user's env; only set if missing
-    os.environ.setdefault("SCOUT_LLM_DEFAULT_BACKEND", "ollama")
-    os.environ.setdefault("SCOUT_LLM_DEFAULT_MODEL", "phi4-mini:latest")
+    # Intentionally do nothing: respect user's .env and environment.
+    # Previously, we set defaults for LLM backend/model here which could preempt
+    # values loaded from .env (python-dotenv loads after this function is called).
+    # Leaving this empty ensures SCOUT_LLM_DEFAULT_BACKEND/MODEL from .env are honored.
+    return
 
 
 async def run_agent_generate(agent, name: str, prompt: str):
