@@ -174,16 +174,25 @@ class GeminiBackend(LLMBackend):
             )
             
             # Make the streaming request
-            response = await self._stream_generate_async(model, prompt)
-            
-            async for chunk in response:
-                if chunk.text:
-                    yield chunk.text
+            # Note: _stream_generate_async returns an async generator; do not await it.
+            try:
+                async for chunk in self._stream_generate_async(model, prompt):
+                    if getattr(chunk, 'text', None):
+                        yield chunk.text
+            except (StopAsyncIteration, RuntimeError) as e:
+                # Some environments surface generator completion as RuntimeError with 'StopIteration'
+                if isinstance(e, RuntimeError) and 'StopIteration' in str(e):
+                    return
+                return
                     
         except Exception as e:
-            if "quota" in str(e).lower() or "rate" in str(e).lower():
+            # Some runtimes surface generator completion as an exception
+            msg = str(e)
+            if 'async generator raised StopIteration' in msg:
+                return
+            if "quota" in msg.lower() or "rate" in msg.lower():
                 raise LLMRateLimitError(f"Gemini rate limit exceeded: {e}")
-            elif "timeout" in str(e).lower():
+            elif "timeout" in msg.lower():
                 raise LLMTimeoutError(f"Gemini streaming request timed out: {e}")
             else:
                 self.logger.error(f"Error streaming response: {e}")
@@ -242,18 +251,41 @@ class GeminiBackend(LLMBackend):
         return await loop.run_in_executor(None, model.generate_content, prompt)
     
     async def _stream_generate_async(self, model, prompt):
-        """Async wrapper for Gemini stream generation."""
-        # Run the synchronous method in a thread pool
+        """Async wrapper for Gemini stream generation using a background thread and an asyncio.Queue."""
         loop = asyncio.get_event_loop()
-        
-        def _stream_sync():
-            return model.generate_content(prompt, stream=True)
-        
-        stream = await loop.run_in_executor(None, _stream_sync)
-        
-        # Convert synchronous iterator to async iterator
-        for chunk in stream:
-            yield chunk
+        queue: asyncio.Queue = asyncio.Queue(maxsize=10)
+
+        SENTINEL = object()
+
+        def worker():
+            try:
+                stream = model.generate_content(prompt, stream=True)
+                for chunk in stream:
+                    # hand off to event loop thread-safely
+                    loop.call_soon_threadsafe(queue.put_nowait, chunk)
+            except Exception as e:
+                # forward exception info as a tuple
+                loop.call_soon_threadsafe(queue.put_nowait, ("__error__", e))
+            finally:
+                loop.call_soon_threadsafe(queue.put_nowait, SENTINEL)
+
+        # Start worker in default thread pool
+        fut = loop.run_in_executor(None, worker)
+
+        try:
+            while True:
+                item = await queue.get()
+                if item is SENTINEL:
+                    break
+                if isinstance(item, tuple) and len(item) == 2 and item[0] == "__error__":
+                    raise item[1]
+                yield item
+        finally:
+            # Ensure worker future is awaited to let exceptions surface to logs
+            try:
+                await asyncio.wait_for(fut, timeout=0.0)
+            except Exception:
+                pass
     
     async def _test_connection(self):
         """Test the Gemini connection."""

@@ -192,6 +192,8 @@ class ScoutConfig:
             self.prompts_dir,
             self.data_dir,
             self.output_dir,
+            # Data subfolders
+            str(Path(self.data_dir) / "reddit_cache"),
         ]
         
         for directory in directories:
@@ -252,6 +254,7 @@ class ConfigManager:
                 search=SearchConfig(**config_dict.get('search', {})),
                 memory=MemoryConfig(**config_dict.get('memory', {})),
                 api=APIConfig(**config_dict.get('api', {})),
+                llm_routing=LLMRoutingConfig(**config_dict.get('llm_routing', {})),
                 config_file=config_dict.get('config_file'),
                 prompts_dir=config_dict.get('prompts_dir', './prompts'),
                 data_dir=config_dict.get('data_dir', './data'),

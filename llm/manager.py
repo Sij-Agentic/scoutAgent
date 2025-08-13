@@ -162,6 +162,41 @@ class LLMManager:
         
         # Execute the request
         backend = self.backends[target_backend]
+
+        # Ensure model compatibility with the selected backend (handles fallback cases)
+        try:
+            available = set(backend.get_available_models()) if hasattr(backend, "get_available_models") else set()
+            if available and request and getattr(request, "extra_params", None):
+                override = request.extra_params.get("model_name_override")
+                if override and override not in available:
+                    request.extra_params["model_name_override"] = backend.config.model_name
+                    self.logger.warning(
+                        f"[stream] Remapped unsupported model '{override}' for backend '{target_backend}' to default '{backend.config.model_name}'"
+                    )
+        except Exception as _e:
+            self.logger.debug(f"[stream] Model compatibility check skipped: {_e}")
+
+        # Ensure model compatibility with the selected backend (handles fallback cases)
+        try:
+            available = set(backend.get_available_models()) if hasattr(backend, "get_available_models") else set()
+            # Extract current model (override or backend default)
+            current_model = None
+            if request and getattr(request, "extra_params", None):
+                current_model = request.extra_params.get("model_name_override")
+            if not current_model:
+                current_model = getattr(backend.config, "model_name", None)
+            # If override exists and is incompatible, remap to backend default
+            if available and request and getattr(request, "extra_params", None):
+                override = request.extra_params.get("model_name_override")
+                if override and override not in available:
+                    # Remap to backend's configured default model
+                    request.extra_params["model_name_override"] = backend.config.model_name
+                    self.logger.warning(
+                        f"Remapped unsupported model '{override}' for backend '{target_backend}' to default '{backend.config.model_name}'"
+                    )
+        except Exception as _e:
+            # Do not fail generation due to compatibility check
+            self.logger.debug(f"Model compatibility check skipped: {_e}")
         start_time = asyncio.get_event_loop().time()
         
         try:
