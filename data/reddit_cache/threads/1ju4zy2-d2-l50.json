@@ -1,0 +1,315 @@
+{
+  "post": {
+    "id": "1ju4zy2",
+    "subreddit": "productivity",
+    "title": "Looking for a good note-taking / personal knowledge management app - What do you recommend besides the big names?",
+    "author": "Defiant_Fix8658",
+    "created_utc": 1744085677.0,
+    "score": 12,
+    "num_comments": 43,
+    "url": "https://www.reddit.com/r/productivity/comments/1ju4zy2/looking_for_a_good_notetaking_personal_knowledge/",
+    "permalink": "https://www.reddit.com/r/productivity/comments/1ju4zy2/looking_for_a_good_notetaking_personal_knowledge/",
+    "selftext": "I'm trying to get my notes and ideas organized digitally. I know about Evernote and Notion, but wondering what other note-taking or personal knowledge management (PKM) apps people find really effective? Looking for something possibly with good linking features (like Roam/Obsidian?), tagging, and available across devices (desktop/mobile). Open to free or paid options. What tools do you use and why do you like them? Thanks!"
+  },
+  "comments": [
+    {
+      "id": "mm0g1fo",
+      "author": "Smooth-Bowler-9216",
+      "body": "Obsidian because you can link the notes and create a spider web",
+      "created_utc": 1744108484.0,
+      "score": 11,
+      "parent_id": "t3_1ju4zy2",
+      "depth": 0
+    },
+    {
+      "id": "mlzgb30",
+      "author": "Pztch",
+      "body": "Workflowy.\n\nIt’s simply awesome/awesomely simple.",
+      "created_utc": 1744087020.0,
+      "score": 9,
+      "parent_id": "t3_1ju4zy2",
+      "depth": 0
+    },
+    {
+      "id": "mlzmipp",
+      "author": "Glittering_Staff_535",
+      "body": "I use and love Obsidian! I only use it for knowledge management with minimal plugins but you can customize it to be a lot of things. I use it every single day and couldn‘t live without it haha",
+      "created_utc": 1744090274.0,
+      "score": 7,
+      "parent_id": "t3_1ju4zy2",
+      "depth": 0
+    },
+    {
+      "id": "mlzsudj",
+      "author": "Artistic_Incident_33",
+      "body": "Obsidian",
+      "created_utc": 1744093825.0,
+      "score": 7,
+      "parent_id": "t3_1ju4zy2",
+      "depth": 0
+    },
+    {
+      "id": "mm06k8b",
+      "author": "Interesting-Scarf309",
+      "body": "Upnote",
+      "created_utc": 1744102583.0,
+      "score": 6,
+      "parent_id": "t3_1ju4zy2",
+      "depth": 0
+    },
+    {
+      "id": "mlzf7w5",
+      "author": "Shapperd",
+      "body": "I used OneNote during uni and it was great. The only thing I regret is taking notes manually cause you can't search in it... Also I'd look into something like a self hosted Wiki, I don't know what the name is but you can search it up easily.",
+      "created_utc": 1744086479.0,
+      "score": 3,
+      "parent_id": "t3_1ju4zy2",
+      "depth": 0
+    },
+    {
+      "id": "mm07dzo",
+      "author": "koneu",
+      "body": "Personally, I'm a user of Obsidian. But it's more like an IDE for text, so it has somewhat of a learning curve to get into all the features.",
+      "created_utc": 1744103136.0,
+      "score": 3,
+      "parent_id": "t3_1ju4zy2",
+      "depth": 0
+    },
+    {
+      "id": "mm0woih",
+      "author": "Infamous-Roof757",
+      "body": "Unpopular opinion here, but I found that Google Docs is quite usable after the updates in recent years. There's tabs and cross-document reference links. The only persistent issue is that managing multiple files remains a mess as the interface for navigating files in Google Drive is quite horrible.",
+      "created_utc": 1744116014.0,
+      "score": 3,
+      "parent_id": "t3_1ju4zy2",
+      "depth": 0
+    },
+    {
+      "id": "mm28yxx",
+      "author": "AvidReader31",
+      "body": "Obsidian. It's free, there is a huge community for it and the markdown-files can be edited by other programs as well.",
+      "created_utc": 1744131241.0,
+      "score": 3,
+      "parent_id": "t3_1ju4zy2",
+      "depth": 0
+    },
+    {
+      "id": "mlzl5jh",
+      "author": "NaamBullaRakhtaKhula",
+      "body": "Memotron?",
+      "created_utc": 1744089524.0,
+      "score": 2,
+      "parent_id": "t3_1ju4zy2",
+      "depth": 0
+    },
+    {
+      "id": "mm0hj6t",
+      "author": "TimArtefaX",
+      "body": "i've recently switched from notion to appflowy.\nits a decent replacement",
+      "created_utc": 1744109282.0,
+      "score": 2,
+      "parent_id": "t3_1ju4zy2",
+      "depth": 0
+    },
+    {
+      "id": "mm49bgs",
+      "author": "MindingMomma",
+      "body": "MYNDIFY - it’s truly unique; a cool blend of a note-taking, journal, task management, and a reminder app.",
+      "created_utc": 1744152766.0,
+      "score": 2,
+      "parent_id": "t3_1ju4zy2",
+      "depth": 0
+    },
+    {
+      "id": "mm4se62",
+      "author": "karlitooo",
+      "body": "Current go to is BearNotes which is cheap/fast and super nice in the Apple ecosystem. But used to use Noteplan pretty heavy. I aspire to use Tana but I don't think I'll ever be that much of a nerd. If could be bothered I would probably try Reflect Notes or Lunatask to replace bear but who has time to swap out a system that's working well",
+      "created_utc": 1744159332.0,
+      "score": 2,
+      "parent_id": "t3_1ju4zy2",
+      "depth": 0
+    },
+    {
+      "id": "mm0qe3w",
+      "author": "Oldboy_8856",
+      "body": "Appflowy (opensource, you can self host it and use a local ai model, mutliplatform...)",
+      "created_utc": 1744113454.0,
+      "score": 1,
+      "parent_id": "t3_1ju4zy2",
+      "depth": 0
+    },
+    {
+      "id": "mm0txki",
+      "author": "sharkyboy623",
+      "body": "Personally I use RemNote. It is good for all of my needs",
+      "created_utc": 1744114929.0,
+      "score": 1,
+      "parent_id": "t3_1ju4zy2",
+      "depth": 0
+    },
+    {
+      "id": "mm0znws",
+      "author": "DreamySakura99",
+      "body": "I keep it simple. I use the notes app on iphone.",
+      "created_utc": 1744117128.0,
+      "score": 1,
+      "parent_id": "t3_1ju4zy2",
+      "depth": 0
+    },
+    {
+      "id": "mm14b65",
+      "author": "Windjammer1969",
+      "body": "\"Cross-platform\" is the bugaboo.  EssentialPIM Pro works fine between Windows and Android, with local sync capability - but I would not consider the Notes module to be powerful enough to serve as a reference / research database.  (Does OK with shorter notes - but emphasis is on PIM functions of contacts, calendar, todo.)\n\nFor \"live\" notes, I have given up on mobile phone and simply use Word on a \"thin &amp; light\" laptop, saving to OneDrive.  But only take live notes a few times each month now: if something seems particularly important will import it into RightNote (see below) - otherwise just leave the word doc in a somewhat organized folder structure and rely on Copernic Desktop Search to find data as needed.  \n\nAs a Reference / Research Database, have been using RightNote Pro for over a decade and have not found anything that was Sufficiently \"Better\" to make it seem worth the effort to change over.  RN does not have an Android version, although it DOES have a good Export function, into a variety of file formats including html and \"Webbook\" - the latter of which works well on a chromebook or android tablet (larger screen than phone....).\n\nRN also worked with Evernote at one time - may still do, although I gave up on Evernote after a group of notes somehow got \"lost\" (along with pricing changes...).",
+      "created_utc": 1744118789.0,
+      "score": 1,
+      "parent_id": "t3_1ju4zy2",
+      "depth": 0
+    },
+    {
+      "id": "mm2megb",
+      "author": "futureteams",
+      "body": "Any AI tools?  Like a personal twin?",
+      "created_utc": 1744135019.0,
+      "score": 1,
+      "parent_id": "t3_1ju4zy2",
+      "depth": 0
+    },
+    {
+      "id": "mm2sa8q",
+      "author": "ElmrPhD",
+      "body": "I was a heavy user of Quip at my last job. I’m using Microsoft Loop now and found it to be decent especially for collaborative efforts.",
+      "created_utc": 1744136707.0,
+      "score": 1,
+      "parent_id": "t3_1ju4zy2",
+      "depth": 0
+    },
+    {
+      "id": "mm2unkg",
+      "author": "tobyroberts",
+      "body": "NotePlan app keeps getting better and better",
+      "created_utc": 1744137410.0,
+      "score": 1,
+      "parent_id": "t3_1ju4zy2",
+      "depth": 0
+    },
+    {
+      "id": "mm645mp",
+      "author": "Careful_Biscotti4980",
+      "body": "OneNote",
+      "created_utc": 1744179331.0,
+      "score": 1,
+      "parent_id": "t3_1ju4zy2",
+      "depth": 0
+    },
+    {
+      "id": "mm6gzl7",
+      "author": "Thieves0fTime",
+      "body": "Why the big names are not a go? OneNote is amazing. And comes free.",
+      "created_utc": 1744187427.0,
+      "score": 1,
+      "parent_id": "t3_1ju4zy2",
+      "depth": 0
+    },
+    {
+      "id": "mm6vqis",
+      "author": "Next_Description_995",
+      "body": "Bro, it's about keeping it simple, so just get an app that u  can type and connect ideas",
+      "created_utc": 1744196268.0,
+      "score": 1,
+      "parent_id": "t3_1ju4zy2",
+      "depth": 0
+    },
+    {
+      "id": "mm84awd",
+      "author": "malloryknox86",
+      "body": "Obsidian",
+      "created_utc": 1744212015.0,
+      "score": 1,
+      "parent_id": "t3_1ju4zy2",
+      "depth": 0
+    },
+    {
+      "id": "mm88u6k",
+      "author": "FENRiS738",
+      "body": "Airtable",
+      "created_utc": 1744213361.0,
+      "score": 1,
+      "parent_id": "t3_1ju4zy2",
+      "depth": 0
+    },
+    {
+      "id": "mlznxml",
+      "author": "Talent_Tactician_09",
+      "body": "I've tried many yet none really stuck. A good old trusty calendar notebook combo does the trick for me.",
+      "created_utc": 1744091065.0,
+      "score": 0,
+      "parent_id": "t3_1ju4zy2",
+      "depth": 0
+    },
+    {
+      "id": "mm3gib0",
+      "author": "Slow_Pay_7171",
+      "body": "What do you get out of it? Tried Obsidian several times but it just felt so... \"unprofessional\" and ugly. The \"net\" seems useless, somehow.\n\nBut I work a lot with tags, so I rly have no usage of the net.",
+      "created_utc": 1744143803.0,
+      "score": 2,
+      "parent_id": "t1_mm0g1fo",
+      "depth": 1
+    },
+    {
+      "id": "mm0c0x4",
+      "author": "pmwakade",
+      "body": "\\+1",
+      "created_utc": 1744106116.0,
+      "score": 1,
+      "parent_id": "t1_mlzgb30",
+      "depth": 1
+    },
+    {
+      "id": "mm14y53",
+      "author": "dreamer8991",
+      "body": "i want to use obsidian for doing my PhD lit review but I'm unable to get a hang of it. could you help?",
+      "created_utc": 1744119010.0,
+      "score": 2,
+      "parent_id": "t1_mlzmipp",
+      "depth": 1
+    },
+    {
+      "id": "mnwmeaz",
+      "author": "spirolking",
+      "body": "AI workspace? No, thank you.",
+      "created_utc": 1745058391.0,
+      "score": 1,
+      "parent_id": "t1_mm0hj6t",
+      "depth": 1
+    },
+    {
+      "id": "mtn46w6",
+      "author": "silent-reader-geek",
+      "body": "Is this cloud base app?",
+      "created_utc": 1747915792.0,
+      "score": 1,
+      "parent_id": "t1_mm49bgs",
+      "depth": 1
+    },
+    {
+      "id": "mnwn9cf",
+      "author": "spirolking",
+      "body": "I've been using EssentialPIM for more than a decade. The best calendar app for Windows ever made. Notes are ok but they are a bit stuck up in the 90's.\nEventually I stopped using it because of lack of portability. The Android app is absolutely horribble to be useful. Not being able to use my notes on phone or tablet is too much to sacrifice.",
+      "created_utc": 1745058922.0,
+      "score": 2,
+      "parent_id": "t1_mm14b65",
+      "depth": 1
+    },
+    {
+      "id": "mm6w686",
+      "author": "Next_Description_995",
+      "body": "Obsidian is offline and keeps u r data private. u can pay like a 1$ for a sync with your phone for and u can make as simple as u want or complex you want",
+      "created_utc": 1744196481.0,
+      "score": 1,
+      "parent_id": "t1_mm6vqis",
+      "depth": 1
+    }
+  ],
+  "fetched_at": 1755100769,
+  "schema": "v1"
+}

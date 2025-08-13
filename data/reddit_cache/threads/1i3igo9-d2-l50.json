@@ -1,0 +1,63 @@
+{
+  "post": {
+    "id": "1i3igo9",
+    "subreddit": "SaaS",
+    "title": "Is automated customer support worth the investment for apps?",
+    "author": "kateomali",
+    "created_utc": 1737126649.0,
+    "score": 5,
+    "num_comments": 8,
+    "url": "https://www.reddit.com/r/SaaS/comments/1i3igo9/is_automated_customer_support_worth_the/",
+    "permalink": "https://www.reddit.com/r/SaaS/comments/1i3igo9/is_automated_customer_support_worth_the/",
+    "selftext": "Handling customer support manually has been manageable so far, but as my app grows, it’s becoming a bottleneck. I’m considering automating part of the process with chatbots or pre-written FAQs.\n\nFor those who’ve implemented automated support, did it improve efficiency without losing the personal touch? And how do you decide what’s worth automating?"
+  },
+  "comments": [
+    {
+      "id": "m7nsk5l",
+      "author": "Ok-Entertainer-1414",
+      "body": "Automated support is pretty much garbage and tends to frustrate customers.",
+      "created_utc": 1737135074.0,
+      "score": 1,
+      "parent_id": "t3_1i3igo9",
+      "depth": 0
+    },
+    {
+      "id": "m7u2mka",
+      "author": "ethanator777",
+      "body": "We automated FAQs and common questions. It saved time, but we kept a live support option for complex issues",
+      "created_utc": 1737222375.0,
+      "score": 1,
+      "parent_id": "t3_1i3igo9",
+      "depth": 0
+    },
+    {
+      "id": "m852ba2",
+      "author": "hopefully_useful",
+      "body": "A lot of automated support/chatbot/AI agent solutions nowadays allow for a good bit of personalisation in their tone/behaviour, so while it isn't 'personal' per se, it can definitely help.\n\nThe key is usually to ensure that when implementing any automation there is always an 'escape route' for a customer where they can get personal/human support when they need it.\n\nThen it becomes more like a triage flow, they can get quick answers, when they need them for easier things and a person (who can now be more proactive and responsive as their workload is smaller) for those that are more complex.\n\nThis isn't just theory, this was what [some of our customers](https://myaskai.com/blog/tags/case-study-posts) said to us when we interviewed them about the impact of our AI agents.",
+      "created_utc": 1737368772.0,
+      "score": 1,
+      "parent_id": "t3_1i3igo9",
+      "depth": 0
+    },
+    {
+      "id": "m8c42j1",
+      "author": "Marc_Rasch",
+      "body": "We wanted to invest in better tools but needed extra revenue first  \nAdding ads through Yango helped us fund automation without cutting corners",
+      "created_utc": 1737461602.0,
+      "score": 1,
+      "parent_id": "t3_1i3igo9",
+      "depth": 0
+    },
+    {
+      "id": "mvmi02n",
+      "author": "Marinuch",
+      "body": "Same here - automating FAQs helped a ton. We also work with SupportYourApp to handle live support when things get complex. Good balance of speed + human touch",
+      "created_utc": 1748886009.0,
+      "score": 1,
+      "parent_id": "t1_m7u2mka",
+      "depth": 1
+    }
+  ],
+  "fetched_at": 1755100726,
+  "schema": "v1"
+}

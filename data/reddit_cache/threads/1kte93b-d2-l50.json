@@ -1,0 +1,99 @@
+{
+  "post": {
+    "id": "1kte93b",
+    "subreddit": "SaaS",
+    "title": "I built an AI Sales Agent to automate cold outreach — it’s booking meetings while I sleep",
+    "author": "FlatLiterature9702",
+    "created_utc": 1747988101.0,
+    "score": 0,
+    "num_comments": 10,
+    "url": "https://www.reddit.com/r/SaaS/comments/1kte93b/i_built_an_ai_sales_agent_to_automate_cold/",
+    "permalink": "https://www.reddit.com/r/SaaS/comments/1kte93b/i_built_an_ai_sales_agent_to_automate_cold/",
+    "selftext": "As a solo founder, I was spending hours every week:  \n• Finding leads  \n• Writing cold emails  \n• Following up manually (when I remembered)\n\nSo I built something to replace all of that.\n\nIt’s called **ElevateSells**, and it acts like a full-time sales assistant — powered by AI.\n\nHere’s what it does:\n\n✅ Finds leads based on your target market  \n✅ Writes **personalized cold emails** (no templates, no {first\\_name} laziness)  \n✅ Sends them at the right time  \n✅ Follows up automatically, 100% hands-off  \n✅ Tracks replies and meetings — and learns what works\n\nThe whole thing feels like having an SDR who never sleeps, never forgets to follow up, and actually sounds human.\n\nMy goal wasn’t to build yet another “sales tool” — it was to *replace the part of the founder job I dreaded most* with something that just worked.\n\nRight now it’s running live on my own outreach — and booking real meetings.\n\nIf you’re running a B2B startup and don’t want to waste time on manual prospecting, I’d be happy to show you how I set it up.\n\nFeedback, questions, or critiques are welcome 🙌"
+  },
+  "comments": [
+    {
+      "id": "mtsv8l8",
+      "author": "Whisky-Toad",
+      "body": "Do they read like an exact copy paste of gpt like this post?",
+      "created_utc": 1747988896.0,
+      "score": 2,
+      "parent_id": "t3_1kte93b",
+      "depth": 0
+    },
+    {
+      "id": "n5gzl7e",
+      "author": "ConfectionStock4566",
+      "body": "I want to know more",
+      "created_utc": 1753639450.0,
+      "score": 2,
+      "parent_id": "t3_1kte93b",
+      "depth": 0
+    },
+    {
+      "id": "mtsuvs1",
+      "author": "[deleted]",
+      "body": "[removed]",
+      "created_utc": 1747988675.0,
+      "score": 1,
+      "parent_id": "t3_1kte93b",
+      "depth": 0
+    },
+    {
+      "id": "mzu60jh",
+      "author": "[deleted]",
+      "body": "[deleted]",
+      "created_utc": 1750918188.0,
+      "score": 1,
+      "parent_id": "t3_1kte93b",
+      "depth": 0
+    },
+    {
+      "id": "n7lur0t",
+      "author": "stealthagents",
+      "body": "Sounds like a game changer! If it’s really nailing that human touch and feels less robotic, it could be a lifesaver for solo founders. I’d be curious to see how it adapts to different industries too, since tone and approach can vary a ton in B2B.",
+      "created_utc": 1754663301.0,
+      "score": 1,
+      "parent_id": "t3_1kte93b",
+      "depth": 0
+    },
+    {
+      "id": "mtswan0",
+      "author": "FlatLiterature9702",
+      "body": "No they feels more human than you 😜",
+      "created_utc": 1747989544.0,
+      "score": 0,
+      "parent_id": "t1_mtsv8l8",
+      "depth": 1
+    },
+    {
+      "id": "n5kz7hb",
+      "author": "FlatLiterature9702",
+      "body": "You can book a time that works best for you using my calendar link here and i will guide you through a quick demo to show you how everything works :  \n[https://cal.elevatesells.com/ahmed/30min](https://cal.elevatesells.com/ahmed/30min)",
+      "created_utc": 1753696797.0,
+      "score": 1,
+      "parent_id": "t1_n5gzl7e",
+      "depth": 1
+    },
+    {
+      "id": "mtswfls",
+      "author": "FlatLiterature9702",
+      "body": "Elevate sells support recent funding signals",
+      "created_utc": 1747989630.0,
+      "score": 1,
+      "parent_id": "t1_mtsuvs1",
+      "depth": 1
+    },
+    {
+      "id": "mzub4gr",
+      "author": "FlatLiterature9702",
+      "body": "Hello, my dm's are open",
+      "created_utc": 1750920965.0,
+      "score": 1,
+      "parent_id": "t1_mzu60jh",
+      "depth": 1
+    }
+  ],
+  "fetched_at": 1755100758,
+  "schema": "v1"
+}

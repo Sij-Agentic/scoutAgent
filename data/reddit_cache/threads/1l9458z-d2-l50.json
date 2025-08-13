@@ -1,0 +1,27 @@
+{
+  "post": {
+    "id": "1l9458z",
+    "subreddit": "SaaS",
+    "title": "We Built an AI Tool to Automate Warehouse Receiving – Struggling to Find early adapters (Need Help from Sales/Marketing Folks)",
+    "author": "confusedprogrammer22",
+    "created_utc": 1749675869.0,
+    "score": 1,
+    "num_comments": 12,
+    "url": "https://www.reddit.com/r/SaaS/comments/1l9458z/we_built_an_ai_tool_to_automate_warehouse/",
+    "permalink": "https://www.reddit.com/r/SaaS/comments/1l9458z/we_built_an_ai_tool_to_automate_warehouse/",
+    "selftext": "Hey everyone,\n\nWe a team of 2 building an **AI-powered B2B SaaS product** in the supply chain space. Its called an **AI Receiving Agent** – the goal is simple: help warehouse teams **automate the processing of packing slips**, **match them against POs**, and **write back to ERP systems,** functionality will be further expanded iteratively.\n\nIt replaces the manual effort of keying in receiving documents (which is still surprisingly common at many warehouses) with an AI agent that reads documents (handles unstructured data), verifies against ERP data, do checks as per company's policies, makes a decision (auto-receive or human review), and completes the ERP entry.\n\n**We have built the MVP.**  \nIt’s functional, handles various PO types, supports LLM reasoning, and we can demo it live or via video.  \n**But** — we’re struggling to break into pilot projects. Finding supply chain managers or decision-makers who are willing to test it out has been really tough.\n\nWe’re looking for someone who gets B2B, especially in logistics or supply chain, and can help us:\n\n* Get in front of potential clients\n* Refine our GTM and positioning\n* Maybe even take the lead on sales/partnerships\n\nIf you're someone with a knack for **B2B sales, marketing, or early-stage growth**, or you know someone who is, we would like to discuss this.\n\nFeel free to DM me or drop a comment.  \nalso take a look at the demo video we made demonstrating MVP version of the product.  \n\nhttps://youtu.be/dAAJjpdSuSU?si=TUWTBb9J1LXID_ie\n\nThankyou guys."
+  },
+  "comments": [
+    {
+      "id": "mxg910e",
+      "author": "confusedprogrammer22",
+      "body": "I see there are 11 comment counts but I can’t see any of them. Any reason why ??",
+      "created_utc": 1749762450.0,
+      "score": 1,
+      "parent_id": "t3_1l9458z",
+      "depth": 0
+    }
+  ],
+  "fetched_at": 1755100752,
+  "schema": "v1"
+}

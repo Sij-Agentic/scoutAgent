@@ -1,0 +1,27 @@
+{
+  "post": {
+    "id": "1mgez2t",
+    "subreddit": "smallbusiness",
+    "title": "I'm building Shopify automation templates for annoying niche workflows. What do you think of this approach?",
+    "author": "BinaryBlitz10",
+    "created_utc": 1754213131.0,
+    "score": 0,
+    "num_comments": 1,
+    "url": "https://www.reddit.com/r/smallbusiness/comments/1mgez2t/im_building_shopify_automation_templates_for/",
+    "permalink": "https://www.reddit.com/r/smallbusiness/comments/1mgez2t/im_building_shopify_automation_templates_for/",
+    "selftext": "Hey all,\n\nI'm exploring an idea to save Shopify entrepreneurs from wasting time on repetitive tasks, especially those frustrating, niche issues that no app really solves.\n\nI'm trying to solve this by building **plug-and-play automation templates** that store owners can use. These are pre-built workflows tailored to specific problems, and they don’t require coding.\n\nTwo niche examples:\n\n* **Smart Shopify Filters**: Shopify’s Search &amp; Discovery app shows filter options (like size) even when they’re out of stock. We’ve figured out how to show only options that are actually available based on live inventory.\n* **Order Merger Helper**: Automatically flags orders from the same customer (same billing and shipping info) so the ops team can combine them before shipping. Saves a ton of time manually scanning.\n\nInstead of yet another Shopify app, this would be a library of workflows with clear guides, install buttons, and maybe optional setup help.\n\nIt’s early, but we’re trying to validate whether this idea actually solves a real problem before going too far. So I’m here with a few honest questions:\n\n1. If you’ve run a Shopify store, what were the most annoying tasks you had to do over and over?\n2. Would you trust and use a pre-built automation pack like this?\n3. What’s the one thing you wish just “ran in the background” for your store?\n4. Am I missing anything obvious here?\n\n  \nWe’re not selling anything. Just pressure testing the idea while we build."
+  },
+  "comments": [
+    {
+      "id": "n6o1u20",
+      "author": "AutoModerator",
+      "body": "This is a friendly reminder that r/smallbusiness is a question and answer subreddit. You ask a question about starting, owning, and growing a small business and the community answers. Posts that violate the rules listed in the sidebar will be removed. A permanent or temporary ban may also be issued if you do not remove the offending post. Seeing this message does not mean your post was automatically removed. Please also note our new Rule 5- Posts with negative vote totals may be removed if they are deemed non-specific, or if they are repeats of questions designed to gather information rather than solve a small business problem.\n\n*I am a bot, and this action was performed automatically. Please [contact the moderators of this subreddit](/message/compose/?to=/r/smallbusiness) if you have any questions or concerns.*",
+      "created_utc": 1754213132.0,
+      "score": 1,
+      "parent_id": "t3_1mgez2t",
+      "depth": 0
+    }
+  ],
+  "fetched_at": 1755100809,
+  "schema": "v1"
+}

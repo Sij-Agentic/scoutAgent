@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "scout_plan_v1.json",
+  "title": "Scout Plan v1",
+  "type": "object",
+  "required": ["schema", "target_market", "time_window", "sources", "keywords", "subreddits", "limits", "dag"],
+  "properties": {
+    "schema": {"const": "scout_plan_v1"},
+    "target_market": {"type": "string"},
+    "time_window": {"type": "string", "enum": ["3m", "6m", "12m", "24m", "all"]},
+    "sources": {"type": "array", "items": {"type": "string"}},
+    "keywords": {"type": "array", "items": {"type": "string"}},
+    "subreddits": {"type": "array", "items": {"type": "string"}},
+    "limits": {
+      "type": "object",
+      "required": ["per_query_limit", "comment_depth", "comment_limit", "min_num_comments", "min_score"],
+      "properties": {
+        "per_query_limit": {"type": "integer", "minimum": 1},
+        "comment_depth": {"type": "integer", "minimum": 0},
+        "comment_limit": {"type": "integer", "minimum": 0},
+        "min_num_comments": {"type": "integer", "minimum": 0},
+        "min_score": {"type": "integer", "minimum": 0}
+      }
+    },
+    "dag": {
+      "type": "object",
+      "required": ["run_id", "nodes"],
+      "properties": {
+        "run_id": {"type": "string"},
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "type", "inputs", "outputs", "deps"],
+            "properties": {
+              "id": {"type": "string"},
+              "type": {"type": "string", "enum": ["agent", "tool"]},
+              "agent": {"type": ["string", "null"]},
+              "stage": {"type": ["string", "null"], "enum": ["plan", "think", "act", null]},
+              "tool": {"type": ["string", "null"]},
+              "parallelize_by": {"type": ["string", "null"]},
+              "inputs": {"type": "object"},
+              "outputs": {"type": "array", "items": {"type": "string"}},
+              "deps": {"type": "array", "items": {"type": "string"}}
+            }
+          }
+        }
+      }
+    }
+  }
+}

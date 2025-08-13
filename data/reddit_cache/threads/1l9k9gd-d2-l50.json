@@ -1,0 +1,17 @@
+{
+  "post": {
+    "id": "1l9k9gd",
+    "subreddit": "SaaS",
+    "title": "I just launched bulk Pocket imports into my AI knowledge management app (Recall) to support those looking for a Pocket Alternative",
+    "author": "paulrchds6",
+    "created_utc": 1749728387.0,
+    "score": 1,
+    "num_comments": 0,
+    "url": "https://www.reddit.com/r/SaaS/comments/1l9k9gd/i_just_launched_bulk_pocket_imports_into_my_ai/",
+    "permalink": "https://www.reddit.com/r/SaaS/comments/1l9k9gd/i_just_launched_bulk_pocket_imports_into_my_ai/",
+    "selftext": "Hello everyone, I’m the founder of [getrecall.ai](https://getrecall.ai). Recall started as a side project to build the PKM system I always dreamed of. Today, we've come a long way, and I’m super excited to share that we just sprinted to release **bulk Pocket import** to support all those users who may be frantically looking for their next Pocket alternative.\n\nIf you're open to an AI read-it-later app, Recall offers a lot more than a traditional one:\n\n* **All your content is saved in an AI-powered knowledge base**, so it’s automatically categorized. You don’t have to worry about staying on top of folders or tagging everything manually.\n* **You can interact with your content in a whole new way** – get one-click summaries or even chat with your content directly.\n* **Automatic knowledge graph creation** – this one’s a personal favorite. It’s like an automatic Obsidian: your related notes and highlights are auto-connected so you can discover insights and connections in the content you consume. I know it still needs work and may not be for everyone, but I think it’s powerful.\n\nA heads-up: bulk import from Pocket requires a paid sub, since the AI costs to support it are pretty high. That said, you can still use Recall for **free as a read-it-later app** – just switch your settings to “reader only” and you can save as much content as you like.\n\nIf you were a Pocket fan and you're looking for something that can elevate how you consume and organize content, give Recall a try – and please share your candid feedback."
+  },
+  "comments": [],
+  "fetched_at": 1755100782,
+  "schema": "v1"
+}

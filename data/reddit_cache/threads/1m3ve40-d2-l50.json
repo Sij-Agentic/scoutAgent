@@ -1,0 +1,17 @@
+{
+  "post": {
+    "id": "1m3ve40",
+    "subreddit": "SaaS",
+    "title": "Built Salesdok.com to automate your pre-sales Q&amp;A - Feedbacks are welcomed !",
+    "author": "ExtensionOriginal960",
+    "created_utc": 1752929186.0,
+    "score": 1,
+    "num_comments": 0,
+    "url": "https://www.reddit.com/r/SaaS/comments/1m3ve40/built_salesdokcom_to_automate_your_presales_qa/",
+    "permalink": "https://www.reddit.com/r/SaaS/comments/1m3ve40/built_salesdokcom_to_automate_your_presales_qa/",
+    "selftext": "Hey r/SaaS 👋\n\nI'm working on a SaaS tool called [**Salesdok**](https://salesdok.com/) – it’s an AI Assistant that helps SaaS founders like us handle  **pre-sales questions** using your own content (website, docs, FAQs, etc.).\n\n# 🧠 What it does:\n\n* Uses **RAG (Retrieval-Augmented Generation)** to understand and answer user questions\n* Trained on your content: web pages, PDFs, product docs, pricing pages, etc.\n* Embedded on your site with one line of code\n* Ideal for answering things like:\n   * “Do you support X?”\n   * “How is this different from \\[competitor\\]?”\n   * “What’s your refund policy?”\n   * “Is this available for teams?”\n\n# 🧪 Why I built it:\n\nI noticed that founders and indie SaaS builders often waste time replying to the same pre-sales DMs and emails over and over. An AI  trained on your actual product info can free up your time while keeping leads warm.\n\n# ✅ Live Now — Free plan available:\n\nYou can try it right now. There’s a  **free plan** to test it with unlimited knowledge base and 150 chunks of data limit. No credit card required.\n\n👉 [Check it out here](https://salesdok.com/)  \nI’d *love* your feedback — even if it’s brutally honest."
+  },
+  "comments": [],
+  "fetched_at": 1755100761,
+  "schema": "v1"
+}

@@ -1,0 +1,17 @@
+{
+  "post": {
+    "id": "1m205m3",
+    "subreddit": "SaaS",
+    "title": "Feedback On Tool to Automate Finding KDMs on LI Sales Navigator",
+    "author": "Expensive-Carrot-205",
+    "created_utc": 1752733376.0,
+    "score": 1,
+    "num_comments": 1,
+    "url": "https://www.reddit.com/r/SaaS/comments/1m205m3/feedback_on_tool_to_automate_finding_kdms_on_li/",
+    "permalink": "https://www.reddit.com/r/SaaS/comments/1m205m3/feedback_on_tool_to_automate_finding_kdms_on_li/",
+    "selftext": "Hey all!\n\nI’m building an MVPs Chrome Browser extension that uses AI to take control of your LI Sales Navigator and automate the process of finding KDMs for accounts. Specifically, it automates these two tasks:\n1) Scanning through roles at a company to find the most relevant titles to your persona \n2) Diving through those profiles to verify things like location, responsibilities, titles of connections, skills, and interests.\n\nThe model has been trained on an extensive set of personas, but it learns from industry knowledge you input, and it constantly learns from incorrect recommendations.\n\nIf anyone here burns time prospecting for KDMs on LI Sales Navigator, and that’s frustrating, getting in the way of hitting SQLs / SOLs, or error-prone, I’d love to hear your feedback, criticisms, and thoughts on this idea\n\nThis is most relevant for sales teams prospecting medium to large accounts with relatively consistent ICPs and relatively consistent personas "
+  },
+  "comments": [],
+  "fetched_at": 1755100760,
+  "schema": "v1"
+}

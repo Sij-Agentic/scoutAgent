@@ -1,0 +1,54 @@
+{
+  "post": {
+    "id": "1mdx9t9",
+    "subreddit": "SaaS",
+    "title": "Automates Your Workflow with me",
+    "author": "Zestyclose-Wall-3858",
+    "created_utc": 1753955297.0,
+    "score": 1,
+    "num_comments": 5,
+    "url": "https://www.reddit.com/r/SaaS/comments/1mdx9t9/automates_your_workflow_with_me/",
+    "permalink": "https://www.reddit.com/r/SaaS/comments/1mdx9t9/automates_your_workflow_with_me/",
+    "selftext": "Automate Your Workflow with n8n – Custom Automation Gigs (Affordable + Fast Delivery)\n\nHey founders, solo hustlers, devs, and ops teams – tired of repetitive manual tasks? I’ll automate it for you using n8n.\n\n✅ What I Can Build:\n\nCRM + Email automation (HubSpot, Notion, Airtable, Gmail, etc.)\n\nGoogle Sheets / Excel data syncs\n\nWhatsApp bots / notifications (via Twilio or Gupshup)\n\nScrapers + alert systems\n\nStripe, Razorpay, PayPal automations\n\nCustom business logic – any webhook → any action\n\nInternal tools &amp; dashboards using n8n + Supabase\n\nChatGPT &amp; AI-powered workflows\n\nWebhook to API integrations\n\nInventory/order automation for Shopify, WooCommerce, Odoo, etc.\n\n\n🧠 Bonus: I also create documented, scalable, and maintainable workflows. No janky setups.\n\n\n---\n\n🛠 Tech Stack:\n\nn8n · Supabase · Postgres · APIs · Make.com (on request) · Puppeteer · ChatGPT · Zapier migration expert\n\n\n---\n\n💰 Pricing:\n\nStarting at $49/project\n→ Most gigs delivered in 48–72 hours\n→ Discounts for startups and long-term work\n\n\n---\n\n📩 DM Me If You:\n\nHave a boring, time-sucking task\n\nWant your business to run while you sleep\n\nHate Zapier’s overpriced limits\n\n\nLet’s build something smarter, not harder.\n"
+  },
+  "comments": [
+    {
+      "id": "n69666m",
+      "author": "samla123li",
+      "body": "Hey, this sounds like a solid service! n8n is super powerful for all sorts of automation.\n\nFor the WhatsApp stuff, I've had pretty good luck with WasenderAPI for similar setups. It integrates well. There's even an n8n workflow for audio chat with WasenderAPI that's pretty neat: https://github.com/wasenderapi/audio-chat-n8n-wasenderapi\n\nGood luck with it!",
+      "created_utc": 1754003201.0,
+      "score": 2,
+      "parent_id": "t3_1mdx9t9",
+      "depth": 0
+    },
+    {
+      "id": "n6qraku",
+      "author": "Lakshmifn7",
+      "body": "This is the future, man.\nAutomating workflows is non-negotiable.\nBut go beyond simple tasks.\nThink agentic AI.\nIt learns. It adapts. It drives growth. https://myli.in/GnXNx2WI",
+      "created_utc": 1754248347.0,
+      "score": 2,
+      "parent_id": "t3_1mdx9t9",
+      "depth": 0
+    },
+    {
+      "id": "n7e8591",
+      "author": "Living-Bandicoot9293",
+      "body": "Sounds interesting! I’ve been looking for affordable automation solutions. DM me if you can offer more details.",
+      "created_utc": 1754563949.0,
+      "score": 1,
+      "parent_id": "t3_1mdx9t9",
+      "depth": 0
+    },
+    {
+      "id": "n6zba50",
+      "author": "Zestyclose-Wall-3858",
+      "body": "I did checked it I will look into it in detail",
+      "created_utc": 1754358906.0,
+      "score": 1,
+      "parent_id": "t1_n69666m",
+      "depth": 1
+    }
+  ],
+  "fetched_at": 1755100795,
+  "schema": "v1"
+}

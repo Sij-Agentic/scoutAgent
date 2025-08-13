@@ -1,0 +1,17 @@
+{
+  "post": {
+    "id": "1g3gc3l",
+    "subreddit": "SaaS",
+    "title": "Customer Support Platform with Chat Workflow for Initial Chat Automation",
+    "author": "Prudent-Turnip5373",
+    "created_utc": 1728914102.0,
+    "score": 1,
+    "num_comments": 0,
+    "url": "https://www.reddit.com/r/SaaS/comments/1g3gc3l/customer_support_platform_with_chat_workflow_for/",
+    "permalink": "https://www.reddit.com/r/SaaS/comments/1g3gc3l/customer_support_platform_with_chat_workflow_for/",
+    "selftext": "Hello Everyone,\n\nI'm developing a Customer Support Platform with Chat, Tickets, Mailboxes, a Knowledge Base, and other required features for CSP. I know there are many tools available, such as Intercom, HelpScout, FreshWorks, and others, but I feel I can develop one that focuses on Chat and Ticket Automation/Workflow.\n\nNot all startups/businesses can afford a 24-hour support team, so an Automated Chat Workflow can help resolve queries even in off-hours. Besides that, this can reduce the number of Tickets and Live Chat requests, ultimately reducing the number of support agents, and Ticket Automation can also reduce support agents' work. So, my main focus is on Chat Workflow and Ticket Workflow.\n\nPlease let me know if this is helpful for businesses with support teams or if there are already tools available that have Chat Workflow.\n\nYou can also suggest things that the existing tools are missing and are helpful for Support Agents and Businesses.\n\nI'm also looking for people who have support teams or are support agents or leaders, to discuss if a new feature is helpful or not.\n\nThanks :)"
+  },
+  "comments": [],
+  "fetched_at": 1755100734,
+  "schema": "v1"
+}

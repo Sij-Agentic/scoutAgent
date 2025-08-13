@@ -1,0 +1,36 @@
+{
+  "post": {
+    "id": "1mepkdt",
+    "subreddit": "smallbusiness",
+    "title": "Automated systems / ai workflows for your business",
+    "author": "GazelleAfter7189",
+    "created_utc": 1754031471.0,
+    "score": 1,
+    "num_comments": 3,
+    "url": "https://www.reddit.com/r/smallbusiness/comments/1mepkdt/automated_systems_ai_workflows_for_your_business/",
+    "permalink": "https://www.reddit.com/r/smallbusiness/comments/1mepkdt/automated_systems_ai_workflows_for_your_business/",
+    "selftext": "I'm starting an agency building automations and Al systems/tools that save your business time and help you grow revenue faster.\n\n\nI've done this kind of work and tested a few systems and now want to give them out to you and help you out and get your testimonials in return to help me market and scale my agency.\n\nAnyway, I can build any automated system but here are a few examples:\n• Email, sales funnel or CRM automation\n• Automation for invoicing, client onboarding, follow-ups, payment reminders, etc\n• Custom Al systems that read from your data and/or documents\n• Automated data pipelines and/or reporting\n\nI'll build it 100% fully for you , for free or a very minimal cost depending on the work. No strings attached.\n\nYou get an automated system to help your business. I get a case study.\nOnly catch:\n1. It needs to be something of real value to your business - save time, generate revenue, etc\n2. I'm only offering this to 2 businesses\nComment or DM if interested"
+  },
+  "comments": [
+    {
+      "id": "n6b3qq5",
+      "author": "AutoModerator",
+      "body": "This is a friendly reminder that r/smallbusiness is a question and answer subreddit. You ask a question about starting, owning, and growing a small business and the community answers. Posts that violate the rules listed in the sidebar will be removed. A permanent or temporary ban may also be issued if you do not remove the offending post. Seeing this message does not mean your post was automatically removed. Please also note our new Rule 5- Posts with negative vote totals may be removed if they are deemed non-specific, or if they are repeats of questions designed to gather information rather than solve a small business problem.\n\n*I am a bot, and this action was performed automatically. Please [contact the moderators of this subreddit](/message/compose/?to=/r/smallbusiness) if you have any questions or concerns.*",
+      "created_utc": 1754031471.0,
+      "score": 1,
+      "parent_id": "t3_1mepkdt",
+      "depth": 0
+    },
+    {
+      "id": "n7eay7t",
+      "author": "blibsy",
+      "body": "If you are diving into automation for businesses, one thing that helped me a ton was decoupling the automation logic from the browser execution layer. A lot of the friction comes when you are trying to automate across different browser based tools that dont play nicely together.\n\nI have been using Anchor Browser to run persistent cloud sessions so my agents dont get logged out or flagged constantly. From there I hook into them using orchestrators like n8n or custom scripts that handle retries and decision logic. This setup has worked well for invoice scraping, lead follow-ups and even auto filling portals that would otherwise block headless scrapers.",
+      "created_utc": 1754565218.0,
+      "score": 2,
+      "parent_id": "t3_1mepkdt",
+      "depth": 0
+    }
+  ],
+  "fetched_at": 1755100802,
+  "schema": "v1"
+}

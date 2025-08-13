@@ -1,0 +1,63 @@
+{
+  "post": {
+    "id": "1m803sx",
+    "subreddit": "smallbusiness",
+    "title": "What are some of the most useful processes or workflows you've automated (or want to automate) using n8n?",
+    "author": "Quick-Advice7303",
+    "created_utc": 1753350507.0,
+    "score": 1,
+    "num_comments": 7,
+    "url": "https://www.reddit.com/r/smallbusiness/comments/1m803sx/what_are_some_of_the_most_useful_processes_or/",
+    "permalink": "https://www.reddit.com/r/smallbusiness/comments/1m803sx/what_are_some_of_the_most_useful_processes_or/",
+    "selftext": "**Hey everyone – I need your help 🙏**\n\nI’m a PR manager for my CEO: he’s super technical (like, actually codes and builds things himself), and I’m not from a tech background. I've been lurking here trying to learn as much as I can, reading posts, watching videos, but figured asking directly might be the smartest move.\n\nWe’re planning to make a LinkedIn tutorial on **n8n** – and we want to show real, useful automation examples. The goal is to help other tech folks or business teams save time by showing what *can* be automated.\n\nSo I’d love to hear from you:  \n**What are some of the most useful processes or workflows you've automated (or want to automate) using n8n?**\n\nBonus: We’re a software development services company, so if you have ideas from that world (like project management, lead gen, client onboarding, reporting, etc), even better!\n\nThanks a ton, I really appreciate your time!"
+  },
+  "comments": [
+    {
+      "id": "n4ve4m7",
+      "author": "AutoModerator",
+      "body": "This is a friendly reminder that r/smallbusiness is a question and answer subreddit. You ask a question about starting, owning, and growing a small business and the community answers. Posts that violate the rules listed in the sidebar will be removed. A permanent or temporary ban may also be issued if you do not remove the offending post. Seeing this message does not mean your post was automatically removed. Please also note our new Rule 5- Posts with negative vote totals may be removed if they are deemed non-specific, or if they are repeats of questions designed to gather information rather than solve a small business problem.\n\n*I am a bot, and this action was performed automatically. Please [contact the moderators of this subreddit](/message/compose/?to=/r/smallbusiness) if you have any questions or concerns.*",
+      "created_utc": 1753350508.0,
+      "score": 1,
+      "parent_id": "t3_1m803sx",
+      "depth": 0
+    },
+    {
+      "id": "n4veqj0",
+      "author": "Difficult-Plate-8767",
+      "body": "Used n8n to automate lead capture from web forms to CRM, trigger onboarding tasks in Notion + Slack, and generate weekly client reports via Google Sheets + email. Saves hours every week!",
+      "created_utc": 1753350831.0,
+      "score": 1,
+      "parent_id": "t3_1m803sx",
+      "depth": 0
+    },
+    {
+      "id": "n4vuabd",
+      "author": "[deleted]",
+      "body": "[deleted]",
+      "created_utc": 1753358015.0,
+      "score": 1,
+      "parent_id": "t3_1m803sx",
+      "depth": 0
+    },
+    {
+      "id": "n4x0qtj",
+      "author": "[deleted]",
+      "body": "[removed]",
+      "created_utc": 1753371250.0,
+      "score": 1,
+      "parent_id": "t3_1m803sx",
+      "depth": 0
+    },
+    {
+      "id": "n533wrn",
+      "author": "Hot-Coffee-007",
+      "body": "I've been using n8n for about a year now and it's been a game changer for our lead gen processes. Here's what I'd definitely include in your tutorial.  \n  \nLead enrichment and scoring workflows  \n  \nSet up n8n to automatically enrich new leads from your website forms using [Apollo.io](http://Apollo.io) or ZoomInfo APIs. Then score them based on company size, industry, and job title before pushing them into your CRM. This way your sales team only gets qualified leads instead of random tire kickers.  \n  \nCold email follow up sequences  \n  \nConnect n8n to your email platform like Instantly AI to automatically send follow up emails based on engagement. If someone doesn't open your first email, wait 3 days then send a different angle. Lead Gen Jay talks about this stuff in his YouTube videos about email automation and it really works.  \n  \nClient onboarding automation  \n  \nOnce someone becomes a client, trigger a whole sequence that creates their project in your PM tool, sends welcome emails with next steps, schedules kickoff calls, and even generates contracts. We save like 2 hours per new client just with this workflow alone.  \n  \nThe key is starting simple with one process that actually bugs you every day. Don't try to automate everything at once or you'll get overwhelmed. What specific pain points are you trying to solve first? That'll help determine which workflows would be most valuable to show.",
+      "created_utc": 1753451286.0,
+      "score": 1,
+      "parent_id": "t3_1m803sx",
+      "depth": 0
+    }
+  ],
+  "fetched_at": 1755100793,
+  "schema": "v1"
+}

@@ -1,0 +1,27 @@
+{
+  "post": {
+    "id": "1mp7fsa",
+    "subreddit": "indiehackers",
+    "title": "We built Syfly -a zero-knowledge password manager with container-level keys, secure recovery, and free sign-up",
+    "author": "miliachref",
+    "created_utc": 1755098617.0,
+    "score": 1,
+    "num_comments": 1,
+    "url": "https://www.reddit.com/r/indiehackers/comments/1mp7fsa/we_built_syfly_a_zeroknowledge_password_manager/",
+    "permalink": "https://www.reddit.com/r/indiehackers/comments/1mp7fsa/we_built_syfly_a_zeroknowledge_password_manager/",
+    "selftext": "We’re the team behind Syfly, a password manager that:\n\n* Lets you create separate encrypted containers with different unlock methods (password, YubiKey, biometric, 2FA)\n* Works on macOS, Windows, Android, iOS, and all major browsers (Safari, Chrome, Firefox, Edge, Opera)\n* Has an optional Backup Person feature for safe recovery\n* Uses zero-knowledge encryption — we can’t access your data\n* Free to sign up and use — paid plans are available for advanced features\n\nHow it works:\n\n1. Create containers (e.g., Personal, Finance, Work)\n2. Assign different unlock methods\n3. Add logins, notes, or files\n4. (Optional) Assign a Backup Person\n\nWe’d love feedback on:\n\n* Does the container concept make sense?\n* Is onboarding clear?\n* Any concerns with the recovery feature?\n\nhttps://preview.redd.it/hxlsz6z91tif1.png?width=1920&amp;format=png&amp;auto=webp&amp;s=bb8fdd24e2950ca6d595b07361ad76bbf785aab2\n\n"
+  },
+  "comments": [
+    {
+      "id": "n8hdq3x",
+      "author": "miliachref",
+      "body": "Free to try - no credit card needed  \nTry Syfly at: [https://syfly.io/register/2](https://syfly.io/register/2)\n\nTest it in minutes:\n\n1. Create 2 containers\n2. Set different unlock methods\n3. Add a few logins\n4. Try the Backup Person feature\n\nFeedback welcome!",
+      "created_utc": 1755098632.0,
+      "score": 1,
+      "parent_id": "t3_1mp7fsa",
+      "depth": 0
+    }
+  ],
+  "fetched_at": 1755100774,
+  "schema": "v1"
+}

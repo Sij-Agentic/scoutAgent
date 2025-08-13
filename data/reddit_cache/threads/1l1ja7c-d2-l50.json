@@ -1,0 +1,36 @@
+{
+  "post": {
+    "id": "1l1ja7c",
+    "subreddit": "SaaS",
+    "title": "Stop Losing Links &amp; Start Building Knowledge: Introducing LinkSeek - Your AI-Powered Bookmark Manager!",
+    "author": "cmglezpdev",
+    "created_utc": 1748874090.0,
+    "score": 1,
+    "num_comments": 2,
+    "url": "https://www.reddit.com/r/SaaS/comments/1l1ja7c/stop_losing_links_start_building_knowledge/",
+    "permalink": "https://www.reddit.com/r/SaaS/comments/1l1ja7c/stop_losing_links_start_building_knowledge/",
+    "selftext": "Hey r/SaaS!\n\nAre you tired of that familiar pain: saving a super useful link, article, or tool, only for it to disappear into the digital abyss of scattered bookmarks, notes, or chat histories? I've been there, and that's why I built **LinkSeek**!\n\n**What is LinkSeek?**\n\nLinkSeek is an AI-powered bookmark and knowledge management tool designed to transform your messy collection of links into an intelligent, searchable, and truly *usable* personal knowledge base. Think of it as your second brain for all the valuable content you find online.\n\n**The Problem We're Solving:**\n\n* **Lost Links &amp; Wasted Time:** Hours spent trying to recall *where* you saw that one crucial piece of information.\n* **Disorganized Knowledge:** Bookmarks become graveyards, and valuable insights get lost.\n* **Information Overload:** It's hard to connect the dots when your resources are all over the place.\n\n**How LinkSeek Helps (Key Features &amp; Benefits):**\n\n* 🧠 **AI Semantic Search:** Don't remember exact keywords? No problem! Just describe what you're looking for in natural language (e.g., \"those articles about AI productivity tools I saved last month\"), and LinkSeek's AI will find it. This is a game-changer for information retrieval.\n* 🏷️ **AI-Powered Organization:** Say goodbye to manual tagging! LinkSeek automatically processes your links, generating relevant AI tags and concise summaries. It intelligently categorizes your content, making organization effortless.\n* 📝 **Rich Context:** Add Markdown notes to any link, providing deeper context and connecting ideas.\n* 🖼️ **Effortless Content Scraping:** LinkSeek automatically fetches titles, descriptions, and even key images from your links, enriching your database.\n* 🌐 **Universal Access:** Your knowledge base is synced and accessible across all your devices.\n* 🚀 **(Coming Soon) AI Knowledge Chat:** Imagine chatting with your entire link collection! Ask questions, get cross-document summaries, and uncover hidden connections.\n* ➕ **(Coming Soon) Browser Extension:** One-click saving with AI-suggested tags.\n* ➕ **(Coming Soon) Import/Export:** Bring your existing bookmarks and take your data with you anytime.\n\n**Why is this valuable for Indie Hackers &amp; SaaS builders?**\n\n* **Stay Organized:** Keep track of market research, competitor analysis, useful tools, inspiring articles, and code snippets.\n* **Boost Productivity:** Find what you need, when you need it, without breaking your flow.\n* **Uncover Insights:** Connect ideas from different sources to spark innovation for your own projects.\n* **Build Your Own \"Swipe File\":** Easily create and access a well-organized repository of ideas and resources.\n\n**Early Adopter Perks!**\n\nWe're currently in our \"Early Bird Launch\" phase and offering some amazing perks for **Founding Members**:\n\n* **Up to 2 Months FREE Trial**\n* **Discounted Pricing LOCKED IN FOREVER**\n* 500 Monthly Credits\n* Unlimited Bookmarks &amp; Collections\n* Exclusive early access to new features.\n\nI'd love for you to check out LinkSeek and give me your honest feedback. My goal is to build the ultimate tool for managing and leveraging digital knowledge.\n\n**Website:** [linkseek.app](https://linkseek.app?utm_source=reddit&amp;utm_campaign=SaaS)\n\n**Direct to Pricing/Sign-up:** [linkseek.app/pricing](https://linkseek.app/pricing?utm_source=reddit&amp;utm_campaign=SaaS)\n\nWhat are your biggest frustrations with managing online resources? What features would make your life easier? Let me know in the comments!\n\nThanks for reading!"
+  },
+  "comments": [
+    {
+      "id": "mvlfbr5",
+      "author": "Scoutreach",
+      "body": "AI bookmark managers are everywhere now – how’s your search latency compared to competitors when handling 10k+ links?",
+      "created_utc": 1748874942.0,
+      "score": 1,
+      "parent_id": "t3_1l1ja7c",
+      "depth": 0
+    },
+    {
+      "id": "mvlnb7z",
+      "author": "cmglezpdev",
+      "body": "For now, I don't have 10K links, so I don't have a good answer. LinkSeek uses a combination of Full Text Search and Semantic Search using embedding vectors.",
+      "created_utc": 1748877287.0,
+      "score": 1,
+      "parent_id": "t1_mvlfbr5",
+      "depth": 1
+    }
+  ],
+  "fetched_at": 1755100781,
+  "schema": "v1"
+}

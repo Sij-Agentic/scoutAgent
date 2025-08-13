@@ -1,0 +1,27 @@
+{
+  "post": {
+    "id": "1mmquow",
+    "subreddit": "SideProject",
+    "title": "I built an automation marketplace where you can run workflows instantly — no Zapier learning curve",
+    "author": "AIShoply",
+    "created_utc": 1754852287.0,
+    "score": 3,
+    "num_comments": 1,
+    "url": "https://aishoply.com",
+    "permalink": "https://www.reddit.com/r/SideProject/comments/1mmquow/i_built_an_automation_marketplace_where_you_can/",
+    "selftext": "&gt;I’ve been building a platform that makes automation as simple as filling a form and clicking “run.”\n\n&gt;The idea:\n\n* Devs post ready-to-use workflows (email scraping, auto-social posting, data extraction, etc.)\n* Users run them without seeing the backend logic\n* Devs get paid every time someone uses their workflow\n\n&gt;Why I built it:\n\n* Zapier/Make are powerful but have a steep learning curve for non-tech users\n* Devs often don’t have a marketplace to easily sell their automations\n\n&gt;Would love your feedback — what workflows would *you* want in a push-button format?"
+  },
+  "comments": [
+    {
+      "id": "n81izhh",
+      "author": "Take1n",
+      "body": "url?",
+      "created_utc": 1754877534.0,
+      "score": 1,
+      "parent_id": "t3_1mmquow",
+      "depth": 0
+    }
+  ],
+  "fetched_at": 1755100805,
+  "schema": "v1"
+}

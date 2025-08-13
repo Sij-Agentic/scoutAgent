@@ -1,0 +1,27 @@
+{
+  "post": {
+    "id": "1l2j5tn",
+    "subreddit": "SaaS",
+    "title": "i want to automate my customer support - need voice AI help",
+    "author": "Delicious_Track6230",
+    "created_utc": 1748974438.0,
+    "score": 2,
+    "num_comments": 1,
+    "url": "https://www.reddit.com/r/SaaS/comments/1l2j5tn/i_want_to_automate_my_customer_support_need_voice/",
+    "permalink": "https://www.reddit.com/r/SaaS/comments/1l2j5tn/i_want_to_automate_my_customer_support_need_voice/",
+    "selftext": "\nRunning a small e-commerce store and getting 90+ support calls daily. Can't afford to hire more people, but customers are now leaving i'm not able to handle this and searching for ai voice solutions.\n\n I just need something that sounds natural and can handle my load related to order status, returns, shipping info without hanging up on customers.\n\nany advice? really can't afford to mess this up and lose even more customers.\n"
+  },
+  "comments": [
+    {
+      "id": "n3ytrc9",
+      "author": "IslamGamalig",
+      "body": "I feel your pain handling high call volumes is tough. I recently tested VoiceHub by DataQueue for similar needs, and it handled basic queries like order status and returns pretty smoothly. The voice sounded surprisingly natural, and it didn’t drop calls during testing. Might be worth a look if you’re exploring budget friendly options. Hope that helps, and good luck",
+      "created_utc": 1752916540.0,
+      "score": 1,
+      "parent_id": "t3_1l2j5tn",
+      "depth": 0
+    }
+  ],
+  "fetched_at": 1755100724,
+  "schema": "v1"
+}

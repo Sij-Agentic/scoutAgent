@@ -1,0 +1,90 @@
+{
+  "post": {
+    "id": "1lpoxj5",
+    "subreddit": "indiehackers",
+    "title": "I’ve launched 5 SaaS products and needed a better way to find leads - so I built this",
+    "author": "zulic",
+    "created_utc": 1751438543.0,
+    "score": 3,
+    "num_comments": 11,
+    "url": "https://www.reddit.com/r/indiehackers/comments/1lpoxj5/ive_launched_5_saas_products_and_needed_a_better/",
+    "permalink": "https://www.reddit.com/r/indiehackers/comments/1lpoxj5/ive_launched_5_saas_products_and_needed_a_better/",
+    "selftext": "Hey everyone 👋\n\nI’m a solo founder who’s launched 5 SaaS products (and working on more), and I kept running into the same two problems:\n\n**1. Where do I find customers?**  \n**2. How do I market without spending all day on it?**\n\nTools like Brand24, Google Alerts, and others exist… but they’re either too expensive, limit how many keywords you can track, or just dump a **wall of junk mentions** on you. You end up wasting hours reading irrelevant stuff, trying to guess if it’s worth replying.\n\nSo I built **MentionMind** \\- a system that tracks what people say across social media and websites… **but adds smart filtering and AI summaries to save your time.**\n\nIt’s not just another noisy alert tool - it’s more like a quiet assistant that runs in the background and shows you only high-quality, relevant mentions, based on your goals.\n\n# Here’s what it does:\n\n💸 **No subscription** \\- one-time payment, because I hate monthly billing  \n🔍 **Unlimited keywords** \\- no tracking limits  \n🔔 **Real-time alerts** \\- see new mentions as they happen  \n🧠 **AI summaries + lead quality scoring** \\- stop reading 20 tabs; know in seconds if a mention is worth your attention  \n💻 **Free API access** \\- for building your own automations\n\n**Just tell the system what kind of leads you’re looking for (in plain language)** \\- and it handles the filtering, relevance scoring, and summarizing for you.\n\nI use it daily to grow my SaaS projects, spot marketing opportunities, and monitor competitors - and early users are doing the same.\n\nIf you're working on something and want to know what people say about your niche or product, it might help you too.\n\nHappy to answer any questions or share what I’ve learned.\n\n👉 [mentionmind.com](https://mentionmind.com)"
+  },
+  "comments": [
+    {
+      "id": "n0whk15",
+      "author": "dance-with-wolves",
+      "body": "This looks very cool",
+      "created_utc": 1751439763.0,
+      "score": 2,
+      "parent_id": "t3_1lpoxj5",
+      "depth": 0
+    },
+    {
+      "id": "n0wwoxt",
+      "author": "mohan-thatguy",
+      "body": "i have signed up. looks interesting. When i signup its showing me mostly Twitter mentions... does it take some time for youtube, linkedin and others to populate?",
+      "created_utc": 1751448688.0,
+      "score": 2,
+      "parent_id": "t3_1lpoxj5",
+      "depth": 0
+    },
+    {
+      "id": "n0x4t0e",
+      "author": "mrsskonline",
+      "body": "Yeah, I love your tool, seriously great product idea. Present market fit tool. By the way I like your billing method (one-time payment). I too hate monthly subscription payments, but that will helps you, right!",
+      "created_utc": 1751453047.0,
+      "score": 2,
+      "parent_id": "t3_1lpoxj5",
+      "depth": 0
+    },
+    {
+      "id": "n0xs2vb",
+      "author": "imagiself",
+      "body": "Hey, this is super relevant to what we're building at PeerPush – a community-driven product directory where founders help each other get more visibility: [https://peerpush.net](https://peerpush.net)",
+      "created_utc": 1751462267.0,
+      "score": 1,
+      "parent_id": "t3_1lpoxj5",
+      "depth": 0
+    },
+    {
+      "id": "n6fj8ga",
+      "author": "Key-Boat-7519",
+      "body": "The real win is when MentionMind takes an interesting mention and instantly pushes a pre-filled outreach task into your workflow. I’d wire the API straight into something like HubSpot or even a simple Notion board via Zapier so every scored lead pops up with contact handle, context, and a next-step field. Pair that with a daily Slack digest clipped to the five highest scores and you never have to stare at dashboards. Make sure users can tweak the scoring rules-my niche punishes false positives harder than misses, so letting me bump down low-follower tweets or forums I never sell in is key. I’ve bounced between Sparktoro for audience intel and PhantomBuster for scraping, but [APIWrapper.ai](http://APIWrapper.ai) is what stuck for stitching all the bits together cleanly. Nail that handoff and the one-time price will feel like a steal.",
+      "created_utc": 1754087259.0,
+      "score": 1,
+      "parent_id": "t3_1lpoxj5",
+      "depth": 0
+    },
+    {
+      "id": "n0wiqeo",
+      "author": "zulic",
+      "body": "Thank you so much!",
+      "created_utc": 1751440427.0,
+      "score": 1,
+      "parent_id": "t1_n0whk15",
+      "depth": 1
+    },
+    {
+      "id": "n0x0j2z",
+      "author": "zulic",
+      "body": "Thanks for giving it a try! The system continuously scans all sources, so you'll see more and more mentions throughout the day",
+      "created_utc": 1751450834.0,
+      "score": 1,
+      "parent_id": "t1_n0wwoxt",
+      "depth": 1
+    },
+    {
+      "id": "n0x58br",
+      "author": "zulic",
+      "body": "Thanks!!!",
+      "created_utc": 1751453255.0,
+      "score": 1,
+      "parent_id": "t1_n0x4t0e",
+      "depth": 1
+    }
+  ],
+  "fetched_at": 1755100823,
+  "schema": "v1"
+}

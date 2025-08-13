@@ -1,0 +1,189 @@
+{
+  "post": {
+    "id": "1fpre14",
+    "subreddit": "startups",
+    "title": "Validating a startup idea: AI-powered workplace knowledge management",
+    "author": "crmne",
+    "created_utc": 1727339428.0,
+    "score": 5,
+    "num_comments": 32,
+    "url": "https://www.reddit.com/r/startups/comments/1fpre14/validating_a_startup_idea_aipowered_workplace/",
+    "permalink": "https://www.reddit.com/r/startups/comments/1fpre14/validating_a_startup_idea_aipowered_workplace/",
+    "selftext": "Hey r/startups,\n\nI'm in the early stages of validating a startup idea focused on improving workplace knowledge management using AI. The concept is to create an AI assistant that can search across multiple work platforms (Slack, email, wikis, etc.) to help knowledge workers find information more efficiently.\n\nI'd love to get your thoughts:\n\n1. In your startup experience, how significant is the challenge of managing and retrieving information across multiple platforms?\n\n2. What solutions have you tried? What worked and what didn't?\n\n3. What would be your concerns about using an AI-powered solution for this?\n\n4. If such a solution existed, what features would be most valuable to you?\n\nAt this stage, I'm focused on understanding the problem space and validating the need. Any insights, critiques, or advice would be greatly appreciated!\n\nIf anyone is particularly interested in this topic and would like to provide more detailed feedback, please comment, and I can share a link to a more comprehensive survey via DM.\n\nThanks in advance for your input."
+  },
+  "comments": [
+    {
+      "id": "lozx4fd",
+      "author": "BeenThere11",
+      "body": "Someone else had just posted this idea some time back.\n\nIf the team lead says everyone needs to update confluence or twiki,  with search terms amd jira, it's enough. \n\nUsually the documentation is never read if it's a ton of information. If it's on different media it's inconsistent so you cannot trust it as if you get 3 copies you have to know which one to trust .",
+      "created_utc": 1727345736.0,
+      "score": 3,
+      "parent_id": "t3_1fpre14",
+      "depth": 0
+    },
+    {
+      "id": "lp03cng",
+      "author": "Particular_Knee_9044",
+      "body": "0.2% chance of dollar one…much less actual success. Every tech bro and their grandma is doing the exact same thing.",
+      "created_utc": 1727349321.0,
+      "score": 3,
+      "parent_id": "t3_1fpre14",
+      "depth": 0
+    },
+    {
+      "id": "lp0h8xd",
+      "author": "marcos_airbyte",
+      "body": "Is it similar to [https://www.dashworks.ai/](https://www.dashworks.ai/) ?",
+      "created_utc": 1727355466.0,
+      "score": 3,
+      "parent_id": "t3_1fpre14",
+      "depth": 0
+    },
+    {
+      "id": "lp0rqmq",
+      "author": "Synyster328",
+      "body": "Check out [Glean](https://www.glean.com/). Connecting all your workplace data to a knowledge graph.",
+      "created_utc": 1727359274.0,
+      "score": 3,
+      "parent_id": "t3_1fpre14",
+      "depth": 0
+    },
+    {
+      "id": "lozsf82",
+      "author": "finally_i_found_one",
+      "body": "First thought that popped in my mind: if such a tool exists, can I ask questions to get access to confidential information? Ex: salaries of other employees, bank balances at the moment, passwords, conversations that I wasn't a part of.",
+      "created_utc": 1727342604.0,
+      "score": 2,
+      "parent_id": "t3_1fpre14",
+      "depth": 0
+    },
+    {
+      "id": "lp00r87",
+      "author": "op-cha",
+      "body": "From what I understand, connecting to multiple services is a hurdle. Solutions like workato exist to solve this pain point. A similar first step will be needed before the main solution comes in.",
+      "created_utc": 1727347910.0,
+      "score": 2,
+      "parent_id": "t3_1fpre14",
+      "depth": 0
+    },
+    {
+      "id": "lp0546y",
+      "author": "FewEstablishment2696",
+      "body": "This doesn't really sound like a startup problem, as they tend to have fewer tools and less dispersed information. Established companies on the other hand definitely suffer from this.\n\nI'm not sure how \"AI\" solves an issue here. Finding the right information is the real challenge, especially when companies often have multiple copies of documents, out dated web pages etc.\n\nThe key feature for me would be accuracy.",
+      "created_utc": 1727350200.0,
+      "score": 2,
+      "parent_id": "t3_1fpre14",
+      "depth": 0
+    },
+    {
+      "id": "lp0bwq3",
+      "author": "Jpahoda",
+      "body": "I implemented something like this for my own team and pretty much nobody used it. And I didn’t even have to worry about access rights at the time. It was a gimmick, basically.",
+      "created_utc": 1727353300.0,
+      "score": 1,
+      "parent_id": "t3_1fpre14",
+      "depth": 0
+    },
+    {
+      "id": "lp0w8ls",
+      "author": "Juannieve05",
+      "body": "Would you be using RAGs ?",
+      "created_utc": 1727360778.0,
+      "score": 1,
+      "parent_id": "t3_1fpre14",
+      "depth": 0
+    },
+    {
+      "id": "lp39pn6",
+      "author": "PixelSteel",
+      "body": "I’d be very curious about the financial side of this. There’s only a few free API libraries that can connect directly to the users bank (through secure auths like Plaid) and retrieve financial information you can then analyze. I wonder how this service would help developers by providing more libraries and choices to choose from",
+      "created_utc": 1727387734.0,
+      "score": 1,
+      "parent_id": "t3_1fpre14",
+      "depth": 0
+    },
+    {
+      "id": "lp096ds",
+      "author": "crmne",
+      "body": "Thanks for your input. You're right that good practices like consistent documentation can help, but in reality, many organizations struggle with this. Even with guidelines, information often ends up scattered or outdated. The goal here is to complement existing systems, making it easier to find and synthesize information across platforms, even when best practices aren't perfectly followed.",
+      "created_utc": 1727352095.0,
+      "score": 1,
+      "parent_id": "t1_lozx4fd",
+      "depth": 1
+    },
+    {
+      "id": "lp09lgt",
+      "author": "crmne",
+      "body": "I appreciate your candid feedback. While it's true that there's a lot of activity in this space, I believe there's still room for innovation, especially in making these solutions more accessible and effective for a broader range of companies. I'm focusing on understanding specific pain points that aren't being adequately addressed by current solutions.",
+      "created_utc": 1727352284.0,
+      "score": 1,
+      "parent_id": "t1_lp03cng",
+      "depth": 1
+    },
+    {
+      "id": "lp0jok1",
+      "author": "crmne",
+      "body": "Thanks for this. I wasn't aware of Dashworks - they're indeed very similar to what I envisioned.\n\nAs a bootstrapped solopreneur, I'm reconsidering my approach. Might focus on underserved niches or unique features they don't offer.\n\nAny gaps you've noticed in such tools? Your insights would be valuable for my next steps.",
+      "created_utc": 1727356394.0,
+      "score": 3,
+      "parent_id": "t1_lp0h8xd",
+      "depth": 1
+    },
+    {
+      "id": "lp0wkib",
+      "author": "crmne",
+      "body": "Thank you! They seem to be focusing on big companies as they are quite pricy, and they have a minimum spend. Do you have any experience of them?",
+      "created_utc": 1727360885.0,
+      "score": 2,
+      "parent_id": "t1_lp0rqmq",
+      "depth": 1
+    },
+    {
+      "id": "lozswdb",
+      "author": "crmne",
+      "body": "Great question! Absolutely not, as it will replicate the access permissions of the user.",
+      "created_utc": 1727342938.0,
+      "score": 2,
+      "parent_id": "t1_lozsf82",
+      "depth": 1
+    },
+    {
+      "id": "lp0a47k",
+      "author": "crmne",
+      "body": "You're right that connecting to multiple services is a hurdle. There are various ETL solutions out there like Airbyte, DLT, and others that address this. I'm considering both leveraging existing solutions and potentially rolling out my own integrations. That would give me more control over the data flow. It's a careful balance between development time, vendor lock-in, and customization.",
+      "created_utc": 1727352516.0,
+      "score": 1,
+      "parent_id": "t1_lp00r87",
+      "depth": 1
+    },
+    {
+      "id": "lp0atp1",
+      "author": "crmne",
+      "body": "I agree that this tends to be more of an issue for established companies, though I've seen startups struggle with this as well, including my previous venture where I had the idea for this, especially as they scale rapidly.\n\nRegarding AI, its power here lies in a few key areas:\n\n1. Understanding context, connecting, and synthesizing information across sources.\n\n2. Creating derivative work and documents based on existing ones and new information shared in the chat with AI.\n\n3. Semantic search capabilities. Unlike traditional keyword-based search, semantic search can find relevant information even when the exact keywords aren't used.\n\nYour emphasis on accuracy is spot-on. It's a key challenge I'm focusing on. Any thoughts on features that would help ensure accuracy in your experience?",
+      "created_utc": 1727352831.0,
+      "score": 1,
+      "parent_id": "t1_lp0546y",
+      "depth": 1
+    },
+    {
+      "id": "lp0fh30",
+      "author": "crmne",
+      "body": "Thanks for sharing your experience!\n\nCan I ask what you think led to the low adoption? Was it the tool's functionality, how it was introduced, or maybe the team's existing workflows?\n\nDid you notice any particular features that people found useful, even if overall usage was low?",
+      "created_utc": 1727354772.0,
+      "score": 1,
+      "parent_id": "t1_lp0bwq3",
+      "depth": 1
+    },
+    {
+      "id": "lp0we5o",
+      "author": "crmne",
+      "body": "Yes indeed!",
+      "created_utc": 1727360827.0,
+      "score": 1,
+      "parent_id": "t1_lp0w8ls",
+      "depth": 1
+    }
+  ],
+  "fetched_at": 1755100780,
+  "schema": "v1"
+}

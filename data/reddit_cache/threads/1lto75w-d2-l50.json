@@ -1,0 +1,54 @@
+{
+  "post": {
+    "id": "1lto75w",
+    "subreddit": "Entrepreneur",
+    "title": "What kind of repetitive workflows are people automating in HR or IT with AI these days?",
+    "author": "Party-Purple6552",
+    "created_utc": 1751874434.0,
+    "score": 0,
+    "num_comments": 4,
+    "url": "https://www.reddit.com/r/Entrepreneur/comments/1lto75w/what_kind_of_repetitive_workflows_are_people/",
+    "permalink": "https://www.reddit.com/r/Entrepreneur/comments/1lto75w/what_kind_of_repetitive_workflows_are_people/",
+    "selftext": "\nIt feels like HR and IT departments are just swimming in repetitive tasks that chew up valuable time and burn out staff. I’m thinking about all those basic queries, password resets, onboarding checklists, routine ticket classifications, or even just chasing down approvals. It's the kind of stuff that has to get done, but it doesn't really require human ingenuity, and it just takes so much focus away from strategic work. I know ai is supposed to be a game changer here, moving beyond just simple RPA, but I'm curious about real world examples. What specific, tedious workflows have you actually seen successfully automated with ai in either HR or IT lately, and how much of a difference has it made? Thanks for sharing any practical examples!"
+  },
+  "comments": [
+    {
+      "id": "n1rsuhp",
+      "author": "AutoModerator",
+      "body": "Welcome to /r/Entrepreneur and thank you for the post, /u/Party-Purple6552! Please make sure you read our [community rules](https://www.reddit.com/r/Entrepreneur/about/rules/) before participating here. As a quick refresher:  \n\n* Promotion of products and services is not allowed here. This includes dropping URLs, asking users to DM you, check your profile, job-seeking, and investor-seeking. *Unsanctioned promotion of any kind will lead to a permanent ban for all of your accounts.* \n* AI and GPT-generated posts and comments are unprofessional, and will be treated as spam, including a permanent ban for that account.   \n* If you have free offerings, please comment in our weekly Thursday stickied thread.\n* If you need feedback, please comment in our weekly Friday stickied thread. \n\n\n*I am a bot, and this action was performed automatically. Please [contact the moderators of this subreddit](/message/compose/?to=/r/Entrepreneur) if you have any questions or concerns.*",
+      "created_utc": 1751874434.0,
+      "score": 1,
+      "parent_id": "t3_1lto75w",
+      "depth": 0
+    },
+    {
+      "id": "n1sge45",
+      "author": "kizum",
+      "body": "Definitely seeing AI handle first-level support queries and onboarding FAQs. Stuff like SiteSpeak for website chat Zendesk bots and internal knowledge base tools are cutting down ticket volume.",
+      "created_utc": 1751887651.0,
+      "score": 1,
+      "parent_id": "t3_1lto75w",
+      "depth": 0
+    },
+    {
+      "id": "n22n8hy",
+      "author": "Weekly_Accident7552",
+      "body": "Yeah, HR and IT are automating a ton of the boring stuff now. Ive seen onboarding checklists that trigger IT account setups, equipment orders, and welcome emails automatically no more chasing people down. Password resets, ticket triage, and even basic approvals are getting handled by bots or smart checklists (we use Manifestly for this at work and it’s been a game changer). Honestly, it frees up so much time for actual problem solving instead of just putting out fires all day.",
+      "created_utc": 1752014717.0,
+      "score": 1,
+      "parent_id": "t3_1lto75w",
+      "depth": 0
+    },
+    {
+      "id": "n1rtjs5",
+      "author": "FewEstablishment2696",
+      "body": "Some companies have a fully automated JML process, others have a completely manual process.\n\nThe difference is usually intent and ambition.",
+      "created_utc": 1751874847.0,
+      "score": 0,
+      "parent_id": "t3_1lto75w",
+      "depth": 0
+    }
+  ],
+  "fetched_at": 1755100806,
+  "schema": "v1"
+}

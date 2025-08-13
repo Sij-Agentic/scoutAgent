@@ -12,23 +12,111 @@ Your goal is to develop a comprehensive plan for identifying, extracting, and va
 - Keywords to Focus On: {keywords}
 
 # OUTPUT FORMAT
-Respond with a JSON object containing your plan. Follow this format exactly:
+Respond with a STRICT JSON object (no prose) that conforms to the schema `scout_plan_v1` and includes a runnable DAG/task spec. Do not include markdown fences.
 
-```json
-{{
-  "phases": ["phase1", "phase2", ...],
-  "sources": ["source1", "source2", ...],
-  "keywords": ["keyword1", "keyword2", ...],
-  "expected_duration": 300,
-  "max_pain_points": 10
-}}
-```
+# CONSTRAINTS AND DEFAULTS
+- time_window: "12m" (last 12 months)
+- per_query_limit: 15 (per keyword across subreddits)
+- include_comments: true
+- comment_depth: 2
+- comment_limit: 50
+- quality filters (optional but recommended): min_num_comments >= 3, min_score >= 1
+- deduplicate threads by id/permalink
+- parallelize collection by keyword
 
-# INSTRUCTIONS
-1. Define a logical sequence of phases for discovering pain points (e.g., market research, pain point extraction, evidence collection)
-2. Determine which sources will be most valuable for the target market
-3. Expand on the provided keywords to improve discovery
-4. Estimate a reasonable duration for this research process in seconds
-5. Confirm or adjust the maximum number of pain points to discover
+# REQUIRED OUTPUT FIELDS
+{
+  "schema": "scout_plan_v1",
+  "target_market": string,
+  "time_window": "12m",
+  "sources": array of strings (e.g., ["reddit"]),
+  "keywords": array of strings (expand or refine from {keywords}),
+  "subreddits": array of strings (infer if missing),
+  "limits": {
+    "per_query_limit": number,
+    "comment_depth": number,
+    "comment_limit": number,
+    "min_num_comments": number,
+    "min_score": number
+  },
+  "dag": {
+    "run_id": string,
+    "nodes": [
+      {
+        "id": "plan",
+        "type": "agent",
+        "agent": "scout",
+        "stage": "plan",
+        "inputs": {"target_market": string, "sources": array, "keywords": array, "subreddits": array},
+        "outputs": ["data/runs/{run_id}/plan.json"],
+        "deps": []
+      },
+      {
+        "id": "collect_reddit",
+        "type": "tool",
+        "tool": "reddit_search_and_fetch_threads",
+        "parallelize_by": "keyword",
+        "inputs": {
+          "keywords": array,
+          "subreddits": array,
+          "time_window": "12m",
+          "per_query_limit": number,
+          "include_comments": true,
+          "comment_depth": number,
+          "comment_limit": number,
+          "use_cache": true
+        },
+        "outputs": [
+          "data/reddit_cache/search/*.json",
+          "data/reddit_cache/threads/*.json",
+          "data/runs/{run_id}/reddit_index.json"
+        ],
+        "deps": ["plan"]
+      },
+      {
+        "id": "think",
+        "type": "agent",
+        "agent": "scout",
+        "stage": "think",
+        "inputs": {
+          "reddit_index": "data/runs/{run_id}/reddit_index.json",
+          "thread_glob": "data/reddit_cache/threads/*.json"
+        },
+        "outputs": ["data/runs/{run_id}/scout_think.json"],
+        "deps": ["collect_reddit"]
+      },
+      {
+        "id": "act",
+        "type": "agent",
+        "agent": "scout",
+        "stage": "act",
+        "inputs": {
+          "think_output": "data/runs/{run_id}/scout_think.json",
+          "plan": "data/runs/{run_id}/plan.json"
+        },
+        "outputs": ["data/runs/{run_id}/scout_output.json"],
+        "deps": ["think"]
+      }
+    ]
+  }
+}
 
-Remember that your plan should be tailored to the specific target market and research scope.
+# EXAMPLE OUTPUT
+{
+  "schema": "scout_plan_v1",
+  "target_market": "SaaS founders",
+  "time_window": "12m",
+  "sources": ["reddit"],
+  "keywords": ["customer support automation", "workflow automation", "knowledge management"],
+  "subreddits": ["SaaS", "MicroSaaS", "indiehackers", "startups", "Entrepreneur", "SideProject", "Business_Ideas", "growmybusiness", "smallbusiness", "Productivity"],
+  "limits": {"per_query_limit": 15, "comment_depth": 2, "comment_limit": 50, "min_num_comments": 3, "min_score": 1},
+  "dag": {
+    "run_id": "run_2025_08_13_215500",
+    "nodes": [
+      {"id": "plan", "type": "agent", "agent": "scout", "stage": "plan", "inputs": {"target_market": "SaaS founders", "sources": ["reddit"], "keywords": ["customer support automation", "workflow automation", "knowledge management"], "subreddits": ["SaaS", "MicroSaaS", "indiehackers", "startups", "Entrepreneur", "SideProject", "Business_Ideas", "growmybusiness", "smallbusiness", "Productivity"]}, "outputs": ["data/runs/{run_id}/plan.json"], "deps": []},
+      {"id": "collect_reddit", "type": "tool", "tool": "reddit_search_and_fetch_threads", "parallelize_by": "keyword", "inputs": {"keywords": ["customer support automation", "workflow automation", "knowledge management"], "subreddits": ["SaaS", "MicroSaaS", "indiehackers", "startups", "Entrepreneur", "SideProject", "Business_Ideas", "growmybusiness", "smallbusiness", "Productivity"], "time_window": "12m", "per_query_limit": 15, "include_comments": true, "comment_depth": 2, "comment_limit": 50, "use_cache": true}, "outputs": ["data/reddit_cache/search/*.json", "data/reddit_cache/threads/*.json", "data/runs/{run_id}/reddit_index.json"], "deps": ["plan"]},
+      {"id": "think", "type": "agent", "agent": "scout", "stage": "think", "inputs": {"reddit_index": "data/runs/{run_id}/reddit_index.json", "thread_glob": "data/reddit_cache/threads/*.json"}, "outputs": ["data/runs/{run_id}/scout_think.json"], "deps": ["collect_reddit"]},
+      {"id": "act", "type": "agent", "agent": "scout", "stage": "act", "inputs": {"think_output": "data/runs/{run_id}/scout_think.json", "plan": "data/runs/{run_id}/plan.json"}, "outputs": ["data/runs/{run_id}/scout_output.json"], "deps": ["think"]}
+    ]
+  }
+}

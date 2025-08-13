@@ -1,0 +1,36 @@
+{
+  "post": {
+    "id": "1exqoax",
+    "subreddit": "SaaS",
+    "title": "Are you investing enough in customer support, or are you relying too heavily on automation?",
+    "author": "raunakhajela",
+    "created_utc": 1724249597.0,
+    "score": 0,
+    "num_comments": 6,
+    "url": "https://www.reddit.com/r/SaaS/comments/1exqoax/are_you_investing_enough_in_customer_support_or/",
+    "permalink": "https://www.reddit.com/r/SaaS/comments/1exqoax/are_you_investing_enough_in_customer_support_or/",
+    "selftext": ""
+  },
+  "comments": [
+    {
+      "id": "lj7ot6i",
+      "author": "salilsethi",
+      "body": "We just launched, so heavily involved with customer support. \n\nNo better way to learn the market than talking to customers and answering their questions, no matter how basic they are or how easily they can be automated away.",
+      "created_utc": 1724249796.0,
+      "score": 1,
+      "parent_id": "t3_1exqoax",
+      "depth": 0
+    },
+    {
+      "id": "lj7pdls",
+      "author": "raunakhajela",
+      "body": "How you handling the customer support?",
+      "created_utc": 1724249983.0,
+      "score": 1,
+      "parent_id": "t1_lj7ot6i",
+      "depth": 1
+    }
+  ],
+  "fetched_at": 1755100731,
+  "schema": "v1"
+}

@@ -1,0 +1,45 @@
+{
+  "post": {
+    "id": "1mcnv7p",
+    "subreddit": "productivity",
+    "title": "How I Automated My Way from 6 to 10+ Productive Hours Per Day (Specific Tools &amp; Workflows)",
+    "author": "One-Flight-7894",
+    "created_utc": 1753823902.0,
+    "score": 4,
+    "num_comments": 3,
+    "url": "https://www.reddit.com/r/productivity/comments/1mcnv7p/how_i_automated_my_way_from_6_to_10_productive/",
+    "permalink": "https://www.reddit.com/r/productivity/comments/1mcnv7p/how_i_automated_my_way_from_6_to_10_productive/",
+    "selftext": "After tracking my productivity for 6 months, I realized I was spending 4+ hours daily on 'productivity theater' - organizing tasks, switching between apps, and managing my workflow instead of actually working. Here's exactly how I automated my way out of that trap.\n\n**The Big 3 Automations (80% of the impact):**\n\n🔄 **Morning Brain Dump → Prioritized Schedule**\n- Use Zapier to connect voice notes from my commute directly to Todoist\n- AI automatically categorizes and prioritizes based on deadlines + energy levels\n- Calendar blocks automatically created for top 3 priorities\n- **Time saved:** 45 minutes daily, **Focus gained:** Massive\n\n⚡ **Context Switching Elimination** \n- Set up automated 'focus modes' that block distracting websites during deep work blocks\n- Phone automatically goes to DND with work-only exceptions\n- Slack/email only check at predetermined times (auto-responses set)\n- **Time saved:** 2+ hours daily of recovered focus time\n\n📊 **End-of-day Workflow Automation**\n- Automatically generate tomorrow's priorities based on today's incomplete tasks + calendar\n- Time-tracking data auto-analyzed to identify productivity patterns\n- Weekly review document auto-populated with key metrics\n- **Time saved:** 30 minutes daily, **Insight gained:** Huge\n\n**The Surprising Tools That Made the Difference:**\n\n• **Zapier:** For connecting all my apps (totally worth the $20/month)\n• **Motion:** AI calendar scheduling (game-changer for context switching)\n• **TextExpander:** Automated responses and templates\n• **IFTTT:** Simple phone/environment automations\n\n**Before vs After:**\n- **Before:** 6 productive hours, 4 hours of 'productivity overhead'\n- **After:** 10+ productive hours, 30 minutes of system maintenance\n- **ROI:** Tools cost ~$50/month, but I gained 20+ hours weekly\n\n**The key insight:** Automate the meta-work (organizing, planning, switching) so you can focus on the actual work.\n\nHappy to share specific workflows or answer questions about any of these automations!"
+  },
+  "comments": [
+    {
+      "id": "n5z3eph",
+      "author": "-Exstasy",
+      "body": "This is an ad",
+      "created_utc": 1753881671.0,
+      "score": 5,
+      "parent_id": "t3_1mcnv7p",
+      "depth": 0
+    },
+    {
+      "id": "n5vhs8s",
+      "author": "palhastry00",
+      "body": "Which were the apps you were using before? Did it change something for the stack you are using after the automation?\n\nAnd, if it is not asking too much, could you detail a bit more apps you’re using now?",
+      "created_utc": 1753826973.0,
+      "score": 1,
+      "parent_id": "t3_1mcnv7p",
+      "depth": 0
+    },
+    {
+      "id": "n67oens",
+      "author": "Dwarven_Warrior",
+      "body": "The end of day and start of day effectively did the exact same thing? prioritising workload twice?",
+      "created_utc": 1753987228.0,
+      "score": 1,
+      "parent_id": "t3_1mcnv7p",
+      "depth": 0
+    }
+  ],
+  "fetched_at": 1755100801,
+  "schema": "v1"
+}

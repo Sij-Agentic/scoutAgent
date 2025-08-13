@@ -1,0 +1,72 @@
+{
+  "post": {
+    "id": "1losvx5",
+    "subreddit": "startups",
+    "title": "Building AI-first platform for learning and the job and managing professional knowledge (i will not promote)",
+    "author": "5tush",
+    "created_utc": 1751345082.0,
+    "score": 0,
+    "num_comments": 9,
+    "url": "https://www.reddit.com/r/startups/comments/1losvx5/building_aifirst_platform_for_learning_and_the/",
+    "permalink": "https://www.reddit.com/r/startups/comments/1losvx5/building_aifirst_platform_for_learning_and_the/",
+    "selftext": "# The problem\n\n* I have found that AI has been very helpful to internalise difficult concepts, however the structure of regular LLMs (ChatGPT, Gemini, Claude) does not allow me to easily organise/extract the “gems” of information I internalise to all the other generative output in that message.\n* LLMs do have a memory, but most of the time, due their general purpose nature, the context window gets polluted with the unnecessary output, rather than the “gems” you internalised which are what’s valuable for building upon for future learning.\n* PKM tools like obsidian &amp; roam have been shown to be quite helpful for people to organise there knowledge in this way, but I feel like for a lot of general users the learning curve and setup is quite steep. Additionally, these tools aren’t built with AI-first rather is (or would be) added as a bolt-on\n\n# Why now?\n\n* We can’t that deny AI will inevitably a part of our future educational and professional lives\n* I believe that most people are utilising this technology too much or the wrong way such that their actually offloading their thinking and becoming what I’ve heard to be an “LLM with extra steps”\n* IMO, a tool should exists that gives the user the ability to still **use AI to enhance their thinking and learning but not do the thinking for them**\n\n# The solution\n\n* Users would have the ability to extract their ‘gems’ of understanding from a regular ChatGPT like chat and store in our PKM, (note. this will be integrated in the app)\n* Similar to what obsidian does (manually), the AI would semantically match the gem to relevant ones and store in your knowledge base\n* When the user is curious about learning or storing something related (to the topic that was stored), AI will draw on the appropriate ‘gems of understanding’ to explain this new concept\n* This (hopefully) resurfaces prior understanding for the user and also helps enhance understanding of the new idea due to wider contextual awareness (strengthening both areas of knowledge)\n* I want to eventually extend this functionality, such that this product becomes the goto platform for someone who wants **teach themselves anything and** **have the best chance to retain that understanding long-term.**\n\n# I would love your input on…\n\n* Do you believe this learning method would work for you?\n* Do you see any direct flaws with this approach to learning?\n* Do you see any flaws with traditional note taking platforms, like Notion, Obsidian, OneNote, etc.?\n* Do you see yourself paying for a product like this?\n* Would it be uncomfortable for you to ditch your systems of learning"
+  },
+  "comments": [
+    {
+      "id": "n0q5o1j",
+      "author": "[deleted]",
+      "body": "[removed]",
+      "created_utc": 1751359239.0,
+      "score": 3,
+      "parent_id": "t3_1losvx5",
+      "depth": 0
+    },
+    {
+      "id": "n0qp0oe",
+      "author": "IntenselySwedish",
+      "body": "I like this. I think the pain point is real and i really belive there is a place to innovate how we use AI for info gathering.  \n  \nBut you invited critique, so here goes:  \n  \nYour way of doing it isn't good IMO. Summarization is already handled well by existing LLMs (e.g., via TLDR or Socratic questioning). Hell, if you're discussing something with an chatgpt, it already gives you a tldr section at the end. The real problem isn't even finding insights; it's helping people understand the subject enough to generate insights themselves. Meaning, drawing logical conclusions, mental models, or structured reasoning.  \n  \nWhat i think you could do instead of your idea is create a tool/wrapper which help build out reasoning skill, rather than just storing and surfacing “gems”. Because you're right, a shitton gets lost in the LLM noise of a conversation. But IMO you're \"solving\" the wrong part of this equation: It's not really about “retaining info, in the form of gems, from an LLM.”  \n  \nHow do you get to a point where the logic, layers, and structure of a subject get structured enough for you without you being spoon-fed by an AI? Because extracting gems from a chat doesn't mean they get internalized or understood. You're just repeating what it said or what was right, etc.  \n  \nSo, I would \"solve\" it like this: Add logic trees so that when a user uses it, they sketch out an idea in their natural language, and the system can offer upgrades or challenge some parts of it. The system could track learning struggles to see where the user gets confused, where they changed their minds, or asked for clarification. Hell, you can also have the system ask the user to summarize what they're thinking about or talking about and then grade the user on that. Over time, they'll start using a better \"mental model\" for stacking and extracting said gems themselves.",
+      "created_utc": 1751369643.0,
+      "score": 3,
+      "parent_id": "t3_1losvx5",
+      "depth": 0
+    },
+    {
+      "id": "n0s3qwp",
+      "author": "founderled",
+      "body": "Your learning method is basically what I do. I call it building a second brain.\n\n  \nThe flaw isn't the approach, it's the execution. Doing it manually is a huge time suck. You nailed the problem with Obsidian. People spend more time managing their notes than actually learning from them.\n\n  \nTraditional platforms like Notion are just digital filing cabinets. They don't build connections for you. Information goes in and just sits there. It’s a dead end.\n\n  \nI use a tool that has an AI copilot built for this exact purpose. I throw all my stuff at it, web pages, my own notes, pdfs. The AI organizes it and connects the ideas automatically. I don't have to spend hours manually tagging and linking everything. It just resurfaces the right info when I need it.\n\n  \nSo yes, I'd pay for it. It's not about ditching a system, it's about upgrading from a pile of disconnected notes to something that actually helps you think.",
+      "created_utc": 1751386041.0,
+      "score": 2,
+      "parent_id": "t3_1losvx5",
+      "depth": 0
+    },
+    {
+      "id": "n0rc1aa",
+      "author": "5tush",
+      "body": "Yeah still early stages and trying to refine my approach. Thanks a lot for taking the time write a response! If your okay with it, I’d love to message you later down the road when I have a prototype for you to test. If you don’t want me bothering you no stress at all haha :)",
+      "created_utc": 1751378071.0,
+      "score": 2,
+      "parent_id": "t1_n0q5o1j",
+      "depth": 1
+    },
+    {
+      "id": "n0rauuf",
+      "author": "5tush",
+      "body": "Thank you so much for writing out such a detailed answer! I really like the logic tree idea and the focus on helping the user build reasoning skill. Any chance I can add you and maybe get your thoughts on the prototype when we have it built?",
+      "created_utc": 1751377692.0,
+      "score": 2,
+      "parent_id": "t1_n0qp0oe",
+      "depth": 1
+    },
+    {
+      "id": "n0usyti",
+      "author": "5tush",
+      "body": "Thanks for the response, glad to hear your keen about the concept. You mentioned that you used a tool that has an AI copilot for this purpose, do you mind telling me what it is?",
+      "created_utc": 1751414660.0,
+      "score": 1,
+      "parent_id": "t1_n0s3qwp",
+      "depth": 1
+    }
+  ],
+  "fetched_at": 1755100771,
+  "schema": "v1"
+}
