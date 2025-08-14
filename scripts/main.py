@@ -42,7 +42,7 @@ def parse_args() -> argparse.Namespace:
 
 async def run_collect(mcp: MultiMCPClient, args: argparse.Namespace) -> dict:
     # Choose tool
-    tools = await mcp.get_all_tools() if hasattr(mcp, "get_all_tools") else []
+    tools = mcp.get_all_tools() if hasattr(mcp, "get_all_tools") else []
     prefer_api = args.use_api
     tool_name = "reddit_api_search_and_fetch_threads" if prefer_api else "reddit_search_and_fetch_threads"
     # Fallback if chosen tool not available
