@@ -9,10 +9,10 @@ and their integration with the existing DAG engine and orchestration system.
 import asyncio
 import sys
 from pathlib import Path
-from agents.gap_finder import GapFinderAgent, GapFinderInput
-from agents.builder import BuilderAgent, BuilderInput
-from agents.writer import WriterAgent, WriterInput
-from services.agents.memory import MemoryService, get_memory_service
+from scout_agent.agents.gap_finder import GapFinderAgent, GapFinderInput
+from scout_agent.agents.builder import BuilderAgent, BuilderInput
+from scout_agent.agents.writer import WriterAgent, WriterInput
+from scout_agent.services.agents.memory import MemoryService, get_memory_service
 
 
 def print_section(title):
@@ -376,8 +376,8 @@ async def test_agent_registration():
     print_section("Testing Agent Registration")
     
     try:
-        from agents.base import get_agent_class
-        from service_registry import get_registry
+        from scout_agent.agents.base import get_agent_class
+        from scout_agent.service_registry import get_registry
         
         # Test traditional agents
         agents_to_test = ["gapfinder", "builder", "writer"]
@@ -400,11 +400,11 @@ async def test_agent_registration():
             else:
                 try:
                     if service_name == "memory":
-                        from services.agents.memory import get_memory_service
+                        from scout_agent.services.agents.memory import get_memory_service
                         service = get_memory_service()
                         print_test_result(f"{service_name} service factory", True)
                     elif service_name == "code_execution":
-                        from services.agents.code import get_code_execution_service
+                        from scout_agent.services.agents.code import get_code_execution_service
                         service = get_code_execution_service()
                         print_test_result(f"{service_name} service factory", True)
                 except Exception as e:

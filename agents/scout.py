@@ -9,8 +9,10 @@ import asyncio
 import json
 import traceback
 from typing import Dict, List, Any, Optional
+import textwrap
 from datetime import datetime
 from dataclasses import dataclass, asdict, field
+from pathlib import Path
 
 from .base import BaseAgent, AgentInput, AgentOutput, AgentState
 from .research_agent import ResearchAgent
@@ -19,6 +21,7 @@ from ..mcp_integration.client.base import MCPClient
 from ..mcp_integration.config import load_server_configs
 from ..llm.utils import LLMAgentMixin, load_prompt_template
 from ..llm.base import LLMBackendType
+from ..services.agents.code.service import CodeExecutionService
 
 
 @dataclass
@@ -155,10 +158,6 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
                 tool_names = []
 
             # Prepare prompt substitutions
-            print('--------- -------        --------------------------------')
-            print(tool_names)
-            print(tools_catalog)
-            print('--------- -------        --------------------------------')
             substitutions = {
                 "target_market": input_data.target_market,
                 "research_scope": input_data.research_scope,
@@ -218,6 +217,20 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
                 "max_pain_points": input_data.max_pain_points
             }
         
+        # Ensure a run_id is present and store it for later stages
+        try:
+            dag = plan.get("dag") or {}
+            run_id = dag.get("run_id") or plan.get("run_id")
+            if not run_id:
+                run_id = datetime.now().strftime("run_%Y%m%d_%H%M%S")
+            dag["run_id"] = run_id
+            plan["dag"] = dag
+            plan["run_id"] = run_id
+            # persist in state
+            setattr(self.state, "run_id", run_id)
+        except Exception:
+            pass
+
         self.state.plan = plan
         return plan
     
@@ -513,8 +526,10 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
                     code = n.get("code")
                     primary_out = (n.get("outputs") or [f"{tool}_output.json"])[0]
                     if not code or not isinstance(code, str) or not code.strip():
+                        # Use Python literal repr for params so booleans are True/False, not JSON true/false
+                        params_literal = repr(n.get('params') or {})
                         n["code"] = (
-                            f"result = mcp_call(tool=\"{tool}\", params={json.dumps(n.get('params') or {})}); "
+                            f"result = mcp_call(tool=\"{tool}\", params={params_literal}); "
                             f"save_json(\"{primary_out}\", result)"
                         )
 
@@ -526,6 +541,323 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
         except Exception:
             # On any failure, return original plan
             return plan
+
+    async def _execute_plan_non_agent_nodes(self, plan: Dict[str, Any], *, run_dir_override: Optional[Path] = None) -> Dict[str, Any]:
+        """Execute all non-agent DAG nodes (e.g., tool/code) using sandboxed code execution.
+
+        - Reads run_id from plan['dag']['run_id']
+        - Executes nodes honoring simple dependency order; runs ready nodes in parallel
+        - Each node's `code` is wrapped with a prelude providing mcp_call/save_json helpers
+        """
+        if not isinstance(plan, dict) or not isinstance(plan.get("dag"), dict):
+            return {"completed": [], "failed": []}
+        dag = plan["dag"]
+        nodes: List[Dict[str, Any]] = list(dag.get("nodes") or [])
+        if not nodes:
+            return {"completed": [], "failed": []}
+
+        # Compute run directory: override > dag.run_id > plan.run_id > state.run_id
+        run_id = dag.get("run_id") or plan.get("run_id") or getattr(self.state, "run_id", None) or "dev_run"
+        if run_dir_override is not None:
+            run_dir = Path(run_dir_override)
+        else:
+            project_root = Path(__file__).resolve().parents[2]
+            run_dir = (project_root / "data" / "runs" / run_id)
+        run_dir.mkdir(parents=True, exist_ok=True)
+
+        # Filter non-agent nodes
+        target_nodes = [n for n in nodes if (n.get("type") or "").lower() != "agent"]
+        if not target_nodes:
+            return {"completed": [], "failed": []}
+
+        # Index nodes by id and deps
+        node_map = {n.get("id") or f"node_{i}": n for i, n in enumerate(target_nodes)}
+        for i, (nid, n) in enumerate(list(node_map.items())):
+            n.setdefault("id", nid)
+            n.setdefault("deps", n.get("dependencies") or [])
+
+        # Consider agent nodes satisfied ONLY if their declared outputs already exist under run_dir
+        def _all_outputs_exist(n: Dict[str, Any]) -> bool:
+            outs = n.get("outputs") or []
+            if not outs:
+                return False
+            try:
+                for o in outs:
+                    # Resolve basic placeholders like {run_id}
+                    path_str = str(o).replace("{run_id}", run_id)
+                    p = (run_dir / path_str) if not Path(path_str).is_absolute() else Path(path_str)
+                    if not p.exists():
+                        return False
+                return True
+            except Exception:
+                return False
+
+        pre_satisfied_agents: set[str] = set()
+        for n in nodes:
+            if (n.get("type") or "").lower() == "agent" and n.get("id"):
+                if _all_outputs_exist(n):
+                    pre_satisfied_agents.add(n["id"])  # e.g., plan is done if plan.json exists
+
+        # completed/failed track ONLY target (non-agent) nodes
+        completed: set[str] = set()
+        failed: set[str] = set()
+        # satisfied is used for dependency checks and includes completed target nodes + pre-satisfied agent nodes
+        satisfied: set[str] = set(pre_satisfied_agents)
+
+        # Identify the plan file to update as a running manifest
+        plan_file: Optional[Path] = None
+        for candidate in (run_dir / "scout_plan.json", run_dir / "plan.json"):
+            if candidate.exists():
+                plan_file = candidate
+                break
+
+        def _update_manifest(nid: str, status: str, *, artifacts: Optional[List[str]] = None, error: Optional[Dict[str, Any]] = None):
+            if not plan_file:
+                return
+            try:
+                data = json.loads(plan_file.read_text())
+            except Exception:
+                data = {}
+            try:
+                ts = datetime.now().isoformat()
+                dag_data = data.get("dag") or {}
+                nodes_data = list(dag_data.get("nodes") or [])
+                for node in nodes_data:
+                    if (node.get("id") or "") == nid:
+                        run_meta = node.get("run") or {}
+                        run_meta["status"] = status
+                        run_meta["updated_at"] = ts
+                        if artifacts is not None:
+                            run_meta["artifacts"] = artifacts
+                        if error is not None:
+                            run_meta["error"] = error
+                        node["run"] = run_meta
+                        break
+                dag_data["nodes"] = nodes_data
+                dag_data["updated_at"] = ts
+                data["dag"] = dag_data
+                plan_file.write_text(json.dumps(data, indent=2))
+            except Exception:
+                # Best-effort only; ignore manifest write errors
+                pass
+
+        async def exec_node(n: Dict[str, Any]):
+            nid = n["id"]
+            lang = (n.get("language") or "python").lower()
+            code = (n.get("code") or "").strip()
+            if not code:
+                self.logger.warning(f"Node {nid} has no code; skipping")
+                completed.add(nid)
+                return
+
+            # Determine declared outputs
+            outs = n.get("outputs") or []
+            has_wild = any("*" in str(o) for o in outs)
+            preferred_out = None
+            for o in outs:
+                s = str(o)
+                if "*" not in s:
+                    preferred_out = s.replace("{run_id}", run_id)
+                    break
+            preferred_out = preferred_out or "tool_output.json"
+
+            # Build execution prelude with helpers bound to this run_dir
+            # Inject project root into sys.path so imports like 'scout_agent.*' work from sandboxed temp file
+            PROJECT_ROOT = Path(__file__).resolve().parents[2]
+            prelude = textwrap.dedent(f"""
+import json, os, asyncio
+import sys
+from pathlib import Path
+
+RUN_DIR = Path(r"{run_dir}")
+RUN_DIR.mkdir(parents=True, exist_ok=True)
+PROJ_ROOT = Path(r"{PROJECT_ROOT}")
+if str(PROJ_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJ_ROOT))
+
+from scout_agent.mcp_integration.client.multi import MultiMCPClient
+from scout_agent.mcp_integration.config import load_server_configs
+
+def save_json(rel_path: str, obj):
+    p = RUN_DIR / rel_path
+    p.parent.mkdir(parents=True, exist_ok=True)
+    with open(p, "w", encoding="utf-8") as f:
+        if isinstance(obj, str):
+            try:
+                obj = json.loads(obj)
+            except Exception:
+                pass
+        json.dump(obj, f, indent=2)
+
+def _ensure_payload(res):
+    try:
+        content = res.content[0].text if getattr(res, "content", None) else "{{}}"
+        return json.loads(content)
+    except Exception:
+        return {{"raw": str(res)}}
+
+def mcp_call(tool: str, params: dict):
+    async def _run():
+        servers = load_server_configs()
+        client = MultiMCPClient(servers)
+        await client.initialize()
+        try:
+            result = await client.call_tool(tool, params or {{}})
+            return _ensure_payload(result)
+        finally:
+            await client.shutdown()
+    return asyncio.run(_run())
+            """)
+
+            postlude = ""
+            if has_wild:
+                postlude = f"\n# --- Auto-persist index for wildcard outputs ---\ntry:\n    save_json(\"{preferred_out}\", result)\nexcept Exception as _e:\n    pass\n"
+
+            # Parallelization support: fan-out by list param if specified and tool/params are present
+            parallel_by = n.get("parallelize_by")
+            tool_name = n.get("tool")
+            params = n.get("params") or {}
+            fan_items: List[Any] = []
+            if parallel_by and tool_name and isinstance(params, dict):
+                seq = params.get(parallel_by)
+                if isinstance(seq, list) and seq:
+                    fan_items = seq
+
+            async def run_code_with_text(code_text: str):
+                svc = CodeExecutionService()
+                svc.setup_direct(working_dir=str(run_dir))
+                return await svc.execute_code(code_text, language=lang, timeout=n.get("timeout") or 60)
+
+            if fan_items:
+                # Build and run per-item code using tool/params (ignore provided code to make clean overrides)
+                import re
+                def slugify(s: str) -> str:
+                    return re.sub(r"[^a-zA-Z0-9_-]+", "_", str(s)).strip("_") or "item"
+
+                generated_files: List[str] = []
+                tasks = []
+                for item in fan_items:
+                    item_params = dict(params)
+                    # Replace the list with a singleton list for this item
+                    item_params[parallel_by] = [item]
+                    slug = slugify(item)
+                    out_name = f"{Path(preferred_out).stem}_{slug}.json"
+                    generated_files.append(out_name)
+                    per_code = prelude + f"\n# Auto-generated per-item tool call for {parallel_by}={item!r}\n" \
+                        + f"result = mcp_call(tool=\"{tool_name}\", params={json.dumps(item_params)}); " \
+                        + f"save_json(\"{out_name}\", result)\n"
+                    tasks.append(run_code_with_text(per_code))
+
+                await asyncio.gather(*tasks, return_exceptions=False)
+                # Write index file with generated file list
+                try:
+                    (run_dir / preferred_out).write_text(json.dumps({"files": generated_files}, indent=2))
+                except Exception:
+                    pass
+                completed.add(nid)
+                _update_manifest(nid, "completed", artifacts=generated_files)
+            else:
+                full_code = prelude + "\n\n# --- Node code begins ---\n" + code + postlude + "\n# --- Node code ends ---\n"
+                self.logger.info(f"Starting node {nid} (language={lang})")
+                _update_manifest(nid, "running")
+                exec_result = await run_code_with_text(full_code)
+                if not getattr(exec_result, "success", False):
+                    # Persist error details
+                    err_info = {
+                        "exec_id": getattr(exec_result, "exec_id", None),
+                        "stderr": getattr(exec_result, "error", None),
+                        "stdout": getattr(exec_result, "output", None),
+                    }
+                    (run_dir / f"{nid}_error.json").write_text(json.dumps(err_info, indent=2))
+                    failed.add(nid)
+                    _update_manifest(nid, "failed", error=err_info)
+                    raise RuntimeError(f"Node {nid} failed during execution")
+                # On success, record artifacts and log
+                try:
+                    produced: list[str] = []
+                    for o in outs:
+                        o_str = str(o).replace("{run_id}", run_id)
+                        if "*" in o_str:
+                            for p in run_dir.glob(o_str):
+                                try:
+                                    produced.append(str(p.relative_to(run_dir)))
+                                except Exception:
+                                    produced.append(str(p))
+                        else:
+                            p = (run_dir / o_str) if not Path(o_str).is_absolute() else Path(o_str)
+                            if p.exists():
+                                try:
+                                    produced.append(str(p.relative_to(run_dir)))
+                                except Exception:
+                                    produced.append(str(p))
+                    # Write per-node artifact manifest
+                    manifest = {"node": nid, "artifacts": sorted(produced)}
+                    (run_dir / f"{nid}_artifacts.json").write_text(json.dumps(manifest, indent=2))
+                    self.logger.info(f"Completed node {nid}; artifacts: {len(produced)} files")
+                    _update_manifest(nid, "completed", artifacts=manifest["artifacts"]) 
+                except Exception as _e:
+                    self.logger.warning(f"Node {nid} completed but failed to record artifacts: {_e}")
+                completed.add(nid)
+
+        # Simple dependency-driven execution with parallel batches
+        while len(completed | failed) < len(node_map):
+            ready = [
+                nid for nid, n in node_map.items()
+                if nid not in completed and nid not in failed
+                and all(d in satisfied for d in (n.get("deps") or []))
+            ]
+            if not ready:
+                break
+            # Execute ready nodes concurrently
+            batch = [exec_node(node_map[nid]) for nid in ready]
+            results = await asyncio.gather(*batch, return_exceptions=True)
+            # Log exceptions
+            for nid, res in zip(ready, results):
+                if isinstance(res, Exception):
+                    self.logger.error(f"Execution error in node {nid}: {res}")
+                    failed.add(nid)
+                else:
+                    # Mark node as satisfied for downstream deps
+                    satisfied.add(nid)
+
+        summary = {"completed": sorted(list(completed)), "failed": sorted(list(failed))}
+        if failed:
+            self.logger.error(f"Non-agent stage had failures: {summary['failed']}")
+        return summary
+
+    async def collect(self, *, plan_path: Optional[str] = None, plan: Optional[Dict[str, Any]] = None, run_id: Optional[str] = None) -> Dict[str, Any]:
+        """Public entry to run the collect stage (non-agent DAG nodes).
+
+        Args:
+            plan_path: Optional filesystem path to plan.json
+            plan: Optional plan dict (if already loaded)
+
+        Returns: summary dict with completed and failed node ids.
+        """
+        try:
+            selected_run_dir: Optional[Path] = None
+            if plan is None:
+                if not plan_path:
+                    raise ValueError("Either plan or plan_path must be provided")
+                p = Path(plan_path)
+                if not p.exists():
+                    raise FileNotFoundError(f"Plan not found: {p}")
+                plan = json.loads(p.read_text())
+                selected_run_dir = p.parent
+            # Determine run_id preference: explicit arg > plan dag/run_id > state
+            dag = plan.get("dag") or {}
+            chosen_run_id = run_id or dag.get("run_id") or plan.get("run_id") or getattr(self.state, "run_id", None)
+            if chosen_run_id:
+                dag["run_id"] = chosen_run_id
+                plan["dag"] = dag
+                plan["run_id"] = chosen_run_id
+                setattr(self.state, "run_id", chosen_run_id)
+
+            # Prefer using the directory of plan_path if provided, to keep artifacts together for testing
+            return await self._execute_plan_non_agent_nodes(plan, run_dir_override=selected_run_dir)
+        except Exception as e:
+            self.logger.error(f"Collect stage error: {e}\n{traceback.format_exc()}")
+            return {"completed": [], "failed": [str(e)]}
     
     def _extract_pain_points(self, research_results: Dict[str, Any], market: str) -> List[PainPoint]:
         """Extract pain points from research data."""

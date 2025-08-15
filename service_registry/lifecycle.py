@@ -12,9 +12,9 @@ import time
 import networkx as nx
 from typing import Dict, List, Set, Any, Optional, Tuple
 
-from custom_logging import get_logger
-from service_registry.base import ServiceBase, ServiceRegistry, ServiceState
-from service_registry.exceptions import CircularDependencyError, DependencyError
+from scout_agent.custom_logging import get_logger
+from .base import ServiceBase, ServiceRegistry, ServiceState
+from .exceptions import CircularDependencyError, DependencyError
 
 logger = get_logger("service_lifecycle")
 
@@ -360,5 +360,5 @@ class LifecycleManager:
 # Create a lifecycle manager for the global registry
 def get_lifecycle_manager() -> LifecycleManager:
     """Get a lifecycle manager for the global registry."""
-    from service_registry.base import get_registry
+    from .base import get_registry
     return LifecycleManager(get_registry())

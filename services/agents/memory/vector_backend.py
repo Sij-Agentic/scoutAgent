@@ -19,7 +19,7 @@ try:
 except ImportError:
     VECTOR_SUPPORT = False
 
-from services.agents.memory.service import (
+from .service import (
     MemoryBackend, MemoryBackendType, Memory, MemoryType, MemorySearchResult
 )
 
@@ -45,7 +45,7 @@ class VectorDatabaseBackend(MemoryBackend):
             
         try:
             # Initialize file backend for actual storage
-            from services.agents.memory.service import FileSystemBackend
+            from .service import FileSystemBackend
             self.file_backend = FileSystemBackend(self.config)
             await self.file_backend.initialize()
             

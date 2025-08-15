@@ -11,7 +11,7 @@ Core components:
 - Service lifecycle management
 """
 
-from service_registry.base import (
+from .base import (
     ServiceBase, 
     ServiceRegistry,
     ServiceState,
@@ -22,20 +22,20 @@ from service_registry.base import (
     get_service
 )
 
-from service_registry.decorators import (
+from .decorators import (
     service,
     requires,
     factory,
     inject
 )
 
-from service_registry.lifecycle import (
+from .lifecycle import (
     LifecycleManager,
     DependencyGraph,
     get_lifecycle_manager
 )
 
-from service_registry.exceptions import (
+from .exceptions import (
     ServiceRegistryError,
     ServiceNotFoundError,
     ServiceInitializationError,
