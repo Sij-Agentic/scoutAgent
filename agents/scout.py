@@ -15,6 +15,8 @@ from dataclasses import dataclass, asdict, field
 from .base import BaseAgent, AgentInput, AgentOutput, AgentState
 from .research_agent import ResearchAgent
 from ..config import get_config
+from ..mcp_integration.client.base import MCPClient
+from ..mcp_integration.config import load_server_configs
 from ..llm.utils import LLMAgentMixin, load_prompt_template
 from ..llm.base import LLMBackendType
 
@@ -36,8 +38,8 @@ class PainPoint:
         return asdict(self)
 
 
-@dataclass
-class ScoutInput(AgentInput):
+@dataclass(kw_only=True)
+class ScoutInput:
     """Input for ScoutAgent."""
     target_market: str
     research_scope: str = "comprehensive"  # quick, focused, comprehensive
@@ -52,8 +54,8 @@ class ScoutInput(AgentInput):
             self.keywords = ["pain point", "problem", "frustration", "issue"]
 
 
-@dataclass
-class ScoutOutput(AgentOutput):
+@dataclass(kw_only=True)
+class ScoutOutput:
     """Output from ScoutAgent."""
     pain_points: List[PainPoint]
     total_discovered: int
@@ -72,25 +74,107 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
     """
     
     def __init__(self, agent_id: str = None):
-        BaseAgent.__init__(self, agent_id)
+        # Initialize BaseAgent with the correct name and agent_id
+        BaseAgent.__init__(self, name="scout_agent", agent_id=agent_id)
         # Do not force a backend here; honor global/per-agent config in LLMAgentMixin
         LLMAgentMixin.__init__(self, preferred_backend=None)
         self.name = "scout_agent"  # Used for prompt template loading
         self.research_agent = ResearchAgent()
         self.config = get_config()
+
+    def _normalize_input(self, agent_input: Any) -> ScoutInput:
+        """Coerce incoming input into a ScoutInput-like structure.
+
+        Accepts either:
+        - a ScoutInput instance
+        - an AgentInput with data dict containing required fields
+        - a plain dict with required fields
+        """
+        if isinstance(agent_input, ScoutInput):
+            return agent_input
+        # If it's an AgentInput, prefer its data payload
+        payload = None
+        if hasattr(agent_input, "data"):
+            payload = agent_input.data
+        elif isinstance(agent_input, dict):
+            payload = agent_input
+        else:
+            payload = {}
+
+        payload = payload or {}
+        # Map fields with defaults similar to ScoutInput
+        target_market = payload.get("target_market") or payload.get("market") or ""
+        research_scope = payload.get("research_scope", "comprehensive")
+        max_pain_points = int(payload.get("max_pain_points", 10))
+        sources = payload.get("sources") or ["reddit", "twitter", "forums", "reviews", "blogs"]
+        keywords = payload.get("keywords") or ["pain point", "problem", "frustration", "issue"]
+        return ScoutInput(
+            target_market=target_market,
+            research_scope=research_scope,
+            max_pain_points=max_pain_points,
+            sources=sources,
+            keywords=keywords,
+        )
     
-    async def plan(self, input_data: ScoutInput) -> Dict[str, Any]:
+    async def plan(self, agent_input: AgentInput) -> Dict[str, Any]:
         """Plan the pain point discovery process."""
+        # Normalize incoming input into ScoutInput
+        input_data = self._normalize_input(agent_input)
         self.logger.info(f"Planning pain point discovery for market: {input_data.target_market}")
         
         try:
+            # Discover available MCP tools (names + descriptions) for the planner
+            tools_catalog = []
+            tool_names = []
+            try:
+                servers = load_server_configs()
+                # Aggregate tools from all configured servers (best-effort)
+                for srv in servers:
+                    url = srv.get("url")
+                    if not url:
+                        continue
+                    client = MCPClient(url)
+                    try:
+                        tools = await client.list_tools()
+                        for t in (tools or []):
+                            # Best-effort extraction of fields from MCP tool objects
+                            name = getattr(t, "name", None) or getattr(t, "tool", None) or str(t)
+                            desc = getattr(t, "description", "")
+                            # Some MCP tool objects might expose input schema; capture if available
+                            schema = getattr(t, "inputSchema", None) or getattr(t, "input_schema", None)
+                            tools_catalog.append({"name": name, "description": desc, "input_schema": getattr(schema, "model_dump", lambda: schema)() if hasattr(schema, "model_dump") else schema})
+                            tool_names.append(name)
+                    finally:
+                        try:
+                            await client.shutdown()
+                        except Exception:
+                            pass
+            except Exception:
+                # If discovery fails, proceed with empty catalog; prompt will still work
+                tools_catalog = []
+                tool_names = []
+
             # Prepare prompt substitutions
+            print('--------- -------        --------------------------------')
+            print(tool_names)
+            print(tools_catalog)
+            print('--------- -------        --------------------------------')
             substitutions = {
                 "target_market": input_data.target_market,
                 "research_scope": input_data.research_scope,
                 "max_pain_points": input_data.max_pain_points,
                 "sources": json.dumps(input_data.sources),
-                "keywords": json.dumps(input_data.keywords)
+                "keywords": json.dumps(input_data.keywords),
+                "subreddits": json.dumps([k for k in input_data.keywords if isinstance(k, str) and k.startswith("r/")]),
+                "limits_json": json.dumps({
+                    "per_query_limit": 50,
+                    "comment_depth": 2,
+                    "comment_limit": 200,
+                    "min_num_comments": 5,
+                    "min_score": 3
+                }),
+                "tools_json": json.dumps(tools_catalog, ensure_ascii=False),
+                "tool_names_csv": ", ".join(tool_names)
             }
 
             # Load and render the planning prompt template
@@ -100,6 +184,8 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
             try:
                 llm_text = await self.llm_generate(prompt=prompt_text, task_type="plan")
                 plan = self._extract_json(llm_text)
+                # Post-process to enforce Option A (strict) and add execution code
+                plan = self._postprocess_plan(plan, input_data, tools_catalog, tool_names)
                 self.logger.info(f"Generated plan with keys: {list(plan.keys())}")
             except Exception:
                 # Fallback if LLM fails
@@ -135,10 +221,13 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
         self.state.plan = plan
         return plan
     
-    async def think(self, input_data: ScoutInput) -> Dict[str, Any]:
+    async def think(self, agent_input: AgentInput, plan: Dict[str, Any]) -> Dict[str, Any]:
         """Analyze research data to identify pain points."""
         self.logger.info("Thinking about discovered pain points...")
         
+        # Normalize input data
+        input_data = self._normalize_input(agent_input)
+
         # Use research agent to gather market data
         research_input = {
             "query": f"pain points {input_data.target_market}",
@@ -197,13 +286,20 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
         
         return analysis
     
-    async def act(self, input_data: ScoutInput) -> ScoutOutput:
+    async def act(self, agent_input: AgentInput, plan: Dict[str, Any], thoughts: Dict[str, Any]) -> ScoutOutput:
         """Execute pain point discovery and return results."""
         self.logger.info("Executing pain point discovery...")
         
         start_time = datetime.now()
         
         try:
+            # Normalize input data
+            input_data = self._normalize_input(agent_input)
+
+            # Get research results and analysis from state (ensure available before prompt formatting)
+            research_results = getattr(self.state, 'research_results', {})
+            analysis = getattr(self.state, 'analysis', {})
+
             # Load the action prompt template
             prompt_text = load_prompt_template(template_name="act.prompt", agent_name=self.name, substitutions={
                 "target_market": input_data.target_market,
@@ -213,10 +309,6 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
                 "analysis": json.dumps(analysis),
                 "research_results": json.dumps(research_results)
             })
-            
-            # Get research results and analysis from state
-            research_results = getattr(self.state, 'research_results', {})
-            analysis = getattr(self.state, 'analysis', {})
             
             # If we don't have research results, use mock data
             if not research_results:
@@ -321,6 +413,119 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
         except Exception as e:
             self.logger.error(f"Error extracting JSON: {str(e)}\n{traceback.format_exc()}\nContent: {content}")
             return {}
+
+    def _postprocess_plan(self, plan: Dict[str, Any], input_data: "ScoutInput", tools_catalog: List[Dict[str, Any]], tool_names: List[str]) -> Dict[str, Any]:
+        """Enforce Option A: ensure tool nodes have tool/params/code and normalize outputs.
+
+        - Add version: "1.1"
+        - Normalize outputs to simple filenames (executor resolves run dir)
+        - For each tool node:
+            - Ensure `params` exists (fallback to `inputs`)
+            - Ensure `code` exists: generate a minimal sandbox snippet or 'no_op'
+        - Optionally add collect nodes per available sources if missing.
+        """
+        try:
+            if not isinstance(plan, dict):
+                return {}
+
+            plan.setdefault("schema", "scout_plan_v1")
+            plan.setdefault("version", "1.1")
+
+            dag = plan.get("dag") or {}
+            nodes = list(dag.get("nodes") or [])
+
+            # Helper: simple filename from any path-like string
+            def _basename(p: str) -> str:
+                try:
+                    import os
+                    return os.path.basename(p)
+                except Exception:
+                    return p
+
+            # Build a quick map of existing source-collect nodes
+            existing_tools = {n.get("tool"): n for n in nodes if n.get("type") == "tool"}
+
+            # Heuristic mapping: find tools containing source name
+            available_tools_by_source = {}
+            for name in tool_names:
+                lower = (name or "").lower()
+                for src in (plan.get("sources") or input_data.sources or []):
+                    s = (src or "").lower()
+                    if s and s in lower:
+                        available_tools_by_source.setdefault(s, []).append(name)
+
+            # Ensure collect nodes for sources with available tools
+            desired_sources = [s.lower() for s in (plan.get("sources") or input_data.sources or [])]
+            for s in desired_sources:
+                tools_for_s = available_tools_by_source.get(s, [])
+                if not tools_for_s:
+                    continue
+                # If no node exists for any of these tools, create one using the first tool
+                already_present = any((n.get("type") == "tool" and isinstance(n.get("tool"), str) and s in n.get("tool", "").lower()) for n in nodes)
+                if not already_present:
+                    tool_name = tools_for_s[0]
+                    node_id = f"collect_{s}"
+                    outputs = [f"{s}_index.json"]
+                    params = {
+                        k: plan.get(k) for k in ("keywords", "subreddits", "time_window") if plan.get(k) is not None
+                    }
+                    code = (
+                        f"result = mcp_call(tool=\"{tool_name}\", params={json.dumps(params) if params else '{}'}); "
+                        f"save_json(\"{outputs[0]}\", result)"
+                    )
+                    nodes.append({
+                        "id": node_id,
+                        "type": "tool",
+                        "tool": tool_name,
+                        "params": params or {},
+                        "code": code,
+                        "inputs": {},
+                        "outputs": outputs,
+                        "deps": ["plan"],
+                    })
+
+            # Normalize existing nodes
+            for n in nodes:
+                # Outputs to filenames
+                outs = n.get("outputs") or []
+                n["outputs"] = [_basename(o) for o in outs]
+
+                if n.get("type") == "tool":
+                    # Ensure tool present
+                    tool = n.get("tool")
+                    if not tool or not isinstance(tool, str):
+                        continue  # will be caught by runtime validation
+
+                    # Ensure params
+                    if not isinstance(n.get("params"), dict) or n.get("params") is None:
+                        # Best-effort: copy known fields from inputs
+                        params = {}
+                        for key in ("keywords", "subreddits", "time_window", "per_query_limit", "include_comments", "comment_depth", "comment_limit", "use_cache"):
+                            if key in (n.get("inputs") or {}):
+                                params[key] = n["inputs"][key]
+                            elif key in plan:
+                                params[key] = plan[key]
+                            elif key in (plan.get("limits") or {}):
+                                params[key] = plan["limits"][key]
+                        n["params"] = params
+
+                    # Ensure code
+                    code = n.get("code")
+                    primary_out = (n.get("outputs") or [f"{tool}_output.json"])[0]
+                    if not code or not isinstance(code, str) or not code.strip():
+                        n["code"] = (
+                            f"result = mcp_call(tool=\"{tool}\", params={json.dumps(n.get('params') or {})}); "
+                            f"save_json(\"{primary_out}\", result)"
+                        )
+
+            # Put back nodes
+            dag["nodes"] = nodes
+            plan["dag"] = dag
+
+            return plan
+        except Exception:
+            # On any failure, return original plan
+            return plan
     
     def _extract_pain_points(self, research_results: Dict[str, Any], market: str) -> List[PainPoint]:
         """Extract pain points from research data."""
@@ -424,4 +629,4 @@ Pain Point Discovery Summary for {market}:
 
 # Register the agent
 from .base import register_agent
-register_agent("scout", ScoutAgent)
+register_agent(ScoutAgent)

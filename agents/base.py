@@ -10,8 +10,8 @@ from typing import Dict, Any, Optional, List, Callable
 from dataclasses import dataclass, asdict
 from pathlib import Path
 
-from custom_logging import get_logger
-from config import get_config
+from scout_agent.custom_logging import get_logger
+from scout_agent.config import get_config
 
 
 @dataclass

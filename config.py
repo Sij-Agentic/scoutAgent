@@ -19,7 +19,7 @@ except ImportError:
     def load_dotenv(*args, **kwargs):
         pass  # No-op if dotenv not available
 
-from custom_logging import get_logger
+from scout_agent.custom_logging import get_logger
 
 logger = get_logger("config")
 

@@ -6,6 +6,7 @@
   "required": ["schema", "target_market", "time_window", "sources", "keywords", "subreddits", "limits", "dag"],
   "properties": {
     "schema": {"const": "scout_plan_v1"},
+    "version": {"type": ["string", "null"], "description": "Optional schema version extension (e.g., '1.1')."},
     "target_market": {"type": "string"},
     "time_window": {"type": "string", "enum": ["3m", "6m", "12m", "24m", "all"]},
     "sources": {"type": "array", "items": {"type": "string"}},
@@ -37,12 +38,27 @@
               "type": {"type": "string", "enum": ["agent", "tool"]},
               "agent": {"type": ["string", "null"]},
               "stage": {"type": ["string", "null"], "enum": ["plan", "think", "act", null]},
-              "tool": {"type": ["string", "null"]},
+              "tool": {"type": ["string", "null"], "description": "Exact MCP tool name when type=tool."},
+              "params": {"type": ["object", "null"], "description": "Arguments to pass to the tool when executing."},
+              "code": {"type": ["string", "null"], "description": "Required for type=tool. Python code snippet to execute in sandbox. Use 'no_op' if no code needed."},
               "parallelize_by": {"type": ["string", "null"]},
               "inputs": {"type": "object"},
               "outputs": {"type": "array", "items": {"type": "string"}},
               "deps": {"type": "array", "items": {"type": "string"}}
-            }
+            },
+            "allOf": [
+              {
+                "if": {"properties": {"type": {"const": "tool"}}},
+                "then": {
+                  "required": ["tool", "params", "code"],
+                  "properties": {
+                    "tool": {"type": "string", "minLength": 1},
+                    "params": {"type": "object"},
+                    "code": {"type": "string", "minLength": 1}
+                  }
+                }
+              }
+            ]
           }
         }
       }

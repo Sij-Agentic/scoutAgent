@@ -42,7 +42,7 @@ async def _fetch_top(subreddit: str, limit: int = 5, t: str = "day") -> List[Dic
     return items
 
 
-@mcp.tool()
+#@mcp.tool()
 async def reddit_top(subreddit: str, limit: int = 5, timeframe: str = "day") -> Dict[str, Any]:
     """Get top posts from a subreddit (public JSON, no auth)."""
     try:
@@ -190,7 +190,7 @@ async def reddit_search_and_fetch_threads(
     return {"content": [TextContent(type="text", text=json.dumps(payload))]}
 
 
-@mcp.tool()
+#@mcp.tool()
 async def reddit_api_search_and_fetch_threads(
     keywords: List[str],
     subreddits: List[str] = None,
