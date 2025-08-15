@@ -15,8 +15,8 @@ import math
 
 import asyncio
 from .base import BaseAgent, AgentInput, AgentOutput
-from config import get_config
-from llm.utils import LLMAgentMixin, load_prompt_template
+from scout_agent.config import get_config
+from scout_agent.llm.utils import LLMAgentMixin, load_prompt_template
 
 def _extract_json(text: str) -> Optional[Dict[str, Any]]:
     """Extracts the first valid JSON object from a string."""

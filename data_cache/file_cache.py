@@ -3,8 +3,8 @@ import time
 from pathlib import Path
 from typing import Any, Optional
 
-from custom_logging import get_logger
-from config import get_config
+from scout_agent.custom_logging import get_logger
+from scout_agent.config import get_config
 
 logger = get_logger("data_cache.file_cache")
 

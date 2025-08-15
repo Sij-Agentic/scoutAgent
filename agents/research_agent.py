@@ -23,8 +23,8 @@ except ImportError:
     BS4_AVAILABLE = False
 
 from .base import BaseAgent, AgentInput, AgentOutput
-from config import get_config
-from llm.utils import LLMAgentMixin
+from scout_agent.config import get_config
+from scout_agent.llm.utils import LLMAgentMixin
 
 
 class ResearchAgent(LLMAgentMixin, BaseAgent):
@@ -74,7 +74,7 @@ class ResearchAgent(LLMAgentMixin, BaseAgent):
         query = agent_input.data
         self.log(f"Generating research plan for query: {query}")
 
-        from llm.utils import load_prompt_template
+        from scout_agent.llm.utils import load_prompt_template
         prompt_template = load_prompt_template(
             'plan.prompt',
             agent_name=self.name,
@@ -100,7 +100,7 @@ class ResearchAgent(LLMAgentMixin, BaseAgent):
         plan_str = json.dumps(plan, indent=2)
         self.log(f"Thinking about research plan for query: {query}")
 
-        from llm.utils import load_prompt_template
+        from scout_agent.llm.utils import load_prompt_template
         prompt_template = load_prompt_template(
             'think.prompt',
             agent_name=self.name,

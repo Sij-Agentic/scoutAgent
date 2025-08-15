@@ -7,8 +7,8 @@ from typing import Dict, List, Optional, Any, Union
 from dataclasses import dataclass
 
 from .base import LLMBackend, LLMRequest, LLMResponse, LLMConfig, LLMBackendType, LLMError
-from custom_logging import get_logger
-from config import get_config
+from scout_agent.custom_logging import get_logger
+from scout_agent.config import get_config
 
 
 @dataclass

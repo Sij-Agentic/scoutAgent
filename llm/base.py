@@ -9,7 +9,7 @@ from typing import Dict, Any, Optional, List, Union
 from dataclasses import dataclass, field
 from enum import Enum
 
-from custom_logging import get_logger
+from scout_agent.custom_logging import get_logger
 
 
 class LLMBackendType(Enum):

@@ -6,9 +6,9 @@ from typing import Any, Dict, List, Optional
 
 import requests
 
-from config import get_config
-from custom_logging import get_logger
-from data_cache.file_cache import FileCache
+from scout_agent.config import get_config
+from scout_agent.custom_logging import get_logger
+from scout_agent.data_cache.file_cache import FileCache
 
 logger = get_logger("sources.reddit_client")
 

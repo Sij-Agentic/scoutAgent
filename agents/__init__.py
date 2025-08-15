@@ -1,33 +1,18 @@
 """
-Agents module for ScoutAgent.
+Agents package for ScoutAgent.
 
-This module contains all specialized agents for the ScoutAgent system.
+Avoid heavy side-effects at import time. We only expose base classes and
+registry utilities here. Individual agent modules (e.g., `scout`, `research_agent`)
+should handle their own registration when explicitly imported.
 """
 
 from .base import BaseAgent, AgentInput, AgentOutput, get_registry, register_agent, create_agent
-from .research_agent import ResearchAgent
-from .analysis_agent import AnalysisAgent
-from .gap_finder import GapFinderAgent
-from .builder import BuilderAgent
-from .writer import WriterAgent
 
-# Re-export base classes
 __all__ = [
     'BaseAgent',
-    'AgentInput', 
+    'AgentInput',
     'AgentOutput',
     'get_registry',
     'register_agent',
-    'ResearchAgent',
-    'AnalysisAgent',
-    'GapFinderAgent',
-    'BuilderAgent',
-    'WriterAgent'
+    'create_agent',
 ]
-
-# Register all built-in agents
-register_agent(ResearchAgent)
-register_agent(AnalysisAgent)
-register_agent(GapFinderAgent)
-register_agent(BuilderAgent)
-register_agent(WriterAgent)

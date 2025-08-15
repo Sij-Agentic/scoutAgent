@@ -9,8 +9,8 @@ from dataclasses import dataclass
 
 from .base import LLMRequest, LLMResponse, LLMBackendType
 from .manager import get_llm_manager, initialize_llm_backends
-from config import get_config
-from custom_logging import get_logger
+from scout_agent.config import get_config
+from scout_agent.custom_logging import get_logger
 
 
 @dataclass
@@ -614,6 +614,11 @@ def load_prompt_template(template_name: str, agent_name: Optional[str] = None, s
         template_content = f.read()
 
     if substitutions:
-        return template_content.format(**substitutions)
+        # Escape all braces to avoid treating JSON/object braces as format fields
+        escaped = template_content.replace('{', '{{').replace('}', '}}')
+        # Un-escape only the placeholders we explicitly intend to substitute
+        for key in substitutions.keys():
+            escaped = escaped.replace(f'{{{{{key}}}}}', f'{{{key}}}')
+        return escaped.format(**substitutions)
     
     return template_content
