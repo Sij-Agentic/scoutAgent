@@ -17,7 +17,7 @@ from typing import Dict, Any, Optional, List, Type, Set, Callable, Tuple, Union
 import logging
 from collections import defaultdict
 
-from custom_logging import get_logger
+from scout_agent.custom_logging import get_logger
 
 
 class ServiceState(Enum):

@@ -14,8 +14,8 @@ from enum import Enum
 from pathlib import Path
 from typing import Dict, Any, Optional, List, Union, Set, Tuple
 
-from service_registry import ServiceBase, service, requires, inject
-from custom_logging import get_logger
+from scout_agent.service_registry import ServiceBase, service, requires, inject
+from scout_agent.custom_logging import get_logger
 
 
 class MemoryBackendType(Enum):
@@ -512,7 +512,7 @@ class MemoryService(ServiceBase):
             if self.backend_type == MemoryBackendType.VECTOR_DB:
                 try:
                     # Try to import and use vector backend
-                    from services.agents.memory.vector_backend import VectorDatabaseBackend
+                    from scout_agent.services.agents.memory.vector_backend import VectorDatabaseBackend
                     self.backend = VectorDatabaseBackend(backend_config)
                 except (ImportError, Exception) as e:
                     self.logger.warning(
@@ -859,7 +859,7 @@ def get_memory_service() -> MemoryService:
     
     if _memory_service_instance is None:
         try:
-            from service_registry import get_registry
+            from scout_agent.service_registry import get_registry
             
             # Check if registered in service registry
             registry = get_registry()

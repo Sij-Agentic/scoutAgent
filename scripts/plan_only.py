@@ -50,10 +50,19 @@ async def main_async():
 
     # Plan
     plan = await scout.plan(scout_input)
-    out_path = run_dir / "plan.json"
-    out_path.write_text(json.dumps(plan, indent=2))
-    logger.info(f"Plan written: {out_path}")
-    print(str(out_path))
+    # Embed run_id into plan for cross-stage consistency
+    dag = dict(plan.get("dag") or {})
+    dag["run_id"] = args.run_id
+    plan["dag"] = dag
+    plan["run_id"] = args.run_id
+
+    # Write agent-specific and generic filenames (for compatibility)
+    out_path_agent = run_dir / "scout_plan.json"
+    out_path_generic = run_dir / "plan.json"
+    out_path_agent.write_text(json.dumps(plan, indent=2))
+    out_path_generic.write_text(json.dumps(plan, indent=2))
+    logger.info(f"Plan written: {out_path_agent} and {out_path_generic}")
+    print(str(out_path_agent))
 
 
 def run():

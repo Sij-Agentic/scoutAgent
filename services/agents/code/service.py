@@ -15,8 +15,8 @@ from pathlib import Path
 from typing import Dict, Any, Optional, List, Tuple, Union
 from enum import Enum
 
-from service_registry import ServiceBase, service, requires, inject
-from custom_logging import get_logger
+from scout_agent.service_registry import ServiceBase, service, requires, inject
+from scout_agent.custom_logging import get_logger
 
 
 class ExecutionEnvironment(Enum):
@@ -490,7 +490,8 @@ class CodeExecutionService(ServiceBase):
                 *cmd,
                 stdin=asyncio.subprocess.PIPE if inputs else None,
                 stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
+                stderr=asyncio.subprocess.PIPE,
+                cwd=str(self.working_dir) if self.working_dir else None
             )
             
             # Run with timeout

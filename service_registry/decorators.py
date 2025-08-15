@@ -8,7 +8,7 @@ import inspect
 from functools import wraps
 from typing import Optional, List, Type, Dict, Any, Callable, Union, TypeVar
 
-from service_registry.base import ServiceBase, get_registry, register_service
+from .base import ServiceBase, get_registry, register_service
 
 
 T = TypeVar('T', bound=ServiceBase)
