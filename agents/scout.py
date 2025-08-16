@@ -29,6 +29,7 @@ from ..llm.base import LLMBackendType
 from ..services.agents.code.service import CodeExecutionService
 from dataclasses import dataclass, asdict
 import textwrap
+import traceback
 
 
 @dataclass
@@ -269,56 +270,112 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
         return plan
     
     async def think(self, agent_input: AgentInput, plan: Dict[str, Any]) -> Dict[str, Any]:
-        """Analyze research data to identify pain points."""
-        self.logger.info("Thinking about discovered pain points...")
+        """Analyze collected Reddit data to identify pain points."""
+        self.logger.info("Thinking about discovered pain points from collected Reddit data...")
         
         # Normalize input data
         input_data = self._normalize_input(agent_input)
-
-        # Use research agent to gather market data
-        research_input = {
-            "query": f"pain points {input_data.target_market}",
-            "sources": input_data.sources,
-            "max_results": 50,
-            "include_sentiment": True
-        }
         
         try:
-            # Use research agent to gather market data
-            research_results = await self.research_agent.execute(research_input)
+            # Get the run_id from the plan (try multiple possible locations)
+            run_id = plan.get("run_metadata", {}).get("run_id")
+            if not run_id:
+                run_id = plan.get("run_id")
+            if not run_id:
+                run_id = plan.get("dag", {}).get("run_id")
+            if not run_id:
+                # If still not found, use the one from agent state if available
+                run_id = getattr(self.state, "run_id", None)
+            if not run_id:
+                raise ValueError("No run_id found in plan or agent state")
+            
+            self.logger.info(f"Using run_id: {run_id}")
+            
+            # Determine the manifest path
+            run_dir = self._get_run_dir(run_id)
+            manifest_path = run_dir / "run_manifest.json"
+            
+            if not manifest_path.exists():
+                raise FileNotFoundError(f"Manifest not found at: {manifest_path}")
+            
+            # Load the manifest to access collected Reddit data
+            manifest_manager = ManifestManager(manifest_path)
+            
+            # Get the collect node ID from the manifest
+            collect_node_id = "collect_reddit"  # Default
+            manifest = manifest_manager.get_manifest()
+            
+            # Find the actual collect node ID from the DAG
+            if "dag" in manifest and "nodes" in manifest["dag"]:
+                for node in manifest["dag"]["nodes"]:
+                    if node.get("type") == "tool" and node.get("tool") == "reddit_search_and_fetch_threads":
+                        collect_node_id = node.get("id", "collect_reddit")
+                        break
+            
+            # Get the collected Reddit data from the manifest
+            reddit_data = manifest_manager.get_node_output(collect_node_id)
+            if not reddit_data:
+                raise ValueError(f"No Reddit data found for node: {collect_node_id}")
+            
+            # Extract threads and comments from the collected data
+            threads = reddit_data.get("threads", [])
+            comments = reddit_data.get("comments", [])
+            
+            if not threads:
+                self.logger.warning("No Reddit threads found in collected data")
             
             # Prepare prompt substitutions
             substitutions = {
                 "target_market": input_data.target_market,
-                "research_scope": input_data.research_scope,
-                "plan": json.dumps(self.state.plan),
-                "research_results": json.dumps(research_results)
+                "research_scope": input_data.research_scope
             }
             
             # Load and render the thinking prompt template
             prompt_text = load_prompt_template(template_name="think.prompt", agent_name=self.name, substitutions=substitutions)
-
+            
+            # Add the Reddit data to the prompt
+            # Limit the data to avoid exceeding token limits
+            max_threads = 10
+            max_comments_per_thread = 20
+            
+            # Prepare a condensed version of the Reddit data
+            condensed_threads = threads[:max_threads]
+            
+            # Add comments to their respective threads
+            thread_comments = {}
+            for comment in comments:
+                thread_id = comment.get("link_id", "").replace("t3_", "")
+                if thread_id not in thread_comments:
+                    thread_comments[thread_id] = []
+                if len(thread_comments[thread_id]) < max_comments_per_thread:
+                    thread_comments[thread_id].append(comment)
+            
+            # Add comments to threads
+            for thread in condensed_threads:
+                thread_id = thread.get("id", "").replace("t3_", "")
+                thread["comments"] = thread_comments.get(thread_id, [])
+            
+            # Add the condensed Reddit data to the prompt
+            prompt_text += f"\n\n# REDDIT DATA\n{json.dumps(condensed_threads, indent=2)}"
+            
             # Generate analysis using LLM (returns string)
             try:
                 llm_text = await self.llm_generate(prompt=prompt_text, task_type="think")
                 analysis = self._extract_json(llm_text)
                 self.logger.info("Generated analysis via LLM")
-            except Exception:
+            except Exception as e:
                 # Fallback if LLM fails
-                self.logger.warning("LLM analysis generation failed, using fallback analysis")
+                self.logger.warning(f"LLM analysis generation failed: {str(e)}. Using fallback analysis.")
                 analysis = {
-                    "total_sources_analyzed": len(research_results.get("sources", [])),
-                    "pain_points_found": len(self._extract_pain_points(research_results, input_data.target_market)),
-                    "confidence_factors": [
-                        "multiple_sources",
-                        "consistent_patterns",
-                        "high_severity_indicators"
-                    ],
-                    "next_steps": ["validate", "categorize", "prioritize"]
+                    "per_thread_summaries": [],
+                    "pains": [],
+                    "themes": [],
+                    "error": "LLM analysis failed",
+                    "total_threads_analyzed": len(threads),
+                    "next_steps": ["retry_analysis", "validate_data"]
                 }
                 
-            # Save research results for the act phase
-            self.state.research_results = research_results
+            # Save analysis for the act phase
             self.state.analysis = analysis
             
             # Write analysis to manifest
@@ -328,17 +385,35 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
             self.logger.error(f"Error in think phase: {str(e)}\n{traceback.format_exc()}")
             # Fallback analysis
             analysis = {
-                "total_sources_analyzed": 0,
-                "pain_points_found": 0,
-                "confidence_factors": ["limited_data"],
-                "next_steps": ["gather_more_data"]
+                "per_thread_summaries": [],
+                "pains": [],
+                "themes": [],
+                "error": f"Error in think phase: {str(e)}",
+                "total_threads_analyzed": 0,
+                "next_steps": ["check_data_collection", "retry_analysis"]
             }
         
         return analysis
     
+    def _get_run_dir(self, run_id: str) -> Path:
+        """Get the run directory for a given run_id.
+        
+        Args:
+            run_id: The run ID
+            
+        Returns:
+            Path to the run directory
+        """
+        # Project root at ScoutAgent/ (not scout_agent/)
+        root = Path(__file__).resolve().parents[2]
+        run_dir = root / "data" / "runs" / run_id
+        run_dir.mkdir(parents=True, exist_ok=True)
+        self.logger.info(f"Using run directory: {run_dir}")
+        return run_dir
+    
     async def act(self, agent_input: AgentInput, plan: Dict[str, Any], thoughts: Dict[str, Any]) -> ScoutOutput:
-        """Execute pain point discovery and return results."""
-        self.logger.info("Executing pain point discovery...")
+        """Consolidate and validate pain points from think stage analysis."""
+        self.logger.info("Consolidating and validating pain points from think stage...")
         
         start_time = datetime.now()
         
@@ -346,87 +421,82 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
             # Normalize input data
             input_data = self._normalize_input(agent_input)
 
-            # Get research results and analysis from state (ensure available before prompt formatting)
-            research_results = getattr(self.state, 'research_results', {})
-            analysis = getattr(self.state, 'analysis', {})
-
-            # Load the action prompt template
+            # Get the analysis from the think stage (this is our primary input)
+            analysis = thoughts if thoughts else getattr(self.state, 'analysis', {})
+            
+            if not analysis:
+                raise ValueError("No analysis available from think stage")
+            
+            # Load the action prompt template with think stage analysis
             prompt_text = load_prompt_template(template_name="act.prompt", agent_name=self.name, substitutions={
                 "target_market": input_data.target_market,
-                "research_scope": input_data.research_scope,
-                "max_pain_points": input_data.max_pain_points,
-                "plan": json.dumps(self.state.plan),
-                "analysis": json.dumps(analysis),
-                "research_results": json.dumps(research_results)
+                "research_scope": input_data.research_scope
             })
             
-            # If we don't have research results, use mock data
-            if not research_results:
-                self.logger.warning("No research results in state, using mock data")
-                research_results = {
-                    "sources": ["reddit", "twitter", "product_reviews", "forums"],
-                    "results": [
-                        {"source": "reddit", "sentiment": "negative", "content": "This tool is so hard to use..."},
-                        {"source": "twitter", "sentiment": "negative", "content": "Can't believe how complicated the setup is"},
-                        {"source": "product_reviews", "sentiment": "mixed", "content": "Great features but steep learning curve"}
-                    ]
-                }
+            # Add the think stage analysis to the prompt
+            prompt_text += f"\n\n# THINK STAGE ANALYSIS\n{json.dumps(analysis, indent=2)}"
             
-            # Generate action result using LLM (returns string)
+            # Generate consolidated pain points using LLM
             try:
                 llm_text = await self.llm_generate(prompt=prompt_text, task_type="act")
                 act_result = self._extract_json(llm_text)
+                self.logger.info("Generated consolidated pain points via LLM")
                 
-                # Create pain point objects from the response
+                # Create pain point objects from the consolidated response
                 pain_points = []
                 for pp_data in act_result.get("pain_points", []):
                     pain_point = PainPoint(
-                        description=pp_data.get("description", ""),
+                        description=pp_data.get("statement", pp_data.get("description", "")),
                         severity=pp_data.get("severity", "medium"),
                         market=input_data.target_market,
-                        source=pp_data.get("source", "unknown"),
-                        evidence=pp_data.get("evidence", []),
-                        frequency=pp_data.get("frequency", 0),
-                        impact_score=pp_data.get("impact_score", 5.0),
+                        source="reddit",  # Primary source from our data collection
+                        evidence=[str(ev.get("text", ev)) if isinstance(ev, dict) else str(ev) for ev in pp_data.get("evidence", [])],
+                        frequency=pp_data.get("frequency_indicators", {}).get("thread_mentions", 0),
+                        impact_score=pp_data.get("confidence_score", 0.5) * 10,  # Convert to 1-10 scale
                         tags=pp_data.get("tags", []),
                         discovered_at=datetime.now().isoformat()
                     )
                     pain_points.append(pain_point)
                 
-                self.logger.info(f"Generated {len(pain_points)} pain points using LLM")
-                
-                # Prepare output using the LLM-generated result
+                # Prepare output using the consolidated result
                 output = ScoutOutput(
-                    pain_points=pain_points[:input_data.max_pain_points],
-                    total_discovered=act_result.get("total_discovered", len(pain_points)),
-                    market_summary=act_result.get("market_summary", ""),
-                    confidence_score=act_result.get("confidence_score", 0.0),
-                    sources_used=act_result.get("sources_used", []),
+                    pain_points=pain_points,
+                    total_discovered=act_result.get("consolidation_summary", {}).get("consolidated_pains", len(pain_points)),
+                    market_summary=f"Consolidated {act_result.get('consolidation_summary', {}).get('raw_pains_analyzed', 0)} raw pain points into {len(pain_points)} validated pain points",
+                    confidence_score=act_result.get("consolidation_summary", {}).get("average_confidence", 0.0),
+                    sources_used=act_result.get("sources_used", ["reddit"]),
                     research_duration=(datetime.now() - start_time).total_seconds()
                 )
-            except Exception:
-                # Fallback if LLM fails
-                self.logger.warning("LLM action generation failed, using fallback method")
                 
-                # Extract pain points using fallback method
-                pain_points = self._extract_pain_points(research_results, input_data.target_market)
+            except Exception as e:
+                # Fallback: use raw analysis data if LLM consolidation fails
+                self.logger.warning(f"LLM consolidation failed: {str(e)}. Using raw analysis data.")
                 
-                # Validate pain points
-                validated_pain_points = self._validate_pain_points(pain_points)
+                # Extract pain points directly from think stage analysis
+                raw_pains = analysis.get("pains", [])
+                pain_points = []
                 
-                # Generate market summary
-                market_summary = self._generate_market_summary(validated_pain_points, input_data.target_market)
+                for i, pain_data in enumerate(raw_pains):
+                    pain_point = PainPoint(
+                        description=pain_data.get("statement", f"Pain point {i+1}"),
+                        severity="medium",  # Default severity
+                        market=input_data.target_market,
+                        source="reddit",
+                        evidence=pain_data.get("evidence", []),
+                        frequency=pain_data.get("support_count", 1),
+                        impact_score=5.0,  # Default impact
+                        tags=pain_data.get("tags", []),
+                        discovered_at=datetime.now().isoformat()
+                    )
+                    pain_points.append(pain_point)
                 
-                # Calculate confidence score
-                confidence_score = self._calculate_confidence_score(validated_pain_points, research_results)
-                
-                # Prepare output using fallback method
+                # Prepare fallback output
                 output = ScoutOutput(
-                    pain_points=validated_pain_points,
-                    total_discovered=len(pain_points),
-                    market_summary=market_summary,
-                    confidence_score=confidence_score,
-                    sources_used=research_results.get("sources", []),
+                    pain_points=pain_points,
+                    total_discovered=len(raw_pains),
+                    market_summary=f"Extracted {len(pain_points)} pain points from think stage analysis",
+                    confidence_score=0.6,  # Moderate confidence for fallback
+                    sources_used=["reddit"],
                     research_duration=(datetime.now() - start_time).total_seconds()
                 )
                 
@@ -456,22 +526,180 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
         self.logger.info(f"Found {len(output.pain_points)} validated pain points")
         return output
     
-    def _extract_json(self, content: str) -> Dict[str, Any]:
-        """Extract JSON from LLM response content, handling markdown and common issues."""
+    def _extract_json(self, text: str) -> Dict[str, Any]:
+        """Extract JSON from text that may contain non-JSON content."""
+        import re
+        
+        # Default fallback structure
+        fallback = {
+            "per_thread_summaries": [],
+            "pains": [],
+            "themes": [],
+            "error": "Failed to parse JSON",
+            "total_threads_analyzed": 0,
+            "next_steps": ["retry_analysis", "check_data_quality"]
+        }
+        
+        if not text:
+            self.logger.error("Empty text provided to _extract_json")
+            return fallback
+            
+        # First try to extract content from code blocks
+        content = ""
         try:
-            # Check if the content contains a code block
-            if "```json" in content:
+            # Extract from markdown code blocks with priority
+            if "```json" in text:
                 # Extract content between ```json and ```
-                content = content.split("```json")[1].split("```")[0].strip()
-            elif "```" in content:
+                content = text.split("```json")[1].split("```")[0].strip()
+            elif "```" in text:
                 # Extract content between ``` and ```
-                content = content.split("```")[1].split("```")[0].strip()
-            # Remove some common JSON issues
+                content = text.split("```")[1].split("```")[0].strip()
+            else:
+                # Try to extract JSON directly - find the first { and the last }
+                start = text.find('{')
+                end = text.rfind('}')
+                if start >= 0 and end > start:
+                    content = text[start:end+1].strip()
+                else:
+                    content = text.strip()
+            
+            # Fix common JSON issues
             content = content.replace(",}", "}").replace(",]", "]")
-            return json.loads(content)
+            
+            # Try to parse the JSON directly first
+            try:
+                return json.loads(content)
+            except json.JSONDecodeError as e:
+                self.logger.warning(f"Initial JSON parsing failed: {str(e)}. Attempting fixes...")
+                
+                # More aggressive fixes for common JSON issues
+                # 1. Fix trailing commas in objects and arrays
+                content = re.sub(r',\s*}', '}', content)
+                content = re.sub(r',\s*\]', ']', content)
+                
+                # 2. Fix missing quotes around keys
+                content = re.sub(r'([{,])\s*(\w+)\s*:', r'\1"\2":', content)
+                
+                # 3. Fix unquoted values (true, false, null)
+                content = re.sub(r':\s*true\s*([,}])', r':true\1', content)
+                content = re.sub(r':\s*false\s*([,}])', r':false\1', content)
+                content = re.sub(r':\s*null\s*([,}])', r':null\1', content)
+                
+                # 4. Fix unterminated strings
+                content = re.sub(r'"([^"]*)$', r'"\1"', content)
+                
+                # Try parsing with the fixes
+                try:
+                    return json.loads(content)
+                except json.JSONDecodeError:
+                    # 5. Fix single quotes used instead of double quotes
+                    # This is tricky because we need to avoid replacing single quotes in text
+                    try:
+                        # Replace only single quotes that appear to be for keys or string values
+                        content = re.sub(r"'([^']*)'\s*:", r'"\1":', content)  # For keys
+                        content = re.sub(r":\s*'([^']*)'([,}\]])", r':"\1"\2', content)  # For values
+                        return json.loads(content)
+                    except json.JSONDecodeError:
+                        # Try replacing all single quotes with double quotes as a last resort
+                        content = content.replace("'", '"')
+                        try:
+                            return json.loads(content)
+                        except json.JSONDecodeError as e:
+                            self.logger.error(f"Standard JSON parsing attempts failed: {str(e)}")
+                            
+                            # 6. Try to reconstruct a valid JSON structure
+                            try:
+                                # Extract key-value pairs using regex
+                                pattern = r'"([^"]+)"\s*:\s*([^,}\]]+)'  # Match "key": value
+                                matches = re.findall(pattern, content)
+                                if matches:
+                                    reconstructed = {}
+                                    for key, value in matches:
+                                        # Clean and parse the value
+                                        value = value.strip()
+                                        if value.startswith('"') and value.endswith('"'):
+                                            reconstructed[key] = value[1:-1]  # String
+                                        elif value.lower() == 'true':
+                                            reconstructed[key] = True
+                                        elif value.lower() == 'false':
+                                            reconstructed[key] = False
+                                        elif value.lower() == 'null':
+                                            reconstructed[key] = None
+                                        else:
+                                            try:
+                                                # Try to parse as number
+                                                reconstructed[key] = float(value) if '.' in value else int(value)
+                                            except ValueError:
+                                                reconstructed[key] = value  # Keep as string
+                                    
+                                    if reconstructed:
+                                        self.logger.info(f"Successfully reconstructed JSON with {len(reconstructed)} keys")
+                                        return reconstructed
+                            except Exception as recon_err:
+                                self.logger.warning(f"JSON reconstruction failed: {str(recon_err)}")
+                            
+                            # 7. As a last resort, try to extract valid JSON objects using regex
+                            try:
+                                # Find all JSON-like objects in the text
+                                pattern = r'\{[^\{\}]*(\(\{[^\{\}]*\}\)[^\{\}]*)*\}'
+                                matches = re.findall(pattern, content)
+                                if matches:
+                                    for match in matches:
+                                        try:
+                                            if isinstance(match, tuple):
+                                                for submatch in match:
+                                                    try:
+                                                        return json.loads(submatch)
+                                                    except:
+                                                        continue
+                                            else:
+                                                return json.loads(match)
+                                        except:
+                                            continue
+                                
+                                # Try another pattern for nested objects
+                                pattern = r'\{[^\{\}]*(\{[^\{\}]*\}[^\{\}]*)*\}'
+                                matches = re.findall(pattern, content)
+                                if matches:
+                                    for match in matches:
+                                        try:
+                                            return json.loads(match)
+                                        except:
+                                            continue
+                            except Exception as regex_err:
+                                self.logger.warning(f"Regex extraction failed: {str(regex_err)}")
+                            
+                            # 8. If all else fails, try to create a minimal valid structure
+                            self.logger.warning("All JSON parsing methods failed, returning fallback structure")
+                            # Try to extract any useful information from the text
+                            try:
+                                # Look for thread summaries
+                                thread_pattern = r'thread.*?summary.*?:.*?([^,}\]]+)'
+                                thread_matches = re.findall(thread_pattern, content, re.IGNORECASE)
+                                if thread_matches:
+                                    fallback["per_thread_summaries"] = [{'summary': m.strip()} for m in thread_matches]
+                                
+                                # Look for pain points
+                                pain_pattern = r'pain.*?:.*?([^,}\]]+)'
+                                pain_matches = re.findall(pain_pattern, content, re.IGNORECASE)
+                                if pain_matches:
+                                    fallback["pains"] = [{'description': m.strip()} for m in pain_matches]
+                                
+                                # Look for themes
+                                theme_pattern = r'theme.*?:.*?([^,}\]]+)'
+                                theme_matches = re.findall(theme_pattern, content, re.IGNORECASE)
+                                if theme_matches:
+                                    fallback["themes"] = [{'name': m.strip()} for m in theme_matches]
+                                
+                                fallback["error"] = f"JSON parsing failed: {str(e)}"
+                                fallback["partial_content"] = content[:200] + "..." if len(content) > 200 else content
+                            except Exception:
+                                pass
+                            
+                            return fallback
         except Exception as e:
-            self.logger.error(f"Error extracting JSON: {str(e)}\n{traceback.format_exc()}\nContent: {content}")
-            return {}
+            self.logger.error(f"Error extracting JSON: {str(e)}\n{traceback.format_exc()}\nContent: {content[:200] + '...' if len(content) > 200 else content}")
+            return fallback
 
     def _postprocess_plan(self, plan: Dict[str, Any], input_data: "ScoutInput", tools_catalog: List[Dict[str, Any]], tool_names: List[str]) -> Dict[str, Any]:
         """Enforce Option A: ensure tool nodes have tool/params/code and normalize outputs.
@@ -1262,9 +1490,13 @@ def mcp_call(tool: str, params: dict):
             from datetime import datetime
             
             # Determine run directory
+            # project_root should be ScoutAgent/ (not scout_agent/)
             project_root = Path(__file__).resolve().parents[2]
             run_dir = project_root / "data" / "runs" / run_id
+            # Create the run directory if it doesn't exist
+            run_dir.mkdir(parents=True, exist_ok=True)
             manifest_path = run_dir / "run_manifest.json"
+            self.logger.info(f"Writing to manifest at: {manifest_path}")
             
             # Load existing manifest
             try:

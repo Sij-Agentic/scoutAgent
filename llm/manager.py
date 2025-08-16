@@ -434,7 +434,7 @@ async def initialize_llm_backends():
         try:
             gemini_config = LLMConfig(
                 backend_type=LLMBackendType.GEMINI,
-                model_name="gemini-2.5-flash",
+                model_name="gemini-2.5-flash-lite",
                 api_key=config.api.gemini_api_key,
                 temperature=0.7,
                 max_tokens=4096
