@@ -6,6 +6,7 @@ from pathlib import Path
 
 from scout_agent.custom_logging import get_logger
 from scout_agent.agents.scout import ScoutAgent, ScoutInput
+from scout_agent.memory.manifest_manager import ManifestManager
 
 logger = get_logger("scripts.plan_only")
 
@@ -56,13 +57,54 @@ async def main_async():
     plan["dag"] = dag
     plan["run_id"] = args.run_id
 
-    # Write agent-specific and generic filenames (for compatibility)
-    out_path_agent = run_dir / "scout_plan.json"
-    out_path_generic = run_dir / "plan.json"
-    out_path_agent.write_text(json.dumps(plan, indent=2))
-    out_path_generic.write_text(json.dumps(plan, indent=2))
-    logger.info(f"Plan written: {out_path_agent} and {out_path_generic}")
-    print(str(out_path_agent))
+    # Consolidate into a single manifest file using ManifestManager
+    manifest_path = run_dir / "run_manifest.json"
+    
+    try:
+        # Create a ManifestManager instance for the manifest file
+        manifest_manager = ManifestManager(manifest_path, create_if_missing=True)
+        
+        # Get the current manifest
+        manifest = manifest_manager.get_manifest()
+        
+        # Update with new plan content
+        for key, value in plan.items():
+            if key != "stages" and key != "run_metadata":
+                manifest[key] = value
+        
+        # Store plan data in stages section
+        manifest_manager.store_node_output("plan", plan)
+        
+        # Update the plan node status
+        manifest_manager.update_node_status(
+            node_id="plan",
+            state="completed"
+        )
+        
+        # Update metrics if available
+        metrics = {}
+        if hasattr(scout, "last_metrics") and scout.last_metrics:
+            metrics = scout.last_metrics
+        elif hasattr(scout, "llm") and hasattr(scout.llm, "last_usage"):
+            metrics = {
+                "tokens_used": getattr(scout.llm.last_usage, "total_tokens", 0),
+                "cost": getattr(scout.llm.last_usage, "cost", 0.0),
+                "backend": getattr(scout.llm, "backend_type", None),
+                "model": getattr(scout.llm, "model", None)
+            }
+        
+        if metrics:
+            manifest_manager.record_metrics("plan", metrics)
+        
+        # Start the run
+        manifest_manager.update_run_status("running")
+        
+        logger.info(f"Manifest written: {manifest_path}")
+    except Exception as e:
+        logger.error(f"Failed to update manifest: {e}")
+        # Fallback to direct file write
+        manifest_path.write_text(json.dumps(plan, indent=2))
+    print(str(manifest_path))
 
 
 def run():
