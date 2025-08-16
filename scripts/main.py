@@ -2,27 +2,33 @@ import os
 import json
 import argparse
 import asyncio
+import time
+import datetime
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 
 from scout_agent.custom_logging import get_logger
 from scout_agent.config import get_config
 from scout_agent.agents.scout import ScoutAgent, ScoutInput
 from scout_agent.mcp_integration.client.multi import MultiMCPClient
+from scout_agent.memory.manifest_manager import ManifestManager
 
 logger = get_logger("scripts.main")
 
 
 def ensure_env_defaults():
     # Respect existing env; set sensible defaults otherwise
-    os.environ.setdefault("SCOUT_LLM_DEFAULT_BACKEND", "gemini")
-    os.environ.setdefault("SCOUT_LLM_DEFAULT_MODEL", "gemini-2.5-flash")
+    os.environ.setdefault("SCOUT_LLM_DEFAULT_BACKEND", "deepseek")
+    os.environ.setdefault("SCOUT_LLM_DEFAULT_MODEL", "deepseek-chat")
 
 
 def ensure_run_dirs(run_id: str) -> Path:
-    root = Path(__file__).resolve().parents[2]  # project root at scout_agent/
+    # Project root at ScoutAgent/ (not scout_agent/)
+    # The script is in scout_agent/scripts/ so we need to go up 2 levels to get to ScoutAgent/
+    root = Path(__file__).resolve().parents[2]
     run_dir = root / "data" / "runs" / run_id
     run_dir.mkdir(parents=True, exist_ok=True)
+    logger.info(f"Using run directory: {run_dir}")
     return run_dir
 
 
@@ -31,16 +37,26 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--target-market", required=True, help="Target market description")
     ap.add_argument("--keywords", required=True, help="Comma-separated keywords")
     ap.add_argument("--subreddits", default="", help="Comma-separated subreddits")
-    ap.add_argument("--run-id", default="dev_run", help="Run id for artifacts under data/runs/")
-    ap.add_argument("--per-query-limit", type=int, default=15)
-    ap.add_argument("--include-comments", action="store_true")
-    ap.add_argument("--comment-depth", type=int, default=2)
-    ap.add_argument("--comment-limit", type=int, default=50)
+    ap.add_argument("--run-id", default=f"scout_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}", 
+                   help="Run id for artifacts under data/runs/")
+    ap.add_argument("--research-scope", default="focused", choices=["quick", "focused", "comprehensive"],
+                   help="Research scope: quick, focused, or comprehensive")
+    ap.add_argument("--max-pain-points", type=int, default=10, help="Maximum number of pain points to discover")
+    ap.add_argument("--per-query-limit", type=int, default=15, help="Maximum number of threads per query")
+    ap.add_argument("--include-comments", action="store_true", help="Include comments in thread collection")
+    ap.add_argument("--comment-depth", type=int, default=2, help="Maximum depth of comment tree to collect")
+    ap.add_argument("--comment-limit", type=int, default=50, help="Maximum number of comments per thread")
     ap.add_argument("--use-api", action="store_true", help="Use API-backed reddit tool; default cache tool")
+    ap.add_argument("--skip-stages", default="", help="Comma-separated list of stages to skip (plan,collect,think,act)")
+    ap.add_argument("--verbose", action="store_true", help="Enable verbose logging")
     return ap.parse_args()
 
 
-async def run_collect(mcp: MultiMCPClient, args: argparse.Namespace) -> dict:
+async def run_collect(mcp: MultiMCPClient, args: argparse.Namespace, manifest_manager: ManifestManager) -> dict:
+    """Run the collect stage using MCP client to fetch Reddit data"""
+    start_time = time.time()
+    logger.info("Starting collect stage...")
+    
     # Choose tool
     tools = mcp.get_all_tools() if hasattr(mcp, "get_all_tools") else []
     prefer_api = args.use_api
@@ -49,81 +65,399 @@ async def run_collect(mcp: MultiMCPClient, args: argparse.Namespace) -> dict:
     names = [t.name for t in tools] if tools else []
     if names and tool_name not in names:
         tool_name = names[0] if names else tool_name
+    
+    logger.info(f"Using Reddit tool: {tool_name}")
 
     keywords: List[str] = [s.strip() for s in args.keywords.split(",") if s.strip()]
     subreddits: Optional[List[str]] = [s.strip() for s in args.subreddits.split(",") if s.strip()] if args.subreddits else None
 
-    res = await mcp.call_tool(tool_name, {
-        "keywords": keywords,
-        "subreddits": subreddits,
-        "per_query_limit": args.per_query_limit,
-        "include_comments": bool(args.include_comments),
-        "comment_depth": args.comment_depth,
-        "comment_limit": args.comment_limit,
-        "use_cache": True,
-    })
-    # MCP result content
-    payload = {}
+    # Find the collect node ID from the manifest
+    manifest = manifest_manager.get_manifest()
+    collect_node_id = "collect_reddit"  # Default
+    
+    if "dag" in manifest and "nodes" in manifest["dag"]:
+        for node in manifest["dag"]["nodes"]:
+            if node.get("type") == "tool" and "reddit" in node.get("id", ""):
+                collect_node_id = node.get("id", "collect_reddit")
+                break
+    
+    logger.info(f"Collecting data using node ID: {collect_node_id}")
+    
     try:
-        content = res.content[0].text if getattr(res, "content", None) else "{}"
-        payload = json.loads(content)
-    except Exception:
-        logger.warning("Failed to parse MCP tool response; using empty payload")
-    return payload
+        # Call the MCP tool to fetch Reddit data
+        res = await mcp.call_tool(tool_name, {
+            "keywords": keywords,
+            "subreddits": subreddits,
+            "per_query_limit": args.per_query_limit,
+            "include_comments": bool(args.include_comments),
+            "comment_depth": args.comment_depth,
+            "comment_limit": args.comment_limit,
+            "use_cache": True,
+        })
+        
+        # Parse MCP result content - handle nested structure
+        payload = {}
+        try:
+            if hasattr(res, "content") and res.content:
+                content = res.content[0].text if len(res.content) > 0 else "{}"
+                if content.strip():
+                    parsed_data = json.loads(content)
+                    # Handle nested MCP response structure
+                    if "content" in parsed_data and isinstance(parsed_data["content"], list):
+                        # Extract the actual payload from nested structure
+                        if parsed_data["content"] and "text" in parsed_data["content"][0]:
+                            inner_content = parsed_data["content"][0]["text"]
+                            payload = json.loads(inner_content)
+                        else:
+                            payload = {"threads": [], "comments": []}
+                    else:
+                        # Direct structure
+                        payload = parsed_data
+                else:
+                    logger.warning("MCP tool returned empty content")
+                    payload = {"threads": [], "comments": []}
+            else:
+                logger.warning("MCP tool response has no content attribute")
+                payload = {"threads": [], "comments": []}
+        except Exception as e:
+            logger.warning(f"Failed to parse MCP tool response: {e}")
+            payload = {"threads": [], "comments": [], "error": str(e)}
+        
+        # Log MCP tool results
+        if payload.get("threads"):
+            logger.info(f"MCP tool collected {len(payload['threads'])} threads")
+        elif payload.get("error"):
+            logger.error(f"MCP tool error: {payload['error']}")
+        else:
+            logger.warning("MCP tool returned no threads and no error")
+        
+        # Extract thread and comment counts for logging
+        thread_count = 0
+        comment_count = 0
+        
+        if "threads" in payload:
+            thread_count = len(payload["threads"])
+            
+            # Count comments across all threads
+            for thread in payload["threads"]:
+                if "comments" in thread:
+                    comment_count += len(thread["comments"])
+        
+        # Create detailed output for manifest
+        detailed_output = {
+            "execution_details": {
+                "total_threads_collected": thread_count,
+                "total_comments_collected": comment_count,
+                "keywords_used": keywords,
+                "subreddits_used": subreddits if subreddits else [],
+                "execution_time": time.time() - start_time,
+                "timestamp": datetime.datetime.now().isoformat()
+            },
+            "threads": payload.get("threads", [])
+        }
+        
+        # Store the collect stage output in the manifest
+        # Store in both the node-specific output and in the stages section
+        manifest_manager.store_node_output(collect_node_id, detailed_output)
+        
+        # Also store in the stages section for compatibility with the think stage
+        stages = manifest_manager.get_manifest().setdefault("stages", {})
+        stages["collect_reddit"] = {
+            "data": detailed_output,
+            "status": "completed",
+            "updated_at": datetime.datetime.now().isoformat()
+        }
+        manifest_manager._save()
+        
+        # Update the collect node status
+        manifest_manager.update_node_status(
+            node_id=collect_node_id,
+            state="completed",
+            duration_seconds=time.time() - start_time
+        )
+        
+        logger.info(f"Collect stage completed: {thread_count} threads, {comment_count} comments collected")
+        return detailed_output
+        
+    except Exception as e:
+        logger.error(f"Error in collect stage: {e}")
+        # Update the collect node status to failed
+        manifest_manager.update_node_status(
+            node_id=collect_node_id,
+            state="failed",
+            duration_seconds=time.time() - start_time,
+            error=str(e)
+        )
+        return {"error": str(e)}
 
 
 async def main_async():
+    """Main async function to run the complete Scout workflow"""
+    # Set up environment and parse arguments
     ensure_env_defaults()
     args = parse_args()
     run_dir = ensure_run_dirs(args.run_id)
-
+    
+    # Track overall execution time
+    overall_start_time = time.time()
+    
+    # Parse stages to skip
+    skip_stages = [s.strip() for s in args.skip_stages.split(",") if s.strip()] if args.skip_stages else []
+    logger.info(f"Skipping stages: {skip_stages if skip_stages else 'None'}")
+    
     # Initialize ScoutAgent
-    scout = ScoutAgent()
+    scout = ScoutAgent(agent_id=args.run_id)
+    # Store run_id in the agent's state for later use
+    setattr(scout.state, "run_id", args.run_id)
+    
+    # Create ScoutInput from arguments
     scout_input = ScoutInput(
         target_market=args.target_market,
+        research_scope=args.research_scope,
+        max_pain_points=args.max_pain_points,
         keywords=[s.strip() for s in args.keywords.split(",") if s.strip()],
         sources=["reddit"],
     )
-
-    # Plan
-    plan = await scout.plan(scout_input)
-    (run_dir / "plan.json").write_text(json.dumps(plan, indent=2))
-    logger.info(f"Plan written: {run_dir / 'plan.json'}")
-
-    # MCP client for Reddit server
-    mcp = MultiMCPClient([
-        {"id": "reddit", "url": "http://127.0.0.1:8001/sse", "description": "Reddit MCP"}
-    ])
-    await mcp.initialize()
+    
+    # Initialize manifest path
+    manifest_path = run_dir / "run_manifest.json"
+    
+    # Create a ManifestManager instance
+    manifest_manager = None
+    
+    # Track stage results
+    plan_result = None
+    collect_result = None
+    think_result = None
+    act_result = None
+    
     try:
-        # Collect via MCP
-        collect_payload = await run_collect(mcp, args)
-        (run_dir / "reddit_index.json").write_text(json.dumps(collect_payload, indent=2))
-        logger.info(f"Collect written: {run_dir / 'reddit_index.json'}")
-    finally:
-        await mcp.shutdown()
-
-    # Think
-    analysis = await scout.think(scout_input)
-    (run_dir / "scout_think.json").write_text(json.dumps(analysis, indent=2))
-    logger.info(f"Think written: {run_dir / 'scout_think.json'}")
-
-    # Act
-    output = await scout.act(scout_input)
-    # Convert dataclass output to dict if needed
-    try:
-        out_dict = {
-            "pain_points": [pp.to_dict() for pp in output.pain_points],
-            "total_discovered": output.total_discovered,
-            "market_summary": output.market_summary,
-            "confidence_score": output.confidence_score,
-            "sources_used": output.sources_used,
-            "research_duration": output.research_duration,
-        }
-    except Exception:
-        out_dict = output if isinstance(output, dict) else {"raw": str(output)}
-    (run_dir / "scout_output.json").write_text(json.dumps(out_dict, indent=2))
-    logger.info(f"Output written: {run_dir / 'scout_output.json'}")
+        # PLAN STAGE
+        if "plan" not in skip_stages:
+            logger.info("=== STARTING PLAN STAGE ===")
+            plan_start = time.time()
+            
+            # Execute plan phase
+            plan_result = await scout.plan(scout_input)
+            plan_time = time.time() - plan_start
+            
+            # Initialize manifest manager after plan stage
+            manifest_manager = ManifestManager(manifest_path)
+            
+            # Add metadata to manifest
+            manifest = manifest_manager.get_manifest()
+            manifest["target_market"] = args.target_market
+            manifest["research_scope"] = args.research_scope
+            manifest["keywords"] = [s.strip() for s in args.keywords.split(",") if s.strip()]
+            manifest["subreddits"] = [s.strip() for s in args.subreddits.split(",") if s.strip()] if args.subreddits else []
+            manifest["limits"] = {
+                "per_query_limit": args.per_query_limit,
+                "comment_depth": args.comment_depth,
+                "comment_limit": args.comment_limit
+            }
+            
+            # Store the plan output in the manifest
+            manifest_manager.store_node_output("plan", plan_result)
+            
+            # Update the plan node status
+            manifest_manager.update_node_status(
+                node_id="plan",
+                state="completed",
+                duration_seconds=plan_time
+            )
+            
+            manifest_manager._save()
+            
+            logger.info(f"Plan complete: {len(plan_result.get('phases', []))} phases identified in {plan_time:.2f}s")
+        else:
+            logger.info("Skipping plan stage...")
+            # Initialize manifest manager from existing manifest
+            manifest_manager = ManifestManager(manifest_path)
+            plan_result = manifest_manager.get_manifest()
+        
+        # COLLECT STAGE
+        if "collect" not in skip_stages:
+            logger.info("=== STARTING COLLECT STAGE ===")
+            
+            # MCP client for Reddit server - use configs from the system
+            from scout_agent.mcp_integration.config import load_server_configs
+            
+            # Load server configs from the config system
+            server_configs = load_server_configs()
+            if not server_configs:
+                # Fallback to default if no configs found
+                server_configs = [{"id": "reddit", "url": "http://127.0.0.1:8001/sse", "description": "Reddit MCP"}]
+                logger.warning("No MCP server configs found, using default: http://127.0.0.1:8001/sse")
+            else:
+                logger.info(f"Loaded {len(server_configs)} MCP server configs")
+                
+            # Initialize the MCP client with the server configs
+            mcp = MultiMCPClient(server_configs)
+            await mcp.initialize()
+            
+            try:
+                # Collect via MCP
+                collect_result = await run_collect(mcp, args, manifest_manager)
+            finally:
+                await mcp.shutdown()
+                
+            logger.info(f"Collect complete: {collect_result.get('execution_details', {}).get('total_threads_collected', 0)} threads collected")
+        else:
+            logger.info("Skipping collect stage...")
+            # Get collect result from manifest if available
+            collect_node_id = "collect_reddit"
+            collect_result = manifest_manager.get_node_output(collect_node_id) or {}
+        
+        # THINK STAGE
+        if "think" not in skip_stages:
+            logger.info("=== STARTING THINK STAGE ===")
+            think_start = time.time()
+            
+            # Make sure the collect data is available in the state for the think stage
+            # This is important because the think stage expects to find the Reddit data in the state
+            collect_data = manifest_manager.get_manifest().get("stages", {}).get("collect_reddit", {}).get("data", {})
+            if collect_data:
+                logger.info("Found collect data in manifest, setting it in scout state")
+                # Store the collect data in the scout state for the think stage to access
+                setattr(scout.state, "collect_data", collect_data)
+            else:
+                logger.warning("No collect data found in manifest stages.collect_reddit")
+                
+                # Try to find collect data in node outputs as fallback
+                collect_data = manifest_manager.get_node_output("collect_reddit")
+                if collect_data:
+                    logger.info("Found collect data in node outputs, setting it in scout state")
+                    setattr(scout.state, "collect_data", collect_data)
+                else:
+                    logger.warning("No collect data found in node outputs either")
+            
+            # Execute think phase
+            think_result = await scout.think(agent_input=scout_input, plan=plan_result)
+            think_time = time.time() - think_start
+            
+            # Store the think output in the manifest
+            manifest_manager.store_node_output("think", think_result)
+            
+            # Also store in the stages section for compatibility with the act stage
+            stages = manifest_manager.get_manifest().setdefault("stages", {})
+            stages["think"] = {
+                "data": think_result,
+                "status": "completed",
+                "updated_at": datetime.datetime.now().isoformat()
+            }
+            manifest_manager._save()
+            
+            # Update the think node status
+            manifest_manager.update_node_status(
+                node_id="think",
+                state="completed",
+                duration_seconds=think_time
+            )
+            
+            logger.info(f"Think complete: Analysis with {len(think_result.get('pains', []))} pain points in {think_time:.2f}s")
+        else:
+            logger.info("Skipping think stage...")
+            # Get think result from manifest if available
+            think_result = manifest_manager.get_node_output("think") or {}
+        
+        # ACT STAGE
+        if "act" not in skip_stages:
+            logger.info("=== STARTING ACT STAGE ===")
+            act_start = time.time()
+            
+            # Make sure the think data is available in the state for the act stage
+            # This is important because the act stage expects to find the think data in the state
+            if think_result:
+                logger.info("Setting think result in scout state for act stage")
+                setattr(scout.state, "analysis", think_result)
+            else:
+                logger.warning("No think result available for act stage")
+                
+                # Try to get think data from manifest as fallback
+                think_data = manifest_manager.get_manifest().get("stages", {}).get("think", {}).get("data", {})
+                if think_data:
+                    logger.info("Found think data in manifest, setting it in scout state")
+                    setattr(scout.state, "analysis", think_data)
+                else:
+                    logger.warning("No think data found in manifest stages.think")
+            
+            # Execute act phase
+            act_result = await scout.act(agent_input=scout_input, plan=plan_result, thoughts=think_result)
+            act_time = time.time() - act_start
+            
+            # Convert dataclass output to dict
+            try:
+                act_output_dict = {
+                    "pain_points": [pp.to_dict() for pp in act_result.pain_points],
+                    "total_discovered": act_result.total_discovered,
+                    "market_summary": act_result.market_summary,
+                    "confidence_score": act_result.confidence_score,
+                    "sources_used": act_result.sources_used,
+                    "research_duration": act_result.research_duration,
+                }
+                
+                # Store the act output in the manifest
+                manifest_manager.store_node_output("act", act_output_dict)
+                
+                # Also store in the stages section for consistency
+                stages = manifest_manager.get_manifest().setdefault("stages", {})
+                stages["act"] = {
+                    "data": act_output_dict,
+                    "status": "completed",
+                    "updated_at": datetime.datetime.now().isoformat()
+                }
+                manifest_manager._save()
+                
+                # Update the act node status
+                manifest_manager.update_node_status(
+                    node_id="act",
+                    state="completed",
+                    duration_seconds=act_time
+                )
+                
+                # Write final output to a separate file for easy access
+                (run_dir / "scout_output.json").write_text(json.dumps(act_output_dict, indent=2))
+            except Exception as e:
+                logger.error(f"Error converting act result to dict: {e}")
+                act_output_dict = {"error": str(e)}
+                
+                # Update the act node status to failed
+                manifest_manager.update_node_status(
+                    node_id="act",
+                    state="failed",
+                    duration_seconds=act_time,
+                    error=str(e)
+                )
+            
+            logger.info(f"Act complete: {act_result.total_discovered} pain points discovered in {act_time:.2f}s")
+            
+            # Print a sample of the discovered pain points
+            if hasattr(act_result, 'pain_points') and act_result.pain_points:
+                logger.info("\nSample pain points discovered:")
+                for i, pp in enumerate(act_result.pain_points[:3]):  # Show up to 3 pain points
+                    logger.info(f"  {i+1}. {pp.description} (Severity: {pp.severity}, Impact: {pp.impact_score})")
+                    if pp.evidence:
+                        logger.info(f"     Evidence: {pp.evidence[0][:100]}...")
+        else:
+            logger.info("Skipping act stage...")
+            # Get act result from manifest if available
+            act_dict = manifest_manager.get_node_output("act") or {}
+            logger.info(f"Found {len(act_dict.get('pain_points', []))} pain points in manifest")
+        
+        # Calculate total execution time
+        total_time = time.time() - overall_start_time
+        logger.info(f"\n===== SCOUT WORKFLOW COMPLETE =====\n")
+        logger.info(f"Total execution time: {total_time:.2f}s")
+        logger.info(f"Results stored in: {run_dir}")
+        
+        # Return final manifest path
+        return manifest_path
+        
+    except Exception as e:
+        logger.error(f"Error in Scout workflow: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return None
 
 
 def run():
