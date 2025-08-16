@@ -7,12 +7,17 @@ web research, social media analysis, and user feedback collection.
 
 import asyncio
 import json
-import traceback
-from typing import Dict, List, Any, Optional
-import textwrap
+import asyncio
+import datetime
+import logging
+import os
+import re
+import time
 from datetime import datetime
-from dataclasses import dataclass, asdict, field
 from pathlib import Path
+from typing import Any, Dict, List, Optional, Set, Tuple, Union, cast
+
+from scout_agent.memory.manifest_manager import ManifestManager
 
 from .base import BaseAgent, AgentInput, AgentOutput, AgentState
 from .research_agent import ResearchAgent
@@ -22,6 +27,8 @@ from ..mcp_integration.config import load_server_configs
 from ..llm.utils import LLMAgentMixin, load_prompt_template
 from ..llm.base import LLMBackendType
 from ..services.agents.code.service import CodeExecutionService
+from dataclasses import dataclass, asdict
+import textwrap
 
 
 @dataclass
@@ -232,6 +239,33 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
             pass
 
         self.state.plan = plan
+
+        # Initialize consolidated manifest file for this run
+        try:
+            project_root = Path(__file__).resolve().parents[2]
+            run_dir = project_root / "data" / "runs" / (plan.get("dag", {}).get("run_id") or plan.get("run_id") or getattr(self.state, "run_id", "dev_run"))
+            run_dir.mkdir(parents=True, exist_ok=True)
+            manifest_path = run_dir / "run_manifest.json"
+            # Load existing if present, otherwise start fresh
+            try:
+                manifest = json.loads(manifest_path.read_text()) if manifest_path.exists() else {}
+            except Exception:
+                manifest = {}
+            # Persist core run metadata and seed stages.plan
+            manifest["run_id"] = plan.get("run_id")
+            manifest["dag"] = plan.get("dag") or {}
+            stages = manifest.setdefault("stages", {})
+            stages["plan"] = {
+                "data": plan,
+                "status": "completed",
+                "updated_at": datetime.now().isoformat(),
+            }
+            manifest_path.write_text(json.dumps(manifest, indent=2))
+            self.logger.info(f"Initialized manifest at {manifest_path}")
+        except Exception as _e:
+            # Non-fatal; downstream will create/append as needed
+            self.logger.warning(f"Failed to initialize run_manifest.json: {_e}")
+
         return plan
     
     async def think(self, agent_input: AgentInput, plan: Dict[str, Any]) -> Dict[str, Any]:
@@ -287,6 +321,9 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
             self.state.research_results = research_results
             self.state.analysis = analysis
             
+            # Write analysis to manifest
+            self._write_stage_output("think", analysis)
+        
         except Exception as e:
             self.logger.error(f"Error in think phase: {str(e)}\n{traceback.format_exc()}")
             # Fallback analysis
@@ -405,6 +442,17 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
                 research_duration=(datetime.now() - start_time).total_seconds()
             )
         
+        # Write output to manifest
+        output_dict = {
+            "pain_points": [pp.to_dict() for pp in output.pain_points],
+            "total_discovered": output.total_discovered,
+            "market_summary": output.market_summary,
+            "confidence_score": output.confidence_score,
+            "sources_used": output.sources_used,
+            "research_duration": output.research_duration
+        }
+        self._write_stage_output("act", output_dict)
+        
         self.logger.info(f"Found {len(output.pain_points)} validated pain points")
         return output
     
@@ -418,10 +466,8 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
             elif "```" in content:
                 # Extract content between ``` and ```
                 content = content.split("```")[1].split("```")[0].strip()
-                
-            # Remove any trailing commas before closing braces/brackets (common JSON error)
+            # Remove some common JSON issues
             content = content.replace(",}", "}").replace(",]", "]")
-            
             return json.loads(content)
         except Exception as e:
             self.logger.error(f"Error extracting JSON: {str(e)}\n{traceback.format_exc()}\nContent: {content}")
@@ -431,11 +477,10 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
         """Enforce Option A: ensure tool nodes have tool/params/code and normalize outputs.
 
         - Add version: "1.1"
-        - Normalize outputs to simple filenames (executor resolves run dir)
-        - For each tool node:
-            - Ensure `params` exists (fallback to `inputs`)
-            - Ensure `code` exists: generate a minimal sandbox snippet or 'no_op'
-        - Optionally add collect nodes per available sources if missing.
+        - Normalize outputs to manifest sections
+        - For each tool node ensure `params` and `code`
+        - Add collect nodes per available sources if missing
+        - Ensure agent nodes (plan, think, act) exist with proper deps
         """
         try:
             if not isinstance(plan, dict):
@@ -455,11 +500,8 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
                 except Exception:
                     return p
 
-            # Build a quick map of existing source-collect nodes
-            existing_tools = {n.get("tool"): n for n in nodes if n.get("type") == "tool"}
-
             # Heuristic mapping: find tools containing source name
-            available_tools_by_source = {}
+            available_tools_by_source: Dict[str, List[str]] = {}
             for name in tool_names:
                 lower = (name or "").lower()
                 for src in (plan.get("sources") or input_data.sources or []):
@@ -473,18 +515,23 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
                 tools_for_s = available_tools_by_source.get(s, [])
                 if not tools_for_s:
                     continue
-                # If no node exists for any of these tools, create one using the first tool
                 already_present = any((n.get("type") == "tool" and isinstance(n.get("tool"), str) and s in n.get("tool", "").lower()) for n in nodes)
                 if not already_present:
                     tool_name = tools_for_s[0]
                     node_id = f"collect_{s}"
-                    outputs = [f"{s}_index.json"]
+                    outputs = [f"stages.{node_id}"]
                     params = {
                         k: plan.get(k) for k in ("keywords", "subreddits", "time_window") if plan.get(k) is not None
                     }
+                    try:
+                        subs = params.get("subreddits")
+                        if isinstance(subs, list):
+                            params["subreddits"] = [str(x)[2:] if str(x).startswith("r/") else str(x) for x in subs]
+                    except Exception:
+                        pass
                     code = (
                         f"result = mcp_call(tool=\"{tool_name}\", params={json.dumps(params) if params else '{}'}); "
-                        f"save_json(\"{outputs[0]}\", result)"
+                        f"save_to_manifest(\"{outputs[0]}\", result)"
                     )
                     nodes.append({
                         "id": node_id,
@@ -497,21 +544,100 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
                         "deps": ["plan"],
                     })
 
+            # Ensure core agent nodes exist: plan -> collect_* -> think -> act
+            def has_agent(stage_name: str) -> bool:
+                for n in nodes:
+                    if (n.get("type") == "agent") and (n.get("stage") == stage_name or n.get("id") == stage_name):
+                        return True
+                return False
+
+            if not has_agent("plan"):
+                nodes.insert(0, {
+                    "id": "plan",
+                    "type": "agent",
+                    "agent": "scout",
+                    "stage": "plan",
+                    "inputs": {
+                        "target_market": input_data.target_market,
+                        "sources": plan.get("sources") or input_data.sources,
+                        "keywords": plan.get("keywords") or input_data.keywords,
+                        "subreddits": plan.get("subreddits") or [k[2:] if isinstance(k, str) and k.startswith("r/") else k for k in (plan.get("subreddits") or [])],
+                    },
+                    "outputs": ["stages.plan"],
+                    "deps": [],
+                })
+
+            if not has_agent("think"):
+                collect_ids = [n.get("id") for n in nodes if n.get("type") == "tool"]
+                deps = collect_ids if collect_ids else ["plan"]
+                nodes.append({
+                    "id": "think",
+                    "type": "agent",
+                    "agent": "scout",
+                    "stage": "think",
+                    "inputs": {
+                        "reddit_index": "stages.collect_reddit",
+                    },
+                    "outputs": ["stages.think"],
+                    "deps": deps,
+                })
+
+            if not has_agent("act"):
+                nodes.append({
+                    "id": "act",
+                    "type": "agent",
+                    "agent": "scout",
+                    "stage": "act",
+                    "inputs": {
+                        "think_output": "stages.think",
+                        "plan": "stages.plan",
+                    },
+                    "outputs": ["stages.act"],
+                    "deps": ["think"],
+                })
+
             # Normalize existing nodes
             for n in nodes:
-                # Outputs to filenames
-                outs = n.get("outputs") or []
-                n["outputs"] = [_basename(o) for o in outs]
+                node_id = n.get("id", "unknown")
+                node_type = n.get("type", "")
+                
+                # Normalize outputs to manifest sections
+                if node_type == "agent":
+                    stage = n.get("stage", node_id)
+                    n["outputs"] = [f"stages.{stage}"]
+                elif node_type == "tool":
+                    n["outputs"] = [f"stages.{node_id}"]
+                else:
+                    outs = n.get("outputs") or []
+                    n["outputs"] = [_basename(o) for o in outs]
+                
+                # Normalize inputs for agent nodes to use manifest sections
+                if node_type == "agent":
+                    stage = n.get("stage", node_id)
+                    inputs = n.get("inputs", {})
+                    
+                    # For think stage, ensure reddit_index points to manifest section
+                    if stage == "think" or node_id == "think":
+                        if "reddit_index" in inputs and not str(inputs["reddit_index"]).startswith("stages."):
+                            inputs["reddit_index"] = "stages.collect_reddit"
+                        # Remove any thread_glob if present
+                        if "thread_glob" in inputs:
+                            del inputs["thread_glob"]
+                    
+                    # For act stage, ensure think_output and plan point to manifest sections
+                    if stage == "act" or node_id == "act":
+                        if "think_output" in inputs and not str(inputs["think_output"]).startswith("stages."):
+                            inputs["think_output"] = "stages.think"
+                        if "plan" in inputs and not str(inputs["plan"]).startswith("stages."):
+                            inputs["plan"] = "stages.plan"
+                    
+                    n["inputs"] = inputs
 
                 if n.get("type") == "tool":
-                    # Ensure tool present
                     tool = n.get("tool")
                     if not tool or not isinstance(tool, str):
-                        continue  # will be caught by runtime validation
-
-                    # Ensure params
+                        continue
                     if not isinstance(n.get("params"), dict) or n.get("params") is None:
-                        # Best-effort: copy known fields from inputs
                         params = {}
                         for key in ("keywords", "subreddits", "time_window", "per_query_limit", "include_comments", "comment_depth", "comment_limit", "use_cache"):
                             if key in (n.get("inputs") or {}):
@@ -521,25 +647,25 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
                             elif key in (plan.get("limits") or {}):
                                 params[key] = plan["limits"][key]
                         n["params"] = params
-
-                    # Ensure code
+                    try:
+                        subs = n.get("params", {}).get("subreddits")
+                        if isinstance(subs, list):
+                            n["params"]["subreddits"] = [str(x)[2:] if str(x).startswith("r/") else str(x) for x in subs]
+                    except Exception:
+                        pass
                     code = n.get("code")
                     primary_out = (n.get("outputs") or [f"{tool}_output.json"])[0]
                     if not code or not isinstance(code, str) or not code.strip():
-                        # Use Python literal repr for params so booleans are True/False, not JSON true/false
                         params_literal = repr(n.get('params') or {})
                         n["code"] = (
                             f"result = mcp_call(tool=\"{tool}\", params={params_literal}); "
-                            f"save_json(\"{primary_out}\", result)"
+                            f"save_to_manifest(\"{primary_out}\", result)"
                         )
 
-            # Put back nodes
             dag["nodes"] = nodes
             plan["dag"] = dag
-
             return plan
         except Exception:
-            # On any failure, return original plan
             return plan
 
     async def _execute_plan_non_agent_nodes(self, plan: Dict[str, Any], *, run_dir_override: Optional[Path] = None) -> Dict[str, Any]:
@@ -582,8 +708,26 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
             if not outs:
                 return False
             try:
+                # If outputs are manifest sections like "stages.*", verify presence in manifest
+                if all(isinstance(o, str) and o.startswith("stages.") for o in outs):
+                    manifest_path = run_dir / "run_manifest.json"
+                    if not manifest_path.exists():
+                        return False
+                    try:
+                        manifest = json.loads(manifest_path.read_text())
+                    except Exception:
+                        return False
+                    for o in outs:
+                        keys = str(o).split(".")  # e.g., ["stages", "plan"]
+                        cur = manifest
+                        for k in keys:
+                            if not isinstance(cur, dict) or k not in cur:
+                                return False
+                            cur = cur[k]
+                    return True
+
+                # Otherwise treat outputs as files
                 for o in outs:
-                    # Resolve basic placeholders like {run_id}
                     path_str = str(o).replace("{run_id}", run_id)
                     p = (run_dir / path_str) if not Path(path_str).is_absolute() else Path(path_str)
                     if not p.exists():
@@ -604,47 +748,127 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
         # satisfied is used for dependency checks and includes completed target nodes + pre-satisfied agent nodes
         satisfied: set[str] = set(pre_satisfied_agents)
 
-        # Identify the plan file to update as a running manifest
+        # Identify the plan/manifest file to update as a running manifest
         plan_file: Optional[Path] = None
-        for candidate in (run_dir / "scout_plan.json", run_dir / "plan.json"):
+        for candidate in (run_dir / "run_manifest.json", run_dir / "scout_plan.json", run_dir / "plan.json"):
             if candidate.exists():
                 plan_file = candidate
                 break
 
-        def _update_manifest(nid: str, status: str, *, artifacts: Optional[List[str]] = None, error: Optional[Dict[str, Any]] = None):
-            if not plan_file:
-                return
+        def _update_manifest(nid: str, status: str, artifacts: Optional[List[str]] = None, 
+                      error: Optional[Dict[str, Any]] = None, data: Optional[Dict[str, Any]] = None,
+                      metrics: Optional[Dict[str, Any]] = None):
+            """Update manifest with node execution status."""
             try:
-                data = json.loads(plan_file.read_text())
-            except Exception:
-                data = {}
-            try:
-                ts = datetime.now().isoformat()
-                dag_data = data.get("dag") or {}
-                nodes_data = list(dag_data.get("nodes") or [])
-                for node in nodes_data:
-                    if (node.get("id") or "") == nid:
-                        run_meta = node.get("run") or {}
-                        run_meta["status"] = status
-                        run_meta["updated_at"] = ts
-                        if artifacts is not None:
-                            run_meta["artifacts"] = artifacts
-                        if error is not None:
-                            run_meta["error"] = error
-                        node["run"] = run_meta
-                        break
-                dag_data["nodes"] = nodes_data
-                dag_data["updated_at"] = ts
-                data["dag"] = dag_data
-                plan_file.write_text(json.dumps(data, indent=2))
-            except Exception:
-                # Best-effort only; ignore manifest write errors
+                if not plan_file or not plan_file.exists():
+                    return  # No manifest to update
+                
+                # Create a ManifestManager instance
+                manifest_manager = ManifestManager(plan_file)
+                
+                # Update the node status
+                manifest_manager.update_node_status(
+                    node_id=nid,
+                    state=status
+                )
+                
+                # Process artifacts if provided
+                artifact_list = []
+                if artifacts:
+                    for artifact in artifacts:
+                        if isinstance(artifact, str):
+                            # Simple path string
+                            try:
+                                size = Path(run_dir / artifact).stat().st_size if Path(run_dir / artifact).exists() else 0
+                                artifact_list.append({
+                                    "path": artifact,
+                                    "type": Path(artifact).suffix.lstrip(".") or "txt",
+                                    "size_bytes": size
+                                })
+                            except Exception as e:
+                                self.logger.warning(f"Failed to process artifact {artifact}: {e}")
+                                artifact_list.append({
+                                    "path": artifact,
+                                    "type": "unknown",
+                                    "size_bytes": 0
+                                })
+                        elif isinstance(artifact, dict):
+                            # Already in the right format
+                            artifact_list.append(artifact)
+                
+                # Prepare output data
+                output_data = {}
+                if data:
+                    output_data.update(data)
+                if artifact_list:
+                    output_data["artifacts"] = artifact_list
+                
+                # Store output data if we have any
+                if output_data:
+                    manifest_manager.store_node_output(
+                        node_id=nid,
+                        data=output_data
+                    )
+                
+                # Record metrics if provided
+                if metrics:
+                    manifest_manager.record_metrics(
+                        node_id=nid,
+                        metrics=metrics
+                    )
+                
+                # Record error if provided
+                if error:
+                    manifest_manager.record_error(
+                        node_id=nid,
+                        error_message=error.get("stderr", "Unknown error"),
+                        error_type="execution_error",
+                        stack_trace=error.get("stdout", "")
+                    )
+                
+                # Update overall run status based on node status
+                if status == "failed":
+                    manifest_manager.update_run_status("failed")
+                elif status == "completed":
+                    # Check if all nodes are completed
+                    manifest = manifest_manager.get_manifest()
+                    if "dag" in manifest and "nodes" in manifest["dag"]:
+                        all_nodes = manifest["dag"]["nodes"]
+                        node_runs = manifest.get("node_runs", {})
+                        
+                        # Count how many nodes are completed vs total
+                        total_nodes = len(all_nodes)
+                        completed_nodes = 0
+                        
+                        for node in all_nodes:
+                            node_id = node.get("id")
+                            if node_id and node_id in node_runs:
+                                node_status = node_runs[node_id].get("status")
+                                if node_status == "completed":
+                                    completed_nodes += 1
+                        
+                        # Update progress percentage
+                        if total_nodes > 0:
+                            progress = int((completed_nodes / total_nodes) * 100)
+                            manifest_manager.update_run_metadata({"progress": progress})
+                            
+                            # If all nodes are completed, mark the run as completed
+                            if completed_nodes == total_nodes:
+                                manifest_manager.update_run_status("completed")
+                elif status == "running" and manifest_manager.get_manifest()["run_metadata"]["status"] == "initialized":
+                    manifest_manager.update_run_status("running")
+                    
+            except Exception as e:
+                # Best-effort only; log but don't fail the execution
+                self.logger.warning(f"Failed to update manifest for node {nid}: {e}")
                 pass
 
         async def exec_node(n: Dict[str, Any]):
             nid = n["id"]
             lang = (n.get("language") or "python").lower()
             code = (n.get("code") or "").strip()
+            start_time = time.time()
+            
             if not code:
                 self.logger.warning(f"Node {nid} has no code; skipping")
                 completed.add(nid)
@@ -664,14 +888,14 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
             # Build execution prelude with helpers bound to this run_dir
             # Inject project root into sys.path so imports like 'scout_agent.*' work from sandboxed temp file
             PROJECT_ROOT = Path(__file__).resolve().parents[2]
-            prelude = textwrap.dedent(f"""
+            prelude_template = textwrap.dedent(r''' 
 import json, os, asyncio
 import sys
 from pathlib import Path
 
-RUN_DIR = Path(r"{run_dir}")
+RUN_DIR = Path(r"__RUN_DIR__")
 RUN_DIR.mkdir(parents=True, exist_ok=True)
-PROJ_ROOT = Path(r"{PROJECT_ROOT}")
+PROJ_ROOT = Path(r"__PROJ_ROOT__")
 if str(PROJ_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJ_ROOT))
 
@@ -689,12 +913,61 @@ def save_json(rel_path: str, obj):
                 pass
         json.dump(obj, f, indent=2)
 
+def save_to_manifest(section_key: str, obj):
+    """Save data to a specific section in the run manifest."""
+    manifest_path = RUN_DIR / "run_manifest.json"
+    try:
+        if manifest_path.exists():
+            manifest = json.loads(manifest_path.read_text())
+        else:
+            manifest = {}
+    except Exception:
+        manifest = {}
+    
+    # Parse section key like "stages.collect_reddit" -> ["stages", "collect_reddit"]
+    keys = section_key.split(".")
+    current = manifest
+    for key in keys[:-1]:
+        current = current.setdefault(key, {})
+    
+    # Set the data
+    if isinstance(obj, str):
+        try:
+            obj = json.loads(obj)
+        except Exception:
+            pass
+    
+    current[keys[-1]] = {
+        "data": obj,
+        "updated_at": __import__("datetime").datetime.now().isoformat()
+    }
+    
+    manifest_path.write_text(json.dumps(manifest, indent=2))
+
+def read_from_manifest(section_key: str):
+    """Read data from a specific section in the run manifest."""
+    manifest_path = RUN_DIR / "run_manifest.json"
+    try:
+        if not manifest_path.exists():
+            return None
+        manifest = json.loads(manifest_path.read_text())
+        
+        # Parse section key like "stages.collect_reddit" -> ["stages", "collect_reddit"]
+        keys = section_key.split(".")
+        current = manifest
+        for key in keys:
+            current = current.get(key, {})
+        
+        return current.get("data") if isinstance(current, dict) else current
+    except Exception:
+        return None
+
 def _ensure_payload(res):
     try:
-        content = res.content[0].text if getattr(res, "content", None) else "{{}}"
+        content = res.content[0].text if getattr(res, "content", None) else "{}"
         return json.loads(content)
     except Exception:
-        return {{"raw": str(res)}}
+        return {"raw": str(res)}
 
 def mcp_call(tool: str, params: dict):
     async def _run():
@@ -702,12 +975,17 @@ def mcp_call(tool: str, params: dict):
         client = MultiMCPClient(servers)
         await client.initialize()
         try:
-            result = await client.call_tool(tool, params or {{}})
+            result = await client.call_tool(tool, params or {})
             return _ensure_payload(result)
         finally:
             await client.shutdown()
     return asyncio.run(_run())
-            """)
+''')
+            prelude = (
+                prelude_template
+                .replace("__RUN_DIR__", str(run_dir))
+                .replace("__PROJ_ROOT__", str(PROJECT_ROOT))
+            )
 
             postlude = ""
             if has_wild:
@@ -755,7 +1033,22 @@ def mcp_call(tool: str, params: dict):
                 except Exception:
                     pass
                 completed.add(nid)
-                _update_manifest(nid, "completed", artifacts=generated_files)
+                
+                # Calculate execution duration
+                duration_seconds = time.time() - start_time
+                
+                # Track metrics
+                metrics = {
+                    "duration_seconds": duration_seconds
+                }
+                
+                _update_manifest(
+                    nid, 
+                    "completed", 
+                    artifacts=generated_files, 
+                    data={"generated_files": generated_files},
+                    metrics=metrics
+                )
             else:
                 full_code = prelude + "\n\n# --- Node code begins ---\n" + code + postlude + "\n# --- Node code ends ---\n"
                 self.logger.info(f"Starting node {nid} (language={lang})")
@@ -770,7 +1063,21 @@ def mcp_call(tool: str, params: dict):
                     }
                     (run_dir / f"{nid}_error.json").write_text(json.dumps(err_info, indent=2))
                     failed.add(nid)
-                    _update_manifest(nid, "failed", error=err_info)
+                    
+                    # Calculate execution duration
+                    duration_seconds = time.time() - start_time
+                    
+                    # Track metrics
+                    metrics = {
+                        "duration_seconds": duration_seconds
+                    }
+                    
+                    _update_manifest(
+                        nid, 
+                        "failed", 
+                        error=err_info,
+                        metrics=metrics
+                    )
                     raise RuntimeError(f"Node {nid} failed during execution")
                 # On success, record artifacts and log
                 try:
@@ -794,7 +1101,32 @@ def mcp_call(tool: str, params: dict):
                     manifest = {"node": nid, "artifacts": sorted(produced)}
                     (run_dir / f"{nid}_artifacts.json").write_text(json.dumps(manifest, indent=2))
                     self.logger.info(f"Completed node {nid}; artifacts: {len(produced)} files")
-                    _update_manifest(nid, "completed", artifacts=manifest["artifacts"]) 
+                    
+                    # Calculate execution duration
+                    duration_seconds = time.time() - start_time
+                    
+                    # Track metrics
+                    metrics = {
+                        "duration_seconds": duration_seconds
+                    }
+                    
+                    # Add LLM metrics if available
+                    if hasattr(self, "llm") and hasattr(self.llm, "last_usage"):
+                        llm_metrics = {
+                            "tokens_used": getattr(self.llm.last_usage, "total_tokens", 0),
+                            "cost": getattr(self.llm.last_usage, "cost", 0.0),
+                            "backend": getattr(self.llm, "backend_type", None),
+                            "model": getattr(self.llm, "model", None)
+                        }
+                        metrics.update(llm_metrics)
+                    
+                    _update_manifest(
+                        nid, 
+                        "completed", 
+                        artifacts=manifest["artifacts"],
+                        data={"artifacts": manifest["artifacts"]},
+                        metrics=metrics
+                    )
                 except Exception as _e:
                     self.logger.warning(f"Node {nid} completed but failed to record artifacts: {_e}")
                 completed.add(nid)
@@ -921,6 +1253,43 @@ def mcp_call(tool: str, params: dict):
         
         return validated
     
+    def _write_stage_output(self, stage_name: str, data: Dict[str, Any]) -> None:
+        """Write stage output to manifest section."""
+        try:
+            run_id = getattr(self.state, "run_id", "unknown")
+            from pathlib import Path
+            import json
+            from datetime import datetime
+            
+            # Determine run directory
+            project_root = Path(__file__).resolve().parents[2]
+            run_dir = project_root / "data" / "runs" / run_id
+            manifest_path = run_dir / "run_manifest.json"
+            
+            # Load existing manifest
+            try:
+                if manifest_path.exists():
+                    manifest = json.loads(manifest_path.read_text())
+                else:
+                    manifest = {}
+            except Exception:
+                manifest = {}
+            
+            # Update stage data
+            stages = manifest.setdefault("stages", {})
+            stages[stage_name] = {
+                "data": data,
+                "status": "completed",
+                "updated_at": datetime.now().isoformat()
+            }
+            
+            # Write back to manifest
+            manifest_path.write_text(json.dumps(manifest, indent=2))
+            self.logger.info(f"Stage {stage_name} output written to manifest")
+            
+        except Exception as e:
+            self.logger.error(f"Failed to write stage {stage_name} output: {e}")
+
     def _generate_market_summary(self, pain_points: List[PainPoint], market: str) -> str:
         """Generate a summary of the pain point discovery."""
         if not pain_points:

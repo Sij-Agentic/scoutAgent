@@ -150,7 +150,12 @@ async def reddit_search_and_fetch_threads(
         cache_root = _cache_root()
         threads_dir = os.path.join(cache_root, "threads")
         all_items = _load_cached_threads(threads_dir)
-        filtered = _filter_cached(all_items, keywords=keywords, subreddits=subreddits or [], time_window=time_window)
+        # Normalize subreddit names to bare names (strip any leading 'r/') to match cached post.subreddit
+        subs_norm = [
+            (s[2:] if isinstance(s, str) and s.lower().startswith("r/") else s)
+            for s in (subreddits or [])
+        ]
+        filtered = _filter_cached(all_items, keywords=keywords, subreddits=subs_norm, time_window=time_window)
 
         # Fan-out limit per keyword: build per-keyword buckets
         buckets: Dict[str, List[Dict[str, Any]]] = {k: [] for k in (keywords or ["_"])}

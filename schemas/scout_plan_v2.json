@@ -1,0 +1,139 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "scout_plan_v2.json",
+  "title": "Scout Plan v2",
+  "type": "object",
+  "required": ["schema", "version", "run_id", "run_metadata", "dag", "stages"],
+  "properties": {
+    "schema": {"const": "scout_plan_v2"},
+    "version": {"type": "string", "description": "Schema version (e.g., '2.0')."},
+    "run_id": {"type": "string"},
+    "run_metadata": {
+      "type": "object",
+      "required": ["started_at", "updated_at", "status", "overall_progress"],
+      "properties": {
+        "started_at": {"type": "string", "format": "date-time"},
+        "updated_at": {"type": "string", "format": "date-time"},
+        "status": {"type": "string", "enum": ["initialized", "running", "completed", "failed"]},
+        "overall_progress": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    },
+    "target_market": {"type": "string"},
+    "time_window": {"type": "string", "enum": ["3m", "6m", "12m", "24m", "all"]},
+    "sources": {"type": "array", "items": {"type": "string"}},
+    "keywords": {"type": "array", "items": {"type": "string"}},
+    "subreddits": {"type": "array", "items": {"type": "string"}},
+    "limits": {
+      "type": "object",
+      "properties": {
+        "per_query_limit": {"type": "integer", "minimum": 1},
+        "comment_depth": {"type": "integer", "minimum": 0},
+        "comment_limit": {"type": "integer", "minimum": 0},
+        "min_num_comments": {"type": "integer", "minimum": 0},
+        "min_score": {"type": "integer", "minimum": 0}
+      }
+    },
+    "dag": {
+      "type": "object",
+      "required": ["nodes"],
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "type"],
+            "properties": {
+              "id": {"type": "string"},
+              "type": {"type": "string", "enum": ["agent", "tool"]},
+              "agent": {"type": ["string", "null"]},
+              "stage": {"type": ["string", "null"], "enum": ["plan", "think", "act", null]},
+              "tool": {"type": ["string", "null"], "description": "Exact MCP tool name when type=tool."},
+              "params": {"type": ["object", "null"], "description": "Arguments to pass to the tool when executing."},
+              "code": {"type": ["string", "null"], "description": "Python code snippet to execute in sandbox. Use 'no_op' if no code needed."},
+              "parallelize_by": {"type": ["string", "null"]},
+              "inputs": {"type": "object"},
+              "deps": {"type": "array", "items": {"type": "string"}},
+              "status": {
+                "type": "object",
+                "properties": {
+                  "state": {"type": "string", "enum": ["pending", "running", "completed", "failed"]},
+                  "started_at": {"type": "string", "format": "date-time"},
+                  "updated_at": {"type": "string", "format": "date-time"},
+                  "duration_seconds": {"type": "number", "minimum": 0},
+                  "attempts": {"type": "integer", "minimum": 0},
+                  "retries_remaining": {"type": "integer", "minimum": 0},
+                  "error": {
+                    "type": ["object", "null"],
+                    "properties": {
+                      "message": {"type": "string"},
+                      "type": {"type": "string"},
+                      "stack": {"type": "string"}
+                    }
+                  }
+                }
+              },
+              "metrics": {
+                "type": "object",
+                "properties": {
+                  "tokens_used": {"type": "integer", "minimum": 0},
+                  "cost": {"type": "number", "minimum": 0},
+                  "backend": {"type": ["string", "null"]},
+                  "model": {"type": ["string", "null"]}
+                }
+              },
+              "outputs": {
+                "type": "object",
+                "properties": {
+                  "location": {"type": "string"},
+                  "artifacts": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": ["path", "type"],
+                      "properties": {
+                        "path": {"type": "string"},
+                        "type": {"type": "string"},
+                        "size_bytes": {"type": "integer", "minimum": 0}
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "allOf": [
+              {
+                "if": {"properties": {"type": {"const": "tool"}}},
+                "then": {
+                  "required": ["tool", "params"],
+                  "properties": {
+                    "tool": {"type": "string", "minLength": 1},
+                    "params": {"type": "object"}
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "stages": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "status": {"type": "string", "enum": ["pending", "running", "completed", "failed"]},
+          "updated_at": {"type": "string", "format": "date-time"},
+          "data": {"type": "object"},
+          "error": {
+            "type": ["object", "null"],
+            "properties": {
+              "message": {"type": "string"},
+              "type": {"type": "string"},
+              "stack": {"type": "string"}
+            }
+          }
+        }
+      }
+    }
+  }
+}
