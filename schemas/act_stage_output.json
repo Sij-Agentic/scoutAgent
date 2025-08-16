@@ -1,0 +1,153 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "act_stage_output.json",
+  "title": "Scout Act Stage Output Schema",
+  "description": "Schema for the output of the ScoutAgent act stage, which consolidates and validates pain points from the think stage",
+  "type": "object",
+  "required": ["pain_points", "total_discovered", "market_summary", "confidence_score", "sources_used", "research_duration"],
+  "properties": {
+    "pain_points": {
+      "type": "array",
+      "description": "Consolidated and validated pain points",
+      "items": {
+        "type": "object",
+        "required": ["description", "severity", "market", "source", "evidence", "frequency", "impact_score", "tags", "discovered_at"],
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "Clear, specific pain point statement"
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["low", "medium", "high", "critical"],
+            "description": "Assessed severity of the pain point"
+          },
+          "market": {
+            "type": "string",
+            "description": "Target market the pain point relates to"
+          },
+          "source": {
+            "type": "string",
+            "description": "Primary source of the pain point data (e.g., 'reddit')"
+          },
+          "evidence": {
+            "type": "array",
+            "description": "Citations and quotes supporting this pain point",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1
+          },
+          "frequency": {
+            "type": "integer",
+            "description": "Number of occurrences or mentions of this pain point",
+            "minimum": 0
+          },
+          "impact_score": {
+            "type": "number",
+            "description": "Assessed impact of the pain point on a scale of 1-10",
+            "minimum": 0,
+            "maximum": 10
+          },
+          "tags": {
+            "type": "array",
+            "description": "Categorization tags for the pain point",
+            "items": {
+              "type": "string"
+            }
+          },
+          "discovered_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO timestamp when the pain point was discovered/processed"
+          }
+        }
+      }
+    },
+    "total_discovered": {
+      "type": "integer",
+      "description": "Total number of pain points discovered and validated",
+      "minimum": 0
+    },
+    "market_summary": {
+      "type": "string",
+      "description": "Brief summary of the pain point consolidation for the target market"
+    },
+    "confidence_score": {
+      "type": "number",
+      "description": "Overall confidence in the consolidated pain points (0.0-1.0)",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "sources_used": {
+      "type": "array",
+      "description": "Data sources used in the research",
+      "items": {
+        "type": "string"
+      }
+    },
+    "research_duration": {
+      "type": "number",
+      "description": "Duration of the act stage processing in seconds",
+      "minimum": 0
+    },
+    "consolidation_summary": {
+      "type": "object",
+      "description": "Summary statistics about the consolidation process",
+      "properties": {
+        "raw_pains_analyzed": {
+          "type": "integer",
+          "description": "Number of raw pain points analyzed from the think stage",
+          "minimum": 0
+        },
+        "consolidated_pains": {
+          "type": "integer",
+          "description": "Number of pain points after consolidation",
+          "minimum": 0
+        },
+        "deduplication_rate": {
+          "type": "number",
+          "description": "Rate of deduplication (0.0-1.0)",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "average_confidence": {
+          "type": "number",
+          "description": "Average confidence score across all pain points",
+          "minimum": 0.0,
+          "maximum": 1.0
+        }
+      }
+    },
+    "evidence_quality": {
+      "type": "object",
+      "description": "Assessment of evidence quality",
+      "properties": {
+        "strong_evidence_count": {
+          "type": "integer",
+          "description": "Number of pain points with strong evidence",
+          "minimum": 0
+        },
+        "moderate_evidence_count": {
+          "type": "integer",
+          "description": "Number of pain points with moderate evidence",
+          "minimum": 0
+        },
+        "weak_evidence_count": {
+          "type": "integer",
+          "description": "Number of pain points with weak evidence",
+          "minimum": 0
+        },
+        "overall_quality": {
+          "type": "string",
+          "enum": ["poor", "fair", "good", "excellent"],
+          "description": "Overall assessment of evidence quality"
+        }
+      }
+    },
+    "error": {
+      "type": ["string", "null"],
+      "description": "Error message if consolidation failed"
+    }
+  }
+}

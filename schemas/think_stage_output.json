@@ -1,0 +1,163 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "think_stage_output.json",
+  "title": "Scout Think Stage Output Schema",
+  "description": "Schema for the output of the ScoutAgent think stage, which analyzes Reddit data to identify pain points",
+  "type": "object",
+  "required": ["per_thread_summaries", "pains", "themes"],
+  "properties": {
+    "per_thread_summaries": {
+      "type": "array",
+      "description": "Summaries and pain points extracted from each analyzed Reddit thread",
+      "items": {
+        "type": "object",
+        "required": ["post_id", "title", "subreddit", "permalink", "bullets", "pains"],
+        "properties": {
+          "post_id": {
+            "type": "string",
+            "description": "Reddit post ID (e.g., t3_abc123)"
+          },
+          "title": {
+            "type": "string",
+            "description": "Title of the Reddit thread"
+          },
+          "subreddit": {
+            "type": "string",
+            "description": "Name of the subreddit where the thread was posted"
+          },
+          "permalink": {
+            "type": "string",
+            "description": "Relative URL path to the Reddit thread"
+          },
+          "bullets": {
+            "type": "array",
+            "description": "2-3 concise bullet points summarizing the thread content",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "maxItems": 3
+          },
+          "pains": {
+            "type": "array",
+            "description": "Pain points identified in this specific thread",
+            "items": {
+              "type": "object",
+              "required": ["statement", "evidence", "severity", "tags"],
+              "properties": {
+                "statement": {
+                  "type": "string",
+                  "description": "Clear, specific pain point statement"
+                },
+                "evidence": {
+                  "type": "array",
+                  "description": "Citations supporting this pain point (comment IDs or direct quotes)",
+                  "items": {
+                    "type": "string"
+                  },
+                  "minItems": 1
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": ["low", "medium", "high", "critical"],
+                  "description": "Assessed severity of the pain point"
+                },
+                "tags": {
+                  "type": "array",
+                  "description": "Categorization tags for the pain point",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "pains": {
+      "type": "array",
+      "description": "Deduplicated pain points aggregated across all analyzed threads",
+      "items": {
+        "type": "object",
+        "required": ["statement", "support_count", "citations", "tags"],
+        "properties": {
+          "statement": {
+            "type": "string",
+            "description": "Normalized pain point statement (deduplicated across threads)"
+          },
+          "support_count": {
+            "type": "integer",
+            "description": "Number of occurrences or mentions of this pain point",
+            "minimum": 1
+          },
+          "citations": {
+            "type": "array",
+            "description": "References to threads or comments where this pain was identified",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1
+          },
+          "tags": {
+            "type": "array",
+            "description": "Categorization tags for the pain point",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "themes": {
+      "type": "array",
+      "description": "Thematic clusters of related pain points",
+      "items": {
+        "type": "object",
+        "required": ["theme", "count", "example_citations", "related_pains"],
+        "properties": {
+          "theme": {
+            "type": "string",
+            "description": "Descriptive label for the theme cluster"
+          },
+          "count": {
+            "type": "integer",
+            "description": "Number of pain points in this theme",
+            "minimum": 1
+          },
+          "example_citations": {
+            "type": "array",
+            "description": "Example references to threads or comments illustrating this theme",
+            "items": {
+              "type": "string"
+            }
+          },
+          "related_pains": {
+            "type": "array",
+            "description": "Pain point statements that belong to this theme",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1
+          }
+        }
+      }
+    },
+    "total_threads_analyzed": {
+      "type": "integer",
+      "description": "Total number of Reddit threads analyzed",
+      "minimum": 0
+    },
+    "error": {
+      "type": ["string", "null"],
+      "description": "Error message if analysis failed"
+    },
+    "next_steps": {
+      "type": "array",
+      "description": "Suggested next steps for the analysis",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}
