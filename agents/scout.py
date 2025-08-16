@@ -228,7 +228,9 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
         # Ensure a run_id is present and store it for later stages
         try:
             dag = plan.get("dag") or {}
-            run_id = dag.get("run_id") or plan.get("run_id")
+            # Prefer run_id from state (set by main script), then from plan, then generate new
+            state_run_id = getattr(self.state, "run_id", None)
+            run_id = state_run_id or dag.get("run_id") or plan.get("run_id")
             if not run_id:
                 run_id = datetime.now().strftime("run_%Y%m%d_%H%M%S")
             dag["run_id"] = run_id
@@ -932,7 +934,19 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
 
         # Consider agent nodes satisfied ONLY if their declared outputs already exist under run_dir
         def _all_outputs_exist(n: Dict[str, Any]) -> bool:
-            outs = n.get("outputs") or []
+            outputs = n.get("outputs")
+            if not outputs:
+                return False
+            
+            # Handle both list format ["stages.collect_reddit"] and dict format {"location": "stages.collect_reddit"}
+            if isinstance(outputs, dict):
+                location = outputs.get("location")
+                outs = [location] if location else []
+            elif isinstance(outputs, list):
+                outs = outputs
+            else:
+                return False
+            
             if not outs:
                 return False
             try:
@@ -988,11 +1002,18 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
                       metrics: Optional[Dict[str, Any]] = None):
             """Update manifest with node execution status."""
             try:
-                if not plan_file or not plan_file.exists():
-                    return  # No manifest to update
-                
+                # Resolve manifest dynamically: prefer run_manifest.json if it now exists
+                target_manifest = None
+                mf = run_dir / "run_manifest.json"
+                if mf.exists():
+                    target_manifest = mf
+                elif plan_file and plan_file.exists():
+                    target_manifest = plan_file
+                if not target_manifest:
+                    return  # No manifest to update yet
+
                 # Create a ManifestManager instance
-                manifest_manager = ManifestManager(plan_file)
+                manifest_manager = ManifestManager(target_manifest)
                 
                 # Update the node status
                 manifest_manager.update_node_status(
@@ -1024,18 +1045,12 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
                             # Already in the right format
                             artifact_list.append(artifact)
                 
-                # Prepare output data
-                output_data = {}
-                if data:
-                    output_data.update(data)
-                if artifact_list:
-                    output_data["artifacts"] = artifact_list
-                
-                # Store output data if we have any
-                if output_data:
+                # Store output data/artifacts without overwriting existing stage data
+                if data or artifact_list:
                     manifest_manager.store_node_output(
                         node_id=nid,
-                        data=output_data
+                        data=(data or {}),
+                        artifacts=artifact_list if artifact_list else None
                     )
                 
                 # Record metrics if provided
@@ -1083,9 +1098,15 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
                             # If all nodes are completed, mark the run as completed
                             if completed_nodes == total_nodes:
                                 manifest_manager.update_run_status("completed")
-                elif status == "running" and manifest_manager.get_manifest()["run_metadata"]["status"] == "initialized":
-                    manifest_manager.update_run_status("running")
-                    
+                elif status == "running":
+                    try:
+                        rm = manifest_manager.get_manifest().get("run_metadata", {})
+                        if rm.get("status") == "initialized":
+                            manifest_manager.update_run_status("running")
+                    except Exception:
+                        # Best effort: mark as running
+                        manifest_manager.update_run_status("running")
+                
             except Exception as e:
                 # Best-effort only; log but don't fail the execution
                 self.logger.warning(f"Failed to update manifest for node {nid}: {e}")
@@ -1165,10 +1186,18 @@ def save_to_manifest(section_key: str, obj):
         except Exception:
             pass
     
-    current[keys[-1]] = {
-        "data": obj,
-        "updated_at": __import__("datetime").datetime.now().isoformat()
-    }
+    # For stages, ensure we have the proper structure and save the actual data
+    if keys[0] == "stages":
+        stage_name = keys[-1]
+        current.setdefault(stage_name, {})
+        current[stage_name]["data"] = obj
+        current[stage_name]["updated_at"] = __import__("datetime").datetime.now().isoformat()
+        current[stage_name]["status"] = "completed"
+    else:
+        current[keys[-1]] = {
+            "data": obj,
+            "updated_at": __import__("datetime").datetime.now().isoformat()
+        }
     
     manifest_path.write_text(json.dumps(manifest, indent=2))
 
@@ -1235,6 +1264,7 @@ def mcp_call(tool: str, params: dict):
                 return await svc.execute_code(code_text, language=lang, timeout=n.get("timeout") or 60)
 
             if fan_items:
+                _update_manifest(nid, "running")
                 # Build and run per-item code using tool/params (ignore provided code to make clean overrides)
                 import re
                 def slugify(s: str) -> str:
@@ -1273,8 +1303,7 @@ def mcp_call(tool: str, params: dict):
                 _update_manifest(
                     nid, 
                     "completed", 
-                    artifacts=generated_files, 
-                    data={"generated_files": generated_files},
+                    artifacts=generated_files,
                     metrics=metrics
                 )
             else:
@@ -1352,7 +1381,6 @@ def mcp_call(tool: str, params: dict):
                         nid, 
                         "completed", 
                         artifacts=manifest["artifacts"],
-                        data={"artifacts": manifest["artifacts"]},
                         metrics=metrics
                     )
                 except Exception as _e:
@@ -1423,50 +1451,45 @@ def mcp_call(tool: str, params: dict):
         """Extract pain points from research data."""
         pain_points = []
         
-        # Mock extraction - in real implementation, use NLP
-        mock_pain_points = [
-            {
-                "description": "Complex setup process takes too long",
-                "severity": "high",
-                "source": "user_reviews",
-                "evidence": ["Review 1", "Forum post 3"],
-                "frequency": 15,
-                "impact_score": 8.5,
-                "tags": ["onboarding", "complexity"]
-            },
-            {
-                "description": "Integration with existing tools is limited",
-                "severity": "medium",
-                "source": "reddit",
-                "evidence": ["Reddit thread", "Twitter mention"],
-                "frequency": 12,
-                "impact_score": 7.2,
-                "tags": ["integration", "compatibility"]
-            },
-            {
-                "description": "Pricing is too high for small teams",
-                "severity": "high",
-                "source": "forums",
-                "evidence": ["Forum discussion", "Blog comment"],
-                "frequency": 20,
-                "impact_score": 9.1,
-                "tags": ["pricing", "accessibility"]
-            }
-        ]
-        
-        for pp_data in mock_pain_points:
-            pain_point = PainPoint(
-                description=pp_data["description"],
-                severity=pp_data["severity"],
-                market=market,
-                source=pp_data["source"],
-                evidence=pp_data["evidence"],
-                frequency=pp_data["frequency"],
-                impact_score=pp_data["impact_score"],
-                tags=pp_data["tags"],
-                discovered_at=datetime.now().isoformat()
-            )
-            pain_points.append(pain_point)
+        # Extract from actual research data - no mock data
+        if not research_results:
+            return pain_points
+            
+        # Process real Reddit threads and other sources
+        threads = research_results.get("threads", [])
+        for thread in threads:
+            post = thread.get("post", {})
+            title = post.get("title", "")
+            selftext = post.get("selftext", "")
+            subreddit = post.get("subreddit", "")
+            
+            # Simple keyword-based pain point extraction
+            pain_indicators = ["problem", "issue", "bug", "error", "fail", "broken", "difficult", "hard", "annoying", "frustrating"]
+            text = f"{title} {selftext}".lower()
+            
+            if any(indicator in text for indicator in pain_indicators):
+                # Extract a meaningful description from the title
+                description = title if title else "Unspecified issue"
+                
+                # Determine severity based on keywords
+                severity = "high" if any(word in text for word in ["critical", "urgent", "blocking", "broken"]) else "medium"
+                
+                # Calculate basic impact score
+                impact_score = 7.0 + (post.get("score", 0) / 100.0)  # Base 7.0 + Reddit score influence
+                impact_score = min(impact_score, 10.0)  # Cap at 10.0
+                
+                pain_point = PainPoint(
+                    description=description,
+                    severity=severity,
+                    market=market,
+                    source="reddit",
+                    evidence=[f"Reddit post: {post.get('permalink', '')}"],
+                    frequency=1,  # Each thread counts as 1 occurrence
+                    impact_score=impact_score,
+                    tags=[subreddit] if subreddit else [],
+                    discovered_at=datetime.now().isoformat()
+                )
+                pain_points.append(pain_point)
         
         return pain_points[:10]  # Limit to max_pain_points
     
@@ -1482,45 +1505,39 @@ def mcp_call(tool: str, params: dict):
         return validated
     
     def _write_stage_output(self, stage_name: str, data: Dict[str, Any]) -> None:
-        """Write stage output to manifest section."""
+        """Write stage output to manifest section using ManifestManager."""
         try:
             run_id = getattr(self.state, "run_id", "unknown")
             from pathlib import Path
-            import json
-            from datetime import datetime
             
             # Determine run directory
             # project_root should be ScoutAgent/ (not scout_agent/)
             project_root = Path(__file__).resolve().parents[2]
             run_dir = project_root / "data" / "runs" / run_id
-            # Create the run directory if it doesn't exist
             run_dir.mkdir(parents=True, exist_ok=True)
             manifest_path = run_dir / "run_manifest.json"
-            self.logger.info(f"Writing to manifest at: {manifest_path}")
             
-            # Load existing manifest
-            try:
-                if manifest_path.exists():
-                    manifest = json.loads(manifest_path.read_text())
-                else:
-                    manifest = {}
-            except Exception:
-                manifest = {}
+            self.logger.info(f"Writing stage {stage_name} output to manifest at: {manifest_path}")
             
-            # Update stage data
-            stages = manifest.setdefault("stages", {})
-            stages[stage_name] = {
-                "data": data,
-                "status": "completed",
-                "updated_at": datetime.now().isoformat()
-            }
+            # Use ManifestManager for consistent manifest operations
+            from scout_agent.memory.manifest_manager import ManifestManager
+            manifest_manager = ManifestManager(manifest_path, create_if_missing=True)
             
-            # Write back to manifest
-            manifest_path.write_text(json.dumps(manifest, indent=2))
-            self.logger.info(f"Stage {stage_name} output written to manifest")
+            # Store the stage output
+            manifest_manager.store_node_output(stage_name, data)
+            
+            # Update node status to completed
+            manifest_manager.update_node_status(
+                node_id=stage_name,
+                state="completed"
+            )
+            
+            self.logger.info(f"Stage {stage_name} output written to manifest successfully")
             
         except Exception as e:
             self.logger.error(f"Failed to write stage {stage_name} output: {e}")
+            import traceback
+            self.logger.error(traceback.format_exc())
 
     def _generate_market_summary(self, pain_points: List[PainPoint], market: str) -> str:
         """Generate a summary of the pain point discovery."""

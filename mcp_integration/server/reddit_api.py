@@ -49,17 +49,19 @@ async def reddit_top(subreddit: str, limit: int = 5, timeframe: str = "day") -> 
         posts = await _fetch_top(subreddit=subreddit, limit=limit, t=timeframe)
         payload = {"results": posts}
     except Exception as e:
-        payload = {"error": str(e), "results": []}
+        payload = {"error": str(e), "threads": []}
     return {"content": [TextContent(type="text", text=json.dumps(payload))]}
 
 
 # --- Cache-backed Reddit collection tool (no live fetch) ---
 
 def _cache_root() -> str:
-    # Two levels up from this file to reach scout_agent/
+    # Navigate to the project root (ScoutAgent/) then to data/reddit_cache
     here = os.path.dirname(__file__)  # .../mcp_integration/server
-    scout_root = os.path.dirname(os.path.dirname(here))  # .../scout_agent
-    return os.path.join(scout_root, "data", "reddit_cache")
+    scout_agent_dir = os.path.dirname(os.path.dirname(here))  # .../scout_agent
+    project_root = os.path.dirname(scout_agent_dir)  # .../ScoutAgent
+    cache_path = os.path.join(project_root, "data", "reddit_cache")
+    return cache_path
 
 
 def _load_cached_threads(threads_dir: str) -> List[Dict[str, Any]]:
@@ -103,7 +105,7 @@ def _filter_cached(
     max_age = _months_to_seconds(time_window)
     subs = set([s.lower() for s in (subreddits or [])])
     keys = [k.lower() for k in (keywords or [])]
-
+    
     def ok_time(created_utc: float) -> bool:
         if not created_utc:
             return True
@@ -150,52 +152,45 @@ async def reddit_search_and_fetch_threads(
         cache_root = _cache_root()
         threads_dir = os.path.join(cache_root, "threads")
         all_items = _load_cached_threads(threads_dir)
+        
         # Normalize subreddit names to bare names (strip any leading 'r/') to match cached post.subreddit
         subs_norm = [
             (s[2:] if isinstance(s, str) and s.lower().startswith("r/") else s)
             for s in (subreddits or [])
         ]
+        
         filtered = _filter_cached(all_items, keywords=keywords, subreddits=subs_norm, time_window=time_window)
 
-        # Fan-out limit per keyword: build per-keyword buckets
-        buckets: Dict[str, List[Dict[str, Any]]] = {k: [] for k in (keywords or ["_"])}
-        for k in buckets.keys():
-            kl = k.lower()
-            for it in filtered:
-                post = it.get("post", {})
-                text = ((post.get("title") or "") + "\n" + (post.get("selftext") or "")).lower()
-                if kl in text:
-                    buckets[k].append(it)
-
-        # Apply per_query_limit per keyword and dedupe by post id
+        # Apply per_query_limit and dedupe by post id
         seen = set()
         results: List[Dict[str, Any]] = []
-        for k, items_k in buckets.items():
-            count = 0
-            for it in items_k:
-                pid = (it.get("post", {}).get("id") or "")
-                if pid in seen:
-                    continue
-                seen.add(pid)
-                obj = {
-                    "type": "reddit_thread" if include_comments else "reddit_post",
-                    "source": it.get("post", {}).get("permalink"),
-                    "post": it.get("post"),
-                }
-                if include_comments:
-                    obj["comments"] = it.get("comments", [])
-                results.append(obj)
-                count += 1
-                if count >= max(1, int(per_query_limit)):
-                    break
+        count = 0
+        for it in filtered:
+            pid = (it.get("post", {}).get("id") or "")
+            if pid in seen:
+                continue
+            seen.add(pid)
+            obj = {
+                "type": "reddit_thread" if include_comments else "reddit_post",
+                "source": it.get("source"),
+                "post": it.get("post"),
+            }
+            if include_comments:
+                obj["comments"] = it.get("comments", [])
+            results.append(obj)
+            count += 1
+            if count >= max(1, int(per_query_limit)):
+                break
 
-        payload = {"results": results}
+        payload = {"threads": results}
+        json_payload = json.dumps(payload)
     except Exception as e:
-        payload = {"error": str(e), "results": []}
-    return {"content": [TextContent(type="text", text=json.dumps(payload))]}
+        payload = {"error": str(e), "threads": []}
+        json_payload = json.dumps(payload)
+    return {"content": [TextContent(type="text", text=json_payload)]}
 
 
-#@mcp.tool()
+@mcp.tool()
 async def reddit_api_search_and_fetch_threads(
     keywords: List[str],
     subreddits: List[str] = None,
@@ -231,9 +226,9 @@ async def reddit_api_search_and_fetch_threads(
                 obj["comments"] = r.get("comments", [])
             normalized.append(obj)
 
-        payload = {"results": normalized}
+        payload = {"threads": normalized}
     except Exception as e:
-        payload = {"error": str(e), "results": []}
+        payload = {"error": str(e), "threads": []}
     return {"content": [TextContent(type="text", text=json.dumps(payload))]}
 
 

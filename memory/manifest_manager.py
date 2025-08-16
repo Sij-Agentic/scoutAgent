@@ -169,6 +169,20 @@ class ManifestManager:
         self.manifest_path.parent.mkdir(parents=True, exist_ok=True)
         self.manifest_path.write_text(json.dumps(self._manifest, indent=2))
     
+    def _merge_dicts(self, base: Dict[str, Any], updates: Dict[str, Any]) -> Dict[str, Any]:
+        """Shallow-then-deep merge dictionaries.
+        - For keys present in both, if both values are dicts, merge recursively
+        - Otherwise, overwrite base with updates' value
+        """
+        if not isinstance(base, dict) or not isinstance(updates, dict):
+            return updates
+        for k, v in updates.items():
+            if k in base and isinstance(base[k], dict) and isinstance(v, dict):
+                base[k] = self._merge_dicts(base[k], v)
+            else:
+                base[k] = v
+        return base
+    
     def get_manifest(self) -> Dict[str, Any]:
         """Get the full manifest."""
         return self._manifest
@@ -312,12 +326,12 @@ class ManifestManager:
         # Save changes
         self._save()
         
-    def store_node_output(self, node_id: str, data: Dict[str, Any], artifacts: Optional[List[Dict[str, Any]]] = None) -> None:
-        """Store output data for a node in the manifest.
+    def store_node_output(self, node_id: str, data: Optional[Dict[str, Any]] = None, artifacts: Optional[List[Dict[str, Any]]] = None) -> None:
+        """Store output data and/or artifacts for a node in the manifest.
         
         Args:
             node_id: The ID of the node
-            data: The output data to store
+            data: Optional output data to store; if existing data is present, it will be merged
             artifacts: Optional list of file artifacts produced by the node
         """
         manifest = self.get_manifest()
@@ -331,15 +345,20 @@ class ManifestManager:
             manifest["stages"][node_id] = {}
         
         # For plan stage, avoid duplicating the entire plan data structure
-        if node_id == "plan" and "dag" in data:
-            # Store only essential metadata, not the entire plan
-            manifest["stages"][node_id]["data"] = {
-                "summary": "Plan completed successfully",
-                "reference": "See root level for complete plan data"
-            }
-        else:
-            # Store data normally for other nodes
-            manifest["stages"][node_id]["data"] = data
+        if data is not None:
+            if node_id == "plan" and isinstance(data, dict) and "dag" in data:
+                # Store only essential metadata, not the entire plan
+                manifest["stages"][node_id]["data"] = {
+                    "summary": "Plan completed successfully",
+                    "reference": "See root level for complete plan data"
+                }
+            else:
+                # Merge with any existing data rather than overwrite
+                existing = manifest["stages"][node_id].get("data")
+                if isinstance(existing, dict) and isinstance(data, dict):
+                    manifest["stages"][node_id]["data"] = self._merge_dicts(existing, data)
+                else:
+                    manifest["stages"][node_id]["data"] = data
         
         # Store artifacts if provided
         if artifacts:
