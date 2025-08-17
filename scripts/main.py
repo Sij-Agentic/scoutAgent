@@ -52,143 +52,8 @@ def parse_args() -> argparse.Namespace:
     return ap.parse_args()
 
 
-async def run_collect(mcp: MultiMCPClient, args: argparse.Namespace, manifest_manager: ManifestManager) -> dict:
-    """Run the collect stage using MCP client to fetch Reddit data"""
-    start_time = time.time()
-    logger.info("Starting collect stage...")
-    
-    # Choose tool
-    tools = mcp.get_all_tools() if hasattr(mcp, "get_all_tools") else []
-    prefer_api = args.use_api
-    tool_name = "reddit_api_search_and_fetch_threads" if prefer_api else "reddit_search_and_fetch_threads"
-    # Fallback if chosen tool not available
-    names = [t.name for t in tools] if tools else []
-    if names and tool_name not in names:
-        tool_name = names[0] if names else tool_name
-    
-    logger.info(f"Using Reddit tool: {tool_name}")
-
-    keywords: List[str] = [s.strip() for s in args.keywords.split(",") if s.strip()]
-    subreddits: Optional[List[str]] = [s.strip() for s in args.subreddits.split(",") if s.strip()] if args.subreddits else None
-
-    # Find the collect node ID from the manifest
-    manifest = manifest_manager.get_manifest()
-    collect_node_id = "collect_reddit"  # Default
-    
-    if "dag" in manifest and "nodes" in manifest["dag"]:
-        for node in manifest["dag"]["nodes"]:
-            if node.get("type") == "tool" and "reddit" in node.get("id", ""):
-                collect_node_id = node.get("id", "collect_reddit")
-                break
-    
-    logger.info(f"Collecting data using node ID: {collect_node_id}")
-    
-    try:
-        # Call the MCP tool to fetch Reddit data
-        res = await mcp.call_tool(tool_name, {
-            "keywords": keywords,
-            "subreddits": subreddits,
-            "per_query_limit": args.per_query_limit,
-            "include_comments": bool(args.include_comments),
-            "comment_depth": args.comment_depth,
-            "comment_limit": args.comment_limit,
-            "use_cache": True,
-        })
-        
-        # Parse MCP result content - handle nested structure
-        payload = {}
-        try:
-            if hasattr(res, "content") and res.content:
-                content = res.content[0].text if len(res.content) > 0 else "{}"
-                if content.strip():
-                    parsed_data = json.loads(content)
-                    # Handle nested MCP response structure
-                    if "content" in parsed_data and isinstance(parsed_data["content"], list):
-                        # Extract the actual payload from nested structure
-                        if parsed_data["content"] and "text" in parsed_data["content"][0]:
-                            inner_content = parsed_data["content"][0]["text"]
-                            payload = json.loads(inner_content)
-                        else:
-                            payload = {"threads": [], "comments": []}
-                    else:
-                        # Direct structure
-                        payload = parsed_data
-                else:
-                    logger.warning("MCP tool returned empty content")
-                    payload = {"threads": [], "comments": []}
-            else:
-                logger.warning("MCP tool response has no content attribute")
-                payload = {"threads": [], "comments": []}
-        except Exception as e:
-            logger.warning(f"Failed to parse MCP tool response: {e}")
-            payload = {"threads": [], "comments": [], "error": str(e)}
-        
-        # Log MCP tool results
-        if payload.get("threads"):
-            logger.info(f"MCP tool collected {len(payload['threads'])} threads")
-        elif payload.get("error"):
-            logger.error(f"MCP tool error: {payload['error']}")
-        else:
-            logger.warning("MCP tool returned no threads and no error")
-        
-        # Extract thread and comment counts for logging
-        thread_count = 0
-        comment_count = 0
-        
-        if "threads" in payload:
-            thread_count = len(payload["threads"])
-            
-            # Count comments across all threads
-            for thread in payload["threads"]:
-                if "comments" in thread:
-                    comment_count += len(thread["comments"])
-        
-        # Create detailed output for manifest
-        detailed_output = {
-            "execution_details": {
-                "total_threads_collected": thread_count,
-                "total_comments_collected": comment_count,
-                "keywords_used": keywords,
-                "subreddits_used": subreddits if subreddits else [],
-                "execution_time": time.time() - start_time,
-                "timestamp": datetime.datetime.now().isoformat()
-            },
-            "threads": payload.get("threads", [])
-        }
-        
-        # Store the collect stage output in the manifest
-        # Store in both the node-specific output and in the stages section
-        manifest_manager.store_node_output(collect_node_id, detailed_output)
-        
-        # Also store in the stages section for compatibility with the think stage
-        stages = manifest_manager.get_manifest().setdefault("stages", {})
-        stages["collect_reddit"] = {
-            "data": detailed_output,
-            "status": "completed",
-            "updated_at": datetime.datetime.now().isoformat()
-        }
-        manifest_manager._save()
-        
-        # Update the collect node status
-        manifest_manager.update_node_status(
-            node_id=collect_node_id,
-            state="completed",
-            duration_seconds=time.time() - start_time
-        )
-        
-        logger.info(f"Collect stage completed: {thread_count} threads, {comment_count} comments collected")
-        return detailed_output
-        
-    except Exception as e:
-        logger.error(f"Error in collect stage: {e}")
-        # Update the collect node status to failed
-        manifest_manager.update_node_status(
-            node_id=collect_node_id,
-            state="failed",
-            duration_seconds=time.time() - start_time,
-            error=str(e)
-        )
-        return {"error": str(e)}
+# The run_collect function is no longer needed as we're using scout.collect() directly
+# which handles sandboxed execution of the tool nodes in the plan
 
 
 async def main_async():
@@ -278,30 +143,71 @@ async def main_async():
         # COLLECT STAGE
         if "collect" not in skip_stages:
             logger.info("=== STARTING COLLECT STAGE ===")
+            collect_start = time.time()
             
-            # MCP client for Reddit server - use configs from the system
-            from scout_agent.mcp_integration.config import load_server_configs
+            # Ensure the plan has a collect node with the Reddit tool
+            dag_nodes = plan_result.get("dag", {}).get("nodes", [])
+            has_collect_node = any(n.get("id") == "collect_reddit" for n in dag_nodes)
             
-            # Load server configs from the config system
-            server_configs = load_server_configs()
-            if not server_configs:
-                # Fallback to default if no configs found
-                server_configs = [{"id": "reddit", "url": "http://127.0.0.1:8001/sse", "description": "Reddit MCP"}]
-                logger.warning("No MCP server configs found, using default: http://127.0.0.1:8001/sse")
-            else:
-                logger.info(f"Loaded {len(server_configs)} MCP server configs")
+            if not has_collect_node:
+                logger.info("Adding collect_reddit node to the DAG")
+                # Create a collect node with the Reddit tool
+                keywords = [s.strip() for s in args.keywords.split(",") if s.strip()]
+                subreddits = [s.strip() for s in args.subreddits.split(",") if s.strip()] if args.subreddits else []
                 
-            # Initialize the MCP client with the server configs
-            mcp = MultiMCPClient(server_configs)
-            await mcp.initialize()
+                tool_name = "reddit_api_search_and_fetch_threads" if args.use_api else "reddit_search_and_fetch_threads"
+                
+                # Create the code for the collect node
+                code = f'result = mcp_call(tool="{tool_name}", params={{"keywords": {keywords}, "subreddits": {subreddits}, "per_query_limit": {args.per_query_limit}, "include_comments": {bool(args.include_comments)}, "comment_depth": {args.comment_depth}, "comment_limit": {args.comment_limit}, "use_cache": True}}); save_to_manifest("stages.collect_reddit", result)'
+                
+                collect_node = {
+                    "id": "collect_reddit",
+                    "type": "tool",
+                    "tool": tool_name,
+                    "params": {
+                        "keywords": keywords,
+                        "subreddits": subreddits,
+                        "per_query_limit": args.per_query_limit,
+                        "include_comments": bool(args.include_comments),
+                        "comment_depth": args.comment_depth,
+                        "comment_limit": args.comment_limit,
+                        "use_cache": True
+                    },
+                    "code": code,
+                    "inputs": {},
+                    "outputs": ["stages.collect_reddit"],
+                    "deps": ["plan"]
+                }
+                
+                # Add the collect node to the DAG
+                dag_nodes.append(collect_node)
+                plan_result["dag"]["nodes"] = dag_nodes
+                
+                # Update the manifest with the modified plan
+                manifest_manager.store_node_output("plan", plan_result)
+                manifest_manager._save()
             
             try:
-                # Collect via MCP
-                collect_result = await run_collect(mcp, args, manifest_manager)
-            finally:
-                await mcp.shutdown()
+                # Use scout's collect method with sandboxed execution
+                # This will execute the tool nodes in the plan using the CodeExecutionService
+                collect_result = await scout.collect(plan=plan_result, run_id=args.run_id)
                 
-            logger.info(f"Collect complete: {collect_result.get('execution_details', {}).get('total_threads_collected', 0)} threads collected")
+                # Log the results
+                logger.info(f"Collect stage completed with result: {collect_result}")
+                
+                # Get the actual data from the manifest for logging
+                manifest = manifest_manager.get_manifest()
+                collect_data = manifest.get("stages", {}).get("collect_reddit", {}).get("data", {})
+                threads_collected = collect_data.get("execution_details", {}).get("total_threads_collected", 0)
+                comments_collected = collect_data.get("execution_details", {}).get("total_comments_collected", 0)
+                logger.info(f"Collect complete: {threads_collected} threads, {comments_collected} comments collected")
+                
+                # Calculate and log execution time
+                collect_duration = time.time() - collect_start
+                logger.info(f"Collect stage execution time: {collect_duration:.2f} seconds")
+            except Exception as e:
+                logger.error(f"Error in collect stage: {e}")
+                collect_result = {"error": str(e), "completed": [], "failed": ["collect_reddit"]}
         else:
             logger.info("Skipping collect stage...")
             # Get collect result from manifest if available
@@ -392,45 +298,26 @@ async def main_async():
                     "total_discovered": act_result.total_discovered,
                     "market_summary": act_result.market_summary,
                     "confidence_score": act_result.confidence_score,
-                    "sources_used": act_result.sources_used,
-                    "research_duration": act_result.research_duration,
                 }
                 
-                # Store the act output in the manifest
+                # Write final output to a dedicated file
+                (run_dir / "scout_output.json").write_text(json.dumps(act_output_dict, indent=2))
+                
+                # Store in manifest
                 manifest_manager.store_node_output("act", act_output_dict)
-                
-                # Also store in the stages section for consistency
-                stages = manifest_manager.get_manifest().setdefault("stages", {})
-                stages["act"] = {
-                    "data": act_output_dict,
-                    "status": "completed",
-                    "updated_at": datetime.datetime.now().isoformat()
-                }
-                manifest_manager._save()
-                
-                # Update the act node status
                 manifest_manager.update_node_status(
                     node_id="act",
                     state="completed",
                     duration_seconds=act_time
                 )
                 
-                # Write final output to a separate file for easy access
-                (run_dir / "scout_output.json").write_text(json.dumps(act_output_dict, indent=2))
+                # Update run status
+                manifest_manager.update_run_status("completed")
+                manifest_manager.update_run_metadata({"progress": 100})
             except Exception as e:
-                logger.error(f"Error converting act result to dict: {e}")
+                logger.error(f"Error processing act result: {e}")
                 act_output_dict = {"error": str(e)}
                 
-                # Update the act node status to failed
-                manifest_manager.update_node_status(
-                    node_id="act",
-                    state="failed",
-                    duration_seconds=act_time,
-                    error=str(e)
-                )
-            
-            logger.info(f"Act complete: {act_result.total_discovered} pain points discovered in {act_time:.2f}s")
-            
             # Print a sample of the discovered pain points
             if hasattr(act_result, 'pain_points') and act_result.pain_points:
                 logger.info("\nSample pain points discovered:")
