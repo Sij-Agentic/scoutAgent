@@ -311,19 +311,25 @@ class AgentOrchestrator:
         self.logger.info(f"Executing agent node: {node.node_id}")
         result = await method(**params)
         
+        # Convert result to dict if it has a to_dict method (for JSON serialization)
+        serializable_result = result
+        if hasattr(result, 'to_dict') and callable(result.to_dict):
+            serializable_result = result.to_dict()
+            self.logger.info(f"Converted {type(result).__name__} to dict for serialization")
+        
         # Special handling for plan stage: dynamically update DAG
-        if stage == "plan" and result:
-            await self._update_dag_from_plan(agent_id, result, node.node_id)
+        if stage == "plan" and serializable_result:
+            await self._update_dag_from_plan(agent_id, serializable_result, node.node_id)
         
         # Store result in manifest
         if self.manifest_manager:
-            self.manifest_manager.store_node_output(node.node_id, result)
+            self.manifest_manager.store_node_output(node.node_id, serializable_result)
             self.manifest_manager.update_node_status(node.node_id, NodeStatus.COMPLETED)
         
         end_time = datetime.now()
         return NodeResult(
             success=True,
-            output=result,
+            output=serializable_result,
             start_time=start_time,
             end_time=end_time
         )

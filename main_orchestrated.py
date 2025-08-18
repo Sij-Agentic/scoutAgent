@@ -22,6 +22,9 @@ from scout_agent.orchestration import AgentOrchestrator, create_orchestrator, AG
 from scout_agent.custom_logging.logger import get_logger
 
 
+os.environ.setdefault("SCOUT_LLM_DEFAULT_BACKEND", "deepseek")
+os.environ.setdefault("SCOUT_LLM_DEFAULT_MODEL", "deepseek-chat")
+
 async def run_orchestrated_workflow(
     target_market: str,
     sources: List[str] = None,
@@ -46,7 +49,8 @@ async def run_orchestrated_workflow(
     Returns:
         Dict containing the workflow results
     """
-    logger = get_logger("orchestrated_workflow", level=logging.DEBUG if debug else logging.INFO)
+    #logger = get_logger("orchestrated_workflow", level=logging.DEBUG if debug else logging.INFO)
+    logger = get_logger("orchestrated_workflow")
     logger.info(f"Starting orchestrated workflow for market: {target_market}")
     
     # Generate run_id if not provided
@@ -68,7 +72,10 @@ async def run_orchestrated_workflow(
             "sources": sources,
             "keywords": keywords
         },
-        run_id=run_id
+        metadata={
+            "run_id": run_id,
+            "timestamp": datetime.datetime.now().isoformat()
+        }
     )
     
     # Create the orchestrator
@@ -76,7 +83,7 @@ async def run_orchestrated_workflow(
     
     # Register the ScoutAgent
     scout_agent = ScoutAgent(agent_id="scout")
-    orchestrator.register_agent(scout_agent, AGENT_STAGE_CONFIGS["scout"])
+    orchestrator.register_agent("scout", AGENT_STAGE_CONFIGS["scout"], scout_agent)
     
     # Initialize the orchestrator
     await orchestrator.initialize(agent_input)
@@ -97,6 +104,7 @@ async def run_orchestrated_workflow(
 
 
 def main():
+
     """Main entry point for the script."""
     parser = argparse.ArgumentParser(description="Run ScoutAgent with orchestration")
     parser.add_argument("--target-market", type=str, required=True, help="Target market to research")
