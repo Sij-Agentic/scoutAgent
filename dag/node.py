@@ -112,11 +112,15 @@ class DAGNode:
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert node to dictionary for serialization."""
+        # Handle enum serialization by converting to string values
+        node_type_value = self.node_type.value if hasattr(self.node_type, "value") else str(self.node_type)
+        status_value = self.status.value if hasattr(self.status, "value") else str(self.status)
+        
         return {
             "node_id": self.node_id,
             "name": self.name,
             "description": self.description,
-            "node_type": self.node_type.value,
+            "node_type": node_type_value,
             "agent_name": self.agent_name,
             "function": self.function,
             "config": {
@@ -126,7 +130,7 @@ class DAGNode:
                 "parallel": self.config.parallel,
                 "metadata": self.config.metadata
             },
-            "status": self.status.value,
+            "status": status_value,
             "result": {
                 "success": self.result.success if self.result else None,
                 "output": self.result.output if self.result else None,
