@@ -20,7 +20,6 @@ from typing import Any, Dict, List, Optional, Set, Tuple, Union, cast
 from scout_agent.memory.manifest_manager import ManifestManager
 
 from .base import BaseAgent, AgentInput, AgentOutput, AgentState
-from .research_agent import ResearchAgent
 from ..config import get_config
 from ..mcp_integration.client.base import MCPClient
 from ..mcp_integration.config import load_server_configs
@@ -74,6 +73,17 @@ class ScoutOutput:
     confidence_score: float
     sources_used: List[str]
     research_duration: float
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert ScoutOutput to a dictionary for JSON serialization."""
+        return {
+            "pain_points": [pp.to_dict() for pp in self.pain_points],
+            "total_discovered": self.total_discovered,
+            "market_summary": self.market_summary,
+            "confidence_score": self.confidence_score,
+            "sources_used": self.sources_used,
+            "research_duration": self.research_duration
+        }
 
 
 class ScoutAgent(BaseAgent, LLMAgentMixin):
@@ -90,7 +100,6 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
         # Do not force a backend here; honor global/per-agent config in LLMAgentMixin
         LLMAgentMixin.__init__(self, preferred_backend=None)
         self.name = "scout_agent"  # Used for prompt template loading
-        self.research_agent = ResearchAgent()
         self.config = get_config()
 
     def _normalize_input(self, agent_input: Any) -> ScoutInput:
@@ -514,16 +523,8 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
                 research_duration=(datetime.now() - start_time).total_seconds()
             )
         
-        # Write output to manifest
-        output_dict = {
-            "pain_points": [pp.to_dict() for pp in output.pain_points],
-            "total_discovered": output.total_discovered,
-            "market_summary": output.market_summary,
-            "confidence_score": output.confidence_score,
-            "sources_used": output.sources_used,
-            "research_duration": output.research_duration
-        }
-        self._write_stage_output("act", output_dict)
+        # Write output to manifest using the to_dict method
+        self._write_stage_output("act", output.to_dict())
         
         self.logger.info(f"Found {len(output.pain_points)} validated pain points")
         return output
