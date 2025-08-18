@@ -325,12 +325,37 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
             
             # Get the collected Reddit data from the manifest
             reddit_data = manifest_manager.get_node_output(collect_node_id)
+            
+            # Add debug logging to see what's in the manifest
+            manifest = manifest_manager.get_manifest()
+            self.logger.warning(f"Checking for collect data in manifest stages.{collect_node_id}")
+            
+            if not reddit_data:
+                self.logger.warning(f"No collect data found in manifest stages.{collect_node_id}")
+                
+                # Check if there's data in the node outputs
+                if collect_node_id in manifest.get("stages", {}):
+                    node_data = manifest["stages"][collect_node_id]
+                    self.logger.info(f"Found node data with keys: {list(node_data.keys())}")
+                    
+                    if "data" in node_data:
+                        reddit_data = node_data["data"]
+                        self.logger.info(f"Using data from stages.{collect_node_id}.data with keys: {list(reddit_data.keys()) if isinstance(reddit_data, dict) else 'not a dict'}")
+                    else:
+                        self.logger.warning(f"No collect data found in node outputs either")
+                else:
+                    self.logger.warning(f"Node {collect_node_id} not found in stages")
+            
+            # If we still don't have data, raise an error
             if not reddit_data:
                 raise ValueError(f"No Reddit data found for node: {collect_node_id}")
             
             # Extract threads and comments from the collected data
             threads = reddit_data.get("threads", [])
             comments = reddit_data.get("comments", [])
+            
+            # Log what we found
+            self.logger.info(f"Found {len(threads)} threads and {len(comments)} comments in the Reddit data")
             
             if not threads:
                 self.logger.warning("No Reddit threads found in collected data")
@@ -1187,10 +1212,47 @@ def save_to_manifest(section_key: str, obj):
         except Exception:
             pass
     
+    # Ensure we have valid data to save
+    if obj is None:
+        print(f"WARNING: Attempting to save None object to {section_key}")
+        obj = {"warning": "No data was returned from the tool call"}
+    
     # For stages, ensure we have the proper structure and save the actual data
     if keys[0] == "stages":
         stage_name = keys[-1]
         current.setdefault(stage_name, {})
+        
+        # Ensure we have a proper data structure for Reddit threads
+        if stage_name == "collect_reddit":
+            # Special handling for MCP tool responses with nested JSON
+            if isinstance(obj, dict):
+                # Check if this is an MCP response with content structure
+                if "content" in obj and isinstance(obj["content"], list) and len(obj["content"]) > 0:
+                    content_item = obj["content"][0]
+                    if isinstance(content_item, dict) and "text" in content_item:
+                        # Try to parse the nested JSON in the text field
+                        try:
+                            print(f"DEBUG: Found nested JSON in MCP response text field, attempting to parse")
+                            nested_data = json.loads(content_item["text"])
+                            if isinstance(nested_data, dict):
+                                obj = nested_data  # Replace with the parsed nested data
+                                print(f"DEBUG: Successfully parsed nested JSON with keys: {list(obj.keys())}")
+                        except Exception as e:
+                            print(f"DEBUG: Failed to parse nested JSON in text field: {e}")
+                
+                # If threads key doesn't exist, initialize it
+                if "threads" not in obj:
+                    obj["threads"] = []
+                    
+                # Add execution details if not present
+                if "execution_details" not in obj:
+                    obj["execution_details"] = {
+                        "total_threads_collected": len(obj.get("threads", [])),
+                        "total_comments_collected": sum(len(t.get("comments", [])) for t in obj.get("threads", []))
+                    }
+                    
+                print(f"DEBUG: Saving {len(obj.get('threads', []))} threads to manifest")
+        
         current[stage_name]["data"] = obj
         current[stage_name]["updated_at"] = __import__("datetime").datetime.now().isoformat()
         current[stage_name]["status"] = "completed"
@@ -1200,7 +1262,14 @@ def save_to_manifest(section_key: str, obj):
             "updated_at": __import__("datetime").datetime.now().isoformat()
         }
     
-    manifest_path.write_text(json.dumps(manifest, indent=2))
+    # Write the updated manifest
+    try:
+        manifest_path.write_text(json.dumps(manifest, indent=2))
+        print(f"DEBUG: Successfully wrote manifest to {manifest_path}")
+    except Exception as e:
+        print(f"ERROR: Failed to write manifest: {e}")
+        import traceback
+        print(f"DEBUG: Traceback: {traceback.format_exc()}")
 
 def read_from_manifest(section_key: str):
     """Read data from a specific section in the run manifest."""
@@ -1222,21 +1291,137 @@ def read_from_manifest(section_key: str):
 
 def _ensure_payload(res):
     try:
-        content = res.content[0].text if getattr(res, "content", None) else "{}"
-        return json.loads(content)
-    except Exception:
-        return {"raw": str(res)}
+        # Log the response structure for debugging
+        print(f"DEBUG: Response type: {type(res)}")
+        print(f"DEBUG: Response attributes: {dir(res)}")
+        
+        # Check if response has content attribute
+        if hasattr(res, "content") and res.content:
+            print(f"DEBUG: Content type: {type(res.content)}")
+            print(f"DEBUG: Content length: {len(res.content)}")
+            
+            # Try to get the text from the first content item
+            if isinstance(res.content, list) and len(res.content) > 0:
+                content_item = res.content[0]
+                print(f"DEBUG: Content item type: {type(content_item)}")
+                print(f"DEBUG: Content item attributes: {dir(content_item)}")
+                
+                if hasattr(content_item, "text"):
+                    content = content_item.text
+                    print(f"DEBUG: Content text length: {len(content)}")
+                    try:
+                        parsed = json.loads(content)
+                        print(f"DEBUG: Successfully parsed JSON with keys: {list(parsed.keys())}")
+                        return parsed
+                    except json.JSONDecodeError as e:
+                        print(f"DEBUG: JSON decode error: {e}")
+                        # Return partial content for debugging
+                        return {"raw": content[:500], "error": f"JSON decode error: {e}"}
+                else:
+                    print("DEBUG: Content item has no text attribute")
+                    # Try to convert the content item to a dict if possible
+                    if hasattr(content_item, "__dict__"):
+                        try:
+                            item_dict = content_item.__dict__
+                            print(f"DEBUG: Converted content item to dict with keys: {list(item_dict.keys())}")
+                            return {"content": [item_dict]}
+                        except Exception as e:
+                            print(f"DEBUG: Failed to convert content item to dict: {e}")
+                    return {"raw": str(content_item), "error": "No text attribute in content item"}
+            else:
+                print("DEBUG: Content is not a list or is empty")
+                # Try to convert the content to a dict if possible
+                if hasattr(res.content, "__dict__"):
+                    try:
+                        content_dict = res.content.__dict__
+                        print(f"DEBUG: Converted content to dict with keys: {list(content_dict.keys())}")
+                        return {"content": [content_dict]}
+                    except Exception as e:
+                        print(f"DEBUG: Failed to convert content to dict: {e}")
+                return {"raw": str(res.content), "error": "Content is not a list or is empty"}
+        else:
+            print("DEBUG: Response has no content attribute or content is None")
+            # Try to get raw text or other attributes
+            if hasattr(res, "text"):
+                try:
+                    return json.loads(res.text)
+                except Exception:
+                    return {"raw": res.text[:500], "error": "No content attribute, using text"}
+            elif hasattr(res, "body"):
+                try:
+                    return json.loads(res.body)
+                except Exception:
+                    return {"raw": str(res.body)[:500], "error": "No content attribute, using body"}
+            else:
+                # Try to convert the response object itself to a dict
+                if hasattr(res, "__dict__"):
+                    try:
+                        res_dict = res.__dict__
+                        print(f"DEBUG: Converted response to dict with keys: {list(res_dict.keys())}")
+                        return res_dict
+                    except Exception as e:
+                        print(f"DEBUG: Failed to convert response to dict: {e}")
+                return {"raw": str(res)[:500], "error": "No content, text, or body attributes"}
+    except Exception as e:
+        print(f"DEBUG: Exception in _ensure_payload: {e}")
+        import traceback
+        print(f"DEBUG: Traceback: {traceback.format_exc()}")
+        return {"raw": str(res)[:500] if res else "None", "error": f"Exception: {e}"}
 
 def mcp_call(tool: str, params: dict):
     async def _run():
-        servers = load_server_configs()
-        client = MultiMCPClient(servers)
-        await client.initialize()
+        print(f"DEBUG: Starting MCP call for tool: {tool}")
+        print(f"DEBUG: Parameters: {params}")
+        
         try:
-            result = await client.call_tool(tool, params or {})
-            return _ensure_payload(result)
+            # Load server configs
+            print("DEBUG: Loading server configs")
+            servers = load_server_configs()
+            print(f"DEBUG: Loaded {len(servers)} server configs")
+            
+            # Initialize client
+            print("DEBUG: Initializing MultiMCPClient")
+            client = MultiMCPClient(servers)
+            print("DEBUG: Client created, calling initialize()")
+            await client.initialize()
+            print("DEBUG: Client initialized successfully")
+            
+            try:
+                # Make the tool call
+                print(f"DEBUG: Calling tool {tool} with params {params}")
+                result = await client.call_tool(tool, params or {})
+                print(f"DEBUG: Tool call completed, result type: {type(result)}")
+                
+                # Process the result
+                processed_result = _ensure_payload(result)
+                print(f"DEBUG: Processed result type: {type(processed_result)}")
+                
+                # Check if we have threads in the result
+                if isinstance(processed_result, dict) and 'threads' in processed_result:
+                    print(f"DEBUG: Found {len(processed_result['threads'])} threads in result")
+                else:
+                    print("DEBUG: No threads found in result")
+                    
+                return processed_result
+            except Exception as e:
+                print(f"DEBUG: Error during tool call: {e}")
+                import traceback
+                print(f"DEBUG: Traceback: {traceback.format_exc()}")
+                return {"error": f"Tool call error: {e}", "tool": tool, "params": params}
+        except Exception as e:
+            print(f"DEBUG: Error setting up MCP client: {e}")
+            import traceback
+            print(f"DEBUG: Traceback: {traceback.format_exc()}")
+            return {"error": f"MCP client setup error: {e}", "tool": tool, "params": params}
         finally:
-            await client.shutdown()
+            try:
+                if 'client' in locals():
+                    print("DEBUG: Shutting down client")
+                    await client.shutdown()
+                    print("DEBUG: Client shutdown complete")
+            except Exception as e:
+                print(f"DEBUG: Error during client shutdown: {e}")
+                pass
     return asyncio.run(_run())
 ''')
             prelude = (
