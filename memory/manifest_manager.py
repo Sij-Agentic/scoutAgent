@@ -6,10 +6,21 @@ consistent structure, status tracking, and output handling.
 """
 
 import json
-import time
 import datetime
+import os
 from pathlib import Path
 from typing import Dict, Any, List, Optional, Union
+from enum import Enum
+from scout_agent.custom_logging.logger import get_logger
+
+
+class EnumEncoder(json.JSONEncoder):
+    """Custom JSON encoder that can handle Enum types."""
+    
+    def default(self, obj):
+        if isinstance(obj, Enum):
+            return obj.value
+        return super().default(obj)
 
 
 class ManifestManager:
@@ -167,7 +178,7 @@ class ManifestManager:
     def _save(self) -> None:
         """Save the manifest to disk."""
         self.manifest_path.parent.mkdir(parents=True, exist_ok=True)
-        self.manifest_path.write_text(json.dumps(self._manifest, indent=2))
+        self.manifest_path.write_text(json.dumps(self._manifest, indent=2, cls=EnumEncoder))
     
     def _merge_dicts(self, base: Dict[str, Any], updates: Dict[str, Any]) -> Dict[str, Any]:
         """Shallow-then-deep merge dictionaries.

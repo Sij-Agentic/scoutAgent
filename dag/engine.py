@@ -14,8 +14,8 @@ import networkx as nx
 from pathlib import Path
 import json
 
-from dag.node import DAGNode, NodeStatus, NodeResult
-from custom_logging.logger import get_logger
+from scout_agent.dag.node import DAGNode, NodeStatus, NodeResult
+from scout_agent.custom_logging.logger import get_logger
 
 
 @dataclass
