@@ -157,26 +157,209 @@ async def main_async():
                 
                 tool_name = "reddit_api_search_and_fetch_threads" if args.use_api else "reddit_search_and_fetch_threads"
                 
-                # Create the code for the collect node
-                code = f'result = mcp_call(tool="{tool_name}", params={{"keywords": {keywords}, "subreddits": {subreddits}, "per_query_limit": {args.per_query_limit}, "include_comments": {bool(args.include_comments)}, "comment_depth": {args.comment_depth}, "comment_limit": {args.comment_limit}, "use_cache": True}}); save_to_manifest("stages.collect_reddit", result)'
+                # Create the code for the collect node with extreme logging to files
+                code = f'''
+# Import necessary modules
+import os
+import sys
+import json
+import datetime
+import traceback
+
+# Create direct file logging that doesn't depend on print statements
+def log_to_file(message, filename="direct_debug.log"):
+    try:
+        log_path = os.path.join(os.getcwd(), filename)
+        with open(log_path, "a") as f:
+            timestamp = datetime.datetime.now().isoformat()
+            f.write(f"[{{timestamp}}] {{message}}\n")
+        return log_path
+    except Exception as e:
+        print(f"ERROR LOGGING: {{e}}")
+        return None
+
+# Start logging
+log_to_file("===== COLLECT_REDDIT NODE EXECUTION STARTED =====")
+
+# Log environment info for debugging
+env_info = {{
+    "cwd": os.getcwd(),
+    "sys_path": sys.path,
+    "python_version": sys.version,
+    "env_vars": {{k: v for k, v in os.environ.items() if not k.startswith("AWS") and k not in ["PATH"]}}
+}}
+log_to_file(f"ENVIRONMENT: {{json.dumps(env_info, indent=2)}}")
+
+# Get the parameters
+try:
+    # Log parameters
+    tool = "{tool_name}"
+    params = {{
+        "keywords": {keywords},
+        "subreddits": {subreddits},
+        "per_query_limit": {args.per_query_limit},
+        "include_comments": {bool(args.include_comments)},
+        "comment_depth": {args.comment_depth},
+        "comment_limit": {args.comment_limit},
+        "use_cache": True
+    }}
+    log_to_file(f"TOOL: {{tool}}")
+    log_to_file(f"PARAMS: {{json.dumps(params, indent=2)}}")
+except Exception as e:
+    log_to_file(f"ERROR PROCESSING PARAMS: {{e}}\n{{traceback.format_exc()}}")
+
+# Call the MCP tool with extreme logging
+try:
+    log_to_file("BEFORE MCP CALL")
+    
+    # Save the exact code of mcp_call for debugging
+    import inspect
+    if callable(mcp_call):
+        try:
+            log_to_file(f"MCP_CALL FUNCTION: {{inspect.getsource(mcp_call)}}")
+        except Exception as e:
+            log_to_file(f"Could not get mcp_call source: {{e}}")
+    
+    # Make the actual call
+    log_to_file("Executing mcp_call with tool=" + tool)
+    result = mcp_call(tool, **params)
+    log_to_file("AFTER MCP CALL")
+    
+    # Write raw result to file immediately
+    with open(os.path.join(os.getcwd(), "raw_mcp_result.json"), "w") as f:
+        try:
+            json.dump(result, f, indent=2)
+            log_to_file("Saved raw result to raw_mcp_result.json")
+        except Exception as e:
+            log_to_file(f"Error saving raw result: {{e}}")
+            f.write(str(result))
+            
+except Exception as e:
+    log_to_file(f"ERROR IN MCP CALL: {{e}}\n{{traceback.format_exc()}}")
+    result = {{
+        "threads": [],
+        "error": str(e), 
+        "traceback": traceback.format_exc()
+    }}
+
+# Log the result structure
+try:
+    log_to_file(f"RESULT TYPE: {{type(result)}}")
+    
+    if result is None:
+        log_to_file("RESULT IS NONE")
+        result = {{"threads": [], "error": "MCP call returned None"}}
+    
+    if isinstance(result, dict):
+        log_to_file(f"RESULT KEYS: {{list(result.keys())}}")
+        threads = result.get("threads", [])
+        log_to_file(f"THREAD COUNT: {{len(threads)}}")
+        
+        if threads:
+            log_to_file(f"FIRST THREAD KEYS: {{list(threads[0].keys()) if threads else []}}")
+            log_to_file(f"FIRST THREAD ID: {{threads[0].get('id', 'unknown')}}")
+            log_to_file(f"FIRST THREAD TITLE: {{threads[0].get('title', 'unknown')}}")
+            comments = threads[0].get("comments", [])
+            log_to_file(f"FIRST THREAD COMMENT COUNT: {{len(comments)}}")
+        else:
+            log_to_file("NO THREADS FOUND IN RESULT")
+    else:
+        log_to_file(f"RESULT IS NOT A DICT: {{result}}")
+        # Convert to dict if it's not already
+        try:
+            if isinstance(result, str):
+                result = json.loads(result)
+            elif isinstance(result, dict) and 'response' in result and isinstance(result['response'], str):
+                # Handle nested JSON in MCP response
+                try:
+                    parsed_response = json.loads(result['response'])
+                    if isinstance(parsed_response, dict) and 'threads' in parsed_response:
+                        log_to_file(f"Successfully parsed nested JSON response with {len(parsed_response['threads'])} threads")
+                        result = parsed_response
+                    else:
+                        log_to_file(f"Parsed response doesn't contain threads key: {list(parsed_response.keys()) if isinstance(parsed_response, dict) else type(parsed_response)}")
+                except Exception as e:
+                    log_to_file(f"Error parsing nested JSON: {e}")
+            else:
+                result = {"threads": [], "error": f"Unexpected result type: {type(result)}", "raw_result": str(result)}
+        except Exception as e:
+            log_to_file(f"ERROR CONVERTING RESULT: {e}")
+            result = {"threads": [], "error": f"Failed to convert result: {e}", "raw_result": str(result)}
+except Exception as e:
+    log_to_file(f"ERROR PROCESSING RESULT: {{e}}\n{{traceback.format_exc()}}")
+    result = {{"threads": [], "error": f"Error processing result: {{e}}"}}
+
+# Add execution details to the result
+try:
+    if isinstance(result, dict):
+        result.setdefault('execution_details', {{}})
+        thread_count = len(result.get("threads", []))
+        comment_count = sum(len(t.get("comments", [])) for t in result.get("threads", []))
+        result['execution_details'] = {{
+            "total_threads_collected": thread_count,
+            "total_comments_collected": comment_count,
+            "keywords_used": params["keywords"],
+            "subreddits_used": params["subreddits"],
+            "execution_time": str(datetime.datetime.now())
+        }}
+        log_to_file(f"EXECUTION DETAILS: {{thread_count}} threads, {{comment_count}} comments")
+except Exception as e:
+    log_to_file(f"ERROR ADDING EXECUTION DETAILS: {{e}}\n{{traceback.format_exc()}}")
+
+# Save debug info to multiple locations to ensure it's captured
+try:
+    # Save to current directory as primary debug file
+    debug_file = os.path.join(os.getcwd(), "collect_reddit_debug.json")
+    
+    debug_data = {{
+        "params": params,
+        "environment": env_info,
+        "result_summary": {{
+            "type": str(type(result)),
+            "is_dict": isinstance(result, dict),
+            "keys": list(result.keys()) if isinstance(result, dict) else None,
+            "thread_count": len(result.get("threads", [])) if isinstance(result, dict) else 0,
+        }},
+        "full_result": result
+    }}
+    
+    with open(debug_file, "w") as f:
+        json.dump(debug_data, f, indent=2)
+    log_to_file(f"SAVED DEBUG FILE: {{debug_file}}")
+    
+    # Also save to /tmp as another backup
+    try:
+        tmp_file = "/tmp/collect_reddit_debug.json"
+        with open(tmp_file, "w") as f:
+            json.dump(debug_data, f, indent=2)
+        log_to_file(f"SAVED TMP DEBUG FILE: {{tmp_file}}")
+    except Exception as e:
+        log_to_file(f"ERROR SAVING TMP DEBUG FILE: {{e}}")
+        
+except Exception as e:
+    log_to_file(f"ERROR SAVING DEBUG FILES: {{e}}\n{{traceback.format_exc()}}")
+
+# Save to manifest
+try:
+    log_to_file("BEFORE SAVE TO MANIFEST")
+    # Ensure we're saving to the correct path that the think stage expects
+    save_to_manifest("stages.collect_reddit.data", result)
+    log_to_file("AFTER SAVE TO MANIFEST")
+except Exception as e:
+    log_to_file(f"ERROR SAVING TO MANIFEST: {e}\n{traceback.format_exc()}")
+
+log_to_file("===== COLLECT_REDDIT NODE EXECUTION COMPLETED =====")
+return result'''
                 
                 collect_node = {
                     "id": "collect_reddit",
-                    "type": "tool",
-                    "tool": tool_name,
-                    "params": {
-                        "keywords": keywords,
-                        "subreddits": subreddits,
-                        "per_query_limit": args.per_query_limit,
-                        "include_comments": bool(args.include_comments),
-                        "comment_depth": args.comment_depth,
-                        "comment_limit": args.comment_limit,
-                        "use_cache": True
-                    },
+                    "type": "code",  # Changed from 'tool' to 'code' to ensure our code is used
+                    "language": "python",
                     "code": code,
                     "inputs": {},
                     "outputs": ["stages.collect_reddit"],
                     "deps": ["plan"]
+                    # Explicitly NOT using tool, params, or parallelize_by to ensure our code is used
                 }
                 
                 # Add the collect node to the DAG
@@ -201,6 +384,24 @@ async def main_async():
                 threads_collected = collect_data.get("execution_details", {}).get("total_threads_collected", 0)
                 comments_collected = collect_data.get("execution_details", {}).get("total_comments_collected", 0)
                 logger.info(f"Collect complete: {threads_collected} threads, {comments_collected} comments collected")
+                
+                # Check if we have actual thread data
+                threads = collect_data.get("threads", [])
+                if not threads:
+                    logger.warning("No threads found in collect_data! Checking for debug file...")
+                    debug_path = os.path.join(run_dir, "collect_reddit_debug.json")
+                    if os.path.exists(debug_path):
+                        try:
+                            with open(debug_path, 'r') as f:
+                                debug_data = json.load(f)
+                                logger.info(f"Debug file found with {len(debug_data.get('threads', []))} threads")
+                                # If we have data in debug file but not in manifest, fix the manifest
+                                if debug_data.get("threads") and not threads:
+                                    logger.info("Restoring data from debug file to manifest")
+                                    manifest_manager.store_stage_output("collect_reddit", debug_data)
+                                    manifest_manager._save()
+                        except Exception as e:
+                            logger.error(f"Error reading debug file: {e}")
                 
                 # Calculate and log execution time
                 collect_duration = time.time() - collect_start
