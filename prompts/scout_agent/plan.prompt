@@ -17,6 +17,8 @@ Your job is to generate ONLY the tool nodes needed for data collection.
 # OUTPUT FORMAT
 Respond with a STRICT JSON object (no prose) containing only tool nodes for the orchestrator to integrate. Do not include markdown fences.
 
+**CRITICAL: Each tool node MUST include a "code" field with the executable Python code for the MCP tool call.**
+
 # CONSTRAINTS AND DEFAULTS
 - time_window: "12m" (last 12 months)
 - per_query_limit: 15 (per keyword across subreddits)
@@ -43,7 +45,10 @@ Respond with a STRICT JSON object (no prose) containing only tool nodes for the 
           "comment_depth": number (default 2),
           "comment_limit": number (default 200),
           "use_cache": true
-        }
+        },
+        "code": "# MCP tool call for reddit_search_and_fetch_threads\nimport json\n\n# Call the tool with parameters\nresult = mcp_call(\"reddit_search_and_fetch_threads\", {\n  \"keywords\": [\"keyword1\", \"keyword2\"],\n  \"subreddits\": [\"subreddit1\", \"subreddit2\"],\n  \"per_query_limit\": 50,\n  \"include_comments\": true,\n  \"comment_depth\": 2,\n  \"comment_limit\": 200,\n  \"use_cache\": true\n})\n\n# Save result to manifest\nsave_to_manifest(\"collect_reddit\", result)\n\nprint(f\"DEBUG: reddit_search_and_fetch_threads completed, result type: {type(result)}\")\nif isinstance(result, dict):\n    threads_count = len(result.get('threads', []))\n    comments_count = sum(len(t.get('comments', [])) for t in result.get('threads', []))\n    print(f\"DEBUG: Collected {threads_count} threads and {comments_count} comments\")",
+        "language": "python",
+        "outputs": ["stages.collect_reddit"]
       },
       {
         "id": "collect_twitter",
@@ -53,7 +58,10 @@ Respond with a STRICT JSON object (no prose) containing only tool nodes for the 
           "keywords": array of strings,
           "max_results": number (default 100),
           "include_replies": false
-        }
+        },
+        "code": "# MCP tool call for twitter_search_and_fetch_tweets\nimport json\n\n# Call the tool with parameters\nresult = mcp_call(\"twitter_search_and_fetch_tweets\", {\n  \"keywords\": [\"keyword1\", \"keyword2\"],\n  \"max_results\": 100,\n  \"include_replies\": false\n})\n\n# Save result to manifest\nsave_to_manifest(\"collect_twitter\", result)\n\nprint(f\"DEBUG: twitter_search_and_fetch_tweets completed, result type: {type(result)}\")",
+        "language": "python",
+        "outputs": ["stages.collect_twitter"]
       }
       // Add more tool nodes based on available tools and sources
       }
@@ -83,7 +91,10 @@ Respond with a STRICT JSON object (no prose) containing only tool nodes for the 
           "comment_depth": 2,
           "comment_limit": 200,
           "use_cache": true
-        }
+        },
+        "code": "# MCP tool call for reddit_search_and_fetch_threads\nimport json\n\n# Call the tool with parameters\nresult = mcp_call(\"reddit_search_and_fetch_threads\", {\n  \"keywords\": [\"customer support automation\", \"workflow automation\", \"knowledge management\"],\n  \"subreddits\": [\"SaaS\", \"MicroSaaS\", \"indiehackers\", \"startups\", \"Entrepreneur\", \"SideProject\", \"Business_Ideas\", \"growmybusiness\", \"smallbusiness\", \"Productivity\"],\n  \"per_query_limit\": 50,\n  \"include_comments\": true,\n  \"comment_depth\": 2,\n  \"comment_limit\": 200,\n  \"use_cache\": true\n})\n\n# Save result to manifest\nsave_to_manifest(\"collect_reddit\", result)\n\nprint(f\"DEBUG: reddit_search_and_fetch_threads completed, result type: {type(result)}\")\nif isinstance(result, dict):\n    threads_count = len(result.get('threads', []))\n    comments_count = sum(len(t.get('comments', [])) for t in result.get('threads', []))\n    print(f\"DEBUG: Collected {threads_count} threads and {comments_count} comments\")",
+        "language": "python",
+        "outputs": ["stages.collect_reddit"]
       }
     ]
   },
