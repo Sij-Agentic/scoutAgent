@@ -29,8 +29,13 @@ async def run_orchestrated_workflow(
     target_market: str,
     sources: List[str] = None,
     keywords: List[str] = None,
+    subreddits: List[str] = None,
     research_scope: str = "comprehensive",
     max_pain_points: int = 10,
+    per_query_limit: int = 50,
+    include_comments: bool = True,
+    comment_depth: int = 2,
+    comment_limit: int = 200,
     run_id: Optional[str] = None,
     debug: bool = False
 ) -> Dict[str, Any]:
@@ -41,8 +46,13 @@ async def run_orchestrated_workflow(
         target_market: The target market to research
         sources: List of sources to use for research
         keywords: List of keywords to search for
+        subreddits: List of subreddits to search
         research_scope: Scope of research (quick, focused, comprehensive)
         max_pain_points: Maximum number of pain points to discover
+        per_query_limit: Maximum number of threads per query
+        include_comments: Include comments in thread collection
+        comment_depth: Maximum depth of comment tree to collect
+        comment_limit: Maximum number of comments per thread
         run_id: Optional run ID for the workflow
         debug: Enable debug logging
     
@@ -59,9 +69,11 @@ async def run_orchestrated_workflow(
     
     # Default sources and keywords if not provided
     if sources is None:
-        sources = ["reddit", "twitter", "forums", "reviews", "blogs"]
+        sources = ["reddit"]
     if keywords is None:
         keywords = ["pain point", "problem", "frustration", "issue"]
+    if subreddits is None:
+        subreddits = []
     
     # Create the agent input
     agent_input = AgentInput(
@@ -70,7 +82,12 @@ async def run_orchestrated_workflow(
             "research_scope": research_scope,
             "max_pain_points": max_pain_points,
             "sources": sources,
-            "keywords": keywords
+            "keywords": keywords,
+            "subreddits": subreddits,
+            "per_query_limit": per_query_limit,
+            "include_comments": include_comments,
+            "comment_depth": comment_depth,
+            "comment_limit": comment_limit
         },
         metadata={
             "run_id": run_id,
@@ -104,29 +121,42 @@ async def run_orchestrated_workflow(
 
 
 def main():
-
     """Main entry point for the script."""
     parser = argparse.ArgumentParser(description="Run ScoutAgent with orchestration")
     parser.add_argument("--target-market", type=str, required=True, help="Target market to research")
+    parser.add_argument("--keywords", type=str, required=True, help="Comma-separated keywords to search for")
+    parser.add_argument("--subreddits", type=str, default="", help="Comma-separated subreddits to search")
     parser.add_argument("--sources", type=str, nargs="+", help="Sources to use for research")
-    parser.add_argument("--keywords", type=str, nargs="+", help="Keywords to search for")
     parser.add_argument("--research-scope", type=str, default="comprehensive", 
                         choices=["quick", "focused", "comprehensive"],
                         help="Scope of research")
     parser.add_argument("--max-pain-points", type=int, default=10, 
                         help="Maximum number of pain points to discover")
+    parser.add_argument("--per-query-limit", type=int, default=50, help="Maximum number of threads per query")
+    parser.add_argument("--include-comments", action="store_true", help="Include comments in thread collection")
+    parser.add_argument("--comment-depth", type=int, default=2, help="Maximum depth of comment tree to collect")
+    parser.add_argument("--comment-limit", type=int, default=200, help="Maximum number of comments per thread")
     parser.add_argument("--run-id", type=str, help="Run ID for the workflow")
     parser.add_argument("--debug", action="store_true", help="Enable debug logging")
     
     args = parser.parse_args()
     
+    # Parse keywords and subreddits from command line
+    keywords = [k.strip() for k in args.keywords.split(",") if k.strip()]
+    subreddits = [s.strip() for s in args.subreddits.split(",") if s.strip()] if args.subreddits else []
+    
     # Run the workflow
     results = asyncio.run(run_orchestrated_workflow(
         target_market=args.target_market,
         sources=args.sources,
-        keywords=args.keywords,
+        keywords=keywords,
+        subreddits=subreddits,
         research_scope=args.research_scope,
         max_pain_points=args.max_pain_points,
+        per_query_limit=args.per_query_limit,
+        include_comments=args.include_comments,
+        comment_depth=args.comment_depth,
+        comment_limit=args.comment_limit,
         run_id=args.run_id,
         debug=args.debug
     ))
