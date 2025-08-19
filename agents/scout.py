@@ -833,12 +833,31 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
                 
                 self.logger.info(f"DEBUG: Final params for {tool_name}: {json.dumps(params, indent=2)}")
                 
+                # Generate MCP tool call code
+                code = f'''
+# MCP tool call for {tool_name}
+import json
+from pathlib import Path
+
+# Define parameters as Python dict
+params = {repr(params)}
+
+# Call the MCP tool (synchronous wrapper)
+result = mcp_call("{tool_name}", params)
+
+# Save result to manifest
+save_to_manifest("stages.{node_id}", result)
+
+print(f"DEBUG: {tool_name} completed, result keys: {{list(result.keys()) if isinstance(result, dict) else 'not dict'}}")
+'''.strip()
+
                 # Create tool node compatible with orchestrator expectations
                 tool_node = {
                     "id": node_id,
                     "type": "tool",
                     "tool": tool_name,
-                    "params": params
+                    "params": params,
+                    "code": code
                 }
                 self.logger.info(f"DEBUG: Created tool node {node_id} with params: {json.dumps(tool_node['params'], indent=2)}")
                 
@@ -1030,8 +1049,7 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
                     manifest_manager.record_error(
                         node_id=nid,
                         error_message=error.get("stderr", "Unknown error"),
-                        error_type="execution_error",
-                        stack_trace=error.get("stdout", "")
+                        error_type="execution_error"
                     )
                 
                 # Update overall run status based on node status
@@ -1320,7 +1338,7 @@ def read_from_manifest(section_key: str):
 
 def mcp_call(tool: str, params: dict):
     def _ensure_payload_local(res):
-        """Local version of _ensure_payload for sandboxed execution"""
+        """Local version of _ensure_payload for sandboxed execution with double-nested JSON parsing"""
         try:
             if hasattr(res, "content") and res.content is not None:
                 if isinstance(res.content, list) and res.content:
@@ -1328,9 +1346,39 @@ def mcp_call(tool: str, params: dict):
                     if hasattr(content_item, "text"):
                         content = content_item.text
                         try:
-                            parsed_json = json.loads(content)
-                            return parsed_json
+                            # First layer: Parse the outer JSON structure
+                            first_parse = json.loads(content)
+                            print(f"DEBUG: First parse keys: {list(first_parse.keys()) if isinstance(first_parse, dict) else 'not dict'}")
+                            
+                            # Check if this is the double-nested structure we expect
+                            if isinstance(first_parse, dict) and "content" in first_parse:
+                                content_list = first_parse["content"]
+                                print(f"DEBUG: Found content list with {len(content_list)} items")
+                                if isinstance(content_list, list) and content_list:
+                                    inner_item = content_list[0]
+                                    print(f"DEBUG: Inner item keys: {list(inner_item.keys()) if isinstance(inner_item, dict) else 'not dict'}")
+                                    if isinstance(inner_item, dict) and "text" in inner_item:
+                                        inner_text = inner_item["text"]
+                                        print(f"DEBUG: Found inner text, attempting to parse as JSON")
+                                        try:
+                                            # Second layer: Parse the nested JSON string
+                                            second_parse = json.loads(inner_text)
+                                            print(f"DEBUG: Successfully parsed double-nested JSON, found keys: {list(second_parse.keys()) if isinstance(second_parse, dict) else 'not dict'}")
+                                            if isinstance(second_parse, dict) and "threads" in second_parse:
+                                                print(f"DEBUG: Found {len(second_parse['threads'])} threads in parsed data")
+                                            return second_parse
+                                        except json.JSONDecodeError as e2:
+                                            print(f"DEBUG: Failed to parse inner JSON string: {e2}")
+                                            print(f"DEBUG: Inner text sample: {inner_text[:200]}...")
+                                            # Return the first parse if second fails
+                                            return first_parse
+                            
+                            # If not double-nested, return the first parse
+                            print(f"DEBUG: No double-nesting detected, returning first parse")
+                            return first_parse
+                            
                         except json.JSONDecodeError as e:
+                            print(f"DEBUG: Failed to parse outer JSON: {e}")
                             return {"raw": content[:500], "error": str(e)}
                     else:
                         return {"raw": str(content_item)[:500], "error": "No text attribute"}
@@ -1358,6 +1406,7 @@ def mcp_call(tool: str, params: dict):
                             return {"raw": str(res)[:500], "error": f"Failed to convert response to dict: {e}"}
                     return {"raw": str(res)[:500], "error": "No content, text, or body attributes"}
         except Exception as e:
+            print(f"DEBUG: Exception in _ensure_payload_local: {e}")
             return {"error": str(e), "raw": str(res)[:500] if res else "None"}
     
     async def _run():
