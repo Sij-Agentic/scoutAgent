@@ -461,7 +461,7 @@ return result'''
                 duration_seconds=think_time
             )
             
-            logger.info(f"Think complete: Analysis with {len(think_result.get('pains', []))} pain points in {think_time:.2f}s")
+            #logger.info(f"Think complete: Analysis with {len(think_result.get('pains', []))} pain points in {think_time:.2f}s")
         else:
             logger.info("Skipping think stage...")
             # Get think result from manifest if available

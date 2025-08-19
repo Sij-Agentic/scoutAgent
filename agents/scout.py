@@ -56,6 +56,7 @@ class ScoutInput:
     max_pain_points: int = 10
     sources: List[str] = None
     keywords: List[str] = None
+    subreddits: List[str] = None
     
     def __post_init__(self):
         if self.sources is None:
@@ -128,12 +129,18 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
         max_pain_points = int(payload.get("max_pain_points", 10))
         sources = payload.get("sources") or ["reddit", "twitter", "forums", "reviews", "blogs"]
         keywords = payload.get("keywords") or ["pain point", "problem", "frustration", "issue"]
+        subreddits = payload.get("subreddits") or []
+        
+        # Debug log the extracted subreddits
+        self.logger.info(f"DEBUG: _normalize_input extracted subreddits: {subreddits}")
+        
         return ScoutInput(
             target_market=target_market,
             research_scope=research_scope,
             max_pain_points=max_pain_points,
             sources=sources,
             keywords=keywords,
+            subreddits=subreddits,
         )
     
     async def plan(self, agent_input: AgentInput) -> Dict[str, Any]:
@@ -181,7 +188,7 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
                 "max_pain_points": input_data.max_pain_points,
                 "sources": json.dumps(input_data.sources),
                 "keywords": json.dumps(input_data.keywords),
-                "subreddits": json.dumps([k for k in input_data.keywords if isinstance(k, str) and k.startswith("r/")]),
+                "subreddits": json.dumps(getattr(input_data, 'subreddits', [])),
                 "limits_json": json.dumps({
                     "per_query_limit": 50,
                     "comment_depth": 2,
@@ -280,7 +287,7 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
 
         return plan
     
-    async def think(self, agent_input: AgentInput, plan: Dict[str, Any]) -> Dict[str, Any]:
+    async def think(self, agent_input: AgentInput, plan: Dict[str, Any] = None) -> Dict[str, Any]:
         """Analyze collected Reddit data to identify pain points."""
         self.logger.info("Thinking about discovered pain points from collected Reddit data...")
         
@@ -288,77 +295,116 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
         input_data = self._normalize_input(agent_input)
         
         try:
-            # Get the run_id from the plan (try multiple possible locations)
-            run_id = plan.get("run_metadata", {}).get("run_id")
-            if not run_id:
-                run_id = plan.get("run_id")
-            if not run_id:
-                run_id = plan.get("dag", {}).get("run_id")
-            if not run_id:
-                # If still not found, use the one from agent state if available
-                run_id = getattr(self.state, "run_id", None)
-            if not run_id:
-                raise ValueError("No run_id found in plan or agent state")
+            # First, try to get collect data from agent state (set by orchestrator)
+            reddit_data = getattr(self.state, 'collect_data', None)
             
-            self.logger.info(f"Using run_id: {run_id}")
-            
-            # Determine the manifest path
-            run_dir = self._get_run_dir(run_id)
-            manifest_path = run_dir / "run_manifest.json"
-            
-            if not manifest_path.exists():
-                raise FileNotFoundError(f"Manifest not found at: {manifest_path}")
-            
-            # Load the manifest to access collected Reddit data
-            manifest_manager = ManifestManager(manifest_path)
-            
-            # Get the collect node ID from the manifest
-            collect_node_id = "collect_reddit"  # Default
-            manifest = manifest_manager.get_manifest()
-            
-            # Find the actual collect node ID from the DAG
-            if "dag" in manifest and "nodes" in manifest["dag"]:
-                for node in manifest["dag"]["nodes"]:
-                    if node.get("type") == "tool" and node.get("tool") == "reddit_search_and_fetch_threads":
-                        collect_node_id = node.get("id", "collect_reddit")
-                        break
-            
-            # Get the collected Reddit data from the manifest
-            reddit_data = manifest_manager.get_node_output(collect_node_id)
-            
-            # Add debug logging to see what's in the manifest
-            manifest = manifest_manager.get_manifest()
-            self.logger.warning(f"Checking for collect data in manifest stages.{collect_node_id}")
-            
-            if not reddit_data:
-                self.logger.warning(f"No collect data found in manifest stages.{collect_node_id}")
+            if reddit_data:
+                self.logger.info("Found collect data in agent state (from orchestrator)")
+                self.logger.info(f"Agent state data type: {type(reddit_data)}")
+                if isinstance(reddit_data, dict):
+                    self.logger.info(f"Agent state data keys: {list(reddit_data.keys())}")
+                    for key, value in reddit_data.items():
+                        if isinstance(value, (list, dict)):
+                            self.logger.info(f"  state.{key}: {type(value)} with {len(value) if hasattr(value, '__len__') else 'N/A'} items")
+                        else:
+                            self.logger.info(f"  state.{key}: {type(value)} = {str(value)[:100]}...")
+            else:
+                # Fallback: try to get data from manifest (for compatibility with non-orchestrated runs)
+                self.logger.info("No collect data in agent state, trying manifest...")
                 
-                # Check if there's data in the node outputs
-                if collect_node_id in manifest.get("stages", {}):
-                    node_data = manifest["stages"][collect_node_id]
-                    self.logger.info(f"Found node data with keys: {list(node_data.keys())}")
-                    
-                    if "data" in node_data:
-                        reddit_data = node_data["data"]
-                        self.logger.info(f"Using data from stages.{collect_node_id}.data with keys: {list(reddit_data.keys()) if isinstance(reddit_data, dict) else 'not a dict'}")
-                    else:
-                        self.logger.warning(f"No collect data found in node outputs either")
-                else:
-                    self.logger.warning(f"Node {collect_node_id} not found in stages")
+                # Get the run_id from the plan (try multiple possible locations)
+                run_id = None
+                if plan:
+                    run_id = plan.get("run_metadata", {}).get("run_id")
+                    if not run_id:
+                        run_id = plan.get("run_id")
+                    if not run_id:
+                        run_id = plan.get("dag", {}).get("run_id")
+                if not run_id:
+                    # If still not found, use the one from agent state if available
+                    run_id = getattr(self.state, "run_id", None)
+                if not run_id:
+                    raise ValueError("No run_id found in plan or agent state")
+                
+                self.logger.info(f"Using run_id: {run_id}")
+                
+                # Determine the manifest path
+                run_dir = self._get_run_dir(run_id)
+                manifest_path = run_dir / "run_manifest.json"
+                
+                if not manifest_path.exists():
+                    raise FileNotFoundError(f"Manifest not found at: {manifest_path}")
+                
+                # Load the manifest to access collected Reddit data
+                manifest_manager = ManifestManager(manifest_path)
+                
+                # Get the collect node ID from the manifest
+                collect_node_id = "collect_reddit"  # Default
+                manifest = manifest_manager.get_manifest()
+                
+                # Try to get data from stages first (orchestrator format)
+                if "stages" in manifest and collect_node_id in manifest["stages"]:
+                    stage_data = manifest["stages"][collect_node_id]
+                    if "data" in stage_data:
+                        reddit_data = stage_data["data"]
+                        self.logger.info(f"Found collect data in manifest stages.{collect_node_id}.data")
+                        self.logger.info(f"Stage data type: {type(reddit_data)}")
+                        if isinstance(reddit_data, dict):
+                            self.logger.info(f"Stage data keys: {list(reddit_data.keys())}")
+                
+                # If not found in stages, try node outputs (fallback)
+                if not reddit_data:
+                    reddit_data = manifest_manager.get_node_output(collect_node_id)
+                    if reddit_data:
+                        self.logger.info(f"Found collect data in manifest node outputs")
+                        self.logger.info(f"Node output data type: {type(reddit_data)}")
+                        if isinstance(reddit_data, dict):
+                            self.logger.info(f"Node output keys: {list(reddit_data.keys())}")
+                
+                # If we still don't have data, raise an error
+                if not reddit_data:
+                    self.logger.error(f"No Reddit data found for node: {collect_node_id}")
+                    self.logger.error(f"Manifest stages keys: {list(manifest.get('stages', {}).keys())}")
+                    raise ValueError(f"No Reddit data found for node: {collect_node_id}")
             
-            # If we still don't have data, raise an error
-            if not reddit_data:
-                raise ValueError(f"No Reddit data found for node: {collect_node_id}")
+            # Log the raw reddit_data structure for debugging
+            self.logger.info(f"Raw Reddit data type: {type(reddit_data)}")
+            if isinstance(reddit_data, dict):
+                self.logger.info(f"Reddit data keys: {list(reddit_data.keys())}")
+                for key, value in reddit_data.items():
+                    if isinstance(value, (list, dict)):
+                        self.logger.info(f"  {key}: {type(value)} with {len(value) if hasattr(value, '__len__') else 'N/A'} items")
+                    else:
+                        self.logger.info(f"  {key}: {type(value)} = {str(value)[:100]}...")
+            else:
+                self.logger.info(f"Reddit data content: {str(reddit_data)[:200]}...")
             
             # Extract threads and comments from the collected data
             threads = reddit_data.get("threads", [])
             comments = reddit_data.get("comments", [])
             
-            # Log what we found
+            # Check if data is nested under 'result' key (common MCP tool pattern)
+            if not threads and not comments and "result" in reddit_data:
+                self.logger.info("Checking nested 'result' key for Reddit data")
+                result_data = reddit_data["result"]
+                self.logger.info(f"Result data type: {type(result_data)}")
+                if isinstance(result_data, dict):
+                    self.logger.info(f"Result data keys: {list(result_data.keys())}")
+                    threads = result_data.get("threads", [])
+                    comments = result_data.get("comments", [])
+                    # Log nested structure
+                    for key, value in result_data.items():
+                        if isinstance(value, (list, dict)):
+                            self.logger.info(f"  result.{key}: {type(value)} with {len(value) if hasattr(value, '__len__') else 'N/A'} items")
+                        else:
+                            self.logger.info(f"  result.{key}: {type(value)} = {str(value)[:100]}...")
+            
+            # Log what we found after extraction
             self.logger.info(f"Found {len(threads)} threads and {len(comments)} comments in the Reddit data")
             
             if not threads:
                 self.logger.warning("No Reddit threads found in collected data")
+                self.logger.warning(f"Final Reddit data keys: {list(reddit_data.keys()) if isinstance(reddit_data, dict) else 'not a dict'}")
             
             # Prepare prompt substitutions
             substitutions = {
@@ -426,7 +472,11 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
                 "themes": [],
                 "error": f"Error in think phase: {str(e)}",
                 "total_threads_analyzed": 0,
-                "next_steps": ["check_data_collection", "retry_analysis"]
+                "next_steps": ["check_data_collection", "retry_analysis"],
+                "debug_info": {
+                    "has_agent_state_data": hasattr(self.state, 'collect_data'),
+                    "plan_provided": plan is not None
+                }
             }
         
         return analysis
@@ -730,32 +780,18 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
             return fallback
 
     def _postprocess_plan(self, plan: Dict[str, Any], input_data: "ScoutInput", tools_catalog: List[Dict[str, Any]], tool_names: List[str]) -> Dict[str, Any]:
-        """Enforce Option A: ensure tool nodes have tool/params/code and normalize outputs.
-
-        - Add version: "1.1"
-        - Normalize outputs to manifest sections
-        - For each tool node ensure `params` and `code`
-        - Add collect nodes per available sources if missing
-        - Ensure agent nodes (plan, think, act) exist with proper deps
+        """Generate mini-plans for tool calls only, compatible with orchestrator.
+        
+        The orchestrator handles the main DAG structure (plan -> collect -> think -> act).
+        This method only generates tool nodes that the orchestrator will integrate.
         """
         try:
             if not isinstance(plan, dict):
-                return {}
+                return {"dag": {"nodes": []}}
 
-            plan.setdefault("schema", "scout_plan_v1")
-            plan.setdefault("version", "1.1")
-
-            dag = plan.get("dag") or {}
-            nodes = list(dag.get("nodes") or [])
-
-            # Helper: simple filename from any path-like string
-            def _basename(p: str) -> str:
-                try:
-                    import os
-                    return os.path.basename(p)
-                except Exception:
-                    return p
-
+            # Generate only tool nodes for the orchestrator to integrate
+            tool_nodes = []
+            
             # Heuristic mapping: find tools containing source name
             available_tools_by_source: Dict[str, List[str]] = {}
             for name in tool_names:
@@ -765,164 +801,67 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
                     if s and s in lower:
                         available_tools_by_source.setdefault(s, []).append(name)
 
-            # Ensure collect nodes for sources with available tools
+            # Create tool nodes for available sources
             desired_sources = [s.lower() for s in (plan.get("sources") or input_data.sources or [])]
             for s in desired_sources:
                 tools_for_s = available_tools_by_source.get(s, [])
                 if not tools_for_s:
                     continue
-                already_present = any((n.get("type") == "tool" and isinstance(n.get("tool"), str) and s in n.get("tool", "").lower()) for n in nodes)
-                if not already_present:
-                    tool_name = tools_for_s[0]
-                    node_id = f"collect_{s}"
-                    outputs = [f"stages.{node_id}"]
-                    params = {
-                        k: plan.get(k) for k in ("keywords", "subreddits", "time_window") if plan.get(k) is not None
-                    }
-                    try:
-                        subs = params.get("subreddits")
-                        if isinstance(subs, list):
-                            params["subreddits"] = [str(x)[2:] if str(x).startswith("r/") else str(x) for x in subs]
-                    except Exception:
-                        pass
-                    code = (
-                        f"result = mcp_call(tool=\"{tool_name}\", params={json.dumps(params) if params else '{}'}); "
-                        f"save_to_manifest(\"{outputs[0]}\", result)"
-                    )
-                    nodes.append({
-                        "id": node_id,
-                        "type": "tool",
-                        "tool": tool_name,
-                        "params": params or {},
-                        "code": code,
-                        "inputs": {},
-                        "outputs": outputs,
-                        "deps": ["plan"],
-                    })
-
-            # Ensure core agent nodes exist: plan -> collect_* -> think -> act
-            def has_agent(stage_name: str) -> bool:
-                for n in nodes:
-                    if (n.get("type") == "agent") and (n.get("stage") == stage_name or n.get("id") == stage_name):
-                        return True
-                return False
-
-            if not has_agent("plan"):
-                nodes.insert(0, {
-                    "id": "plan",
-                    "type": "agent",
-                    "agent": "scout",
-                    "stage": "plan",
-                    "inputs": {
-                        "target_market": input_data.target_market,
-                        "sources": plan.get("sources") or input_data.sources,
-                        "keywords": plan.get("keywords") or input_data.keywords,
-                        "subreddits": plan.get("subreddits") or [k[2:] if isinstance(k, str) and k.startswith("r/") else k for k in (plan.get("subreddits") or [])],
-                    },
-                    "outputs": ["stages.plan"],
-                    "deps": [],
-                })
-
-            if not has_agent("think"):
-                collect_ids = [n.get("id") for n in nodes if n.get("type") == "tool"]
-                deps = collect_ids if collect_ids else ["plan"]
-                nodes.append({
-                    "id": "think",
-                    "type": "agent",
-                    "agent": "scout",
-                    "stage": "think",
-                    "inputs": {
-                        "reddit_index": "stages.collect_reddit",
-                    },
-                    "outputs": ["stages.think"],
-                    "deps": deps,
-                })
-
-            if not has_agent("act"):
-                nodes.append({
-                    "id": "act",
-                    "type": "agent",
-                    "agent": "scout",
-                    "stage": "act",
-                    "inputs": {
-                        "think_output": "stages.think",
-                        "plan": "stages.plan",
-                    },
-                    "outputs": ["stages.act"],
-                    "deps": ["think"],
-                })
-
-            # Normalize existing nodes
-            for n in nodes:
-                node_id = n.get("id", "unknown")
-                node_type = n.get("type", "")
+                    
+                tool_name = tools_for_s[0]
+                node_id = f"collect_{s}"
                 
-                # Normalize outputs to manifest sections
-                if node_type == "agent":
-                    stage = n.get("stage", node_id)
-                    n["outputs"] = [f"stages.{stage}"]
-                elif node_type == "tool":
-                    n["outputs"] = [f"stages.{node_id}"]
+                # Prepare parameters for the tool
+                params = {
+                    "keywords": input_data.keywords,
+                    "per_query_limit": getattr(input_data, 'per_query_limit', 50),
+                    "include_comments": getattr(input_data, 'include_comments', True),
+                    "comment_depth": getattr(input_data, 'comment_depth', 2),
+                    "comment_limit": getattr(input_data, 'comment_limit', 200),
+                    "use_cache": True
+                }
+                
+                # Add subreddits if available from input_data
+                subreddits = getattr(input_data, 'subreddits', [])
+                self.logger.info(f"DEBUG: input_data subreddits: {subreddits}")
+                self.logger.info(f"DEBUG: subreddits type: {type(subreddits)}")
+                if subreddits:
+                    params["subreddits"] = subreddits
+                    self.logger.info(f"DEBUG: Added subreddits to params: {subreddits}")
                 else:
-                    outs = n.get("outputs") or []
-                    n["outputs"] = [_basename(o) for o in outs]
+                    self.logger.warning(f"DEBUG: No subreddits found or empty list: {subreddits}")
                 
-                # Normalize inputs for agent nodes to use manifest sections
-                if node_type == "agent":
-                    stage = n.get("stage", node_id)
-                    inputs = n.get("inputs", {})
-                    
-                    # For think stage, ensure reddit_index points to manifest section
-                    if stage == "think" or node_id == "think":
-                        if "reddit_index" in inputs and not str(inputs["reddit_index"]).startswith("stages."):
-                            inputs["reddit_index"] = "stages.collect_reddit"
-                        # Remove any thread_glob if present
-                        if "thread_glob" in inputs:
-                            del inputs["thread_glob"]
-                    
-                    # For act stage, ensure think_output and plan point to manifest sections
-                    if stage == "act" or node_id == "act":
-                        if "think_output" in inputs and not str(inputs["think_output"]).startswith("stages."):
-                            inputs["think_output"] = "stages.think"
-                        if "plan" in inputs and not str(inputs["plan"]).startswith("stages."):
-                            inputs["plan"] = "stages.plan"
-                    
-                    n["inputs"] = inputs
+                self.logger.info(f"DEBUG: Final params for {tool_name}: {json.dumps(params, indent=2)}")
+                
+                # Create tool node compatible with orchestrator expectations
+                tool_node = {
+                    "id": node_id,
+                    "type": "tool",
+                    "tool": tool_name,
+                    "params": params
+                }
+                self.logger.info(f"DEBUG: Created tool node {node_id} with params: {json.dumps(tool_node['params'], indent=2)}")
+                
+                tool_nodes.append(tool_node)
 
-                if n.get("type") == "tool":
-                    tool = n.get("tool")
-                    if not tool or not isinstance(tool, str):
-                        continue
-                    if not isinstance(n.get("params"), dict) or n.get("params") is None:
-                        params = {}
-                        for key in ("keywords", "subreddits", "time_window", "per_query_limit", "include_comments", "comment_depth", "comment_limit", "use_cache"):
-                            if key in (n.get("inputs") or {}):
-                                params[key] = n["inputs"][key]
-                            elif key in plan:
-                                params[key] = plan[key]
-                            elif key in (plan.get("limits") or {}):
-                                params[key] = plan["limits"][key]
-                        n["params"] = params
-                    try:
-                        subs = n.get("params", {}).get("subreddits")
-                        if isinstance(subs, list):
-                            n["params"]["subreddits"] = [str(x)[2:] if str(x).startswith("r/") else str(x) for x in subs]
-                    except Exception:
-                        pass
-                    code = n.get("code")
-                    primary_out = (n.get("outputs") or [f"{tool}_output.json"])[0]
-                    if not code or not isinstance(code, str) or not code.strip():
-                        params_literal = repr(n.get('params') or {})
-                        n["code"] = (
-                            f"result = mcp_call(tool=\"{tool}\", params={params_literal}); "
-                            f"save_to_manifest(\"{primary_out}\", result)"
-                        )
-
-            dag["nodes"] = nodes
-            plan["dag"] = dag
-            return plan
-        except Exception:
-            return plan
+            # Return mini-plan with only tool nodes for orchestrator integration
+            mini_plan = {
+                "dag": {
+                    "nodes": tool_nodes
+                },
+                "metadata": {
+                    "target_market": input_data.target_market,
+                    "research_scope": input_data.research_scope,
+                    "sources": input_data.sources,
+                    "keywords": input_data.keywords,
+                    "subreddits": getattr(input_data, 'subreddits', [])
+                }
+            }
+            
+            return mini_plan
+        except Exception as e:
+            self.logger.error(f"Error in _postprocess_plan: {e}")
+            return {"dag": {"nodes": []}}
 
     async def _execute_plan_non_agent_nodes(self, plan: Dict[str, Any], *, run_dir_override: Optional[Path] = None) -> Dict[str, Any]:
         """Execute all non-agent DAG nodes (e.g., tool/code) using sandboxed code execution.
@@ -1289,140 +1228,279 @@ def read_from_manifest(section_key: str):
     except Exception:
         return None
 
-def _ensure_payload(res):
-    try:
-        # Log the response structure for debugging
-        print(f"DEBUG: Response type: {type(res)}")
-        print(f"DEBUG: Response attributes: {dir(res)}")
+    def _ensure_payload(self, res) -> Dict[str, Any]:
+        """Ensure the MCP response is converted to a proper dict payload.
         
-        # Check if response has content attribute
-        if hasattr(res, "content") and res.content:
-            print(f"DEBUG: Content type: {type(res.content)}")
-            print(f"DEBUG: Content length: {len(res.content)}")
+        Args:
+            res: MCP response object
             
-            # Try to get the text from the first content item
-            if isinstance(res.content, list) and len(res.content) > 0:
-                content_item = res.content[0]
-                print(f"DEBUG: Content item type: {type(content_item)}")
-                print(f"DEBUG: Content item attributes: {dir(content_item)}")
-                
-                if hasattr(content_item, "text"):
-                    content = content_item.text
-                    print(f"DEBUG: Content text length: {len(content)}")
-                    try:
-                        parsed = json.loads(content)
-                        print(f"DEBUG: Successfully parsed JSON with keys: {list(parsed.keys())}")
-                        return parsed
-                    except json.JSONDecodeError as e:
-                        print(f"DEBUG: JSON decode error: {e}")
-                        # Return partial content for debugging
-                        return {"raw": content[:500], "error": f"JSON decode error: {e}"}
-                else:
-                    print("DEBUG: Content item has no text attribute")
-                    # Try to convert the content item to a dict if possible
+        Returns:
+            Dict containing the parsed payload
+        """
+        try:
+            self.logger.info(f"MCP Response type: {type(res)}")
+            if hasattr(res, "content") and res.content is not None:
+                self.logger.info(f"Content type: {type(res.content)}")
+                if isinstance(res.content, list) and res.content:
+                    content_item = res.content[0]
+                    self.logger.info(f"First content item type: {type(content_item)}")
+                    
+                    # Log the full structure of the content item
                     if hasattr(content_item, "__dict__"):
+                        item_dict = content_item.__dict__
+                        self.logger.info(f"Content item attributes: {list(item_dict.keys())}")
+                        for attr, val in item_dict.items():
+                            if isinstance(val, str) and len(val) > 100:
+                                self.logger.info(f"  {attr}: {type(val)} (length: {len(val)}) = {val[:100]}...")
+                            else:
+                                self.logger.info(f"  {attr}: {type(val)} = {val}")
+                    
+                    if hasattr(content_item, "text"):
+                        content = content_item.text
+                        self.logger.info(f"Text content type: {type(content)}, length: {len(content) if isinstance(content, str) else 'N/A'}")
+                        self.logger.info(f"First 200 chars: {content[:200] if isinstance(content, str) else str(content)[:200]}")
                         try:
-                            item_dict = content_item.__dict__
-                            print(f"DEBUG: Converted content item to dict with keys: {list(item_dict.keys())}")
-                            return {"content": [item_dict]}
+                            parsed_json = json.loads(content)
+                            self.logger.info(f"Successfully parsed JSON with keys: {list(parsed_json.keys()) if isinstance(parsed_json, dict) else 'not a dict'}")
+                            return parsed_json
+                        except json.JSONDecodeError as e:
+                            self.logger.error(f"JSON decode error: {e}")
+                            # Return partial content for debugging
+                            return {"raw": content[:500], "error": f"JSON decode error: {e}"}
+                    else:
+                        self.logger.warning("Content item has no text attribute")
+                        # Try to convert the content item to a dict if possible
+                        if hasattr(content_item, "__dict__"):
+                            try:
+                                item_dict = content_item.__dict__
+                                self.logger.info(f"Converted content item to dict with keys: {list(item_dict.keys())}")
+                                return {"content": [item_dict]}
+                            except Exception as e:
+                                self.logger.error(f"Failed to convert content item to dict: {e}")
+                        return {"raw": str(content_item), "error": "No text attribute in content item"}
+                else:
+                    self.logger.warning("Content is not a list or is empty")
+                    # Try to convert the content to a dict if possible
+                    if hasattr(res.content, "__dict__"):
+                        try:
+                            content_dict = res.content.__dict__
+                            self.logger.info(f"Converted content to dict with keys: {list(content_dict.keys())}")
+                            return {"content": [content_dict]}
                         except Exception as e:
-                            print(f"DEBUG: Failed to convert content item to dict: {e}")
-                    return {"raw": str(content_item), "error": "No text attribute in content item"}
+                            self.logger.error(f"Failed to convert content to dict: {e}")
+                    return {"raw": str(res.content), "error": "Content is not a list or is empty"}
             else:
-                print("DEBUG: Content is not a list or is empty")
-                # Try to convert the content to a dict if possible
-                if hasattr(res.content, "__dict__"):
+                self.logger.warning("Response has no content attribute or content is None")
+                # Try to get raw text or other attributes
+                if hasattr(res, "text"):
                     try:
-                        content_dict = res.content.__dict__
-                        print(f"DEBUG: Converted content to dict with keys: {list(content_dict.keys())}")
-                        return {"content": [content_dict]}
-                    except Exception as e:
-                        print(f"DEBUG: Failed to convert content to dict: {e}")
-                return {"raw": str(res.content), "error": "Content is not a list or is empty"}
-        else:
-            print("DEBUG: Response has no content attribute or content is None")
-            # Try to get raw text or other attributes
-            if hasattr(res, "text"):
-                try:
-                    return json.loads(res.text)
-                except Exception:
-                    return {"raw": res.text[:500], "error": "No content attribute, using text"}
-            elif hasattr(res, "body"):
-                try:
-                    return json.loads(res.body)
-                except Exception:
-                    return {"raw": str(res.body)[:500], "error": "No content attribute, using body"}
-            else:
-                # Try to convert the response object itself to a dict
-                if hasattr(res, "__dict__"):
+                        return json.loads(res.text)
+                    except Exception:
+                        return {"raw": res.text[:500], "error": "No content attribute, using text"}
+                elif hasattr(res, "body"):
                     try:
-                        res_dict = res.__dict__
-                        print(f"DEBUG: Converted response to dict with keys: {list(res_dict.keys())}")
-                        return res_dict
-                    except Exception as e:
-                        print(f"DEBUG: Failed to convert response to dict: {e}")
-                return {"raw": str(res)[:500], "error": "No content, text, or body attributes"}
-    except Exception as e:
-        print(f"DEBUG: Exception in _ensure_payload: {e}")
-        import traceback
-        print(f"DEBUG: Traceback: {traceback.format_exc()}")
-        return {"raw": str(res)[:500] if res else "None", "error": f"Exception: {e}"}
+                        return json.loads(res.body)
+                    except Exception:
+                        return {"raw": str(res.body)[:500], "error": "No content attribute, using body"}
+                else:
+                    # Try to convert the response object itself to a dict
+                    if hasattr(res, "__dict__"):
+                        try:
+                            res_dict = res.__dict__
+                            self.logger.info(f"Converted response to dict with keys: {list(res_dict.keys())}")
+                            return res_dict
+                        except Exception as e:
+                            self.logger.error(f"Failed to convert response to dict: {e}")
+                    return {"raw": str(res)[:500], "error": "No content, text, or body attributes"}
+        except Exception as e:
+            self.logger.error(f"Exception in _ensure_payload: {e}")
+            import traceback
+            traceback.print_exc()
+            return {"error": str(e), "raw": str(res)[:500] if res else "None"}
 
 def mcp_call(tool: str, params: dict):
+    def _ensure_payload_local(res):
+        """Local version of _ensure_payload for sandboxed execution"""
+        try:
+            if hasattr(res, "content") and res.content is not None:
+                if isinstance(res.content, list) and res.content:
+                    content_item = res.content[0]
+                    if hasattr(content_item, "text"):
+                        content = content_item.text
+                        try:
+                            parsed_json = json.loads(content)
+                            return parsed_json
+                        except json.JSONDecodeError as e:
+                            return {"raw": content[:500], "error": str(e)}
+                    else:
+                        return {"raw": str(content_item)[:500], "error": "No text attribute"}
+                else:
+                    return {"raw": str(res.content), "error": "Content is not a list or is empty"}
+            else:
+                # Try to get raw text or other attributes
+                if hasattr(res, "text"):
+                    try:
+                        return json.loads(res.text)
+                    except Exception:
+                        return {"raw": res.text[:500], "error": "No content attribute, using text"}
+                elif hasattr(res, "body"):
+                    try:
+                        return json.loads(res.body)
+                    except Exception:
+                        return {"raw": str(res.body)[:500], "error": "No content attribute, using body"}
+                else:
+                    # Try to convert the response object itself to a dict
+                    if hasattr(res, "__dict__"):
+                        try:
+                            res_dict = res.__dict__
+                            return res_dict
+                        except Exception as e:
+                            return {"raw": str(res)[:500], "error": f"Failed to convert response to dict: {e}"}
+                    return {"raw": str(res)[:500], "error": "No content, text, or body attributes"}
+        except Exception as e:
+            return {"error": str(e), "raw": str(res)[:500] if res else "None"}
+    
     async def _run():
-        print(f"DEBUG: Starting MCP call for tool: {tool}")
-        print(f"DEBUG: Parameters: {params}")
+        # Set up dedicated logging for sandboxed execution
+        import os
+        import datetime
+        
+        # Create logs directory if it doesn't exist
+        log_dir = Path("/tmp/scout_sandbox_logs")
+        log_dir.mkdir(exist_ok=True)
+        
+        # Create timestamped log file
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+        log_file = log_dir / f"mcp_call_{tool}_{timestamp}.log"
+        
+        def log_to_file(message):
+            """Log to both console and file"""
+            print(message)
+            with open(log_file, 'a', encoding='utf-8') as f:
+                f.write(f"{datetime.datetime.now().isoformat()}: {message}\n")
+                f.flush()
+        
+        log_to_file(f"\n=== MCP CALL START ===")
+        log_to_file(f"Tool: {tool}")
+        log_to_file(f"Parameters: {json.dumps(params, indent=2)}")
+        log_to_file(f"Parameter types: {[(k, type(v).__name__) for k, v in params.items()]}")
+        log_to_file(f"Has subreddits: {'subreddits' in params}")
+        if 'subreddits' in params:
+            log_to_file(f"Subreddits value: {params['subreddits']}")
+        log_to_file(f"Log file: {log_file}")
         
         try:
             # Load server configs
-            print("DEBUG: Loading server configs")
+            log_to_file("\n--- Loading server configs ---")
             servers = load_server_configs()
-            print(f"DEBUG: Loaded {len(servers)} server configs")
+            log_to_file(f"Loaded {len(servers)} server configs:")
+            for i, server in enumerate(servers):
+                log_to_file(f"  Server {i}: {server.get('name', 'unnamed')} - {server.get('command', 'no command')}")
+                log_to_file(f"    Full server config: {json.dumps(server, indent=4)}")
             
             # Initialize client
-            print("DEBUG: Initializing MultiMCPClient")
+            log_to_file("\n--- Initializing MultiMCPClient ---")
             client = MultiMCPClient(servers)
-            print("DEBUG: Client created, calling initialize()")
+            log_to_file("Client created, calling initialize()")
             await client.initialize()
-            print("DEBUG: Client initialized successfully")
+            log_to_file("Client initialized successfully")
+            
+            # List available tools (skip if method doesn't exist)
+            try:
+                log_to_file("\n--- Available tools ---")
+                if hasattr(client, 'list_tools'):
+                    tools = await client.list_tools()
+                    log_to_file(f"Found {len(tools)} available tools:")
+                    for tool_info in tools:
+                        log_to_file(f"  - {tool_info.get('name', 'unnamed')}: {tool_info.get('description', 'no description')}")
+                        log_to_file(f"    Full tool info: {json.dumps(tool_info, indent=4, default=str)}")
+                    
+                    # Check if our tool exists
+                    tool_names = [t.get('name') for t in tools]
+                    if tool not in tool_names:
+                        log_to_file(f"WARNING: Tool '{tool}' not found in available tools: {tool_names}")
+                    else:
+                        log_to_file(f"Tool '{tool}' found in available tools")
+                else:
+                    log_to_file("Client does not have list_tools method, skipping tool listing")
+            except Exception as e:
+                log_to_file(f"Error listing tools: {e}")
+                import traceback
+                log_to_file(f"Tools listing traceback: {traceback.format_exc()}")
             
             try:
                 # Make the tool call
-                print(f"DEBUG: Calling tool {tool} with params {params}")
+                log_to_file(f"\n--- Calling tool {tool} ---")
+                log_to_file(f"Calling with params: {json.dumps(params, indent=2)}")
                 result = await client.call_tool(tool, params or {})
-                print(f"DEBUG: Tool call completed, result type: {type(result)}")
+                log_to_file(f"Tool call completed successfully")
+                log_to_file(f"Raw result type: {type(result)}")
+                log_to_file(f"Raw result (full): {json.dumps(result, indent=2, default=str)}")
                 
                 # Process the result
-                processed_result = _ensure_payload(result)
-                print(f"DEBUG: Processed result type: {type(processed_result)}")
+                log_to_file("\n--- Processing result ---")
+                processed_result = _ensure_payload_local(result)
+                log_to_file(f"Processed result type: {type(processed_result)}")
+                log_to_file(f"Processed result (full): {json.dumps(processed_result, indent=2, default=str)}")
+                
+                if isinstance(processed_result, dict):
+                    log_to_file(f"Processed result keys: {list(processed_result.keys())}")
+                    for key, value in processed_result.items():
+                        if isinstance(value, list):
+                            log_to_file(f"  {key}: list with {len(value)} items")
+                            if key == 'threads' and len(value) > 0:
+                                log_to_file(f"    First thread keys: {list(value[0].keys()) if value[0] else 'empty thread'}")
+                                log_to_file(f"    First thread sample: {json.dumps(value[0], indent=4, default=str)}")
+                        elif isinstance(value, dict):
+                            log_to_file(f"  {key}: dict with keys {list(value.keys())}")
+                            log_to_file(f"    {key} content: {json.dumps(value, indent=4, default=str)}")
+                        else:
+                            log_to_file(f"  {key}: {type(value)} = {str(value)[:100]}..." if len(str(value)) > 100 else f"  {key}: {value}")
                 
                 # Check if we have threads in the result
                 if isinstance(processed_result, dict) and 'threads' in processed_result:
-                    print(f"DEBUG: Found {len(processed_result['threads'])} threads in result")
+                    thread_count = len(processed_result['threads'])
+                    log_to_file(f"\n✓ Found {thread_count} threads in result")
+                    if thread_count > 0:
+                        log_to_file(f"First thread sample: {json.dumps(processed_result['threads'][0], indent=4, default=str)}")
                 else:
-                    print("DEBUG: No threads found in result")
-                    
+                    log_to_file(f"\n⚠ No threads found in result")
+                    if isinstance(processed_result, dict):
+                        log_to_file(f"Available keys: {list(processed_result.keys())}")
+                
+                log_to_file(f"\n=== MCP CALL SUCCESS ===")
                 return processed_result
+                
             except Exception as e:
-                print(f"DEBUG: Error during tool call: {e}")
+                log_to_file(f"\n❌ ERROR during tool call: {e}")
+                log_to_file(f"Error type: {type(e).__name__}")
                 import traceback
-                print(f"DEBUG: Traceback: {traceback.format_exc()}")
-                return {"error": f"Tool call error: {e}", "tool": tool, "params": params}
+                log_to_file(f"Full traceback:\n{traceback.format_exc()}")
+                error_result = {"error": f"Tool call error: {e}", "tool": tool, "params": params, "error_type": type(e).__name__}
+                log_to_file(f"\n=== MCP CALL FAILED ===")
+                return error_result
+                
         except Exception as e:
-            print(f"DEBUG: Error setting up MCP client: {e}")
+            log_to_file(f"\n❌ ERROR setting up MCP client: {e}")
+            log_to_file(f"Error type: {type(e).__name__}")
             import traceback
-            print(f"DEBUG: Traceback: {traceback.format_exc()}")
-            return {"error": f"MCP client setup error: {e}", "tool": tool, "params": params}
+            log_to_file(f"Full traceback:\n{traceback.format_exc()}")
+            error_result = {"error": f"MCP client setup error: {e}", "tool": tool, "params": params, "error_type": type(e).__name__}
+            log_to_file(f"\n=== MCP SETUP FAILED ===")
+            return error_result
+            
         finally:
             try:
                 if 'client' in locals():
-                    print("DEBUG: Shutting down client")
+                    log_to_file("\n--- Shutting down client ---")
                     await client.shutdown()
-                    print("DEBUG: Client shutdown complete")
+                    log_to_file("Client shutdown complete")
             except Exception as e:
-                print(f"DEBUG: Error during client shutdown: {e}")
-                pass
-    return asyncio.run(_run())
+                log_to_file(f"Error during client shutdown: {e}")
+    
+    result = asyncio.run(_run())
+    print(f"\n=== MCP CALL END ===\n")
+    return result
 ''')
             prelude = (
                 prelude_template
