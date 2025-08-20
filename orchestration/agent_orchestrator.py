@@ -61,6 +61,10 @@ class AgentOrchestrator:
         self.run_dir = None
         self.manifest_manager = None
         
+        # Direct data passing between stages
+        self._stage_outputs = {}  # node_id -> output data
+        self._tool_results = {}  # tool_node_id -> tool result data
+        
         self.logger.info(f"AgentOrchestrator initialized with run_id: {self.run_id}")
     
     def register_agent(self, agent_id: str, config: AgentStageConfig, agent: BaseAgent = None) -> None:
@@ -82,6 +86,113 @@ class AgentOrchestrator:
             f"Registered agent {agent} with stages: {config.stages}"
         )
     
+    def _get_direct_collect_data(self) -> Dict[str, Any]:
+        """
+        Get collect data from direct tool results (primary method).
+        
+        Returns:
+            Aggregated tool results from direct storage
+        """
+        collect_data = {}
+        threads = []
+        comments = []
+        
+        # Aggregate all tool results from direct storage
+        for tool_id, tool_result in self._tool_results.items():
+            if isinstance(tool_result, dict):
+                tool_threads = tool_result.get("threads", [])
+                tool_comments = tool_result.get("comments", [])
+                
+                if tool_threads:
+                    threads.extend(tool_threads)
+                if tool_comments:
+                    comments.extend(tool_comments)
+        
+        if threads or comments:
+            collect_data = {
+                "threads": threads,
+                "comments": comments,
+                "total_threads": len(threads),
+                "total_comments": len(comments)
+            }
+            self.logger.info(f"Direct tool results: {len(threads)} threads, {len(comments)} comments")
+        
+        return collect_data
+
+    def _aggregate_tool_results(self) -> Dict[str, Any]:
+        """
+        Aggregate tool results from manifest for passing to agent stages (fallback method).
+        
+        Returns:
+            Aggregated tool results
+        """
+        if not self.manifest_manager:
+            return {}
+        
+        manifest = self.manifest_manager.get_manifest()
+        stages = manifest.get("stages", {})
+        
+        # Look for collect tool results
+        collect_data = {}
+        threads = []
+        comments = []
+        
+        for stage_id, stage_data in stages.items():
+            if "collect" in stage_id.lower() and isinstance(stage_data, dict):
+                data = stage_data.get("data", {})
+                if isinstance(data, dict):
+                    stage_threads = data.get("threads", [])
+                    stage_comments = data.get("comments", [])
+                    
+                    if stage_threads:
+                        threads.extend(stage_threads)
+                    if stage_comments:
+                        comments.extend(stage_comments)
+        
+        if threads or comments:
+            collect_data = {
+                "threads": threads,
+                "comments": comments,
+                "total_threads": len(threads),
+                "total_comments": len(comments)
+            }
+            self.logger.info(f"Aggregated tool results: {len(threads)} threads, {len(comments)} comments")
+        
+        return collect_data
+
+    def _extract_tool_results_from_manifest(self, plan_result: Dict[str, Any]) -> None:
+        """
+        Extract tool results from manifest after collect stage completes.
+        This populates _tool_results for direct passing to subsequent stages.
+        
+        Args:
+            plan_result: The plan result containing tool node information
+        """
+        if not self.manifest_manager or not plan_result:
+            return
+            
+        dag_data = plan_result.get("dag", {})
+        nodes = dag_data.get("nodes", [])
+        
+        manifest = self.manifest_manager.get_manifest()
+        stages = manifest.get("stages", {})
+        
+        for node in nodes:
+            if node.get("type") == "tool":
+                tool_node_id = node.get("id")
+                if tool_node_id:
+                    # Look for tool result in manifest
+                    tool_data = stages.get(tool_node_id, {}).get("data")
+                    if tool_data:
+                        self._tool_results[tool_node_id] = tool_data
+                        self.logger.info(f"Extracted tool result for direct passing: {tool_node_id}")
+                        if isinstance(tool_data, dict) and "threads" in tool_data:
+                            self.logger.info(f"Found {len(tool_data['threads'])} threads in {tool_node_id}")
+                    else:
+                        self.logger.warning(f"No tool result found in manifest for {tool_node_id}")
+        
+        self.logger.info(f"Extracted {len(self._tool_results)} tool results for direct passing")
+
     def setup_run_directory(self) -> Path:
         """
         Set up the run directory for this orchestration.
@@ -213,11 +324,10 @@ class AgentOrchestrator:
         start_time = datetime.now()
         
         try:
-            # Handle different node types
             if node.node_type == NodeType.AGENT:
                 return await self._execute_agent_node(node, inputs)
-            elif node.node_type == NodeType.FUNCTION:  # Using FUNCTION for tool nodes
-                return await self._execute_tool_node(node, inputs)
+            elif node.node_type == NodeType.FUNCTION:  # Tool nodes handled by agent collect
+                raise ValueError(f"Tool nodes should be executed by agent collect() method, not orchestrator")
             else:
                 raise ValueError(f"Unknown node type: {node.node_type}")
         except Exception as e:
@@ -256,82 +366,61 @@ class AgentOrchestrator:
         method_name = config.metadata.get("method", stage)
         
         if not hasattr(agent, method_name):
-            raise ValueError(f"Method {method_name} not found on agent {agent_id}")
+            raise ValueError(f"Agent {agent_id} does not have method {method_name}")
         
         method = getattr(agent, method_name)
         
-        # Prepare parameters based on method signature
-        import inspect
-        sig = inspect.signature(method)
-        params = {}
+        # Prepare agent input
+        agent_input = self.agent_input
         
-        # Always provide agent_input if the method accepts it
-        if "agent_input" in sig.parameters and hasattr(self, "agent_input"):
-            params["agent_input"] = self.agent_input
-            
-        # Add run_id only if the method accepts it
-        if "run_id" in sig.parameters:
-            params["run_id"] = self.run_id
-        
-        # Get plan results from previous nodes
-        plan_result = None
-        for dep_id, dep_output in inputs.items():
-            if "plan" in dep_id.lower():
-                plan_result = dep_output
-                break
-        
-        # If no plan found in inputs, try to get it from the manifest
-        if not plan_result and self.manifest_manager:
-            # Try to find a plan node for this agent
-            plan_node_id = f"{agent_id}_plan"
-            plan_result = self.manifest_manager.get_node_output(plan_node_id)
-            
-        # Get think results from previous nodes
-        think_result = None
-        for dep_id, dep_output in inputs.items():
-            if "think" in dep_id.lower():
-                think_result = dep_output
-                break
+        # Call the agent method with appropriate arguments
+        if stage == "plan":
+            result = await method(agent_input, run_id=self.run_id)
+        elif stage == "collect":
+            # For collect, pass the plan result with tool nodes
+            plan_result = None
+            if hasattr(self, '_plan_results') and agent_id in self._plan_results:
+                plan_result = self._plan_results[agent_id]
+                self.logger.info(f"Passing plan with tool nodes to collect stage")
+                result = await method(plan=plan_result, run_id=self.run_id)
                 
-        # If no think result found in inputs, try to get it from the manifest
-        if not think_result and self.manifest_manager:
-            # Try to find a think node for this agent
+                # After collect completes, extract tool results from manifest for direct passing
+                self._extract_tool_results_from_manifest(plan_result)
+            else:
+                self.logger.warning(f"No plan result found for agent {agent_id}")
+                result = await method(self.agent_input)
+        elif stage == "think":
+            # Get collect data from direct tool results first, then fallback to aggregated results
+            collect_data = self._get_direct_collect_data()
+            if not collect_data:
+                collect_data = self._aggregate_tool_results()
+                self.logger.info("Using aggregated tool results as fallback for think stage")
+            else:
+                self.logger.info("Using direct tool results for think stage")
+                
+            if collect_data:
+                setattr(agent.state, 'collect_data', collect_data)
+                self.logger.info(f"Set collect_data in agent state for think: {len(collect_data.get('threads', []))} threads")
+            result = await method(self.agent_input)
+        elif stage == "act":
+            # Get plan and think results for act stage
+            plan_result = None
+            think_result = None
+            if hasattr(self, '_plan_results') and agent_id in self._plan_results:
+                plan_result = self._plan_results[agent_id]
+            
+            # Try to get think result from direct stage outputs first, then fallback to manifest
             think_node_id = f"{agent_id}_think"
-            think_result = self.manifest_manager.get_node_output(think_node_id)
-        
-        # Get collect results from previous nodes for think stage
-        collect_result = None
-        if stage == "think":
-            for dep_id, dep_output in inputs.items():
-                if "collect" in dep_id.lower():
-                    collect_result = dep_output
-                    break
-            
-            # If no collect result found in inputs, try to get it from the manifest
-            if not collect_result and self.manifest_manager:
-                # Try to find collect data in manifest stages
-                manifest = self.manifest_manager.get_manifest()
-                collect_data = manifest.get("stages", {}).get("collect_reddit", {}).get("data")
-                if collect_data:
-                    collect_result = collect_data
-        
-        # Add plan parameter if required
-        if "plan" in sig.parameters and plan_result:
-            params["plan"] = plan_result
-            
-        # Add thoughts parameter if required
-        if "thoughts" in sig.parameters and think_result:
-            params["thoughts"] = think_result
-        
-        # For think stage, ensure collect data is available
-        if stage == "think" and collect_result:
-            # Store collect data in agent state for think stage to access
-            if hasattr(agent, 'state'):
-                setattr(agent.state, 'collect_data', collect_result)
-        
-        # Execute the agent method
-        self.logger.info(f"Executing agent node: {node.node_id}")
-        result = await method(**params)
+            think_result = self._stage_outputs.get(think_node_id)
+            if not think_result and self.manifest_manager:
+                think_result = self.manifest_manager.get_node_output(think_node_id)
+                self.logger.info("Using manifest fallback for think result in act stage")
+            else:
+                self.logger.info("Using direct stage output for think result in act stage")
+                
+            result = await method(self.agent_input, plan_result, think_result)
+        else:
+            result = await method(self.agent_input)
         
         # Convert result to dict if it has a to_dict method (for JSON serialization)
         serializable_result = result
@@ -343,7 +432,10 @@ class AgentOrchestrator:
         if stage == "plan" and serializable_result:
             await self._update_dag_from_plan(agent_id, serializable_result, node.node_id)
         
-        # Store result in manifest
+        # Store result for direct passing to subsequent stages
+        self._stage_outputs[node.node_id] = serializable_result
+        
+        # Store result in manifest (fallback)
         if self.manifest_manager:
             self.manifest_manager.store_node_output(node.node_id, serializable_result)
             self.manifest_manager.update_node_status(node.node_id, NodeStatus.COMPLETED)
@@ -356,215 +448,32 @@ class AgentOrchestrator:
             end_time=end_time
         )
     
-    async def _execute_tool_node(self, node: DAGNode, inputs: Dict[str, Any]) -> NodeResult:
-        """
-        Execute a tool node using CodeExecutionService.
-        
-        Args:
-            node: The tool node to execute
-            inputs: Inputs from predecessor nodes
-            
-        Returns:
-            NodeResult with execution results
-        """
-        start_time = datetime.now()
-        
-        # Get the tool configuration from metadata
-        tool_name = node.config.metadata.get("tool")
-        params = node.config.metadata.get("params", {})
-        original_node_id = node.config.metadata.get("node_id", node.node_id)
-        agent_id = node.config.metadata.get("agent_id")
-        
-        self.logger.info(f"Executing tool node: {node.node_id} with tool: {tool_name}")
-        
-        try:
-            # Find the agent responsible for executing this tool
-            if not agent_id or agent_id not in self.agents:
-                # Default to the first agent that has collect capability
-                for aid, agent in self.agents.items():
-                    if "collect" in self.agent_configs[aid].stages:
-                        agent_id = aid
-                        break
-            
-            if not agent_id:
-                raise ValueError("No agent found to execute tool node")
-            
-            agent = self.agents[agent_id]
-            
-            # Create a mini-plan with just this tool node for CodeExecutionService
-            tool_plan = {
-                "dag": {
-                    "nodes": [{
-                        "id": original_node_id,
-                        "type": "tool",
-                        "tool": tool_name,
-                        "params": params,
-                        "code": self._generate_tool_execution_code(tool_name, params, original_node_id)
-                    }]
-                },
-                "run_id": self.run_id
-            }
-            
-            # Execute using agent's collect method (which uses CodeExecutionService)
-            result = await agent.collect(plan=tool_plan, run_id=self.run_id)
-            
-            # Log the tool execution result for debugging
-            self.logger.info(f"Tool {tool_name} execution result type: {type(result)}")
-            if isinstance(result, dict):
-                self.logger.info(f"Tool result keys: {list(result.keys())}")
-                for key, value in result.items():
-                    if isinstance(value, (list, dict)):
-                        self.logger.info(f"  result.{key}: {type(value)} with {len(value) if hasattr(value, '__len__') else 'N/A'} items")
-                    else:
-                        self.logger.info(f"  result.{key}: {type(value)} = {str(value)[:100]}...")
-            else:
-                self.logger.info(f"Tool result content: {str(result)[:200]}...")
-            
-            # Extract the actual tool result data
-            tool_result = None
-            if isinstance(result, dict):
-                # The result from agent.collect() is an execution summary: {completed: [], failed: []}
-                # The actual tool data is stored in the manifest during mcp_call() execution
-                if original_node_id in result.get("completed", []):
-                    # Tool executed successfully, get the actual data from manifest
-                    if self.manifest_manager:
-                        manifest = self.manifest_manager.get_manifest()
-                        # Look for the data stored by save_to_manifest() in the tool execution code
-                        tool_result = manifest.get("stages", {}).get(original_node_id, {}).get("data")
-                        self.logger.info(f"Retrieved tool result from manifest for {original_node_id}: {type(tool_result)}")
-                        if isinstance(tool_result, dict):
-                            self.logger.info(f"Manifest tool result keys: {list(tool_result.keys())}")
-                
-                if not tool_result:
-                    # If tool failed or no data in manifest, check if result contains actual data
-                    if "threads" in result or "comments" in result:
-                        tool_result = result
-                        self.logger.info("Using result as tool_result (contains threads/comments)")
-                    else:
-                        # No actual tool data found
-                        tool_result = {"threads": [], "comments": [], "error": "Tool execution failed or returned no data"}
-                        self.logger.warning(f"No tool result data found. Result was: {result}")
-            
-            # Ensure we have a valid result structure
-            if not tool_result or not isinstance(tool_result, dict):
-                tool_result = {"threads": [], "error": "No valid result from tool execution"}
-            
-            # Store result in manifest using the original node ID from the plan
-            if self.manifest_manager:
-                # Store in the format expected by think stage: stages.{node_id}.data
-                manifest = self.manifest_manager.get_manifest()
-                stages = manifest.setdefault("stages", {})
-                stages[original_node_id] = {
-                    "data": tool_result,
-                    "status": "completed",
-                    "updated_at": datetime.now().isoformat()
-                }
-                self.manifest_manager._save()
-                
-                # Also store using the standard method for compatibility
-                self.manifest_manager.store_node_output(node.node_id, tool_result)
-                self.manifest_manager.update_node_status(node.node_id, "completed")
-            
-            success = original_node_id in result.get("completed", [])
-            
-        except Exception as e:
-            self.logger.error(f"Error executing tool {tool_name}: {e}")
-            tool_result = {"error": str(e), "threads": []}
-            success = False
-            
-            if self.manifest_manager:
-                self.manifest_manager.update_node_status(node.node_id, "failed")
-        
-        end_time = datetime.now()
-        return NodeResult(
-            success=success,
-            output=tool_result,
-            start_time=start_time,
-            end_time=end_time
-        )
+    # Tool node execution removed - handled by agent's collect() method
     
     async def _update_dag_from_plan(self, agent_id: str, plan_result: Dict[str, Any], plan_node_id: str) -> None:
         """
-        Update the DAG based on the plan output.
+        Store the plan result for the collect stage to use.
         
-        This implements Option A, where the plan stage dynamically modifies the DAG.
+        The collect stage will execute the tool nodes from the plan.
         
         Args:
             agent_id: ID of the agent that produced the plan
             plan_result: Output from the plan stage
             plan_node_id: ID of the plan node
         """
-        # Extract DAG structure from plan
+        # Store the plan result for the collect stage to access
+        if not hasattr(self, '_plan_results'):
+            self._plan_results = {}
+        self._plan_results[agent_id] = plan_result
+        
+        # Extract tool node count for logging
         dag_data = plan_result.get("dag", {})
         nodes = dag_data.get("nodes", [])
+        tool_count = len([n for n in nodes if n.get("type") == "tool"])
         
-        # Find the next agent stage after plan (usually collect)
-        next_stage = None
-        agent_stages = self.agent_configs[agent_id].stages
-        plan_index = agent_stages.index("plan") if "plan" in agent_stages else -1
-        if plan_index >= 0 and plan_index + 1 < len(agent_stages):
-            next_stage = agent_stages[plan_index + 1]
-        
-        if not next_stage:
-            self.logger.warning(f"No next stage found after plan for agent {agent_id}")
-            return
-        
-        next_stage_node_id = f"{agent_id}_{next_stage}"
-        
-        # Find tool nodes in the plan
-        tool_nodes = []
-        for node_data in nodes:
-            if node_data.get("type") == "tool":
-                # Create NodeConfig for tool node
-                tool_config = NodeConfig()
-                tool_config.metadata = {
-                    "tool": node_data.get("tool"),
-                    "params": node_data.get("params", {}),
-                    "agent_id": agent_id,  # Associate with the agent that created the plan
-                    "node_id": node_data.get("id")  # Store original node ID for manifest storage
-                }
-                
-                tool_node = DAGNode(
-                    node_id=node_data.get("id", f"tool_{len(tool_nodes)}"),
-                    name=node_data.get("name", f"Tool {len(tool_nodes)}"),
-                    node_type=NodeType.FUNCTION,
-                    config=tool_config,
-                    dependencies=[plan_node_id]  # Depend on the plan node
-                )
-                tool_nodes.append(tool_node)
-        
-        # Add tool nodes to the DAG
-        for tool_node in tool_nodes:
-            self.dag_engine.add_node(tool_node)
-            self.dag_engine.add_edge(plan_node_id, tool_node.node_id)
-            
-            # Make the next stage depend on this tool node
-            if next_stage_node_id in self.dag_engine.graph.nodes():
-                self.dag_engine.add_edge(tool_node.node_id, next_stage_node_id)
-        
-        self.logger.info(f"Updated DAG with {len(tool_nodes)} tool nodes from plan")
+        self.logger.info(f"Stored plan with {tool_count} tool nodes for collect stage execution")
     
-    def _generate_tool_execution_code(self, tool_name: str, params: Dict[str, Any], node_id: str) -> str:
-        """
-        Generate Python code for tool execution using CodeExecutionService.
-        This matches the format used in main.py's _execute_plan_non_agent_nodes.
-        
-        Args:
-            tool_name: Name of the MCP tool to call
-            params: Parameters for the tool
-            node_id: Node ID for manifest storage
-            
-        Returns:
-            Python code string for execution
-        """
-        # Use repr() instead of json.dumps() to ensure Python-compatible literals
-        # This converts True/False to Python booleans instead of JSON true/false
-        params_repr = repr(params)
-        
-        # Generate code that matches the format used in Scout's _execute_plan_non_agent_nodes
-        code = f'result = mcp_call(tool="{tool_name}", params={params_repr}); save_to_manifest("stages.{node_id}.data", result)'
-        
-        return code
+    # Code generation removed - only LLM generates code via plan prompt template
     
     def get_dag_structure(self) -> Dict[str, Any]:
         """Get the current DAG structure.
