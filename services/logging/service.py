@@ -11,11 +11,11 @@ from pathlib import Path
 from typing import Dict, Any, Optional, List
 import os
 
-from service_registry import ServiceBase, service, requires
-from custom_logging import get_logger as get_original_logger, setup_logger
+from scout_agent.service_registry import ServiceBase, service, requires
+from scout_agent.custom_logging import get_logger as get_original_logger, setup_logger
 import logging
 from contextlib import contextmanager
-from custom_logging import logger as custom_logger_module
+from scout_agent.custom_logging import logger as custom_logger_module
 
 @service(name="logging", singleton=True)
 @requires("config")
