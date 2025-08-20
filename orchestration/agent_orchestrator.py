@@ -616,7 +616,7 @@ class AgentOrchestrator:
 # Example agent stage configurations
 AGENT_STAGE_CONFIGS = {
     "scout": AgentStageConfig(stages=["plan", "collect", "think", "act"]),
-    "screener": AgentStageConfig(stages=["plan", "think", "act"]),
+    "screener": AgentStageConfig(stages=["think", "act"]),
     "validator": AgentStageConfig(stages=["plan", "collect", "think", "act"]),
     "gap_finder": AgentStageConfig(stages=["plan", "collect", "think", "act"]),
     "builder": AgentStageConfig(stages=["think", "act"]),

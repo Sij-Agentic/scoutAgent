@@ -389,8 +389,17 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
                 self.logger.info(f"Reddit data content: {str(reddit_data)[:200]}...")
             
             # Extract threads and comments from the collected data
-            threads = reddit_data.get("threads", [])
-            comments = reddit_data.get("comments", [])
+            # Check if data is nested under 'data' key (manifest structure)
+            if "data" in reddit_data and isinstance(reddit_data["data"], dict):
+                self.logger.info("Found nested 'data' key in Reddit data")
+                data_content = reddit_data["data"]
+                threads = data_content.get("threads", [])
+                comments = data_content.get("comments", [])
+                self.logger.info(f"Data content keys: {list(data_content.keys())}")
+            else:
+                # Direct access (fallback)
+                threads = reddit_data.get("threads", [])
+                comments = reddit_data.get("comments", [])
             
             # Check if data is nested under 'result' key (common MCP tool pattern)
             if not threads and not comments and "result" in reddit_data:
