@@ -851,12 +851,8 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
                 
                 self.logger.info(f"DEBUG: Final params for {tool_name}: {json.dumps(params, indent=2)}")
                 
-                # Generate MCP tool call code
+                # Generate simple tool call code (prelude will be added by AgentCodeExecutor)
                 code = f'''
-# MCP tool call for {tool_name}
-import json
-from pathlib import Path
-
 # Define parameters as Python dict
 params = {repr(params)}
 
@@ -1900,25 +1896,27 @@ def mcp_call(tool: str, params: dict):
             run_dir.mkdir(parents=True, exist_ok=True)
             manifest_path = run_dir / "run_manifest.json"
             
-            self.logger.info(f"Writing stage {stage_name} output to manifest at: {manifest_path}")
+            # Always use agent-prefixed stage names for multi-agent support
+            agent_prefixed_stage = f"scout_{stage_name}"
+            self.logger.info(f"Writing stage {agent_prefixed_stage} output to manifest at: {manifest_path}")
             
             # Use ManifestManager for consistent manifest operations
             from scout_agent.memory.manifest_manager import ManifestManager
             manifest_manager = ManifestManager(manifest_path, create_if_missing=True)
             
-            # Store the stage output
-            manifest_manager.store_node_output(stage_name, data)
+            # Store the stage output with agent-prefixed stage name
+            manifest_manager.store_node_output(agent_prefixed_stage, data)
             
-            # Update node status to completed
+            # Update node status to completed with agent-prefixed stage name
             manifest_manager.update_node_status(
-                node_id=stage_name,
+                node_id=agent_prefixed_stage,
                 state="completed"
             )
             
-            self.logger.info(f"Stage {stage_name} output written to manifest successfully")
+            self.logger.info(f"Stage {agent_prefixed_stage} output written to manifest successfully")
             
         except Exception as e:
-            self.logger.error(f"Failed to write stage {stage_name} output: {e}")
+            self.logger.error(f"Failed to write stage {agent_prefixed_stage} output: {e}")
             import traceback
             self.logger.error(traceback.format_exc())
 

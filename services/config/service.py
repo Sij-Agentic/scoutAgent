@@ -11,14 +11,14 @@ from pathlib import Path
 from typing import Dict, Any, Optional, Union, List
 from dataclasses import asdict
 
-from service_registry import ServiceBase, service
-from config import (
+from scout_agent.service_registry import ServiceBase, service
+from scout_agent.config import (
     ScoutConfig, 
     ConfigManager,
     get_config as get_global_config,
     init_config
 )
-from custom_logging import get_logger
+from scout_agent.custom_logging import get_logger
 
 
 @service(name="config", singleton=True)

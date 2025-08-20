@@ -18,6 +18,9 @@ from scout_agent.dag.node import DAGNode, NodeStatus, NodeResult, NodeConfig, No
 from scout_agent.custom_logging.logger import get_logger
 from scout_agent.agents.base import BaseAgent
 from scout_agent.memory.manifest_manager import ManifestManager
+from scout_agent.services.execution.message_service import StageMessageService
+from scout_agent.services.execution.code_executor import AgentCodeExecutor
+from scout_agent.service_registry import get_registry
 
 
 class AgentStageConfig:
@@ -61,11 +64,57 @@ class AgentOrchestrator:
         self.run_dir = None
         self.manifest_manager = None
         
-        # Direct data passing between stages
+        # Service integration
+        self.message_service = None
+        self.code_executor = None
+        self._initialize_services()
+        
+        # Legacy direct data passing (for backward compatibility)
         self._stage_outputs = {}  # node_id -> output data
         self._tool_results = {}  # tool_node_id -> tool result data
         
         self.logger.info(f"AgentOrchestrator initialized with run_id: {self.run_id}")
+    
+    def _initialize_services(self) -> None:
+        """Initialize execution services."""
+        try:
+            # Import and use the service initializer
+            from scout_agent.services.execution.service_initializer import initialize_services
+            registry = initialize_services()
+            
+            # Get message service
+            try:
+                self.message_service = registry.get_service("stage_message")
+                self.logger.info("Initialized StageMessageService")
+                # Initialize and start the service if needed
+                if self.message_service.state == self.message_service.state.UNINITIALIZED:
+                    asyncio.create_task(self.message_service.initialize(registry))
+                    asyncio.create_task(self.message_service.start())
+            except Exception as e:
+                self.logger.warning(f"Could not get stage_message service: {e}")
+                # Create fallback instance
+                self.message_service = StageMessageService()
+                asyncio.create_task(self.message_service.initialize(None))
+                asyncio.create_task(self.message_service.start())
+            
+            # Get code executor service
+            try:
+                self.code_executor = registry.get_service("agent_code_executor")
+                self.logger.info("Initialized AgentCodeExecutor")
+                # Initialize and start the service if needed
+                if self.code_executor.state == self.code_executor.state.UNINITIALIZED:
+                    asyncio.create_task(self.code_executor.initialize(registry))
+                    asyncio.create_task(self.code_executor.start())
+            except Exception as e:
+                self.logger.warning(f"Could not get agent_code_executor service: {e}")
+                # Create fallback instance
+                self.code_executor = AgentCodeExecutor()
+                asyncio.create_task(self.code_executor.initialize(None))
+                asyncio.create_task(self.code_executor.start())
+                
+        except Exception as e:
+            self.logger.error(f"Failed to initialize services: {e}")
+            # Continue without services - fall back to legacy behavior
     
     def register_agent(self, agent_id: str, config: AgentStageConfig, agent: BaseAgent = None) -> None:
         """
@@ -86,13 +135,33 @@ class AgentOrchestrator:
             f"Registered agent {agent} with stages: {config.stages}"
         )
     
-    def _get_direct_collect_data(self) -> Dict[str, Any]:
+    def _get_direct_collect_data(self, agent_id: str = "scout", source: str = "reddit") -> Dict[str, Any]:
         """
         Get collect data from direct tool results (primary method).
+        Uses new message service if available, falls back to legacy method.
+        
+        Args:
+            agent_id: Agent ID to get collect data for
+            source: Data source (reddit, twitter, etc.)
         
         Returns:
             Aggregated tool results from direct storage
         """
+        # Try new message service first
+        if self.message_service:
+            try:
+                collect_data = self.message_service.get_collect_data(
+                    workflow_id=self.run_id,
+                    agent_id=agent_id,
+                    source=source
+                )
+                if collect_data:
+                    self.logger.info(f"Message service collect data for {agent_id}: {len(collect_data.get('threads', []))} threads")
+                    return collect_data
+            except Exception as e:
+                self.logger.warning(f"Failed to get data from message service: {e}")
+        
+        # Fallback to legacy method
         collect_data = {}
         threads = []
         comments = []
@@ -115,7 +184,7 @@ class AgentOrchestrator:
                 "total_threads": len(threads),
                 "total_comments": len(comments)
             }
-            self.logger.info(f"Direct tool results: {len(threads)} threads, {len(comments)} comments")
+            self.logger.info(f"Direct tool results (legacy) for {agent_id}: {len(threads)} threads, {len(comments)} comments")
         
         return collect_data
 
@@ -377,30 +446,47 @@ class AgentOrchestrator:
         if stage == "plan":
             result = await method(agent_input, run_id=self.run_id)
         elif stage == "collect":
-            # For collect, pass the plan result with tool nodes
+            # Get plan result for collect stage
             plan_result = None
             if hasattr(self, '_plan_results') and agent_id in self._plan_results:
                 plan_result = self._plan_results[agent_id]
-                self.logger.info(f"Passing plan with tool nodes to collect stage")
+                self.logger.info(f"Using plan result for collect stage: {len(plan_result.get('dag', {}).get('nodes', []))} tool nodes")
+            
+            # Execute tool nodes directly using AgentCodeExecutor instead of agent's collect method
+            if plan_result and self.code_executor:
+                result = await self._execute_tool_nodes_with_code_executor(plan_result, agent_id)
+            else:
+                # Fallback to agent's collect method if no plan or code executor
+                # ScoutAgent.collect expects a single argument (self) plus keyword arguments
                 result = await method(plan=plan_result, run_id=self.run_id)
-                
-                # After collect completes, extract tool results from manifest for direct passing
+            
+            # Extract tool results from manifest for direct passing to subsequent stages
+            if plan_result:
                 self._extract_tool_results_from_manifest(plan_result)
             else:
                 self.logger.warning(f"No plan result found for agent {agent_id}")
-                result = await method(self.agent_input)
+                # Convert agent_input to keyword args for collect method
+                result = await method(plan=None, run_id=self.run_id)
         elif stage == "think":
-            # Get collect data from direct tool results first, then fallback to aggregated results
-            collect_data = self._get_direct_collect_data()
-            if not collect_data:
-                collect_data = self._aggregate_tool_results()
-                self.logger.info("Using aggregated tool results as fallback for think stage")
+            # Check if this agent has a collect stage - only get collect data if it does
+            agent_config = self.agent_configs.get(agent_id)
+            has_collect_stage = agent_config and "collect" in agent_config.stages
+            
+            if has_collect_stage:
+                # Get collect data from direct tool results first, then fallback to aggregated results
+                collect_data = self._get_direct_collect_data(agent_id=agent_id, source="reddit")
+                if not collect_data:
+                    collect_data = self._aggregate_tool_results()
+                    self.logger.info("Using aggregated tool results as fallback for think stage")
+                else:
+                    self.logger.info("Using direct tool results for think stage")
+                    
+                if collect_data:
+                    setattr(agent.state, 'collect_data', collect_data)
+                    self.logger.info(f"Set collect_data in agent state for think: {len(collect_data.get('threads', []))} threads")
             else:
-                self.logger.info("Using direct tool results for think stage")
+                self.logger.info(f"Agent {agent_id} has no collect stage - skipping collect data retrieval")
                 
-            if collect_data:
-                setattr(agent.state, 'collect_data', collect_data)
-                self.logger.info(f"Set collect_data in agent state for think: {len(collect_data.get('threads', []))} threads")
             result = await method(self.agent_input)
         elif stage == "act":
             # Get plan and think results for act stage
@@ -409,14 +495,29 @@ class AgentOrchestrator:
             if hasattr(self, '_plan_results') and agent_id in self._plan_results:
                 plan_result = self._plan_results[agent_id]
             
-            # Try to get think result from direct stage outputs first, then fallback to manifest
+            # Try to get think result from message service first, then fallbacks
             think_node_id = f"{agent_id}_think"
-            think_result = self._stage_outputs.get(think_node_id)
-            if not think_result and self.manifest_manager:
-                think_result = self.manifest_manager.get_node_output(think_node_id)
-                self.logger.info("Using manifest fallback for think result in act stage")
-            else:
-                self.logger.info("Using direct stage output for think result in act stage")
+            try:
+                # Use synchronous method without await
+                think_result = self.message_service.consume_stage_input(
+                    workflow_id=self.run_id,
+                    stage_id=think_node_id
+                )
+                if think_result:
+                    self.logger.info("Using message service think result for act stage")
+                else:
+                    self.logger.warning("No think result from message service")
+            except Exception as e:
+                self.logger.warning(f"Failed to get think result from message service: {e}")
+                think_result = None       # Fallback to legacy methods
+            if not think_result:
+                think_result = self._stage_outputs.get(think_node_id)
+                if think_result:
+                    self.logger.info("Using direct stage output for think result in act stage")
+                elif self.manifest_manager:
+                    think_result = self.manifest_manager.get_node_output(think_node_id)
+                    if think_result:
+                        self.logger.info("Using manifest fallback for think result in act stage")
                 
             result = await method(self.agent_input, plan_result, think_result)
         else:
@@ -430,10 +531,9 @@ class AgentOrchestrator:
         
         # Special handling for plan stage: dynamically update DAG
         if stage == "plan" and serializable_result:
+            # Store plan result for collect stage to access
             await self._update_dag_from_plan(agent_id, serializable_result, node.node_id)
-        
-        # Store result for direct passing to subsequent stages
-        self._stage_outputs[node.node_id] = serializable_result
+            self.logger.info(f"Plan stage completed with result: {type(serializable_result)}")
         
         # Store result in manifest with standardized stage naming
         if self.manifest_manager:
@@ -611,6 +711,85 @@ class AgentOrchestrator:
         
         self.logger.info(f"Workflow execution completed in {execution_state.duration:.2f}s")
         return results
+    
+    async def _execute_tool_nodes_with_code_executor(self, plan_result: Dict[str, Any], agent_id: str) -> Dict[str, Any]:
+        """
+        Execute tool nodes using AgentCodeExecutor with PreludeService.
+        
+        This replaces the agent's collect method to use Phase 1+2 services.
+        
+        Args:
+            plan_result: Plan result containing tool nodes
+            agent_id: Agent ID for context
+            
+        Returns:
+            Execution summary
+        """
+        if not self.code_executor:
+            raise ValueError("AgentCodeExecutor not available")
+            
+        dag_data = plan_result.get("dag", {})
+        nodes = dag_data.get("nodes", [])
+        tool_nodes = [n for n in nodes if n.get("type") == "tool"]
+        
+        if not tool_nodes:
+            self.logger.warning("No tool nodes found in plan")
+            return {"completed": [], "failed": []}
+        
+        self.logger.info(f"Executing {len(tool_nodes)} tool nodes using AgentCodeExecutor")
+        
+        completed = []
+        failed = []
+        
+        for node in tool_nodes:
+            node_id = node.get("id", "unknown")
+            code = node.get("code", "")
+            
+            if not code:
+                self.logger.warning(f"No code found for tool node {node_id}")
+                failed.append(node_id)
+                continue
+                
+            try:
+                self.logger.info(f"Executing tool node {node_id}")
+                
+                # Use AgentCodeExecutor to wrap and execute code with prelude
+                result = await self.code_executor.wrap_and_execute(
+                    node=node,
+                    agent_id=agent_id,
+                    stage="collect",
+                    context={"run_dir": str(self.run_dir), "workflow_id": self.run_id, "node_id": node_id, "tool": node.get("tool")}
+                )
+                
+                if result.success:
+                    completed.append(node_id)
+                    self.logger.info(f"Tool node {node_id} completed successfully")
+                else:
+                    failed.append(node_id)
+                    error = result.error if hasattr(result, 'error') else "Unknown error"
+                    self.logger.error(f"Tool node {node_id} failed: {error}")
+                    
+            except Exception as e:
+                failed.append(node_id)
+                self.logger.error(f"Exception executing tool node {node_id}: {e}")
+        
+        execution_summary = {
+            "completed": completed,
+            "failed": failed,
+            "total_nodes": len(tool_nodes)
+        }
+        
+        self.logger.info(f"Tool execution complete: {len(completed)} succeeded, {len(failed)} failed")
+        return execution_summary
+
+    async def cleanup(self) -> None:
+        """Clean up orchestrator resources."""
+        if self.message_service:
+            try:
+                await self.message_service.cleanup_workflow(self.run_id)
+                self.logger.info(f"Cleaned up workflow {self.run_id} from message service")
+            except Exception as e:
+                self.logger.warning(f"Failed to cleanup workflow from message service: {e}")
 
 
 # Example agent stage configurations
