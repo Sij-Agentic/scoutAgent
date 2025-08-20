@@ -340,15 +340,23 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
                 manifest_manager = ManifestManager(manifest_path)
                 
                 # Get the collect node ID from the manifest
-                collect_node_id = "collect_reddit"  # Default
+                collect_node_id = "scout_collect"  # Default standardized name
                 manifest = manifest_manager.get_manifest()
                 
                 # Try to get data from stages first (orchestrator format)
                 if "stages" in manifest and collect_node_id in manifest["stages"]:
                     stage_data = manifest["stages"][collect_node_id]
-                    if "data" in stage_data:
+                    # Look for Reddit data in source-specific location
+                    if "reddit" in stage_data:
+                        reddit_data = stage_data["reddit"]
+                        self.logger.info(f"Found collect data in manifest stages.{collect_node_id}.reddit")
+                        self.logger.info(f"Reddit data type: {type(reddit_data)}")
+                        if isinstance(reddit_data, dict):
+                            self.logger.info(f"Reddit data keys: {list(reddit_data.keys())}")
+                    # Fallback: try direct data field for backward compatibility
+                    elif "data" in stage_data:
                         reddit_data = stage_data["data"]
-                        self.logger.info(f"Found collect data in manifest stages.{collect_node_id}.data")
+                        self.logger.info(f"Found collect data in manifest stages.{collect_node_id}.data (fallback)")
                         self.logger.info(f"Stage data type: {type(reddit_data)}")
                         if isinstance(reddit_data, dict):
                             self.logger.info(f"Stage data keys: {list(reddit_data.keys())}")
@@ -847,7 +855,7 @@ params = {repr(params)}
 result = mcp_call("{tool_name}", params)
 
 # Save result to manifest
-save_to_manifest("stages.{node_id}", result)
+save_to_manifest("stages.scout_collect.reddit", result)
 
 print(f"DEBUG: {tool_name} completed, result keys: {{list(result.keys()) if isinstance(result, dict) else 'not dict'}}")
 '''.strip()
@@ -923,7 +931,7 @@ print(f"DEBUG: {tool_name} completed, result keys: {{list(result.keys()) if isin
             if not outputs:
                 return False
             
-            # Handle both list format ["stages.collect_reddit"] and dict format {"location": "stages.collect_reddit"}
+            # Handle both list format ["stages.scout_collect.reddit"] and dict format {"location": "stages.scout_collect.reddit"}
             if isinstance(outputs, dict):
                 location = outputs.get("location")
                 outs = [location] if location else []
@@ -1214,8 +1222,8 @@ def save_to_manifest(section_key: str, obj):
         current.setdefault(stage_name, {})
         
         # Ensure we have a proper data structure for Reddit threads
-        if stage_name == "collect_reddit":
-            log_to_file_prelude(f"DEBUG: Special handling for collect_reddit stage")
+        if stage_name == "scout_collect" or (len(keys) > 2 and keys[1] == "scout_collect" and keys[2] == "reddit"):
+            log_to_file_prelude(f"DEBUG: Special handling for scout_collect Reddit data")
             # Special handling for MCP tool responses with nested JSON
             if isinstance(obj, dict):
                 # Check if this is an MCP response with content structure
@@ -1287,7 +1295,7 @@ def read_from_manifest(section_key: str):
             return None
         manifest = json.loads(manifest_path.read_text())
         
-        # Parse section key like "stages.collect_reddit" -> ["stages", "collect_reddit"]
+        # Parse section key like "stages.scout_collect.reddit" -> ["stages", "scout_collect", "reddit"]
         keys = section_key.split(".")
         current = manifest
         for key in keys:
