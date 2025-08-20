@@ -435,10 +435,20 @@ class AgentOrchestrator:
         # Store result for direct passing to subsequent stages
         self._stage_outputs[node.node_id] = serializable_result
         
-        # Store result in manifest (fallback)
+        # Store result in manifest with standardized stage naming
         if self.manifest_manager:
-            self.manifest_manager.store_node_output(node.node_id, serializable_result)
-            self.manifest_manager.update_node_status(node.node_id, NodeStatus.COMPLETED)
+            # Use agent_id + stage for consistent naming (e.g., scout_plan, scout_collect)
+            stage_id = f"{agent_id}_{stage}"
+            
+            # For collect stage, don't overwrite existing data - just update status
+            if stage == "collect":
+                # Only update the status, preserve any existing data (like Reddit data from sandbox)
+                self.manifest_manager.update_node_status(stage_id, NodeStatus.COMPLETED)
+                self.logger.info(f"Updated collect stage status without overwriting existing data: {stage_id}")
+            else:
+                # For other stages, store the result normally
+                self.manifest_manager.store_node_output(stage_id, serializable_result)
+                self.manifest_manager.update_node_status(stage_id, NodeStatus.COMPLETED)
         
         end_time = datetime.now()
         return NodeResult(

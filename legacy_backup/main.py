@@ -343,7 +343,7 @@ except Exception as e:
 try:
     log_to_file("BEFORE SAVE TO MANIFEST")
     # Ensure we're saving to the correct path that the think stage expects
-    save_to_manifest("stages.collect_reddit.data", result)
+    save_to_manifest("stages.scout_collect.reddit", result)
     log_to_file("AFTER SAVE TO MANIFEST")
 except Exception as e:
     log_to_file(f"ERROR SAVING TO MANIFEST: {e}\n{traceback.format_exc()}")
