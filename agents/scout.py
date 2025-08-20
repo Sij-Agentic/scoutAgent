@@ -143,7 +143,7 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
             subreddits=subreddits,
         )
     
-    async def plan(self, agent_input: AgentInput) -> Dict[str, Any]:
+    async def plan(self, agent_input: AgentInput, run_id: Optional[str] = None) -> Dict[str, Any]:
         """Plan the pain point discovery process."""
         # Normalize incoming input into ScoutInput
         input_data = self._normalize_input(agent_input)
@@ -244,16 +244,17 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
         # Ensure a run_id is present and store it for later stages
         try:
             dag = plan.get("dag") or {}
-            # Prefer run_id from state (set by main script), then from plan, then generate new
+            # Prefer run_id from orchestrator parameter, then from state, then from plan, then generate new
             state_run_id = getattr(self.state, "run_id", None)
-            run_id = state_run_id or dag.get("run_id") or plan.get("run_id")
-            if not run_id:
-                run_id = datetime.now().strftime("run_%Y%m%d_%H%M%S")
-            dag["run_id"] = run_id
+            final_run_id = run_id or state_run_id or dag.get("run_id") or plan.get("run_id")
+            if not final_run_id:
+                # Use same format as main_orchestrated.py to avoid duplicate folders
+                final_run_id = f"scout_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+            dag["run_id"] = final_run_id
             plan["dag"] = dag
-            plan["run_id"] = run_id
+            plan["run_id"] = final_run_id
             # persist in state
-            setattr(self.state, "run_id", run_id)
+            setattr(self.state, "run_id", final_run_id)
         except Exception:
             pass
 
@@ -1145,42 +1146,76 @@ def save_json(rel_path: str, obj):
                 pass
         json.dump(obj, f, indent=2)
 
+def log_to_file_prelude(message):
+    """Log to both console and file from within sandbox prelude"""
+    import datetime
+    log_dir = Path("/tmp/scout_sandbox_logs")
+    log_dir.mkdir(exist_ok=True)
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+    log_file = log_dir / f"prelude_debug_{timestamp}.log"
+    print(message)
+    with open(log_file, 'a', encoding='utf-8') as f:
+        f.write(f"{datetime.datetime.now().isoformat()}: {message}\n")
+        f.flush()
+
 def save_to_manifest(section_key: str, obj):
     """Save data to a specific section in the run manifest."""
+    log_to_file_prelude(f"DEBUG: PRELUDE save_to_manifest called with section_key='{section_key}', obj type={type(obj)}")
+    log_to_file_prelude(f"DEBUG: PRELUDE TESTING - This should appear in sandbox logs!")
+    
     manifest_path = RUN_DIR / "run_manifest.json"
+    log_to_file_prelude(f"DEBUG: PRELUDE Manifest path: {manifest_path}")
+    log_to_file_prelude(f"DEBUG: PRELUDE Manifest exists: {manifest_path.exists()}")
+    
     try:
         if manifest_path.exists():
             manifest = json.loads(manifest_path.read_text())
+            log_to_file_prelude(f"DEBUG: Loaded existing manifest with keys: {list(manifest.keys())}")
         else:
             manifest = {}
-    except Exception:
+            log_to_file_prelude(f"DEBUG: Created new manifest")
+    except Exception as e:
+        log_to_file_prelude(f"ERROR: Failed to load manifest: {e}")
         manifest = {}
     
     # Parse section key like "stages.collect_reddit" -> ["stages", "collect_reddit"]
     keys = section_key.split(".")
+    log_to_file_prelude(f"DEBUG: Parsed keys: {keys}")
+    
     current = manifest
     for key in keys[:-1]:
         current = current.setdefault(key, {})
+        log_to_file_prelude(f"DEBUG: Navigated to key '{key}', current keys: {list(current.keys()) if isinstance(current, dict) else 'not dict'}")
     
     # Set the data
     if isinstance(obj, str):
         try:
             obj = json.loads(obj)
-        except Exception:
+            log_to_file_prelude(f"DEBUG: Parsed string obj to dict with keys: {list(obj.keys()) if isinstance(obj, dict) else 'not dict'}")
+        except Exception as e:
+            log_to_file_prelude(f"DEBUG: Failed to parse string obj as JSON: {e}")
             pass
     
     # Ensure we have valid data to save
     if obj is None:
-        print(f"WARNING: Attempting to save None object to {section_key}")
+        log_to_file_prelude(f"WARNING: Attempting to save None object to {section_key}")
         obj = {"warning": "No data was returned from the tool call"}
+    
+    log_to_file_prelude(f"DEBUG: Final obj type: {type(obj)}")
+    if isinstance(obj, dict):
+        log_to_file_prelude(f"DEBUG: Final obj keys: {list(obj.keys())}")
+        if "threads" in obj:
+            log_to_file_prelude(f"DEBUG: Found {len(obj['threads'])} threads in obj")
     
     # For stages, ensure we have the proper structure and save the actual data
     if keys[0] == "stages":
         stage_name = keys[-1]
+        log_to_file_prelude(f"DEBUG: Processing stage '{stage_name}'")
         current.setdefault(stage_name, {})
         
         # Ensure we have a proper data structure for Reddit threads
         if stage_name == "collect_reddit":
+            log_to_file_prelude(f"DEBUG: Special handling for collect_reddit stage")
             # Special handling for MCP tool responses with nested JSON
             if isinstance(obj, dict):
                 # Check if this is an MCP response with content structure
@@ -1189,44 +1224,60 @@ def save_to_manifest(section_key: str, obj):
                     if isinstance(content_item, dict) and "text" in content_item:
                         # Try to parse the nested JSON in the text field
                         try:
-                            print(f"DEBUG: Found nested JSON in MCP response text field, attempting to parse")
+                            log_to_file_prelude(f"DEBUG: Found nested JSON in MCP response text field, attempting to parse")
                             nested_data = json.loads(content_item["text"])
                             if isinstance(nested_data, dict):
                                 obj = nested_data  # Replace with the parsed nested data
-                                print(f"DEBUG: Successfully parsed nested JSON with keys: {list(obj.keys())}")
+                                log_to_file_prelude(f"DEBUG: Successfully parsed nested JSON with keys: {list(obj.keys())}")
                         except Exception as e:
-                            print(f"DEBUG: Failed to parse nested JSON in text field: {e}")
+                            log_to_file_prelude(f"DEBUG: Failed to parse nested JSON in text field: {e}")
                 
                 # If threads key doesn't exist, initialize it
                 if "threads" not in obj:
+                    log_to_file_prelude(f"DEBUG: No threads key found, initializing empty list")
                     obj["threads"] = []
                     
                 # Add execution details if not present
                 if "execution_details" not in obj:
+                    thread_count = len(obj.get("threads", []))
+                    comment_count = sum(len(t.get("comments", [])) for t in obj.get("threads", []))
                     obj["execution_details"] = {
-                        "total_threads_collected": len(obj.get("threads", [])),
-                        "total_comments_collected": sum(len(t.get("comments", [])) for t in obj.get("threads", []))
+                        "total_threads_collected": thread_count,
+                        "total_comments_collected": comment_count
                     }
+                    log_to_file_prelude(f"DEBUG: Added execution details: {thread_count} threads, {comment_count} comments")
                     
-                print(f"DEBUG: Saving {len(obj.get('threads', []))} threads to manifest")
+                log_to_file_prelude(f"DEBUG: Saving {len(obj.get('threads', []))} threads to manifest")
         
         current[stage_name]["data"] = obj
         current[stage_name]["updated_at"] = __import__("datetime").datetime.now().isoformat()
         current[stage_name]["status"] = "completed"
+        log_to_file_prelude(f"DEBUG: Set data for stage '{stage_name}'")
     else:
         current[keys[-1]] = {
             "data": obj,
             "updated_at": __import__("datetime").datetime.now().isoformat()
         }
+        log_to_file_prelude(f"DEBUG: Set data for non-stage key '{keys[-1]}'")
     
     # Write the updated manifest
     try:
-        manifest_path.write_text(json.dumps(manifest, indent=2))
-        print(f"DEBUG: Successfully wrote manifest to {manifest_path}")
+        manifest_json = json.dumps(manifest, indent=2)
+        log_to_file_prelude(f"DEBUG: Generated manifest JSON ({len(manifest_json)} chars)")
+        manifest_path.write_text(manifest_json)
+        log_to_file_prelude(f"DEBUG: Successfully wrote manifest to {manifest_path}")
+        
+        # Verify the write
+        if manifest_path.exists():
+            verify_content = manifest_path.read_text()
+            log_to_file_prelude(f"DEBUG: Verified manifest file exists and has {len(verify_content)} chars")
+        else:
+            log_to_file_prelude(f"ERROR: Manifest file does not exist after write!")
+        log_to_file_prelude(f"DEBUG: Manifest saved successfully")
     except Exception as e:
-        print(f"ERROR: Failed to write manifest: {e}")
+        log_to_file_prelude(f"ERROR: Failed to save manifest: {e}")
         import traceback
-        print(f"DEBUG: Traceback: {traceback.format_exc()}")
+        log_to_file_prelude(f"DEBUG: Traceback: {traceback.format_exc()}")
 
 def read_from_manifest(section_key: str):
     """Read data from a specific section in the run manifest."""
@@ -1745,9 +1796,11 @@ def mcp_call(tool: str, params: dict):
                     raise FileNotFoundError(f"Plan not found: {p}")
                 plan = json.loads(p.read_text())
                 selected_run_dir = p.parent
-            # Determine run_id preference: explicit arg > plan dag/run_id > state
+            # Determine run_id preference: explicit arg > state > plan dag/run_id 
+            # This ensures orchestrator's run_id takes precedence
             dag = plan.get("dag") or {}
-            chosen_run_id = run_id or dag.get("run_id") or plan.get("run_id") or getattr(self.state, "run_id", None)
+            state_run_id = getattr(self.state, "run_id", None)
+            chosen_run_id = run_id or state_run_id or dag.get("run_id") or plan.get("run_id")
             if chosen_run_id:
                 dag["run_id"] = chosen_run_id
                 plan["dag"] = dag

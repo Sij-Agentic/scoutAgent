@@ -176,9 +176,22 @@ class ManifestManager:
         self._manifest = new_manifest
     
     def _save(self) -> None:
-        """Save the manifest to disk."""
+        """Save the manifest to disk, preserving any existing data."""
         self.manifest_path.parent.mkdir(parents=True, exist_ok=True)
-        self.manifest_path.write_text(json.dumps(self._manifest, indent=2, cls=EnumEncoder))
+        
+        # Read existing manifest to preserve data added by other processes (like sandbox)
+        existing_manifest = {}
+        if self.manifest_path.exists():
+            try:
+                existing_manifest = json.loads(self.manifest_path.read_text())
+            except json.JSONDecodeError:
+                # If existing file is corrupted, proceed with our data
+                pass
+        
+        # Merge existing data with our updates, preserving external additions
+        merged_manifest = self._merge_dicts(existing_manifest, self._manifest)
+        
+        self.manifest_path.write_text(json.dumps(merged_manifest, indent=2, cls=EnumEncoder))
     
     def _merge_dicts(self, base: Dict[str, Any], updates: Dict[str, Any]) -> Dict[str, Any]:
         """Shallow-then-deep merge dictionaries.
