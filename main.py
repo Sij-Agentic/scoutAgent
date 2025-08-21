@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Main script for running the ScoutAgent workflow using the AgentOrchestrator.
+Main script for running the ScoutAgent and ScreenerAgent workflow using the AgentOrchestrator.
 
 This script demonstrates how to use the AgentOrchestrator to manage multiple agents
 with varying lifecycle stages, integrating their workflows into a unified DAG engine.
@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Dict, Any, List, Optional
 
 from scout_agent.agents.scout import ScoutAgent
+from scout_agent.agents.screener import ScreenerAgent
 from scout_agent.agents.base import AgentInput
 from scout_agent.orchestration import AgentOrchestrator, create_orchestrator, AGENT_STAGE_CONFIGS
 from scout_agent.custom_logging.logger import get_logger
@@ -32,6 +33,7 @@ async def run_orchestrated_workflow(
     subreddits: List[str] = None,
     research_scope: str = "comprehensive",
     max_pain_points: int = 10,
+    top_k: int = 5,
     per_query_limit: int = 50,
     include_comments: bool = True,
     comment_depth: int = 2,
@@ -40,7 +42,7 @@ async def run_orchestrated_workflow(
     debug: bool = False
 ) -> Dict[str, Any]:
     """
-    Run the ScoutAgent workflow using the AgentOrchestrator.
+    Run the ScoutAgent and ScreenerAgent workflow using the AgentOrchestrator.
     
     Args:
         target_market: The target market to research
@@ -49,6 +51,7 @@ async def run_orchestrated_workflow(
         subreddits: List of subreddits to search
         research_scope: Scope of research (quick, focused, comprehensive)
         max_pain_points: Maximum number of pain points to discover
+        top_k: Number of top pain points to return from screener
         per_query_limit: Maximum number of threads per query
         include_comments: Include comments in thread collection
         comment_depth: Maximum depth of comment tree to collect
@@ -59,7 +62,6 @@ async def run_orchestrated_workflow(
     Returns:
         Dict containing the workflow results
     """
-    #logger = get_logger("orchestrated_workflow", level=logging.DEBUG if debug else logging.INFO)
     logger = get_logger("orchestrated_workflow")
     logger.info(f"Starting orchestrated workflow for market: {target_market}")
     
@@ -92,6 +94,10 @@ async def run_orchestrated_workflow(
         metadata={
             "run_id": run_id,
             "timestamp": datetime.datetime.now().isoformat()
+        },
+        context={
+            "target_market": target_market,
+            "top_k": top_k
         }
     )
     
@@ -101,6 +107,10 @@ async def run_orchestrated_workflow(
     # Register the ScoutAgent
     scout_agent = ScoutAgent(agent_id="scout")
     orchestrator.register_agent("scout", AGENT_STAGE_CONFIGS["scout"], scout_agent)
+    
+    # Register the ScreenerAgent
+    screener_agent = ScreenerAgent(agent_id="screener")
+    orchestrator.register_agent("screener", AGENT_STAGE_CONFIGS["screener"], screener_agent)
     
     # Initialize the orchestrator
     await orchestrator.initialize(agent_input)
@@ -122,7 +132,7 @@ async def run_orchestrated_workflow(
 
 def main():
     """Main entry point for the script."""
-    parser = argparse.ArgumentParser(description="Run ScoutAgent with orchestration")
+    parser = argparse.ArgumentParser(description="Run ScoutAgent and ScreenerAgent with orchestration")
     parser.add_argument("--target-market", type=str, required=True, help="Target market to research")
     parser.add_argument("--keywords", type=str, required=True, help="Comma-separated keywords to search for")
     parser.add_argument("--subreddits", type=str, default="", help="Comma-separated subreddits to search")
@@ -132,6 +142,8 @@ def main():
                         help="Scope of research")
     parser.add_argument("--max-pain-points", type=int, default=10, 
                         help="Maximum number of pain points to discover")
+    parser.add_argument("--top-k", type=int, default=5,
+                        help="Number of top pain points to return from screener")
     parser.add_argument("--per-query-limit", type=int, default=50, help="Maximum number of threads per query")
     parser.add_argument("--include-comments", action="store_true", help="Include comments in thread collection")
     parser.add_argument("--comment-depth", type=int, default=2, help="Maximum depth of comment tree to collect")
@@ -153,6 +165,7 @@ def main():
         subreddits=subreddits,
         research_scope=args.research_scope,
         max_pain_points=args.max_pain_points,
+        top_k=args.top_k,
         per_query_limit=args.per_query_limit,
         include_comments=args.include_comments,
         comment_depth=args.comment_depth,
