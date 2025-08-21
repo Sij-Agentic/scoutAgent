@@ -353,6 +353,24 @@ class AgentOrchestrator:
                 prev_node_id = node.node_id
                 last_nodes[agent_id] = node.node_id
         
+        # Add inter-agent dependencies
+        # Screener depends on Scout's output
+        if "scout" in last_nodes and "screener" in self.agent_configs:
+            scout_last_node = last_nodes["scout"]  # This should be scout_act
+            screener_first_node = None
+            
+            # Find the first node of the screener agent
+            for node_id in self.dag_engine.graph.nodes():
+                if node_id.startswith("screener_") and "_" in node_id:
+                    stage = node_id.split("_", 1)[1]
+                    if stage == self.agent_configs["screener"].stages[0]:
+                        screener_first_node = node_id
+                        break
+            
+            if screener_first_node:
+                self.logger.info(f"Adding dependency: {scout_last_node} -> {screener_first_node}")
+                self.dag_engine.add_edge(scout_last_node, screener_first_node)
+        
         # Validate the DAG
         validation = self.dag_engine.validate()
         if not validation["valid"]:
@@ -472,7 +490,51 @@ class AgentOrchestrator:
             agent_config = self.agent_configs.get(agent_id)
             has_collect_stage = agent_config and "collect" in agent_config.stages
             
-            if has_collect_stage:
+            if agent_id == "screener":
+                # For ScreenerAgent, get the pain points from ScoutAgent's act stage
+                scout_act_data = None
+                
+                # Try to get scout_act data from message service first
+                try:
+                    scout_act_data = self.message_service.consume_stage_input(
+                        workflow_id=self.run_id,
+                        stage_id="scout_act"
+                    )
+                    if scout_act_data:
+                        self.logger.info("Using message service scout_act data for screener think stage")
+                except Exception as e:
+                    self.logger.warning(f"Failed to get scout_act data from message service: {e}")
+                
+                # If not found in message service, try direct stage output
+                if not scout_act_data:
+                    scout_act_data = self._stage_outputs.get("scout_act")
+                    if scout_act_data:
+                        self.logger.info("Using direct stage output for scout_act data in screener think stage")
+                
+                # If still not found, try manifest
+                if not scout_act_data and self.manifest_manager:
+                    scout_act_data = self.manifest_manager.get_node_output("scout_act")
+                    if scout_act_data:
+                        self.logger.info("Using manifest fallback for scout_act data in screener think stage")
+                
+                # Extract pain points from scout_act data
+                pain_points = []
+                if scout_act_data:
+                    # Extract pain points from different possible formats
+                    if isinstance(scout_act_data, dict):
+                        if "pain_points" in scout_act_data:
+                            pain_points = scout_act_data["pain_points"]
+                        elif "result" in scout_act_data and isinstance(scout_act_data["result"], dict):
+                            pain_points = scout_act_data["result"].get("pain_points", [])
+                    
+                    self.logger.info(f"Found {len(pain_points)} pain points for screener from scout_act")
+                    
+                    # Set pain points as input data for screener
+                    self.agent_input.data = pain_points
+                
+                result = await method(self.agent_input)
+            elif has_collect_stage:
+                # For agents with collect stage (like ScoutAgent), get collect data
                 # Get collect data from direct tool results first, then fallback to aggregated results
                 collect_data = self._get_direct_collect_data(agent_id=agent_id, source="reddit")
                 if not collect_data:
@@ -484,10 +546,11 @@ class AgentOrchestrator:
                 if collect_data:
                     setattr(agent.state, 'collect_data', collect_data)
                     self.logger.info(f"Set collect_data in agent state for think: {len(collect_data.get('threads', []))} threads")
+                
+                result = await method(self.agent_input)
             else:
                 self.logger.info(f"Agent {agent_id} has no collect stage - skipping collect data retrieval")
-                
-            result = await method(self.agent_input)
+                result = await method(self.agent_input)
         elif stage == "act":
             # Get plan and think results for act stage
             plan_result = None
