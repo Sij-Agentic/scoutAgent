@@ -7,7 +7,6 @@ web research, social media analysis, and user feedback collection.
 
 import asyncio
 import json
-import asyncio
 import datetime
 import logging
 import os
@@ -407,13 +406,14 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
             # Load and render the thinking prompt template
             prompt_text = load_prompt_template(template_name="think.prompt", agent_name=self.name, substitutions=substitutions)
             
-            # Add the Reddit data to the prompt
+            # Add the Reddit data to the prompt using a chunked approach to avoid timeouts
             # Limit the data to avoid exceeding token limits
-            max_threads = 10
-            max_comments_per_thread = 20
+            max_threads = 5  # Reduced from 10 to process in smaller batches
+            max_comments_per_thread = 10  # Reduced from 20 to limit data size
+            max_threads_total = min(20, len(threads))  # Process up to 20 threads total
             
-            # Prepare a condensed version of the Reddit data
-            condensed_threads = threads[:max_threads]
+            # Prepare threads for processing
+            all_threads = threads[:max_threads_total]
             
             # Add comments to their respective threads
             thread_comments = {}
@@ -424,28 +424,140 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
                 if len(thread_comments[thread_id]) < max_comments_per_thread:
                     thread_comments[thread_id].append(comment)
             
-            # Add comments to threads
-            for thread in condensed_threads:
-                thread_id = thread.get("id", "").replace("t3_", "")
-                thread["comments"] = thread_comments.get(thread_id, [])
+            # Process threads in batches to avoid LLM timeout (in parallel)
+            batch_count = (len(all_threads) + max_threads - 1) // max_threads  # Ceiling division
             
-            # Add the condensed Reddit data to the prompt
-            prompt_text += f"\n\n# REDDIT DATA\n{json.dumps(condensed_threads, indent=2)}"
+            self.logger.info(f"Processing {len(all_threads)} threads in {batch_count} batches in parallel")
             
-            # Generate analysis using LLM (returns string)
-            try:
-                llm_text = await self.llm_generate(prompt=prompt_text, task_type="think")
-                analysis = self._extract_json(llm_text)
-                self.logger.info("Generated analysis via LLM")
-            except Exception as e:
-                # Fallback if LLM fails
-                self.logger.warning(f"LLM analysis generation failed: {str(e)}. Using fallback analysis.")
+            # Prepare all batches
+            batch_tasks = []
+            
+            async def process_batch(batch_idx, batch_threads):
+                try:
+                    # Add comments to threads in this batch
+                    for thread in batch_threads:
+                        thread_id = thread.get("id", "").replace("t3_", "")
+                        thread["comments"] = thread_comments.get(thread_id, [])
+                    
+                    # Create a batch-specific prompt
+                    batch_prompt = prompt_text + f"\n\n# REDDIT DATA (Batch {batch_idx+1}/{batch_count})\n{json.dumps(batch_threads, indent=2)}"
+                    
+                    self.logger.info(f"Processing batch {batch_idx+1}/{batch_count} with {len(batch_threads)} threads")
+                    llm_text = await self.llm_generate(prompt=batch_prompt, task_type="think")
+                    batch_analysis = self._extract_json(llm_text)
+                    
+                    if batch_analysis:
+                        self.logger.info(f"Successfully analyzed batch {batch_idx+1}")
+                        return batch_analysis
+                    else:
+                        self.logger.warning(f"Failed to extract JSON from batch {batch_idx+1} LLM response")
+                        return None
+                except Exception as e:
+                    self.logger.warning(f"Batch {batch_idx+1} analysis failed: {str(e)}")
+                    return None
+            
+            # Create tasks for all batches
+            for batch_idx in range(batch_count):
+                start_idx = batch_idx * max_threads
+                end_idx = min(start_idx + max_threads, len(all_threads))
+                batch_threads = all_threads[start_idx:end_idx]
+                batch_tasks.append(process_batch(batch_idx, batch_threads))
+            
+            # Run all batches in parallel
+            analysis_results = await asyncio.gather(*batch_tasks)
+            # Filter out None results
+            analysis_results = [result for result in analysis_results if result]
+            
+            # Merge the analysis results from all batches
+            if analysis_results:
+                # Combine per-thread summaries with deduplication
+                per_thread_summaries = []
+                seen_thread_ids = set()
+                
+                for result in analysis_results:
+                    if isinstance(result, dict) and "per_thread_summaries" in result:
+                        summaries = result.get("per_thread_summaries", [])
+                        for summary in summaries:
+                            # Check if this is a dict with an id or thread_id field
+                            thread_id = None
+                            if isinstance(summary, dict):
+                                thread_id = summary.get("id") or summary.get("thread_id")
+                            
+                            # Add if no ID (can't deduplicate) or if ID not seen before
+                            if not thread_id or thread_id not in seen_thread_ids:
+                                per_thread_summaries.append(summary)
+                                if thread_id:
+                                    seen_thread_ids.add(thread_id)
+                
+                # Combine pain points with deduplication by description
+                all_pains = []
+                seen_pain_descriptions = set()
+                
+                for result in analysis_results:
+                    if isinstance(result, dict) and "pains" in result:
+                        pains = result.get("pains", [])
+                        for pain in pains:
+                            # Get a description to use for deduplication
+                            pain_desc = None
+                            if isinstance(pain, dict):
+                                pain_desc = pain.get("description")
+                            elif isinstance(pain, str):
+                                pain_desc = pain
+                                
+                            # Add if no description (can't deduplicate) or if not seen before
+                            if not pain_desc or pain_desc not in seen_pain_descriptions:
+                                all_pains.append(pain)
+                                if pain_desc:
+                                    seen_pain_descriptions.add(pain_desc)
+                
+                # Combine themes (ensure they're hashable strings)
+                all_themes = set()
+                for result in analysis_results:
+                    if isinstance(result, dict) and "themes" in result:
+                        themes = result.get("themes", [])
+                        # Ensure each theme is a hashable type (string)
+                        for theme in themes:
+                            if isinstance(theme, str):
+                                all_themes.add(theme)
+                            elif isinstance(theme, dict) and "name" in theme:
+                                # If themes are objects with a name field
+                                all_themes.add(theme["name"])
+                            elif isinstance(theme, (list, tuple)) and len(theme) > 0:
+                                # If themes are lists/tuples, use the first element if it's a string
+                                if isinstance(theme[0], str):
+                                    all_themes.add(theme[0])
+                
+                # Create the final analysis with enhanced metadata
+                analysis = {
+                    "per_thread_summaries": per_thread_summaries,
+                    "pains": all_pains,
+                    "themes": list(all_themes),
+                    "total_threads_analyzed": len(all_threads),
+                    "total_threads_summarized": len(per_thread_summaries),
+                    "total_pain_points_found": len(all_pains),
+                    "total_themes_identified": len(all_themes),
+                    "batches_processed": len(analysis_results),
+                    "total_batches": batch_count,
+                    "processing_method": "parallel_batched",
+                    "processing_timestamp": datetime.now().isoformat()
+                }
+                self.logger.info(f"Successfully merged analysis from {len(analysis_results)} batches")
+            else:
+                # Fallback if all LLM calls fail
+                self.logger.warning("All LLM analysis attempts failed. Using fallback analysis.")
                 analysis = {
                     "per_thread_summaries": [],
                     "pains": [],
                     "themes": [],
-                    "error": "LLM analysis failed",
+                    "error": "LLM analysis failed for all batches",
                     "total_threads_analyzed": len(threads),
+                    "total_threads_summarized": 0,
+                    "total_pain_points_found": 0,
+                    "total_themes_identified": 0,
+                    "batches_processed": 0,
+                    "total_batches": batch_count,
+                    "processing_method": "parallel_batched_failed",
+                    "processing_timestamp": datetime.now().isoformat(),
                     "next_steps": ["retry_analysis", "validate_data"]
                 }
                 
