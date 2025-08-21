@@ -328,12 +328,15 @@ class AgentOrchestrator:
         # Clear any existing DAG
         self.dag_engine.graph.clear()
         
-        # Track node dependencies
-        last_nodes = {}  # agent_id -> last node_id
+        # Create separate lists to control execution order
+        scout_nodes = []
+        screener_nodes = []
+        other_nodes = []
         
-        # For each agent, add its stages in sequence
+        # For each agent, create its stage nodes but don't add them to the DAG yet
         for agent_id, config in self.agent_configs.items():
             prev_node_id = None
+            agent_nodes = []
             
             for stage in config.stages:
                 # For the first stage of each agent, check if it depends on other agents
@@ -343,39 +346,63 @@ class AgentOrchestrator:
                 
                 # Create the node for this stage
                 node = self._create_agent_stage_node(agent_id, stage, dependencies)
-                self.dag_engine.add_node(node)
                 
-                # If there are dependencies from the previous node, add edges
-                for dep in dependencies:
-                    self.dag_engine.add_edge(dep, node.node_id)
+                # Store the node in the appropriate list
+                if agent_id == "scout":
+                    scout_nodes.append(node)
+                elif agent_id == "screener":
+                    screener_nodes.append(node)
+                else:
+                    other_nodes.append(node)
                 
                 # Update tracking
                 prev_node_id = node.node_id
-                last_nodes[agent_id] = node.node_id
         
-        # Add inter-agent dependencies
-        # Screener depends on Scout's output
-        if "scout" in last_nodes and "screener" in self.agent_configs:
-            scout_last_node = last_nodes["scout"]  # This should be scout_act
-            screener_first_node = None
+        # Add all scout nodes to the DAG first
+        for node in scout_nodes:
+            self.dag_engine.add_node(node)
+            # Add edges for dependencies
+            for dep in node.dependencies:
+                if dep in self.dag_engine.graph.nodes():
+                    self.dag_engine.add_edge(dep, node.node_id)
+        
+        # Find the last scout node (scout_act)
+        scout_last_node = None
+        if scout_nodes:
+            scout_last_node = scout_nodes[-1].node_id
+        
+        # Add screener nodes with dependency on scout_act
+        for i, node in enumerate(screener_nodes):
+            self.dag_engine.add_node(node)
             
-            # Find the first node of the screener agent
-            for node_id in self.dag_engine.graph.nodes():
-                if node_id.startswith("screener_") and "_" in node_id:
-                    stage = node_id.split("_", 1)[1]
-                    if stage == self.agent_configs["screener"].stages[0]:
-                        screener_first_node = node_id
-                        break
+            # For the first screener node, add dependency on scout_act
+            if i == 0 and scout_last_node:
+                self.logger.info(f"Adding dependency: {scout_last_node} -> {node.node_id}")
+                node.dependencies.append(scout_last_node)
+                self.dag_engine.add_edge(scout_last_node, node.node_id)
             
-            if screener_first_node:
-                self.logger.info(f"Adding dependency: {scout_last_node} -> {screener_first_node}")
-                self.dag_engine.add_edge(scout_last_node, screener_first_node)
+            # Add edges for other dependencies
+            for dep in node.dependencies:
+                if dep in self.dag_engine.graph.nodes():
+                    self.dag_engine.add_edge(dep, node.node_id)
+        
+        # Add all other nodes
+        for node in other_nodes:
+            self.dag_engine.add_node(node)
+            # Add edges for dependencies
+            for dep in node.dependencies:
+                if dep in self.dag_engine.graph.nodes():
+                    self.dag_engine.add_edge(dep, node.node_id)
         
         # Validate the DAG
         validation = self.dag_engine.validate()
         if not validation["valid"]:
             self.logger.error(f"Invalid DAG: {validation['errors']}")
             raise ValueError(f"Invalid DAG: {validation['errors']}")
+        
+        # Print the execution order for debugging
+        execution_order = self.dag_engine.get_execution_order()
+        self.logger.info(f"DAG execution order: {execution_order}")
         
         self.logger.info(f"Built initial DAG with {len(self.dag_engine.graph.nodes)} nodes")
     
@@ -532,7 +559,20 @@ class AgentOrchestrator:
                     # Set pain points as input data for screener
                     self.agent_input.data = pain_points
                 
-                result = await method(self.agent_input)
+                    # Create a ScreenerInput object from the AgentInput
+                    from scout_agent.agents.screener import ScreenerInput
+                    screener_input = ScreenerInput.from_agent_input(self.agent_input)
+                    result = await method(screener_input)
+                else:
+                    # This should never happen with proper DAG dependencies, but keep as fallback
+                    # Don't log a warning since this would be an internal error, not user-facing
+                    from scout_agent.agents.screener import ScreenerInput
+                    screener_input = ScreenerInput(
+                        pain_points=[],
+                        target_market=self.agent_input.context.get("target_market", ""),
+                        top_k=self.agent_input.context.get("top_k", 5)
+                    )
+                    result = await method(screener_input)
             elif has_collect_stage:
                 # For agents with collect stage (like ScoutAgent), get collect data
                 # Get collect data from direct tool results first, then fallback to aggregated results
@@ -582,7 +622,13 @@ class AgentOrchestrator:
                     if think_result:
                         self.logger.info("Using manifest fallback for think result in act stage")
                 
-            result = await method(self.agent_input, plan_result, think_result)
+            # For ScreenerAgent, we need to create a ScreenerInput
+            if agent_id == "screener":
+                from scout_agent.agents.screener import ScreenerInput
+                screener_input = ScreenerInput.from_agent_input(self.agent_input)
+                result = await method(screener_input, think_result)
+            else:
+                result = await method(self.agent_input, plan_result, think_result)
         else:
             result = await method(self.agent_input)
         

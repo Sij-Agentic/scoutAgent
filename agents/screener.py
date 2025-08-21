@@ -142,11 +142,30 @@ class ScreenerAgent(BaseAgent, LLMAgentMixin):
         """Evaluate pain points against criteria."""
         self.logger.info(f"Evaluating {len(input_data.pain_points)} pain points")
         
+        # Check if we have any pain points to evaluate
+        if not input_data.pain_points:
+            self.logger.warning("No pain points provided for evaluation")
+            fallback_evaluations = self._generate_fallback_evaluations([])
+            self._write_stage_output("think", fallback_evaluations)
+            self.state.evaluations = fallback_evaluations
+            return fallback_evaluations
+        
+        # Save input pain points for debugging
+        try:
+            debug_dir = Path("debug")
+            debug_dir.mkdir(exist_ok=True)
+            debug_file = debug_dir / f"screener_input_pain_points_{int(time.time())}.json"
+            with open(debug_file, "w", encoding="utf-8") as f:
+                json.dump(input_data.pain_points, f, indent=2)
+                self.logger.info(f"Saved input pain points to {debug_file}")
+        except Exception as e:
+            self.logger.error(f"Failed to save input pain points: {e}")
+        
         try:
             # Load prompt template
             prompt = load_prompt_template(
                 template_name="think.prompt",
-                agent_name=self.name,
+                agent_name="screener_agent",  # Use explicit folder name
                 substitutions={
                     "pain_points": json.dumps(input_data.pain_points, indent=2),
                     "market_focus": input_data.target_market,
@@ -154,13 +173,32 @@ class ScreenerAgent(BaseAgent, LLMAgentMixin):
                 }
             )
             
+            # Debug the prompt path
+            self.logger.info(f"Loading prompt from screener_agent/think.prompt")
+            
+            # Save the prompt for debugging
+            try:
+                debug_file = debug_dir / f"screener_think_prompt_{int(time.time())}.txt"
+                with open(debug_file, "w", encoding="utf-8") as f:
+                    f.write(prompt)
+                    self.logger.info(f"Saved prompt to {debug_file}")
+            except Exception as e:
+                self.logger.error(f"Failed to save prompt: {e}")
+            
             # Generate evaluations using LLM
+            self.logger.info("Calling LLM to generate evaluations...")
             response = await self.llm_generate(prompt=prompt, task_type="evaluation")
+            self.logger.info(f"Received LLM response of length: {len(response) if response else 0}")
             
             # Extract JSON from response
             evaluations = self._extract_json(response)
             
-            self.logger.info(f"Generated evaluations for {len(evaluations.get('evaluations', []))} pain points")
+            # Validate the evaluations structure
+            if not evaluations.get('evaluations'):
+                self.logger.warning("No evaluations found in LLM response, using fallback")
+                evaluations = self._generate_fallback_evaluations(input_data.pain_points)
+            else:
+                self.logger.info(f"Generated evaluations for {len(evaluations.get('evaluations', []))} pain points")
             
             # Write evaluations to manifest
             self._write_stage_output("think", evaluations)
@@ -173,6 +211,7 @@ class ScreenerAgent(BaseAgent, LLMAgentMixin):
         except Exception as e:
             self.logger.error(f"Error in think phase: {str(e)}\n{traceback.format_exc()}")
             # Fallback: generate basic evaluations
+            self.logger.info("Using fallback evaluation due to error")
             fallback_evaluations = self._generate_fallback_evaluations(input_data.pain_points)
             
             # Write fallback evaluations to manifest
@@ -277,6 +316,8 @@ class ScreenerAgent(BaseAgent, LLMAgentMixin):
         """Extract JSON from text with robust error handling."""
         import re
         import json
+        import os
+        from pathlib import Path
         
         # Default fallback result
         default_result = {
@@ -284,7 +325,20 @@ class ScreenerAgent(BaseAgent, LLMAgentMixin):
             "message": "Failed to parse JSON from response"
         }
         
+        # Log the raw response for debugging
+        debug_dir = Path("debug")
+        debug_dir.mkdir(exist_ok=True)
+        debug_file = debug_dir / f"screener_think_response_{int(time.time())}.txt"
+        try:
+            with open(debug_file, "w", encoding="utf-8") as f:
+                f.write("=== RAW LLM RESPONSE ===\n")
+                f.write(text or "")
+                self.logger.info(f"Saved raw LLM response to {debug_file}")
+        except Exception as e:
+            self.logger.error(f"Failed to save debug file: {e}")
+        
         if not text or not isinstance(text, str):
+            self.logger.error("Empty or non-string response from LLM")
             return default_result
         
         # Try to find JSON in markdown code blocks
@@ -292,35 +346,87 @@ class ScreenerAgent(BaseAgent, LLMAgentMixin):
         matches = re.search(code_block_pattern, text, re.DOTALL)
         
         if matches:
+            self.logger.info("Found JSON in code block")
             json_str = matches.group(1)
         else:
             # Try to find JSON without code blocks
+            self.logger.info("No code block found, trying to parse entire response as JSON")
             json_str = text
+            
+            # Try to find JSON object within the text using regex
+            json_pattern = r'\{[\s\S]*\}'
+            json_matches = re.search(json_pattern, text, re.DOTALL)
+            if json_matches:
+                self.logger.info("Found JSON-like structure in response")
+                json_str = json_matches.group(0)
         
         # Clean the JSON string
         json_str = re.sub(r',\s*([\]\}])', r'\1', json_str)  # Remove trailing commas
         
+        # Log the extracted JSON string
         try:
-            return json.loads(json_str)
-        except json.JSONDecodeError:
+            with open(debug_file, "a", encoding="utf-8") as f:
+                f.write("\n\n=== EXTRACTED JSON STRING ===\n")
+                f.write(json_str or "")
+        except Exception:
+            pass
+        
+        try:
+            parsed_json = json.loads(json_str)
+            self.logger.info("Successfully parsed JSON")
+            return parsed_json
+        except json.JSONDecodeError as e:
+            self.logger.error(f"JSON decode error: {e}")
             try:
                 # Try again with more aggressive cleaning
+                self.logger.info("Attempting more aggressive JSON cleaning")
                 json_str = json_str.replace("'", '"')  # Replace single quotes with double quotes
-                return json.loads(json_str)
-            except:
+                json_str = re.sub(r'([{,]\s*)(\w+)(\s*:)', r'\1"\2"\3', json_str)  # Add quotes to keys
+                
+                # Log the cleaned JSON string
+                try:
+                    with open(debug_file, "a", encoding="utf-8") as f:
+                        f.write("\n\n=== CLEANED JSON STRING ===\n")
+                        f.write(json_str or "")
+                except Exception:
+                    pass
+                
+                parsed_json = json.loads(json_str)
+                self.logger.info("Successfully parsed JSON after aggressive cleaning")
+                return parsed_json
+            except Exception as e:
+                self.logger.error(f"Failed to parse JSON after cleaning: {e}")
                 return default_result
     
     def _generate_fallback_evaluations(self, pain_points: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Generate fallback evaluations if LLM fails."""
         evaluations = []
         
+        # Handle empty pain_points list
+        if not pain_points:
+            self.logger.warning("No pain points provided for fallback evaluation")
+            return {
+                "evaluations": [],
+                "evaluation_summary": "No pain points available for evaluation"
+            }
+        
         for i, pain_point in enumerate(pain_points):
             # Extract pain point fields
             pain_id = pain_point.get("id", f"pp{i+1}")
             description = pain_point.get("description", "Unknown pain point")
             
+            # Handle missing description
+            if not description or description == "Unknown pain point":
+                # Try to extract description from other fields
+                if "title" in pain_point:
+                    description = pain_point["title"]
+                elif "summary" in pain_point:
+                    description = pain_point["summary"]
+                elif "text" in pain_point:
+                    description = pain_point["text"][:100] + "..."  # Truncate long text
+            
             # Generate random-ish scores based on available data
-            problem_clarity = min(len(description) / 20, 10)  # Longer descriptions get higher clarity scores
+            problem_clarity = min(len(description) / 20, 10) if description else 5.0  # Longer descriptions get higher clarity scores
             willingness_to_pay = pain_point.get("impact_score", 5) * 0.8  # Base WTP on impact score
             automatability = 7.0  # Default middle-high score for automatability
             source_diversity = min(len(pain_point.get("evidence", [])), 10)  # Score based on evidence count
@@ -331,7 +437,7 @@ class ScreenerAgent(BaseAgent, LLMAgentMixin):
             
             evaluations.append({
                 "id": pain_id,
-                "description": description,
+                "description": description or "No description available",
                 "scores": {
                     "problem_clarity": round(problem_clarity, 1),
                     "willingness_to_pay": round(willingness_to_pay, 1),
@@ -342,6 +448,20 @@ class ScreenerAgent(BaseAgent, LLMAgentMixin):
                 "total_score": round(total_score, 1),
                 "justification": "Fallback evaluation based on available data"
             })
+        
+        # Save fallback evaluations for debugging
+        try:
+            debug_dir = Path("debug")
+            debug_dir.mkdir(exist_ok=True)
+            debug_file = debug_dir / f"screener_fallback_evaluations_{int(time.time())}.json"
+            with open(debug_file, "w", encoding="utf-8") as f:
+                json.dump({
+                    "evaluations": evaluations,
+                    "evaluation_summary": f"Fallback evaluation of {len(evaluations)} pain points"
+                }, f, indent=2)
+                self.logger.info(f"Saved fallback evaluations to {debug_file}")
+        except Exception as e:
+            self.logger.error(f"Failed to save fallback evaluations: {e}")
         
         return {
             "evaluations": evaluations,

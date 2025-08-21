@@ -143,10 +143,13 @@ async def reddit_search_and_fetch_threads(
     comment_depth: int = 2,
     comment_limit: int = 50,
     use_cache: bool = True,
+    test_mode: bool = True,  # New parameter for testing with reduced data
 ) -> Dict[str, Any]:
     """
     Return cached reddit threads matching keywords/subreddits/time_window from data/reddit_cache.
     This is cache-only (no live API calls). Results are normalized like reddit_thread objects.
+    
+    When test_mode=True, returns a significantly reduced dataset for testing.
     """
     try:
         cache_root = _cache_root()
@@ -164,6 +167,13 @@ async def reddit_search_and_fetch_threads(
         # Apply per_query_limit and dedupe by post id
         seen = set()
         results: List[Dict[str, Any]] = []
+        
+        # Reduce limits for test mode
+        if test_mode:
+            per_query_limit = min(3, per_query_limit)  # Max 3 threads
+            comment_limit = min(5, comment_limit)      # Max 5 comments per thread
+            print(f"🔍 TEST MODE: Limiting to {per_query_limit} threads with {comment_limit} comments each")
+        
         count = 0
         for it in filtered:
             pid = (it.get("post", {}).get("id") or "")
@@ -176,7 +186,11 @@ async def reddit_search_and_fetch_threads(
                 "post": it.get("post"),
             }
             if include_comments:
-                obj["comments"] = it.get("comments", [])
+                # Limit comments in test mode
+                comments = it.get("comments", [])
+                if test_mode and comments:
+                    comments = comments[:comment_limit]
+                obj["comments"] = comments
             results.append(obj)
             count += 1
             if count >= max(1, int(per_query_limit)):
@@ -199,11 +213,20 @@ async def reddit_api_search_and_fetch_threads(
     comment_depth: int = 2,
     comment_limit: int = 50,
     use_cache: bool = True,
+    test_mode: bool = False,  # New parameter for testing with reduced data
 ) -> Dict[str, Any]:
     """
     API-backed fetch using RedditClient with on-disk cache. Mirrors scripts/fetch_reddit.py behavior.
+    
+    When test_mode=True, returns a significantly reduced dataset for testing.
     """
     try:
+        # Reduce limits for test mode
+        if test_mode:
+            per_query_limit = min(3, per_query_limit)  # Max 3 threads
+            comment_limit = min(5, comment_limit)      # Max 5 comments per thread
+            print(f"🔍 TEST MODE: Limiting to {per_query_limit} threads with {comment_limit} comments each")
+        
         client = RedditClient()
         results = client.fetch_conversations(
             keywords=keywords,
@@ -223,7 +246,11 @@ async def reddit_api_search_and_fetch_threads(
                 "post": r.get("post"),
             }
             if include_comments:
-                obj["comments"] = r.get("comments", [])
+                # Limit comments in test mode
+                comments = r.get("comments", [])
+                if test_mode and comments:
+                    comments = comments[:comment_limit]
+                obj["comments"] = comments
             normalized.append(obj)
 
         payload = {"threads": normalized}
