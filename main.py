@@ -142,7 +142,7 @@ def main():
                         help="Scope of research")
     parser.add_argument("--max-pain-points", type=int, default=10, 
                         help="Maximum number of pain points to discover")
-    parser.add_argument("--top-k", type=int, default=5,
+    parser.add_argument("--top-k", type=int, default=10,
                         help="Number of top pain points to return from screener")
     parser.add_argument("--per-query-limit", type=int, default=50, help="Maximum number of threads per query")
     parser.add_argument("--include-comments", action="store_true", help="Include comments in thread collection")
