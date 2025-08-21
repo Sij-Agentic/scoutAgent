@@ -35,7 +35,7 @@ Respond with a STRICT JSON object (no prose) containing only tool nodes for the 
   "dag": {
     "nodes": [
       {
-        "id": "collect_reddit",
+        "id": "scout_collect_reddit",
         "type": "tool",
         "tool": "reddit_search_and_fetch_threads",
         "params": {
@@ -47,9 +47,9 @@ Respond with a STRICT JSON object (no prose) containing only tool nodes for the 
           "comment_limit": number (default 200),
           "use_cache": true
         },
-        "code": "# MCP tool call for reddit_search_and_fetch_threads\nimport json\nfrom pathlib import Path\n\nprint(\"DEBUG: Starting reddit tool execution\")\n\n# Define parameters as Python dict\nparams = {\n  \"keywords\": [\"keyword1\", \"keyword2\"],\n  \"subreddits\": [\"subreddit1\", \"subreddit2\"],\n  \"per_query_limit\": 50,\n  \"include_comments\": true,\n  \"comment_depth\": 2,\n  \"comment_limit\": 200,\n  \"use_cache\": true\n}\n\nprint(f\"DEBUG: Calling MCP tool with params: {params}\")\n\n# Call the MCP tool (synchronous wrapper)\nresult = mcp_call(\"reddit_search_and_fetch_threads\", params)\n\nprint(f\"DEBUG: MCP call completed, result type: {type(result)}\")\nprint(f\"DEBUG: Result keys: {list(result.keys()) if isinstance(result, dict) else 'not dict'}\")\n\n# Save result to manifest\nprint(\"DEBUG: About to call save_to_manifest\")\nsave_to_manifest(\"stages.collect_reddit\", result)\nprint(\"DEBUG: save_to_manifest call completed\")\n\nif isinstance(result, dict) and 'threads' in result:\n    threads_count = len(result.get('threads', []))\n    comments_count = sum(len(t.get('comments', [])) for t in result.get('threads', []))\n    print(f\"DEBUG: Processed {threads_count} threads and {comments_count} comments\")",
+        "code": "# MCP tool call for reddit_search_and_fetch_threads\nimport json\nfrom pathlib import Path\n\nprint(\"DEBUG: Starting reddit tool execution\")\n\n# Define parameters as Python dict\nparams = {\n  \"keywords\": [\"keyword1\", \"keyword2\"],\n  \"subreddits\": [\"subreddit1\", \"subreddit2\"],\n  \"per_query_limit\": 50,\n  \"include_comments\": true,\n  \"comment_depth\": 2,\n  \"comment_limit\": 200,\n  \"use_cache\": true\n}\n\nprint(f\"DEBUG: Calling MCP tool with params: {params}\")\n\n# Call the MCP tool (synchronous wrapper)\nresult = mcp_call(\"reddit_search_and_fetch_threads\", params)\n\nprint(f\"DEBUG: MCP call completed, result type: {type(result)}\")\nprint(f\"DEBUG: Result keys: {list(result.keys()) if isinstance(result, dict) else 'not dict'}\")\n\n# Save result to manifest\nprint(\"DEBUG: About to call save_to_manifest\")\nsave_to_manifest(\"stages.scout_collect.reddit\", result)\nprint(\"DEBUG: save_to_manifest call completed\")\n\nif isinstance(result, dict) and 'threads' in result:\n    threads_count = len(result.get('threads', []))\n    comments_count = sum(len(t.get('comments', [])) for t in result.get('threads', []))\n    print(f\"DEBUG: Processed {threads_count} threads and {comments_count} comments\")",
         "language": "python",
-        "outputs": ["stages.collect_reddit"]
+        "outputs": ["stages.scout_collect.reddit"]
       },
       {
         "id": "collect_twitter",
@@ -65,7 +65,7 @@ Respond with a STRICT JSON object (no prose) containing only tool nodes for the 
         "outputs": ["stages.collect_twitter"]
       }
       // Add more tool nodes based on available tools and sources
-      }
+      {}
     ]
   },
   "metadata": {
@@ -81,7 +81,7 @@ Respond with a STRICT JSON object (no prose) containing only tool nodes for the 
   "dag": {
     "nodes": [
       {
-        "id": "collect_reddit",
+        "id": "scout_collect_reddit",
         "type": "tool",
         "tool": "reddit_search_and_fetch_threads",
         "params": {
@@ -93,9 +93,9 @@ Respond with a STRICT JSON object (no prose) containing only tool nodes for the 
           "comment_limit": 200,
           "use_cache": true
         },
-        "code": "# MCP tool call for reddit_search_and_fetch_threads\nimport json\nfrom pathlib import Path\n\n# Define parameters as Python dict\nparams = {\n  \"keywords\": [\"customer support automation\", \"workflow automation\", \"knowledge management\"],\n  \"subreddits\": [\"SaaS\", \"MicroSaaS\", \"indiehackers\", \"startups\", \"Entrepreneur\", \"SideProject\", \"Business_Ideas\", \"growmybusiness\", \"smallbusiness\", \"Productivity\"],\n  \"per_query_limit\": 50,\n  \"include_comments\": true,\n  \"comment_depth\": 2,\n  \"comment_limit\": 200,\n  \"use_cache\": true\n}\n\n# Call the MCP tool (synchronous wrapper)\nresult = mcp_call(\"reddit_search_and_fetch_threads\", params)\n\n# Save result to manifest\nsave_to_manifest(\"stages.collect_reddit\", result)\n\nprint(f\"DEBUG: reddit_search_and_fetch_threads completed, result keys: {list(result.keys()) if isinstance(result, dict) else 'not dict'}\")\nif isinstance(result, dict) and 'threads' in result:\n    threads_count = len(result.get('threads', []))\n    comments_count = sum(len(t.get('comments', [])) for t in result.get('threads', []))\n    print(f\"DEBUG: Saved {threads_count} threads and {comments_count} comments to manifest under stages.collect_reddit\")",
+        "code": "# MCP tool call for reddit_search_and_fetch_threads\nimport json\nfrom pathlib import Path\n\n# Define parameters as Python dict\nparams = {\n  \"keywords\": [\"customer support automation\", \"workflow automation\", \"knowledge management\"],\n  \"subreddits\": [\"SaaS\", \"MicroSaaS\", \"indiehackers\", \"startups\", \"Entrepreneur\", \"SideProject\", \"Business_Ideas\", \"growmybusiness\", \"smallbusiness\", \"Productivity\"],\n  \"per_query_limit\": 50,\n  \"include_comments\": true,\n  \"comment_depth\": 2,\n  \"comment_limit\": 200,\n  \"use_cache\": true\n}\n\n# Call the MCP tool (synchronous wrapper)\nresult = mcp_call(\"reddit_search_and_fetch_threads\", params)\n\n# Save result to manifest\nsave_to_manifest(\"stages.scout_collect.reddit\", result)\n\nprint(f\"DEBUG: reddit_search_and_fetch_threads completed, result keys: {list(result.keys()) if isinstance(result, dict) else 'not dict'}\")\nif isinstance(result, dict) and 'threads' in result:\n    threads_count = len(result.get('threads', []))\n    comments_count = sum(len(t.get('comments', [])) for t in result.get('threads', []))\n    print(f\"DEBUG: Saved {threads_count} threads and {comments_count} comments to manifest under stages.scout_collect.reddit\")",
         "language": "python",
-        "outputs": ["stages.collect_reddit"]
+        "outputs": ["stages.scout_collect.reddit"]
       }
     ]
   },
