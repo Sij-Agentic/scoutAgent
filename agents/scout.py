@@ -245,11 +245,11 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
                 manifest = json.loads(manifest_path.read_text()) if manifest_path.exists() else {}
             except Exception:
                 manifest = {}
-            # Persist core run metadata and seed stages.plan
+            # Persist core run metadata and seed stages.scout_plan
             manifest["run_id"] = plan.get("run_id")
             manifest["dag"] = plan.get("dag") or {}
             stages = manifest.setdefault("stages", {})
-            stages["plan"] = {
+            stages["scout_plan"] = {
                 "data": plan,
                 "status": "completed",
                 "updated_at": datetime.now().isoformat(),
