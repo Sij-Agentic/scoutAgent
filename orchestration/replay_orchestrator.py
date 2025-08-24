@@ -127,10 +127,17 @@ class ReplayOrchestrator(AgentOrchestrator):
         3. Remove stages after to_stage
         """
         # First build the normal DAG
-        self.build_initial_dag()
+        try:
+            self.build_initial_dag()
+        except Exception as e:
+            self.logger.error(f"Error building initial DAG: {e}")
+            return
         
         # Get the execution order
         execution_order = self.dag_engine.get_execution_order()
+        if not execution_order:
+            self.logger.warning("Empty execution order, cannot build replay DAG")
+            return
         
         # Determine which stages to mark as completed
         if self.from_stage and self.from_stage in execution_order:
@@ -250,6 +257,16 @@ class ReplayOrchestrator(AgentOrchestrator):
         Returns:
             AgentInput object loaded from manifest
         """
+        # Ensure run directory and manifest manager are set up
+        if not self.run_dir or not self.manifest_manager:
+            self.setup_run_directory()
+            
+        if not self.manifest_manager:
+            self.logger.error("Failed to initialize manifest manager")
+            # Fallback to empty input
+            from scout_agent.agents.base import AgentInput
+            return AgentInput(data={}, metadata={}, context={})
+            
         manifest = self.manifest_manager.get_manifest()
         
         # Try to get from run_metadata
@@ -279,6 +296,10 @@ class ReplayOrchestrator(AgentOrchestrator):
         Args:
             agent_input: Optional agent input (if None, loads from manifest)
         """
+        # Ensure run directory is set up
+        if not self.run_dir:
+            self.setup_run_directory()
+            
         # If agent_input not provided, load from manifest
         if agent_input is None:
             agent_input = self._load_agent_input_from_manifest()
@@ -325,5 +346,16 @@ class ReplayOrchestrator(AgentOrchestrator):
                 end_time=end_time
             )
         
-        # Otherwise, execute normally
+        # For agent nodes, set run_dir and manifest_manager in agent state
+        if node.node_type == NodeType.AGENT:
+            config = node.config
+            agent_id = config.metadata.get("agent_id")
+            if agent_id in self.agents:
+                agent = self.agents[agent_id]
+                setattr(agent.state, "run_id", self.run_id)
+                setattr(agent.state, "run_dir", self.run_dir)
+                setattr(agent.state, "manifest_manager", self.manifest_manager)
+                self.logger.debug(f"Set run_dir and manifest_manager in {agent_id} agent state")
+        
+        # Execute normally
         return await super()._execute_node(node, inputs)

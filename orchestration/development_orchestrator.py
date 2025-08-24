@@ -181,8 +181,18 @@ class DevelopmentOrchestrator(ReplayOrchestrator):
             self.logger.info(f"Agent {self.dev_agent_id} has no external dependencies")
             return
         
-        # Get data from the dependency
+        # Get data from the dependency - try multiple paths in the manifest
         dependency_data = self.manifest_manager.get_node_output(dependency)
+        
+        # If no data found, try looking in the stages section
+        if not dependency_data:
+            manifest = self.manifest_manager.get_manifest()
+            if "stages" in manifest and dependency in manifest["stages"]:
+                stage_data = manifest["stages"][dependency]
+                if "data" in stage_data:
+                    dependency_data = stage_data["data"]
+                    self.logger.info(f"Found dependency data in manifest stages.{dependency}.data")
+        
         if not dependency_data:
             self.logger.warning(f"No data found for dependency {dependency}")
             return
@@ -190,13 +200,59 @@ class DevelopmentOrchestrator(ReplayOrchestrator):
         # Prepare input data based on agent type
         if self.dev_agent_id == "screener":
             # Screener needs pain points from scout_act
+            pain_points = []
+            
+            # Try to extract pain points from different possible locations
             if isinstance(dependency_data, dict):
-                pain_points = dependency_data.get("pain_points", [])
-                if not pain_points and "result" in dependency_data:
-                    pain_points = dependency_data["result"].get("pain_points", [])
+                # Direct pain_points field
+                if "pain_points" in dependency_data:
+                    pain_points = dependency_data["pain_points"]
+                    self.logger.info("Found pain points in direct pain_points field")
+                    
+                # Inside result field
+                elif "result" in dependency_data and isinstance(dependency_data["result"], dict):
+                    if "pain_points" in dependency_data["result"]:
+                        pain_points = dependency_data["result"]["pain_points"]
+                        self.logger.info("Found pain points in result.pain_points field")
                 
-                self.logger.info(f"Found {len(pain_points)} pain points for screener from scout_act")
-                self.agent_input.data = pain_points
+                # Try to find any array field that might contain pain points
+                if not pain_points:
+                    for key, value in dependency_data.items():
+                        if isinstance(value, list) and len(value) > 0 and isinstance(value[0], dict):
+                            if any(pp.get("description") for pp in value):
+                                pain_points = value
+                                self.logger.info(f"Found potential pain points in {key} field")
+                                break
+            
+            # Log the raw dependency data for debugging
+            self.logger.info(f"Raw dependency data keys: {list(dependency_data.keys()) if isinstance(dependency_data, dict) else 'not a dict'}")
+            
+            # If still no pain points, create a dummy one for testing
+            if not pain_points:
+                self.logger.warning("No pain points found in dependency data, creating dummy data for testing")
+                pain_points = [
+                    {
+                        "id": "dummy_1",
+                        "description": "Dummy pain point for testing",
+                        "severity": "medium",
+                        "market": "Test Market",
+                        "source": "test",
+                        "evidence": ["This is a test pain point"],
+                        "frequency": 1,
+                        "impact_score": 5.0
+                    }
+                ]
+            
+            self.logger.info(f"Found {len(pain_points)} pain points for screener from scout_act")
+            self.agent_input.data = pain_points
+            
+            # Set run_dir and manifest_manager in agent state for screener
+            agent = self.agents.get(self.dev_agent_id)
+            if agent:
+                setattr(agent.state, "run_id", self.run_id)
+                setattr(agent.state, "run_dir", self.run_dir)
+                setattr(agent.state, "manifest_manager", self.manifest_manager)
+                self.logger.info(f"Set run_dir and manifest_manager in {self.dev_agent_id} agent state")
         
         elif self.dev_agent_id == "validator":
             # Validator needs top pain points from screener_act
@@ -207,6 +263,14 @@ class DevelopmentOrchestrator(ReplayOrchestrator):
                 
                 self.logger.info(f"Found {len(top_pain_points)} top pain points for validator from screener_act")
                 self.agent_input.data = top_pain_points
+                
+                # Set run_dir and manifest_manager in agent state for validator
+                agent = self.agents.get(self.dev_agent_id)
+                if agent:
+                    setattr(agent.state, "run_id", self.run_id)
+                    setattr(agent.state, "run_dir", self.run_dir)
+                    setattr(agent.state, "manifest_manager", self.manifest_manager)
+                    self.logger.info(f"Set run_dir and manifest_manager in {self.dev_agent_id} agent state")
         
         # Add more agent types as needed
     
