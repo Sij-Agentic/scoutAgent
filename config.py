@@ -89,6 +89,11 @@ class APIConfig:
     gemini_api_key: Optional[str] = None
     deepseek_api_key: Optional[str] = None
     huggingface_token: Optional[str] = None
+    reddit_client_id: Optional[str] = None
+    reddit_client_secret: Optional[str] = None
+    reddit_user_agent: Optional[str] = None
+    hn_algolia_api_key: Optional[str] = None
+    twitter_bearer_token: Optional[str] = None
 
 
 @dataclass
@@ -194,6 +199,10 @@ class ScoutConfig:
             self.output_dir,
             # Data subfolders
             str(Path(self.data_dir) / "reddit_cache"),
+            str(Path(self.data_dir) / "hn_cache"),
+            str(Path(self.data_dir) / "serp_cache"),
+            str(Path(self.data_dir) / "twitter_cache"),
+            str(Path(self.data_dir) / "reviews_cache"),
         ]
         
         for directory in directories:
@@ -319,6 +328,11 @@ class ConfigManager:
             f"{prefix}GEMINI_API_KEY": ["api", "gemini_api_key"],
             f"{prefix}DEEPSEEK_API_KEY": ["api", "deepseek_api_key"],
             f"{prefix}HUGGINGFACE_TOKEN": ["api", "huggingface_token"],
+            f"{prefix}REDDIT_CLIENT_ID": ["api", "reddit_client_id"],
+            f"{prefix}REDDIT_CLIENT_SECRET": ["api", "reddit_client_secret"],
+            f"{prefix}REDDIT_USER_AGENT": ["api", "reddit_user_agent"],
+            f"{prefix}HN_ALGOLIA_API_KEY": ["api", "hn_algolia_api_key"],
+            f"{prefix}TWITTER_BEARER_TOKEN": ["api", "twitter_bearer_token"],
         }
         
         # Process simple mappings
@@ -466,6 +480,11 @@ class ConfigManager:
             "SCOUT_GEMINI_API_KEY=",
             "SCOUT_DEEPSEEK_API_KEY=",
             "SCOUT_HUGGINGFACE_TOKEN=",
+            "SCOUT_REDDIT_CLIENT_ID=",
+            "SCOUT_REDDIT_CLIENT_SECRET=",
+            "SCOUT_REDDIT_USER_AGENT=",
+            "SCOUT_HN_ALGOLIA_API_KEY=",
+            "SCOUT_TWITTER_BEARER_TOKEN=",
             "",
             "# --- LLM Routing (global defaults) ---",
             "# Choose a default backend and model when not specified by code.",
