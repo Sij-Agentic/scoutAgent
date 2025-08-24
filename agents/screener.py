@@ -537,21 +537,33 @@ class ScreenerAgent(BaseAgent, LLMAgentMixin):
     def _write_stage_output(self, stage_name: str, data: Dict[str, Any]) -> None:
         """Write stage output to manifest section using ManifestManager."""
         try:
-            run_id = getattr(self.state, "run_id", "unknown")
+            # Get run_id from state, if not available check for run_dir attribute
+            run_id = getattr(self.state, "run_id", None)
             
-            # Determine run directory
-            # project_root should be ScoutAgent/ (not scout_agent/)
-            project_root = Path(__file__).resolve().parents[2]
-            run_dir = project_root / "data" / "runs" / run_id
-            run_dir.mkdir(parents=True, exist_ok=True)
-            manifest_path = run_dir / "run_manifest.json"
+            # If we have a run_dir attribute, use that directly
+            run_dir = getattr(self.state, "run_dir", None)
+            manifest_manager = getattr(self.state, "manifest_manager", None)
+            
+            if not run_id and not run_dir and not manifest_manager:
+                self.logger.warning("No run_id, run_dir, or manifest_manager available. Using fallback.")
+                run_id = "unknown"
+            
+            if not manifest_manager:
+                # Determine run directory if we don't have a manifest_manager
+                # project_root should be ScoutAgent/ (not scout_agent/)
+                project_root = Path(__file__).resolve().parents[2]
+                
+                if not run_dir:
+                    run_dir = project_root / "data" / "runs" / run_id
+                    run_dir.mkdir(parents=True, exist_ok=True)
+                
+                manifest_path = run_dir / "run_manifest.json"
+                self.logger.info(f"Creating manifest manager for path: {manifest_path}")
+                manifest_manager = ManifestManager(manifest_path, create_if_missing=True)
             
             # Always use agent-prefixed stage names for multi-agent support
             agent_prefixed_stage = f"screener_{stage_name}"
-            self.logger.info(f"Writing stage {agent_prefixed_stage} output to manifest at: {manifest_path}")
-            
-            # Use ManifestManager for consistent manifest operations
-            manifest_manager = ManifestManager(manifest_path, create_if_missing=True)
+            self.logger.info(f"Writing stage {agent_prefixed_stage} output to manifest")
             
             # Store the stage output with agent-prefixed stage name
             manifest_manager.store_node_output(agent_prefixed_stage, data)
@@ -571,19 +583,31 @@ class ScreenerAgent(BaseAgent, LLMAgentMixin):
     def _get_think_output(self) -> Optional[Dict[str, Any]]:
         """Get the output from the think stage from manifest."""
         try:
-            run_id = getattr(self.state, "run_id", "unknown")
+            # Get manifest_manager from state if available
+            manifest_manager = getattr(self.state, "manifest_manager", None)
             
-            # Determine run directory
-            project_root = Path(__file__).resolve().parents[2]
-            run_dir = project_root / "data" / "runs" / run_id
-            manifest_path = run_dir / "run_manifest.json"
-            
-            if not manifest_path.exists():
-                self.logger.warning(f"Manifest not found at: {manifest_path}")
-                return None
-            
-            # Use ManifestManager to get the think stage output
-            manifest_manager = ManifestManager(manifest_path)
+            if not manifest_manager:
+                # Try to get run_id or run_dir from state
+                run_id = getattr(self.state, "run_id", None)
+                run_dir = getattr(self.state, "run_dir", None)
+                
+                if not run_id and not run_dir:
+                    self.logger.warning("No run_id or run_dir available for getting think output")
+                    return None
+                
+                # Determine run directory
+                project_root = Path(__file__).resolve().parents[2]
+                if not run_dir:
+                    run_dir = project_root / "data" / "runs" / run_id
+                
+                manifest_path = run_dir / "run_manifest.json"
+                
+                if not manifest_path.exists():
+                    self.logger.warning(f"Manifest not found at: {manifest_path}")
+                    return None
+                
+                # Create ManifestManager
+                manifest_manager = ManifestManager(manifest_path)
             
             # Try to get data from screener_think node
             think_node_id = "screener_think"
