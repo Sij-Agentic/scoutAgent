@@ -18,6 +18,7 @@ from typing import Dict, Any, List, Optional
 
 from scout_agent.agents.scout import ScoutAgent
 from scout_agent.agents.screener import ScreenerAgent
+from scout_agent.agents.validator import ValidatorAgent
 from scout_agent.agents.base import AgentInput
 from scout_agent.orchestration import AgentOrchestrator, create_orchestrator, AGENT_STAGE_CONFIGS
 from scout_agent.custom_logging.logger import get_logger
@@ -111,6 +112,10 @@ async def run_orchestrated_workflow(
     # Register the ScreenerAgent
     screener_agent = ScreenerAgent(agent_id="screener")
     orchestrator.register_agent("screener", AGENT_STAGE_CONFIGS["screener"], screener_agent)
+
+    # Register the ValidatorAgent
+    validator_agent = ValidatorAgent(agent_id="validator")
+    orchestrator.register_agent("validator", AGENT_STAGE_CONFIGS["validator"], validator_agent)
     
     # Initialize the orchestrator
     await orchestrator.initialize(agent_input)
