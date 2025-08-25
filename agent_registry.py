@@ -18,7 +18,9 @@ __all__ = [
 # Import and register built-in agents
 from agents.research_agent import ResearchAgent
 from agents.analysis_agent import AnalysisAgent
+from agents.validator import ValidatorAgent
 
 # Register built-in agents
 register_agent(ResearchAgent)
 register_agent(AnalysisAgent)
+register_agent(ValidatorAgent)
