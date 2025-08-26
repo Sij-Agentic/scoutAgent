@@ -271,6 +271,88 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
         # Use the from_agent_input class method to create a ValidatorInput
         return ValidatorInput.from_agent_input(agent_input)
         
+    def _generate_research_node(self, pain_point_id: str, pain_point_desc: str, 
+                               keywords: List[str], context: str, node_variant: str, 
+                               depth: str = "medium", max_results: int = 10) -> Dict[str, Any]:
+        """Generate a comprehensive_research node for a pain point with specific keywords.
+        
+        Args:
+            pain_point_id: The ID of the pain point
+            pain_point_desc: The description of the pain point
+            keywords: The keywords to use for this research node
+            context: The market context
+            node_variant: The variant identifier for this node (e.g., "q1", "q2")
+            depth: The research depth ("light", "medium", "deep")
+            max_results: Maximum results per source
+            
+        Returns:
+            A complete node definition with code for the comprehensive_research tool
+        """
+        # Create a unique node ID and output path
+        node_id = f"validator_collect_{pain_point_id}_{node_variant}"
+        output_path = f"stages.validator_collect.{pain_point_id}.{node_variant}"
+        
+        # Generate the code for the node
+        code = (
+            "# MCP tool call for comprehensive_research\n"
+            "params = {\n"
+            f"  \"topic\": \"{pain_point_desc}\",\n"
+            f"  \"context\": \"{context}\",\n"
+            f"  \"keywords\": {json.dumps(keywords)},\n"
+            "  \"sources\": [\"reddit\", \"hn\", \"google\", \"twitter\", \"reviews\"],\n"
+            f"  \"depth\": \"{depth}\",\n"
+            f"  \"max_results_per_source\": {max_results}\n"
+            "}\n"
+            f"result = mcp_call(\"comprehensive_research\", params)\n"
+            f"save_to_manifest(\"{output_path}\", result)\n"
+            f"print(f\"DEBUG: Comprehensive research completed for {pain_point_id} ({node_variant})\")\n"
+        )
+        
+        # Create and return the complete node
+        return {
+            "id": node_id,
+            "type": "tool",
+            "tool": "comprehensive_research",
+            "params": {
+                "topic": pain_point_desc,
+                "context": context,
+                "keywords": keywords,
+                "sources": ["reddit", "hn", "google", "twitter", "reviews"],
+                "depth": depth,
+                "max_results_per_source": max_results
+            },
+            "code": code,
+            "language": "python",
+            "outputs": [output_path]
+        }
+
+    def _distribute_keywords(self, search_queries: List[str], num_nodes: int) -> List[List[str]]:
+        """Distribute search queries across multiple nodes.
+        
+        Args:
+            search_queries: List of search queries to distribute
+            num_nodes: Number of nodes to distribute across
+            
+        Returns:
+            List of keyword lists, one for each node
+        """
+        if not search_queries:
+            return [[] for _ in range(num_nodes)]
+            
+        # Ensure we have at least one keyword per node
+        if len(search_queries) < num_nodes:
+            # Duplicate some keywords to ensure each node has at least one
+            extended_queries = search_queries * (num_nodes // len(search_queries) + 1)
+            search_queries = extended_queries[:num_nodes]
+        
+        # Distribute keywords across nodes
+        result = [[] for _ in range(num_nodes)]
+        for i, query in enumerate(search_queries):
+            node_idx = i % num_nodes
+            result[node_idx].append(query)
+            
+        return result
+
     def _postprocess_plan(self, plan: Dict[str, Any], input_data: ValidatorInput) -> Dict[str, Any]:
         """Process the LLM-generated plan, ensuring it has the expected structure."""
         try:
@@ -282,9 +364,7 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
             dag = plan.get("dag", {})
             nodes = dag.get("nodes", [])
             
-            if not nodes:
-                self.logger.warning("No nodes found in LLM-generated plan")
-            else:
+            if nodes:
                 self.logger.info(f"Found {len(nodes)} nodes in LLM-generated plan")
                 for i, node in enumerate(nodes):
                     node_id = node.get("id", f"node_{i}")
@@ -305,7 +385,113 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
                 if "validation_strategies" in plan:
                     plan["metadata"]["validation_strategies"] = plan.pop("validation_strategies")
             
-            # Return the plan with minimal modifications
+            # Get validation strategies from metadata
+            strategies = plan.get("metadata", {}).get("validation_strategies") if isinstance(plan.get("metadata"), dict) else None
+            
+            # Generate nodes from validation strategies
+            dag = plan.get("dag") or {}
+            nodes = dag.get("nodes") or []
+            
+            # If we already have nodes, don't regenerate them
+            if nodes:
+                self.logger.info("Using existing nodes from plan")
+                return plan
+                
+            self.logger.info("No nodes found in plan, generating from validation strategies")
+            
+            # Determine number of nodes per pain point based on validation depth
+            nodes_per_pain_point = 2  # Default for light/medium depth
+            if input_data.validation_depth == "deep":
+                nodes_per_pain_point = 3
+            
+            try:
+                # Process each pain point
+                generated_nodes = []
+                for idx, pp in enumerate(input_data.pain_points):
+                    pain_id = pp.get("id") or f"pp{idx+1}"
+                    desc = pp.get("description", "")
+                    
+                    # Find matching strategy
+                    strategy = None
+                    if isinstance(strategies, list):
+                        for s in strategies:
+                            if s.get("pain_point_id") == pain_id:
+                                strategy = s
+                                break
+                    
+                    # Get search queries from strategy or fallback to description
+                    search_queries = []
+                    research_depth = input_data.validation_depth or "medium"
+                    max_results = 10
+                    
+                    if strategy:
+                        search_queries = strategy.get("search_queries") or []
+                        if strategy.get("research_depth"):
+                            research_depth = strategy.get("research_depth")
+                        if strategy.get("max_results_per_source"):
+                            max_results = strategy.get("max_results_per_source")
+                    
+                    if not search_queries and desc:
+                        search_queries = [desc]
+                    
+                    # Distribute keywords across nodes
+                    keyword_groups = self._distribute_keywords(search_queries, nodes_per_pain_point)
+                    
+                    # Generate a node for each keyword group
+                    for node_idx, keywords in enumerate(keyword_groups):
+                        node_variant = f"q{node_idx+1}"
+                        node = self._generate_research_node(
+                            pain_id, 
+                            desc, 
+                            keywords, 
+                            input_data.market_context or input_data.target_market,
+                            node_variant,
+                            research_depth,
+                            max_results
+                        )
+                        generated_nodes.append(node)
+                        
+                self.logger.info(f"Generated {len(generated_nodes)} research nodes from validation strategies")
+                dag["nodes"] = generated_nodes
+                plan["dag"] = dag
+                
+            except Exception as gen_e:
+                self.logger.error(f"Error generating nodes from strategies: {gen_e}")
+                # Fall back to synthesizing minimal nodes if generation fails
+                self.logger.warning("Node generation failed; synthesizing fallback collect nodes")
+                print("[validator_plan] Fallback: synthesizing collect nodes due to node generation failure")
+                
+                # Use existing fallback logic
+                synthesized_nodes: List[Dict[str, Any]] = []
+                for idx, pp in enumerate(input_data.pain_points):
+                    pain_id = pp.get("id") or f"pp{idx+1}"
+                    desc = pp.get("description", "")
+                    # try to find strategy queries
+                    kw = []
+                    if isinstance(strategies, list):
+                        for s in strategies:
+                            if s.get("pain_point_id") == pain_id:
+                                kw = s.get("search_queries") or []
+                                break
+                    if not kw and desc:
+                        kw = [desc]
+                    
+                    # Generate a single fallback node
+                    node = self._generate_research_node(
+                        pain_id,
+                        desc,
+                        kw,
+                        input_data.market_context or input_data.target_market,
+                        "fallback",
+                        input_data.validation_depth or "medium",
+                        10
+                    )
+                    synthesized_nodes.append(node)
+                
+                dag["nodes"] = synthesized_nodes
+                plan["dag"] = dag
+
+            # Return the plan with the generated nodes
             return plan
         except Exception as e:
             self.logger.error(f"Error in _postprocess_plan: {e}")
@@ -367,6 +553,8 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
             
             # Initialize the code executor service
             code_executor = AgentCodeExecutor()
+            await code_executor._initialize(None)
+            await code_executor._start()
             
             # Execute each tool node
             completed_nodes = []
@@ -380,20 +568,29 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
                 self.logger.info(f"Executing tool node {node_id} with tool {tool_name}")
                 
                 try:
-                    # Execute the code in the sandbox
-                    result = await code_executor.execute_code(
-                        code=code,
-                        node_id=node_id,
-                        run_id=dag.get("run_id") or plan.get("run_id"),
-                        run_dir_override=run_dir_override
+                    # Execute the code in the sandbox with proper prelude
+                    run_id = dag.get("run_id") or plan.get("run_id")
+                    run_dir = run_dir_override or Path(f"data/runs/{run_id}") if run_id else None
+                    
+                    # Use wrap_and_execute to properly set up the execution environment
+                    result = await code_executor.wrap_and_execute(
+                        node=node,
+                        agent_id="validator",
+                        stage="collect",
+                        context={
+                            "run_dir": str(run_dir) if run_dir else None,
+                            "workflow_id": run_id,
+                            "node_id": node_id,
+                            "tool": tool_name
+                        }
                     )
                     
                     # Check if execution was successful
-                    if result.get("success", False):
+                    if result.success:
                         self.logger.info(f"Successfully executed tool node {node_id}")
                         completed_nodes.append(node_id)
                     else:
-                        error = result.get("error", "Unknown error")
+                        error = result.error if hasattr(result, 'error') else "Unknown error"
                         self.logger.error(f"Failed to execute tool node {node_id}: {error}")
                         failed_nodes.append(f"{node_id}: {error}")
                 except Exception as e:
@@ -414,8 +611,8 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
             return {"completed": [], "failed": [str(e)]}
     
     async def think(self, input_data: ValidatorInput, plan: Dict[str, Any] = None) -> Dict[str, Any]:
-        """Execute validation research based on the plan."""
-        self.logger.info("Executing validation research based on plan")
+        """Execute validation research based on the plan and analyze the results."""
+        self.logger.info("Executing validation research based on plan and analyzing results")
         
         try:
             # Use plan from parameter or from agent state
@@ -490,13 +687,61 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
             
             self.logger.info(f"Completed research for {research_data['successful_research']} pain points")
             
-            # Write research data to manifest
-            self._write_stage_output("think", research_data)
+            # Analyze research data for each pain point and source in parallel
+            analysis_tasks = []
+            for pain_point_id, pain_point_data in processed_results.items():
+                if "error" in pain_point_data:
+                    continue
+                
+                # Find the corresponding strategy to get the pain point description
+                pain_point_desc = next((s.get("pain_point_description", "") 
+                                      for s in strategies if s.get("pain_point_id") == pain_point_id), "")
+                
+                # Process each source separately
+                for source, source_data in pain_point_data.get("sources", {}).items():
+                    task = self._analyze_research_data(
+                        pain_point_id=pain_point_id,
+                        pain_point_description=pain_point_desc,
+                        research_data=source_data,
+                        source=source
+                    )
+                    analysis_tasks.append(task)
+            
+            # Execute all analysis tasks in parallel
+            analysis_results = await asyncio.gather(*analysis_tasks, return_exceptions=True)
+            
+            # Process analysis results and handle exceptions
+            analyzed_data = {}
+            for i, result in enumerate(analysis_results):
+                if isinstance(result, Exception):
+                    self.logger.error(f"Analysis task {i} failed: {str(result)}")
+                    continue
+                
+                pain_point_id = result.get("pain_point_id")
+                source = result.get("source")
+                
+                if pain_point_id and source:
+                    if pain_point_id not in analyzed_data:
+                        analyzed_data[pain_point_id] = {}
+                    
+                    analyzed_data[pain_point_id][source] = result
+            
+            # Create the final analyzed research data
+            final_research_data = {
+                "raw_research": research_data,
+                "analyzed_research": analyzed_data,
+                "analysis_timestamp": datetime.now().isoformat()
+            }
+            
+            self.logger.info(f"Completed analysis for {len(analyzed_data)} pain points")
+            
+            # Write analyzed research data to manifest
+            self._write_stage_output("think", final_research_data)
             
             # Store in agent state for act phase
-            self.state.research_data = research_data
+            self.state.research_data = final_research_data
             
-            return research_data
+            return final_research_data
             
         except Exception as e:
             self.logger.error(f"Error in think phase: {str(e)}\n{traceback.format_exc()}")
@@ -510,6 +755,74 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
             self.state.research_data = fallback_research
             
             return fallback_research
+            
+    async def _analyze_research_data(
+        self,
+        pain_point_id: str,
+        pain_point_description: str,
+        research_data: List[Dict[str, Any]],
+        source: str
+    ) -> Dict[str, Any]:
+        """Analyze research data for a specific pain point and source."""
+        self.logger.info(f"Analyzing research data for pain point {pain_point_id} from {source}")
+        
+        try:
+            # Load the think prompt template
+            prompt_template = self._load_prompt_template("think")
+            
+            # Format the research data as a string for the prompt
+            research_data_str = json.dumps(research_data, indent=2)
+            
+            # Format the prompt with the pain point and research data
+            prompt = prompt_template.format(
+                pain_point=pain_point_id,
+                pain_point_description=pain_point_description,
+                research_data=research_data_str,
+                source=source
+            )
+            
+            # Call the LLM to analyze the research data
+            response = await self.llm_client.generate_text(
+                prompt=prompt,
+                max_tokens=2048,
+                temperature=0.2,  # Lower temperature for more focused analysis
+                stop=None
+            )
+            
+            # Extract JSON from the response
+            analysis_result = self._extract_json(response)
+            
+            # Validate the analysis result structure
+            if not analysis_result or not isinstance(analysis_result, dict):
+                raise ValueError(f"Invalid analysis result structure: {analysis_result}")
+            
+            # Ensure the pain_point_id and source are correctly set
+            analysis_result["pain_point_id"] = pain_point_id
+            analysis_result["source"] = source
+            
+            # Validate that the relevant_evidence field follows the expected format
+            if "relevant_evidence" in analysis_result and isinstance(analysis_result["relevant_evidence"], list):
+                for evidence in analysis_result["relevant_evidence"]:
+                    if not all(key in evidence for key in ["text", "type", "justification", "credibility"]):
+                        self.logger.warning(f"Evidence missing required fields: {evidence}")
+            else:
+                self.logger.warning(f"Missing or invalid relevant_evidence field in analysis result")
+            
+            return analysis_result
+            
+        except Exception as e:
+            self.logger.error(f"Analysis failed for pain point {pain_point_id} from {source}: {str(e)}")
+            # Return a minimal structure with error information
+            return {
+                "pain_point_id": pain_point_id,
+                "source": source,
+                "error": str(e),
+                "relevant_evidence": [],
+                "key_insights": [],
+                "preliminary_validation_score": 0.0,
+                "confidence_level": "low",
+                "analysis_summary": f"Analysis failed: {str(e)}"
+            }
     
     async def act(self, input_data: ValidatorInput, plan: Dict[str, Any] = None, research_data: Dict[str, Any] = None) -> Dict[str, Any]:
         """Analyze research data and validate pain points."""
@@ -802,7 +1115,7 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
         else:
             # Try to find JSON without code blocks
             self.logger.info("No code block found, trying to parse entire response as JSON")
-            json_str = text
+            json_str = text.strip()
             
             # Try to find JSON object within the text using regex
             json_pattern = r'\{[\s\S]*\}'
@@ -810,6 +1123,12 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
             if json_matches:
                 self.logger.info("Found JSON-like structure in response")
                 json_str = json_matches.group(0)
+            else:
+                # As a final attempt, slice from first { to last }
+                first_idx = text.find('{')
+                last_idx = text.rfind('}')
+                if first_idx != -1 and last_idx != -1 and last_idx > first_idx:
+                    json_str = text[first_idx:last_idx+1]
         
         # Clean the JSON string
         json_str = re.sub(r',\s*([\]\}])', r'\1', json_str)  # Remove trailing commas
@@ -1018,6 +1337,16 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
         except Exception as e:
             self.logger.error(f"Error getting {stage_name} output: {e}")
             return None
+
+    def _load_prompt_template(self, template_name: str) -> str:
+        """Load a prompt template from the prompts directory."""
+        try:
+            from scout_agent.llm.utils import load_prompt_template
+            return load_prompt_template(template_name, agent_name=self.name)
+        except Exception as e:
+            self.logger.error(f"Error loading prompt template {template_name}: {str(e)}")
+            # Return a minimal fallback prompt
+            return "You are a ValidatorAgent. Please analyze the provided data and return a JSON response."
 
 
 # Register the agent
