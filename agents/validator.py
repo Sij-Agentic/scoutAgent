@@ -104,19 +104,13 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
     def __init__(self, agent_id: str = None):
         """Initialize the ValidatorAgent."""
         BaseAgent.__init__(self, name="validator", agent_id=agent_id)
-        LLMAgentMixin.__init__(self, preferred_backend='ollama')
+        LLMAgentMixin.__init__(self)  # Use default backend
         self.name = "validator_agent"  # Used for prompt template loading
         self.config = get_config()
         self.research_client = None
         
-        # Set preferred backend to Ollama for all tasks
-        self.preferred_backend = "ollama"
-        self.task_backend_preferences = {
-            "validation": "ollama",
-            "plan": "ollama",
-            "research": "ollama",
-            "analysis": "ollama"
-        }
+        # Use default backend for all tasks - don't override any backend preferences
+        
         
     async def execute(self, agent_input: AgentInput) -> AgentOutput:
         """Execute the validation process."""
@@ -611,8 +605,8 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
             return {"completed": [], "failed": [str(e)]}
     
     async def think(self, input_data: ValidatorInput, plan: Dict[str, Any] = None) -> Dict[str, Any]:
-        """Execute validation research based on the plan and analyze the results."""
-        self.logger.info("Executing validation research based on plan and analyzing results")
+        """Analyze research data from the collect stage for each pain point."""
+        self.logger.info("Analyzing research data from collect stage")
         
         try:
             # Use plan from parameter or from agent state
@@ -627,61 +621,51 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
             if plan is None:
                 raise ValueError("No validation plan available")
             
-            # Initialize research client if not already done
-            await self._init_research_client()
-            
             # Extract the validation strategies
             strategies = plan.get("validation_strategies", [])
             if not strategies:
-                raise ValueError("No validation strategies found in plan")
-            
-            # Execute research for each pain point in parallel
-            research_tasks = []
-            
-            for strategy in strategies:
-                pain_point_id = strategy.get("pain_point_id")
-                pain_point_desc = strategy.get("pain_point_description", "")
-                search_queries = strategy.get("search_queries", [])
-                data_sources = strategy.get("data_sources", ["reddit", "hn", "google", "twitter", "reviews"])
+                self.logger.warning("No validation strategies found in plan, checking metadata")
+                strategies = plan.get("metadata", {}).get("validation_strategies", [])
                 
-                if not pain_point_id or not pain_point_desc or not search_queries:
-                    self.logger.warning(f"Incomplete strategy for pain point: {pain_point_id}")
-                    continue
+                # If still not found, check if there are pain points in input_data and generate basic strategies
+                if not strategies and hasattr(input_data, 'pain_points') and input_data.pain_points:
+                    self.logger.warning("Generating basic validation strategies from pain points")
+                    strategies = []
+                    for idx, pp in enumerate(input_data.pain_points):
+                        pain_id = pp.get("id") or f"pp{idx+1}"
+                        desc = pp.get("description", "")
+                        strategies.append({
+                            "pain_point_id": pain_id,
+                            "pain_point_description": desc,
+                            "search_queries": [desc] if desc else [],
+                            "research_depth": "medium",
+                            "max_results_per_source": 10
+                        })
+                    self.logger.info(f"Generated {len(strategies)} basic validation strategies")
                 
-                task = self._execute_research_for_pain_point(
-                    pain_point_id=pain_point_id,
-                    pain_point_desc=pain_point_desc,
-                    search_queries=search_queries,
-                    data_sources=data_sources
-                )
-                research_tasks.append(task)
+                if not strategies:
+                    raise ValueError("No validation strategies found in plan and could not generate from input")
             
-            # Execute all research tasks in parallel
-            research_results = await asyncio.gather(*research_tasks, return_exceptions=True)
+            # Get research data from collect stage
+            collect_data = self._get_stage_output("collect")
+            if not collect_data:
+                self.logger.warning("No collect data found in manifest, checking for tool node outputs")
+                
+                # Try to extract data from completed tool nodes in the manifest
+                collect_summary = self._get_collect_tool_outputs(plan)
+                if not collect_summary or not collect_summary.get("completed"):
+                    self.logger.error("No collect data or tool outputs found")
+                    raise ValueError("No research data available from collect stage")
             
-            # Process results and handle exceptions
-            processed_results = {}
-            for i, result in enumerate(research_results):
-                if isinstance(result, Exception):
-                    self.logger.error(f"Research task {i} failed: {str(result)}")
-                    # Add empty result for this pain point
-                    pain_point_id = strategies[i].get("pain_point_id", f"unknown_{i}")
-                    processed_results[pain_point_id] = {
-                        "error": str(result),
-                        "sources": {}
-                    }
-                else:
-                    # Add successful result
-                    pain_point_id = result.get("pain_point_id")
-                    if pain_point_id:
-                        processed_results[pain_point_id] = result
+            # Process the collected research data
+            processed_results = self._process_collect_research_data(collect_data, strategies)
             
             # Create the research data result
             research_data = {
                 "pain_point_research": processed_results,
                 "total_pain_points_researched": len(processed_results),
-                "successful_research": len([r for r in research_results if not isinstance(r, Exception)]),
-                "failed_research": len([r for r in research_results if isinstance(r, Exception)]),
+                "successful_research": len([p for p in processed_results.values() if "error" not in p]),
+                "failed_research": len([p for p in processed_results.values() if "error" in p]),
                 "research_timestamp": datetime.now().isoformat()
             }
             
@@ -746,7 +730,13 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
         except Exception as e:
             self.logger.error(f"Error in think phase: {str(e)}\n{traceback.format_exc()}")
             # Fallback: generate basic research data
-            fallback_research = self._generate_fallback_research(input_data.pain_points)
+            pain_points = []
+            if hasattr(input_data, 'pain_points'):
+                pain_points = input_data.pain_points
+            elif isinstance(input_data, dict) and 'pain_points' in input_data:
+                pain_points = input_data['pain_points']
+            
+            fallback_research = self._generate_fallback_research(pain_points)
             
             # Write fallback research to manifest
             self._write_stage_output("think", fallback_research)
@@ -755,6 +745,100 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
             self.state.research_data = fallback_research
             
             return fallback_research
+    
+    def _get_collect_tool_outputs(self, plan: Dict[str, Any]) -> Dict[str, Any]:
+        """Extract tool outputs from completed nodes in the manifest."""
+        try:
+            # Get the DAG from the plan
+            dag = plan.get("dag", {})
+            if not dag:
+                return {}
+                
+            # Find all completed tool nodes
+            completed_nodes = {}
+            for node_id, node in dag.items():
+                if node.get("type") == "tool" and node.get("status") == "completed":
+                    completed_nodes[node_id] = node
+            
+            # Extract the outputs
+            tool_outputs = {
+                "completed": bool(completed_nodes),
+                "nodes": completed_nodes
+            }
+            
+            return tool_outputs
+        except Exception as e:
+            self.logger.error(f"Error extracting tool outputs: {str(e)}")
+            return {}
+            
+    def _process_collect_research_data(self, collect_data: Dict[str, Any], strategies: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Process research data from collect stage for each pain point."""
+        processed_results = {}
+        
+        try:
+            # If collect_data is None or empty, return empty results
+            if not collect_data:
+                self.logger.warning("No collect data available")
+                return processed_results
+                
+            # The collect_data structure is expected to be:
+            # {pain_point_id: {query_id: {topic, context, keywords, sources_used, depth, data, summary}}}
+            self.logger.info(f"Processing collect data with keys: {list(collect_data.keys())}")
+            
+            # Map strategies to pain point IDs for easier lookup
+            strategy_map = {}
+            for strategy in strategies:
+                pain_point_id = strategy.get("pain_point_id")
+                if pain_point_id:
+                    strategy_map[pain_point_id] = strategy
+                
+            # Process each pain point in the collect data
+            for pain_point_id, queries in collect_data.items():
+                # Get the strategy for this pain point if available
+                strategy = strategy_map.get(pain_point_id)
+                pain_point_desc = strategy.get("pain_point_description", "") if strategy else ""
+                
+                # Initialize pain point data structure
+                pain_point_data = {
+                    "pain_point_id": pain_point_id,
+                    "pain_point_description": pain_point_desc,
+                    "sources": {}
+                }
+                
+                # Process each query for this pain point
+                for query_id, query_data in queries.items():
+                    self.logger.info(f"Processing query {query_id} for pain point {pain_point_id}")
+                    
+                    # Extract data from the query results
+                    if isinstance(query_data, dict) and "data" in query_data:
+                        # The data structure is different from what was expected
+                        # It's directly organized by source type (reddit, twitter, etc.)
+                        for source, source_data in query_data.get("data", {}).items():
+                            if source not in pain_point_data["sources"]:
+                                pain_point_data["sources"][source] = []
+                            
+                            # Extract content from the source data
+                            if isinstance(source_data, dict) and "content" in source_data:
+                                # Add entries from content
+                                pain_point_data["sources"][source].extend(source_data.get("content", []))
+                
+                # If we found data for this pain point, add it to results
+                if pain_point_data["sources"]:
+                    processed_results[pain_point_id] = pain_point_data
+                else:
+                    # No data found for this pain point
+                    processed_results[pain_point_id] = {
+                        "pain_point_id": pain_point_id,
+                        "pain_point_description": pain_point_desc,
+                        "error": "No research data found for this pain point",
+                        "sources": {}
+                    }
+            
+            return processed_results
+        except Exception as e:
+            self.logger.error(f"Error processing collect research data: {str(e)}")
+            # Return empty results on error
+            return processed_results
             
     async def _analyze_research_data(
         self,
@@ -763,7 +847,14 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
         research_data: List[Dict[str, Any]],
         source: str
     ) -> Dict[str, Any]:
-        """Analyze research data for a specific pain point and source."""
+        """Analyze research data for a specific pain point and source.
+        
+        This method performs the following analysis:
+        1. Discards irrelevant entries that don't relate to the pain point
+        2. Determines if pertinent entries support or contradict the pain point
+        3. Condenses similar entries to avoid redundancy
+        4. Provides justification for the analysis
+        """
         self.logger.info(f"Analyzing research data for pain point {pain_point_id} from {source}")
         
         try:
@@ -781,12 +872,12 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
                 source=source
             )
             
-            # Call the LLM to analyze the research data
-            response = await self.llm_client.generate_text(
+            # Call the LLM to analyze the research data using llm_generate
+            # Don't specify a specific backend - use the default backend configuration
+            response = await self.llm_generate(
                 prompt=prompt,
                 max_tokens=2048,
-                temperature=0.2,  # Lower temperature for more focused analysis
-                stop=None
+                temperature=0.2  # Lower temperature for more focused analysis
             )
             
             # Extract JSON from the response
@@ -800,13 +891,34 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
             analysis_result["pain_point_id"] = pain_point_id
             analysis_result["source"] = source
             
-            # Validate that the relevant_evidence field follows the expected format
-            if "relevant_evidence" in analysis_result and isinstance(analysis_result["relevant_evidence"], list):
-                for evidence in analysis_result["relevant_evidence"]:
-                    if not all(key in evidence for key in ["text", "type", "justification", "credibility"]):
-                        self.logger.warning(f"Evidence missing required fields: {evidence}")
-            else:
-                self.logger.warning(f"Missing or invalid relevant_evidence field in analysis result")
+            # Validate and structure the analyzed entries
+            if "entries" not in analysis_result:
+                analysis_result["entries"] = {
+                    "supporting": [],
+                    "contradicting": [],
+                    "neutral": [],
+                    "irrelevant": []
+                }
+                
+            # Ensure we have the expected categories
+            for category in ["supporting", "contradicting", "neutral", "irrelevant"]:
+                if category not in analysis_result["entries"]:
+                    analysis_result["entries"][category] = []
+                    
+            # Validate that each entry has the required fields
+            for category in ["supporting", "contradicting", "neutral"]:
+                for entry in analysis_result["entries"].get(category, []):
+                    if not all(key in entry for key in ["content", "justification"]):
+                        self.logger.warning(f"Entry in {category} missing required fields: {entry}")
+                        
+            # Add summary counts
+            analysis_result["summary"] = {
+                "total_entries": len(research_data),
+                "supporting_count": len(analysis_result["entries"].get("supporting", [])),
+                "contradicting_count": len(analysis_result["entries"].get("contradicting", [])),
+                "neutral_count": len(analysis_result["entries"].get("neutral", [])),
+                "irrelevant_count": len(analysis_result["entries"].get("irrelevant", []))
+            }
             
             return analysis_result
             
@@ -817,9 +929,19 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
                 "pain_point_id": pain_point_id,
                 "source": source,
                 "error": str(e),
-                "relevant_evidence": [],
-                "key_insights": [],
-                "preliminary_validation_score": 0.0,
+                "entries": {
+                    "supporting": [],
+                    "contradicting": [],
+                    "neutral": [],
+                    "irrelevant": []
+                },
+                "summary": {
+                    "total_entries": 0,
+                    "supporting_count": 0,
+                    "contradicting_count": 0,
+                    "neutral_count": 0,
+                    "irrelevant_count": 0
+                },
                 "confidence_level": "low",
                 "analysis_summary": f"Analysis failed: {str(e)}"
             }
@@ -849,12 +971,22 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
                 raise ValueError("No research data available")
             
             # Load prompt template
+            # Handle different input_data types
+            pain_points = []
+            market_focus = ""
+            if hasattr(input_data, 'pain_points'):
+                pain_points = input_data.pain_points
+                market_focus = getattr(input_data, 'target_market', '')
+            elif isinstance(input_data, dict):
+                pain_points = input_data.get('pain_points', [])
+                market_focus = input_data.get('target_market', '')
+                
             prompt = load_prompt_template(
                 template_name="act.prompt",
                 agent_name="validator_agent",
                 substitutions={
-                    "pain_points": json.dumps(input_data.pain_points, indent=2),
-                    "market_focus": input_data.target_market,
+                    "pain_points": json.dumps(pain_points, indent=2),
+                    "market_focus": market_focus,
                     "research_data": json.dumps(research_data, indent=2)
                 }
             )
@@ -869,7 +1001,7 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
             # Validate the result structure
             if not validation_result.get('validated_pain_points'):
                 self.logger.warning("No validated pain points found in LLM response, using fallback")
-                validation_result = self._generate_fallback_validation(input_data.pain_points, research_data)
+                validation_result = self._generate_fallback_validation(pain_points, research_data)
             else:
                 self.logger.info(f"Generated validation for {len(validation_result.get('validated_pain_points', []))} pain points")
             
@@ -881,7 +1013,7 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
         except Exception as e:
             self.logger.error(f"Error in act phase: {str(e)}\n{traceback.format_exc()}")
             # Fallback: generate basic validation
-            fallback_validation = self._generate_fallback_validation(input_data.pain_points, research_data)
+            fallback_validation = self._generate_fallback_validation(pain_points, research_data)
             
             # Write fallback validation to manifest
             self._write_stage_output("act", fallback_validation)
@@ -1330,6 +1462,10 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
                 if "data" in stage_data:
                     self.logger.info(f"Found {stage_name} stage data in manifest stages.{node_id}.data")
                     return stage_data["data"]
+                else:
+                    # If there's no 'data' field, return the stage_data directly
+                    self.logger.info(f"Found {stage_name} stage data in manifest stages.{node_id}")
+                    return stage_data
             
             self.logger.warning(f"No {stage_name} stage data found in manifest")
             return None
@@ -1342,7 +1478,12 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
         """Load a prompt template from the prompts directory."""
         try:
             from scout_agent.llm.utils import load_prompt_template
-            return load_prompt_template(template_name, agent_name=self.name)
+            # First try with the specific agent name
+            try:
+                return load_prompt_template(f"{template_name}.prompt", agent_name=self.name)
+            except FileNotFoundError:
+                # If not found, try without .prompt extension
+                return load_prompt_template(template_name, agent_name=self.name)
         except Exception as e:
             self.logger.error(f"Error loading prompt template {template_name}: {str(e)}")
             # Return a minimal fallback prompt
