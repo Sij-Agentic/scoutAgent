@@ -671,17 +671,23 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
             
             self.logger.info(f"Completed research for {research_data['successful_research']} pain points")
             
-            # Analyze research data for each pain point and source in parallel
-            analysis_tasks = []
+            # Analyze research data for each pain point sequentially, but sources in parallel
+            analyzed_data = {}
+            
+            # Process each pain point sequentially
             for pain_point_id, pain_point_data in processed_results.items():
                 if "error" in pain_point_data:
+                    self.logger.warning(f"Skipping pain point {pain_point_id} due to error in data")
                     continue
+                
+                self.logger.info(f"Processing pain point {pain_point_id}")
                 
                 # Find the corresponding strategy to get the pain point description
                 pain_point_desc = next((s.get("pain_point_description", "") 
                                       for s in strategies if s.get("pain_point_id") == pain_point_id), "")
                 
-                # Process each source separately
+                # For each pain point, process sources in parallel
+                source_tasks = []
                 for source, source_data in pain_point_data.get("sources", {}).items():
                     task = self._analyze_research_data(
                         pain_point_id=pain_point_id,
@@ -689,32 +695,39 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
                         research_data=source_data,
                         source=source
                     )
-                    analysis_tasks.append(task)
-            
-            # Execute all analysis tasks in parallel
-            analysis_results = await asyncio.gather(*analysis_tasks, return_exceptions=True)
-            
-            # Process analysis results and handle exceptions
-            analyzed_data = {}
-            for i, result in enumerate(analysis_results):
-                if isinstance(result, Exception):
-                    self.logger.error(f"Analysis task {i} failed: {str(result)}")
-                    continue
+                    source_tasks.append(task)
                 
-                pain_point_id = result.get("pain_point_id")
-                source = result.get("source")
-                
-                if pain_point_id and source:
-                    if pain_point_id not in analyzed_data:
-                        analyzed_data[pain_point_id] = {}
+                # Execute source tasks in parallel for this pain point
+                if source_tasks:
+                    self.logger.info(f"Analyzing {len(source_tasks)} sources for pain point {pain_point_id}")
+                    source_results = await asyncio.gather(*source_tasks, return_exceptions=True)
                     
-                    analyzed_data[pain_point_id][source] = result
+                    # Process results for this pain point
+                    for result in source_results:
+                        if isinstance(result, Exception):
+                            self.logger.error(f"Analysis task for pain point {pain_point_id} failed: {str(result)}")
+                            continue
+                        
+                        source = result.get("source")
+                        if source:
+                            if pain_point_id not in analyzed_data:
+                                analyzed_data[pain_point_id] = {}
+                            
+                            analyzed_data[pain_point_id][source] = result
+                    
+                    self.logger.info(f"Completed analysis for pain point {pain_point_id}")
+                else:
+                    self.logger.warning(f"No sources to analyze for pain point {pain_point_id}")
             
-            # Create the final analyzed research data
+            # No need for additional processing of analysis_results as we've already built analyzed_data
+            
+            # Create the final analyzed research data - no need to store raw_research again
+            # as it's already available in the collect stage output
             final_research_data = {
-                "raw_research": research_data,
                 "analyzed_research": analyzed_data,
-                "analysis_timestamp": datetime.now().isoformat()
+                "analysis_timestamp": datetime.now().isoformat(),
+                "total_pain_points_analyzed": len(analyzed_data),
+                "successful_analysis": sum(1 for pp_data in analyzed_data.values() if pp_data)
             }
             
             self.logger.info(f"Completed analysis for {len(analyzed_data)} pain points")
@@ -1316,30 +1329,31 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
     
     def _generate_fallback_research(self, pain_points: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Generate fallback research data if research fails."""
-        pain_point_research = {}
+        analyzed_data = {}
         
         for i, pain_point in enumerate(pain_points):
             # Extract pain point fields
             pain_id = pain_point.get("id", f"pp{i+1}")
             description = pain_point.get("description", "Unknown pain point")
             
-            # Create empty research result
-            pain_point_research[pain_id] = {
-                "pain_point_id": pain_id,
-                "pain_point_description": description,
-                "sources": {},
-                "queries_executed": 0,
-                "sources_used": [],
-                "timestamp": datetime.now().isoformat(),
-                "error": "Research failed, using fallback empty data"
+            # Create empty analysis result
+            analyzed_data[pain_id] = {
+                "fallback": {
+                    "pain_point_id": pain_id,
+                    "source": "fallback",
+                    "relevant_evidence": [],
+                    "key_insights": ["No data available"],
+                    "preliminary_validation_score": 0.0,
+                    "confidence_level": "low",
+                    "analysis_summary": "Research failed, using fallback empty data"
+                }
             }
         
         return {
-            "pain_point_research": pain_point_research,
-            "total_pain_points_researched": len(pain_points),
-            "successful_research": 0,
-            "failed_research": len(pain_points),
-            "research_timestamp": datetime.now().isoformat()
+            "analyzed_research": analyzed_data,
+            "total_pain_points_analyzed": len(pain_points),
+            "successful_analysis": 0,
+            "analysis_timestamp": datetime.now().isoformat()
         }
     
     def _generate_fallback_validation(self, pain_points: List[Dict[str, Any]], research_data: Dict[str, Any] = None) -> Dict[str, Any]:
