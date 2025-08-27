@@ -22,10 +22,6 @@ from scout_agent.orchestration.development_orchestrator import DevelopmentOrches
 
 logger = get_logger("enhanced_development_orchestrator")
 
-os.environ.setdefault("SCOUT_LLM_DEFAULT_BACKEND", "deepseek")
-os.environ.setdefault("SCOUT_LLM_DEFAULT_MODEL", "deepseek-chat")
-
-
 class EnhancedDevelopmentOrchestrator(DevelopmentOrchestrator):
     """
     Enhanced orchestrator for developing new agent stages with improved data handling.
