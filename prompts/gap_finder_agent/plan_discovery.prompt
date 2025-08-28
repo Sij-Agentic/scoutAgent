@@ -1,0 +1,79 @@
+Given a validated pain point description: 
+"{{pain_point_description}}"
+
+Your task is to generate {{n_queries}} web search queries for each category to discover existing tools, companies, and competitors that claim to solve this pain point. These queries will be used to find "Who is solving it now, what do they offer, and where are the gaps?"
+
+Organize the queries into 5 strategic categories:
+
+1. **Category-level** (broad terms for the overall solution domain)
+   - Purpose: Identify the general market landscape and established players
+   - Format: "automated {domain} tools", "AI {domain} SaaS", "best {domain} platforms 2025", "{industry} {pain} solutions"
+
+2. **Problem-focused** (phrased around the pain itself)
+   - Purpose: Find tools specifically addressing the exact pain point
+   - Format: "solutions for {pain}", "tools to {pain-related action}", "how to fix {pain keyword}", "software that solves {specific pain}"
+
+3. **Alternatives/comparisons** (force discovery of competing products)
+   - Purpose: Identify competitive landscape and differentiation points
+   - Format: "alternatives to {known category/tool}", "{tool1} vs {tool2} vs {category}", "top competitors of {known product}", "best {solution type} comparison"
+
+4. **Review-site restricted** (site-specific queries)
+   - Purpose: Gather user feedback and identify strengths/weaknesses of existing solutions
+   - Format: "site:g2.com {domain}", "site:capterra.com {keyword}", "site:producthunt.com {keyword}", "site:trustpilot.com {solution type}"
+
+5. **Trend/recency** (capture new entrants/startups)
+   - Purpose: Identify emerging solutions and innovation directions
+   - Format: "new {domain} startups 2025", "AI {domain} SaaS launched", "{keyword} site:techcrunch.com", "innovative {solution} startups"
+
+Return the queries grouped by category in JSON format. Ensure each query is specific, targeted, and likely to return relevant results about companies and products addressing this pain point:
+
+{
+  "category_level": [...],
+  "problem_focused": [...],
+  "alternatives_comparisons": [...],
+  "review_sites": [...],
+  "trend_recency": [...]
+}
+
+Important guidelines for query generation:
+1. Be specific to the pain point - avoid generic queries that would return irrelevant results
+2. Use industry-specific terminology where appropriate
+3. Include both established solutions and emerging technologies
+4. Consider different market segments (enterprise, SMB, startup) when relevant
+5. Ensure queries will return actual companies/products, not just educational content
+
+
+sample pain point
+n_queries - 3
+“Inadequate testing practices with developers neglecting tests and focusing on implementation validation.”
+
+
+
+sample output 
+{
+  "category_level": [
+    "AI test generation tools",
+    "automated software testing SaaS",
+    "best test automation frameworks 2025"
+  ],
+  "problem_focused": [
+    "solutions for developers skipping tests",
+    "tools to automate unit test writing",
+    "how to fix inadequate testing practices"
+  ],
+  "alternatives_comparisons": [
+    "alternatives to Selenium automated testing",
+    "Cypress vs Playwright vs AI testing tools",
+    "top competitors of Testim.io"
+  ],
+  "review_sites": [
+    "site:g2.com automated testing",
+    "site:capterra.com AI test generation",
+    "site:producthunt.com testing tools"
+  ],
+  "trend_recency": [
+    "new AI testing startups 2025",
+    "AI test automation SaaS launched",
+    "automated testing startup site:techcrunch.com"
+  ]
+}

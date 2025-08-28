@@ -149,7 +149,170 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
         """Plan the market gap analysis process."""
         self.logger.info(f"Planning market gap analysis for {len(input_data.validated_pain_points)} pain points")
         
-        plan = {
+        # Step 1: Retrieve data from validator act stage if not provided directly
+        validated_pain_points = input_data.validated_pain_points
+        if not validated_pain_points:
+            self.logger.info("No pain points provided directly, attempting to retrieve from manifest")
+            try:
+                from scout_agent.memory.manifest_manager import ManifestManager
+                
+                # Determine run directory
+                from pathlib import Path
+                project_root = Path(__file__).resolve().parents[2]
+                run_id = getattr(self.state, "run_id", "latest")
+                run_dir = project_root / "data" / "runs" / run_id
+                manifest_path = run_dir / "run_manifest.json"
+                
+                # Try to load from manifest
+                manifest_manager = ManifestManager(manifest_path, create_if_missing=False)
+                
+                # Try different possible node IDs for validator act output
+                validator_output = None
+                for node_id in ["validator_act", "validator_think", "validator"]:
+                    validator_output = manifest_manager.get_node_output(node_id)
+                    if validator_output and "validated_pain_points" in validator_output:
+                        break
+                
+                if validator_output and "validated_pain_points" in validator_output:
+                    validated_pain_points = validator_output["validated_pain_points"]
+                    self.logger.info(f"Retrieved {len(validated_pain_points)} pain points from manifest")
+                else:
+                    self.logger.warning("Could not find validated pain points in manifest")
+            except Exception as e:
+                self.logger.error(f"Error retrieving pain points from manifest: {str(e)}")
+        
+        # Step 2: Generate a plan using the plan.prompt template
+        try:
+            from scout_agent.llm.utils import load_prompt_template
+            
+            # Prepare substitutions for the prompt template
+            substitutions = {
+                "pain_points_count": str(len(validated_pain_points)),
+                "market_context": input_data.market_context,
+                "analysis_scope": input_data.analysis_scope,
+                "include_competitive_analysis": str(input_data.include_competitive_analysis),
+                "include_market_sizing": str(input_data.include_market_sizing)
+            }
+            
+            # Load the prompt template with substitutions
+            prompt_content = load_prompt_template(
+                "plan.prompt", 
+                agent_name=self.name,
+                substitutions=substitutions
+            )
+            
+            # Generate plan using LLM
+            llm_response = await self.llm_generate(
+                prompt=prompt_content,
+                task_type="planning"
+            )
+            
+            # Extract JSON from LLM response
+            plan = self._extract_json(llm_response)
+            
+            if not plan:
+                self.logger.warning("Failed to extract valid JSON from LLM response, using fallback plan")
+                plan = self._create_fallback_plan(input_data)
+        except Exception as e:
+            self.logger.error(f"Error generating plan: {str(e)}")
+            plan = self._create_fallback_plan(input_data)
+        
+        # Step 3: Generate discovery queries for each pain point using act_discovery.prompt
+        discovery_queries = {}
+        try:
+            for i, pain_point in enumerate(validated_pain_points):
+                self.logger.info(f"Generating discovery queries for pain point {i+1}/{len(validated_pain_points)}")
+                
+                # Extract pain point details - handle different possible structures
+                pain_point_text = ""
+                if isinstance(pain_point, dict):
+                    # Direct dictionary format
+                    pain_point_text = pain_point.get("pain_point", "") or pain_point.get("description", "")
+                elif isinstance(pain_point, str):
+                    # Simple string format
+                    pain_point_text = pain_point
+                
+                if not pain_point_text:
+                    self.logger.warning(f"Could not extract text from pain point: {pain_point}")
+                    continue
+                
+                # Prepare substitutions for the discovery prompt
+                discovery_substitutions = {
+                    "pain_point": pain_point_text,
+                    "market_context": input_data.market_context or ""
+                }
+                
+                # Load the discovery prompt template with substitutions
+                discovery_prompt = load_prompt_template(
+                    "act_discovery.prompt",
+                    agent_name=self.name,
+                    substitutions=discovery_substitutions
+                )
+                
+                # Generate discovery queries using LLM
+                discovery_response = await self.llm_generate(
+                    prompt=discovery_prompt,
+                    task_type="discovery"
+                )
+                
+                # Extract JSON from LLM response
+                queries = self._extract_json(discovery_response)
+                
+                if queries:
+                    discovery_queries[pain_point_text] = queries
+                    self.logger.info(f"Generated {len(queries)} discovery queries for pain point {i+1}")
+                else:
+                    self.logger.warning(f"Failed to generate discovery queries for pain point {i+1}")
+        except Exception as e:
+            self.logger.error(f"Error generating discovery queries: {str(e)}")
+        
+        # Add discovery queries to the plan
+        if discovery_queries:
+            plan["discovery_queries"] = discovery_queries
+        
+        self.state.plan = plan
+        return plan
+        
+    def _extract_json(self, text: str) -> Dict[str, Any]:
+        """Extract JSON from text."""
+        try:
+            # Find JSON-like content between curly braces
+            import re
+            import json
+            
+            # First try direct JSON parsing
+            try:
+                return json.loads(text)
+            except json.JSONDecodeError:
+                pass
+            
+            # Look for content between outermost curly braces
+            match = re.search(r'\{[\s\S]*?\}(?=\s*$|\n)', text) or re.search(r'\{[\s\S]*\}', text)
+            if match:
+                json_str = match.group(0)
+                try:
+                    return json.loads(json_str)
+                except json.JSONDecodeError:
+                    # Try to clean up the JSON string
+                    cleaned_json = re.sub(r'\s+', ' ', json_str)
+                    cleaned_json = re.sub(r',\s*\}', '}', cleaned_json)
+                    return json.loads(cleaned_json)
+            
+            # Look for markdown code blocks with JSON
+            code_block_match = re.search(r'```(?:json)?\s*([\s\S]*?)\s*```', text)
+            if code_block_match:
+                json_str = code_block_match.group(1)
+                return json.loads(json_str)
+                
+            return {}
+        except Exception as e:
+            self.logger.error(f"Error extracting JSON: {str(e)}")
+            return {}
+    
+    def _create_fallback_plan(self, input_data: GapFinderInput) -> Dict[str, Any]:
+        """Create a fallback plan if LLM generation fails."""
+        return {
+            "operation": "market_gap_analysis",
             "phases": [
                 "pain_point_clustering",
                 "market_research",
@@ -159,15 +322,19 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                 "risk_assessment",
                 "prioritization"
             ],
-            "analysis_scope": input_data.analysis_scope,
-            "include_competitive_analysis": input_data.include_competitive_analysis,
-            "include_market_sizing": input_data.include_market_sizing,
+            "data_sources": [
+                "web_search",
+                "market_reports",
+                "competitor_websites",
+                "review_platforms"
+            ],
             "expected_duration": 900,  # 15 minutes
-            "pain_point_count": len(input_data.validated_pain_points)
+            "special_considerations": [
+                f"Analysis scope: {input_data.analysis_scope}",
+                f"Include competitive analysis: {input_data.include_competitive_analysis}",
+                f"Include market sizing: {input_data.include_market_sizing}"
+            ]
         }
-        
-        self.state.plan = plan
-        return plan
     
     async def think(self, input_data: GapFinderInput) -> Dict[str, Any]:
         """Analyze pain points to identify market gaps."""
