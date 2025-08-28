@@ -166,12 +166,17 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                 # Try to load from manifest
                 manifest_manager = ManifestManager(manifest_path, create_if_missing=False)
                 
-                # Try different possible node IDs for validator act output
-                validator_output = None
-                for node_id in ["validator_act", "validator_think", "validator"]:
-                    validator_output = manifest_manager.get_node_output(node_id)
-                    if validator_output and "validated_pain_points" in validator_output:
-                        break
+                # Try to get output from validator_think
+                validator_output = manifest_manager.get_node_output("validator_think")
+                
+                # If not found, try fallbacks
+                if not validator_output or "validated_pain_points" not in validator_output:
+                    self.logger.info("Could not find validator_think output, trying fallbacks")
+                    for node_id in ["validator_act", "validator"]:
+                        validator_output = manifest_manager.get_node_output(node_id)
+                        if validator_output and "validated_pain_points" in validator_output:
+                            self.logger.info(f"Found validated pain points in {node_id}")
+                            break
                 
                 if validator_output and "validated_pain_points" in validator_output:
                     validated_pain_points = validator_output["validated_pain_points"]
@@ -217,7 +222,7 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
             self.logger.error(f"Error generating plan: {str(e)}")
             plan = self._create_fallback_plan(input_data)
         
-        # Step 3: Generate discovery queries for each pain point using act_discovery.prompt
+        # Step 3: Generate discovery queries for each pain point using plan_discovery.prompt
         discovery_queries = {}
         try:
             for i, pain_point in enumerate(validated_pain_points):
@@ -236,15 +241,18 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                     self.logger.warning(f"Could not extract text from pain point: {pain_point}")
                     continue
                 
+                # Default number of queries per category
+                n_queries = 3
+                
                 # Prepare substitutions for the discovery prompt
                 discovery_substitutions = {
-                    "pain_point": pain_point_text,
-                    "market_context": input_data.market_context or ""
+                    "pain_point_description": pain_point_text,
+                    "n_queries": str(n_queries)
                 }
                 
                 # Load the discovery prompt template with substitutions
                 discovery_prompt = load_prompt_template(
-                    "act_discovery.prompt",
+                    "plan_discovery.prompt",
                     agent_name=self.name,
                     substitutions=discovery_substitutions
                 )
@@ -260,7 +268,7 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                 
                 if queries:
                     discovery_queries[pain_point_text] = queries
-                    self.logger.info(f"Generated {len(queries)} discovery queries for pain point {i+1}")
+                    self.logger.info(f"Generated discovery queries for pain point {i+1} in {len(queries)} categories")
                 else:
                     self.logger.warning(f"Failed to generate discovery queries for pain point {i+1}")
         except Exception as e:
