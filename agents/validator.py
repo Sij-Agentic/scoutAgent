@@ -959,51 +959,143 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
                 "analysis_summary": f"Analysis failed: {str(e)}"
             }
     
+    def _extract_condensed_evidence(self, research_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Extract condensed evidence from research data.
+        
+        This extracts only supporting and contradicting evidence from the research data,
+        organizing it by pain point ID for easier consumption by the LLM.
+        """
+        self.logger.info("Extracting condensed evidence from research data")
+        
+        condensed_evidence = {}
+        
+        # Check if we have the expected structure
+        if not research_data or not isinstance(research_data, dict):
+            self.logger.warning("Invalid research data structure for evidence extraction")
+            return condensed_evidence
+            
+        # Try to get analyzed_research from the research data
+        analyzed_research = None
+        
+        # Check if research_data has pain_point_research directly
+        if "pain_point_research" in research_data:
+            analyzed_research = research_data["pain_point_research"]
+        # Check if it's in the data field (from think stage output)
+        elif "data" in research_data and isinstance(research_data["data"], dict):
+            if "analyzed_research" in research_data["data"]:
+                analyzed_research = research_data["data"]["analyzed_research"]
+            elif "pain_point_research" in research_data["data"]:
+                analyzed_research = research_data["data"]["pain_point_research"]
+                
+        if not analyzed_research or not isinstance(analyzed_research, dict):
+            self.logger.warning("No analyzed research found in research data")
+            return condensed_evidence
+            
+        # Process each pain point
+        for pain_point_id, sources_data in analyzed_research.items():
+            pain_point_evidence = {
+                "supporting": [],
+                "contradicting": []
+            }
+            
+            # Process each source for this pain point
+            if isinstance(sources_data, dict):
+                for source, source_data in sources_data.items():
+                    # Skip non-dict source data
+                    if not isinstance(source_data, dict):
+                        continue
+                        
+                    # Extract entries from the source data
+                    entries = source_data.get("entries", {})
+                    
+                    # Extract supporting and contradicting evidence
+                    for entry in entries.get("supporting", []):
+                        if isinstance(entry, dict):
+                            evidence_item = {
+                                "source": source,
+                                "content": entry.get("content", ""),
+                                "justification": entry.get("justification", "")
+                            }
+                            pain_point_evidence["supporting"].append(evidence_item)
+                    
+                    for entry in entries.get("contradicting", []):
+                        if isinstance(entry, dict):
+                            evidence_item = {
+                                "source": source,
+                                "content": entry.get("content", ""),
+                                "justification": entry.get("justification", "")
+                            }
+                            pain_point_evidence["contradicting"].append(evidence_item)
+            
+            # Add evidence for this pain point to the condensed evidence
+            condensed_evidence[pain_point_id] = pain_point_evidence
+        
+        self.logger.info(f"Extracted condensed evidence for {len(condensed_evidence)} pain points")
+        return condensed_evidence
+    
     async def act(self, input_data: ValidatorInput, plan: Dict[str, Any] = None, research_data: Dict[str, Any] = None) -> Dict[str, Any]:
         """Analyze research data and validate pain points."""
         self.logger.info("Analyzing research data and validating pain points")
+        from pathlib import Path
+        import json
+        import os
+        
+        start_time = datetime.now()
+        debug_info = {"has_research_data": False, "plan_provided": bool(plan)}
         
         try:
-            # Use plan and research_data from parameters or from agent state
-            if plan is None:
-                plan = getattr(self.state, "plan", None)
-            if research_data is None:
-                research_data = getattr(self.state, "research_data", None)
-                
-            # If still None, try to get from manifest
-            if plan is None:
-                self.logger.info("No plan provided, attempting to load from manifest")
-                plan = self._get_stage_output("plan")
-            if research_data is None:
-                self.logger.info("No research data provided, attempting to load from manifest")
-                research_data = self._get_stage_output("think")
-                
-            if plan is None:
-                raise ValueError("No validation plan available")
-            if research_data is None:
-                raise ValueError("No research data available")
+            # Ensure input_data is ValidatorInput
+            if not isinstance(input_data, ValidatorInput):
+                input_data = self._normalize_input(input_data)
             
-            # Load prompt template
-            # Handle different input_data types
-            pain_points = []
-            market_focus = ""
-            if hasattr(input_data, 'pain_points'):
-                pain_points = input_data.pain_points
-                market_focus = getattr(input_data, 'target_market', '')
-            elif isinstance(input_data, dict):
-                pain_points = input_data.get('pain_points', [])
-                market_focus = input_data.get('target_market', '')
+            # Get pain points from input data
+            pain_points = input_data.pain_points
+            target_market = input_data.target_market
+            
+            # Get research data from parameters, agent state, or manifest
+            if not research_data:
+                # Try to get from agent state
+                research_data = getattr(self.state, 'research_data', None)
+                if research_data:
+                    self.logger.info("Retrieved research data from agent state")
                 
+                # If still not found, try to get from manifest
+                if not research_data and hasattr(self, 'manifest_manager'):
+                    # Try different node IDs to find the research data
+                    node_ids = [f"{self.name}_think", "validator_think", "think"]
+                    
+                    for node_id in node_ids:
+                        research_data = self.manifest_manager.get_node_output(node_id)
+                        if research_data:
+                            self.logger.info(f"Retrieved research data from manifest with node_id: {node_id}")
+                            break
+            
+            if not research_data:
+                self.logger.error("No research data available from think stage")
+                raise ValueError("No research data available from think stage")
+            
+            debug_info["has_research_data"] = True
+            
+            # Extract condensed evidence from research data
+            condensed_evidence = self._extract_condensed_evidence(research_data)
+            
+            # Save condensed evidence for debugging
+            debug_dir = Path(os.getcwd()) / "debug"
+            debug_dir.mkdir(exist_ok=True)
+            with open(debug_dir / "condensed_evidence.json", "w") as f:
+                json.dump(condensed_evidence, f, indent=2)
+            
+            # Load prompt template with pain points, market focus, and condensed evidence
             prompt = load_prompt_template(
                 template_name="act.prompt",
                 agent_name="validator_agent",
                 substitutions={
                     "pain_points": json.dumps(pain_points, indent=2),
-                    "market_focus": market_focus,
-                    "research_data": json.dumps(research_data, indent=2)
+                    "market_focus": target_market,
+                    "condensed_evidence": json.dumps(condensed_evidence, indent=2)
                 }
             )
-            
+                
             # Generate validation analysis using LLM
             self.logger.info("Calling LLM to analyze research data and validate pain points...")
             response = await self.llm_generate(prompt=prompt, task_type="analysis")
@@ -1011,12 +1103,51 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
             # Extract JSON from response
             validation_result = self._extract_json(response)
             
-            # Validate the result structure
-            if not validation_result.get('validated_pain_points'):
-                self.logger.warning("No validated pain points found in LLM response, using fallback")
-                validation_result = self._generate_fallback_validation(pain_points, research_data)
-            else:
-                self.logger.info(f"Generated validation for {len(validation_result.get('validated_pain_points', []))} pain points")
+            if not validation_result:
+                self.logger.warning("Failed to extract JSON from LLM response, using fallback")
+                # Create fallback validation result
+                validation_result = {
+                    "validated_pain_points": [],
+                    "rejected_pain_points": [],
+                    "validation_summary": "Failed to extract validation results from LLM response",
+                    "validation_timestamp": datetime.now().isoformat(),
+                    "error": "JSON extraction failed"
+                }
+            
+            # Add metadata to validation result
+            validation_result["validation_timestamp"] = datetime.now().isoformat()
+            validation_result["processing_time"] = (datetime.now() - start_time).total_seconds()
+            validation_result["pain_points_analyzed"] = len(pain_points)
+            validation_result["evidence_sources_used"] = list(set([ev["source"] for pp_id in condensed_evidence for ev in condensed_evidence[pp_id]["supporting"] + condensed_evidence[pp_id]["contradicting"]]))
+            
+            # Write validation result to manifest
+            if hasattr(self, 'manifest_manager'):
+                self.logger.info("Writing stage validator_act output to manifest")
+                self.manifest_manager.store_node_output(f"{self.name}_act", validation_result)
+                self.logger.info("Stage validator_act output written to manifest successfully")
+            
+            return validation_result
+        except Exception as e:
+            self.logger.error(f"Error in act phase: {str(e)}")
+            self.logger.error(traceback.format_exc())
+            
+            # Create error result
+            error_result = {
+                "validated_pain_points": [],
+                "rejected_pain_points": [],
+                "validation_summary": f"Error in validation: {str(e)}",
+                "validation_timestamp": datetime.now().isoformat(),
+                "error": str(e),
+                "debug_info": debug_info
+            }
+            
+            # Write error result to manifest
+            if hasattr(self, 'manifest_manager'):
+                self.logger.info("Writing stage validator_act output to manifest")
+                self.manifest_manager.store_node_output(f"{self.name}_act", error_result)
+                self.logger.info("Stage validator_act output written to manifest successfully")
+            
+            return error_result
             
             # Write validation result to manifest
             self._write_stage_output("act", validation_result)
@@ -1025,13 +1156,25 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
             
         except Exception as e:
             self.logger.error(f"Error in act phase: {str(e)}\n{traceback.format_exc()}")
-            # Fallback: generate basic validation
-            fallback_validation = self._generate_fallback_validation(pain_points, research_data)
+            # Create fallback validation result
+            fallback_validation = {
+                "validated_pain_points": [],
+                "rejected_pain_points": [],
+                "validation_summary": f"Error in validation: {str(e)}",
+                "validation_timestamp": datetime.now().isoformat(),
+                "error": str(e),
+                "debug_info": {
+                    "has_research_data": research_data is not None,
+                    "plan_provided": plan is not None
+                }
+            }
             
-            # Write fallback validation to manifest
+            # Write fallback result to manifest
             self._write_stage_output("act", fallback_validation)
             
             return fallback_validation
+            
+
     
     async def _execute_research_for_pain_point(
         self, 
