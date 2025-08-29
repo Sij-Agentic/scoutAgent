@@ -84,7 +84,7 @@ class WebContentExtractor:
                 include_tables=include_tables,
                 include_links=include_links,
                 include_images=include_images,
-                output_format="text"
+                output_format="txt"
             )
             
             # Prepare result
