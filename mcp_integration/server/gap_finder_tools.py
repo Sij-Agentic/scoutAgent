@@ -1,12 +1,13 @@
 import json
 import os
 import hashlib
+import asyncio
 from typing import Dict, Any, List, Optional
 from pathlib import Path
 
+from mcp.server.fastmcp import FastMCP
 from mcp.types import TextContent
 
-from scout_agent.mcp_integration.server.base import MCPServer
 from scout_agent.sources.serp_client import SerpApiClient
 from scout_agent.sources.web_content_extractor import WebContentExtractor
 from scout_agent.data_cache.file_cache import FileCache
@@ -14,16 +15,18 @@ from scout_agent.custom_logging import get_logger
 from scout_agent.config import init_config, get_config
 from scout_agent.llm.manager import LLMManager
 from scout_agent.llm.base import LLMRequest, LLMConfig, LLMBackendType
+from scout_agent.sources.scripts.vendor_research_tool import VendorResearchTool
 
 # Initialize config and logger
 init_config()
 logger = get_logger("gap_finder_tools")
 
-# Create server instance
-server = MCPServer(name="gap-finder-tools")
+# Create server instance directly using FastMCP like reddit_api.py
+# Use underscore instead of hyphen in the server name to match the client's expectations
+mcp = FastMCP("gap_finder", host="127.0.0.1", port=8000)
 
 
-@server.tool()
+@mcp.tool()
 async def ping() -> Dict[str, Any]:
     """Health-check tool returning a simple pong payload."""
     payload = {"ok": True, "message": "pong"}
@@ -34,7 +37,7 @@ async def ping() -> Dict[str, Any]:
     }
 
 
-@server.tool()
+@mcp.tool()
 async def search_links(
     queries: List[str],
     pain_point_id: str = "pp1",
@@ -86,7 +89,7 @@ async def search_links(
     }
 
 
-@server.tool()
+@mcp.tool()
 async def extract_content(
     urls: List[str],
     use_cache: bool = True,
@@ -149,22 +152,22 @@ class ContentTriager:
         
         # Set up cache
         if cache_dir is None:
-            cache_dir = os.path.join(get_config().cache_dir, "content_triage")
+            cache_dir = os.path.join(get_config().data_dir, "content_triage_cache")
         os.makedirs(cache_dir, exist_ok=True)
         self.cache = FileCache(cache_dir)
         
         # Load prompt
-        prompt_path = os.path.join(get_config().prompts_dir, "think_triage.prompt")
+        prompt_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "prompts", "gap_finder_agent", "think_triage.prompt")
         with open(prompt_path, "r") as f:
             self.prompt_template = f.read()
     
-    def classify_content(self, url: str, content: str, use_cache: bool = True) -> Dict[str, Any]:
+    async def classify_content(self, url: str, content: str, use_cache: bool = True) -> Dict[str, Any]:
         # Generate cache key
         key = hashlib.md5(f"{url}:{content}".encode()).hexdigest()
         
         # Check cache
         if use_cache:
-            cached = self.cache.get(key)
+            cached = self.cache.load("classification", key, None)
             if cached is not None:
                 logger.info(f"Using cached classification for {url}")
                 return cached
@@ -175,11 +178,13 @@ class ContentTriager:
         # Call LLM
         try:
             llm_request = LLMRequest(
-                prompt=prompt,
+                messages=[{"role": "user", "content": prompt}],
                 temperature=0.1,
                 max_tokens=1000
             )
-            response = self.llm_manager.call_llm(llm_request)
+            loop = asyncio.get_event_loop()
+            response_obj = await loop.create_task(self.llm_manager.generate(llm_request))
+            response = response_obj.content if response_obj.success else ""
             
             # Parse response
             try:
@@ -199,7 +204,7 @@ class ContentTriager:
             # Cache result
             result = {"success": True, "classification": classification}
             if use_cache:
-                self.cache.set(key, result)
+                self.cache.save("classification", key, result)
             
             return result
         except Exception as e:
@@ -208,7 +213,7 @@ class ContentTriager:
             return {"success": False, "error": error_msg}
 
 
-@server.tool()
+@mcp.tool()
 async def triage_content(
     contents: List[Dict[str, Any]],
     use_cache: bool = True
@@ -233,17 +238,21 @@ async def triage_content(
         url = item.get("url", "")
         content = item.get("content", "")
         
-        if not content or not item.get("success", False):
+        if not content:
             triage_results.append({
                 "url": url,
                 "success": False,
                 "error": "No content to triage or content extraction failed"
             })
             continue
+            
+        # If the item was directly provided (not from extract_content), assume success
+        if "success" not in item:
+            item["success"] = True
         
         # Triage the content
         logger.info(f"Triaging content from: {url}")
-        triage_result = triager.classify_content(
+        triage_result = await triager.classify_content(
             url=url,
             content=content,
             use_cache=use_cache
@@ -275,22 +284,22 @@ class VendorIdentifier:
         
         # Set up cache
         if cache_dir is None:
-            cache_dir = os.path.join(get_config().cache_dir, "vendor_identification")
+            cache_dir = os.path.join(get_config().data_dir, "vendor_identification_cache")
         os.makedirs(cache_dir, exist_ok=True)
         self.cache = FileCache(cache_dir)
         
         # Load prompt
-        prompt_path = os.path.join(get_config().prompts_dir, "think_vendorid.prompt")
+        prompt_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "prompts", "gap_finder_agent", "think_vendorid.prompt")
         with open(prompt_path, "r") as f:
             self.prompt_template = f.read()
     
-    def identify_vendors(self, url: str, content: str, use_cache: bool = True) -> Dict[str, Any]:
+    async def identify_vendors(self, url: str, content: str, use_cache: bool = True) -> Dict[str, Any]:
         # Generate cache key
         key = hashlib.md5(f"{url}:{content}".encode()).hexdigest()
         
         # Check cache
         if use_cache:
-            cached = self.cache.get(key)
+            cached = self.cache.load("vendors", key, None)
             if cached is not None:
                 logger.info(f"Using cached vendor identification for {url}")
                 return cached
@@ -301,11 +310,13 @@ class VendorIdentifier:
         # Call LLM
         try:
             llm_request = LLMRequest(
-                prompt=prompt,
+                messages=[{"role": "user", "content": prompt}],
                 temperature=0.1,
                 max_tokens=1000
             )
-            response = self.llm_manager.call_llm(llm_request)
+            loop = asyncio.get_event_loop()
+            response_obj = await loop.create_task(self.llm_manager.generate(llm_request))
+            response = response_obj.content if response_obj.success else ""
             
             # Parse response
             try:
@@ -325,7 +336,7 @@ class VendorIdentifier:
             # Cache result
             result = {"success": True, "vendors": vendors}
             if use_cache:
-                self.cache.set(key, result)
+                self.cache.save("vendors", key, result)
             
             return result
         except Exception as e:
@@ -334,7 +345,7 @@ class VendorIdentifier:
             return {"success": False, "error": error_msg}
 
 
-@server.tool()
+@mcp.tool()
 async def identify_vendors(
     contents: List[Dict[str, Any]],
     use_cache: bool = True
@@ -369,7 +380,7 @@ async def identify_vendors(
         
         # Identify vendors in the content
         logger.info(f"Identifying vendors in content from: {url}")
-        vendor_result = identifier.identify_vendors(
+        vendor_result = await identifier.identify_vendors(
             url=url,
             content=content,
             use_cache=use_cache
@@ -393,3 +404,59 @@ async def identify_vendors(
             TextContent(type="text", text=json.dumps({"vendor_results": vendor_results}))
         ]
     }
+
+
+@mcp.tool()
+async def vendor_research(
+    vendor_name: str,
+    pain_point: str,
+    url: str = None,
+) -> Dict[str, Any]:
+    """
+    Conduct deep research on a vendor including their offerings, features, and reviews.
+    
+    Args:
+        vendor_name: The name of the vendor to research
+        pain_point: The specific pain point or use case to focus the research on
+        url: Optional URL of the vendor's website
+        
+    Returns:
+        Dictionary with vendor research results
+    """
+    # Initialize Vendor Research Tool
+    research_tool = VendorResearchTool()
+    
+    # Prepare the input as a dictionary for the tool
+    tool_input = {
+        'vendor_name': vendor_name,
+        'pain_point': pain_point
+    }
+    
+    if url:
+        tool_input['url'] = url
+    
+    # Call the tool asynchronously
+    logger.info(f"Researching vendor: {vendor_name} for pain point: {pain_point}")
+    result = await research_tool.forward(**tool_input)
+    
+    # Parse the result to ensure it's a proper JSON object
+    try:
+        result_json = json.loads(result)
+        return {
+            "content": [
+                TextContent(type="text", text=json.dumps(result_json))
+            ]
+        }
+    except json.JSONDecodeError as e:
+        error_msg = f"Error parsing vendor research result: {str(e)}"
+        logger.error(error_msg)
+        return {
+            "content": [
+                TextContent(type="text", text=json.dumps({"error": error_msg}))
+            ]
+        }
+
+
+if __name__ == "__main__":
+    # Run with SSE transport
+    mcp.run(transport="sse")

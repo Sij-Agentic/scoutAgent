@@ -316,7 +316,7 @@ class ConfigManager:
             f"{prefix}CHUNK_OVERLAP": ["memory", "chunk_overlap"],
             f"{prefix}PROMPTS_DIR": ["prompts_dir"],
             f"{prefix}DATA_DIR": ["data_dir"],
-            f"{prefix}OUTPUT_DIR": ["output_dir"],
+            f"{prefix}OUTPUT_DIR": ["output_dir"]
         }
         
         # API keys

@@ -15,8 +15,15 @@ from scout_agent.sources.reddit_client import RedditClient
 # Create server instance
 server = MCPServer(name="research-tools")
 
+# For running as a module
+mcp = server._mcp
+
 # Initialize data sources
 validation_manager = ValidationDataManager()
+
+# Main block to make the file runnable as a module
+if __name__ == "__main__":
+    mcp.run(transport="sse")
 
 
 @server.tool()
