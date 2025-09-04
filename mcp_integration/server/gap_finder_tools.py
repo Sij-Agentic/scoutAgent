@@ -161,6 +161,34 @@ class ContentTriager:
         with open(prompt_path, "r") as f:
             self.prompt_template = f.read()
     
+    async def _initialize_llm_backends(self) -> None:
+        """Initialize LLM backends directly."""
+        from scout_agent.llm.backends import DeepSeekBackend
+        logger.info("Starting direct LLM backend initialization in ContentTriager")
+        config = get_config()
+        
+        # Only try to register DeepSeek backend
+        if config.api.deepseek_api_key:
+            try:
+                logger.info("Initializing DeepSeek backend")
+                # Create LLMConfig as a dataclass instance
+                deepseek_config = LLMConfig(
+                    backend_type=LLMBackendType.DEEPSEEK,
+                    model_name="deepseek-chat",
+                    api_key=config.api.deepseek_api_key,
+                    temperature=0.7,
+                    max_tokens=4096
+                )
+                
+                deepseek_backend = DeepSeekBackend(deepseek_config)
+                await self.llm_manager.register_backend(deepseek_backend, is_default=True)
+                logger.info("DeepSeek backend registered successfully")
+                return  # Return early if we successfully registered a backend
+            except Exception as e:
+                logger.error(f"Failed to initialize DeepSeek backend: {e}")
+        
+        logger.warning("No LLM backends were successfully initialized")
+    
     async def classify_content(self, url: str, content: str, use_cache: bool = True) -> Dict[str, Any]:
         # Generate cache key
         key = hashlib.md5(f"{url}:{content}".encode()).hexdigest()
@@ -230,6 +258,7 @@ async def triage_content(
     """
     # Initialize Content Triager
     triager = ContentTriager()
+    await triager._initialize_llm_backends()
     
     # Triage each content item
     triage_results = []
@@ -293,6 +322,86 @@ class VendorIdentifier:
         with open(prompt_path, "r") as f:
             self.prompt_template = f.read()
     
+    async def _initialize_llm_backends(self) -> None:
+        """Initialize LLM backends directly."""
+        from scout_agent.llm.backends import OpenAIBackend, ClaudeBackend, DeepSeekBackend, GeminiBackend
+        logger.info("Starting direct LLM backend initialization in VendorIdentifier")
+        config = get_config()
+        
+        # Try to register DeepSeek backend first
+        if config.api.deepseek_api_key:
+            # Try different DeepSeek models in order of preference
+            deepseek_models = ["deepseek-chat", "deepseek-coder"]
+            
+            for model in deepseek_models:
+                try:
+                    logger.info(f"Initializing DeepSeek backend with model {model}")
+                    # Create LLMConfig as a dataclass instance
+                    deepseek_config = LLMConfig(
+                        backend_type=LLMBackendType.DEEPSEEK,
+                        model_name=model,
+                        api_key=config.api.deepseek_api_key,
+                        temperature=0.7,
+                        max_tokens=4096
+                    )
+                    
+                    deepseek_backend = DeepSeekBackend(deepseek_config)
+                    await self.llm_manager.register_backend(deepseek_backend, is_default=True)
+                    logger.info(f"DeepSeek backend with model {model} registered successfully")
+                    return  # Return early if we successfully registered a backend
+                except Exception as e:
+                    logger.error(f"Failed to initialize DeepSeek backend with model {model}: {e}")
+        
+        # Try to register OpenAI backend as fallback
+        if config.api.openai_api_key:
+            # Try different OpenAI models in order of preference
+            openai_models = ["gpt-3.5-turbo", "gpt-3.5-turbo-0125"]
+            
+            for model in openai_models:
+                try:
+                    logger.info(f"Initializing OpenAI backend with model {model}")
+                    # Create LLMConfig as a dataclass instance
+                    openai_config = LLMConfig(
+                        backend_type=LLMBackendType.OPENAI,
+                        model_name=model,
+                        api_key=config.api.openai_api_key,
+                        temperature=0.7,
+                        max_tokens=4096
+                    )
+                    
+                    openai_backend = OpenAIBackend(openai_config)
+                    await self.llm_manager.register_backend(openai_backend, is_default=True)
+                    logger.info(f"OpenAI backend with model {model} registered successfully")
+                    return  # Return early if we successfully registered a backend
+                except Exception as e:
+                    logger.error(f"Failed to initialize OpenAI backend with model {model}: {e}")
+        
+        # Try to register Claude backend as last resort
+        if config.api.anthropic_api_key:
+            # Try different Claude models in order of preference
+            claude_models = ["claude-3-haiku-20240307", "claude-instant-1.2"]
+            
+            for model in claude_models:
+                try:
+                    logger.info(f"Initializing Claude backend with model {model}")
+                    # Create LLMConfig as a dataclass instance
+                    claude_config = LLMConfig(
+                        backend_type=LLMBackendType.CLAUDE,
+                        model_name=model,
+                        api_key=config.api.anthropic_api_key,
+                        temperature=0.7,
+                        max_tokens=4096
+                    )
+                    
+                    claude_backend = ClaudeBackend(claude_config)
+                    await self.llm_manager.register_backend(claude_backend, is_default=True)
+                    logger.info(f"Claude backend with model {model} registered successfully")
+                    return  # Return early if we successfully registered a backend
+                except Exception as e:
+                    logger.error(f"Failed to initialize Claude backend with model {model}: {e}")
+        
+        logger.warning("No LLM backends were successfully initialized")
+    
     async def identify_vendors(self, url: str, content: str, use_cache: bool = True) -> Dict[str, Any]:
         # Generate cache key
         key = hashlib.md5(f"{url}:{content}".encode()).hexdigest()
@@ -303,6 +412,9 @@ class VendorIdentifier:
             if cached is not None:
                 logger.info(f"Using cached vendor identification for {url}")
                 return cached
+        
+        # Ensure LLM backends are initialized
+        await self._initialize_llm_backends()
         
         # Prepare input for LLM
         prompt = self.prompt_template.replace("{{CONTENT}}", content)
@@ -362,6 +474,9 @@ async def identify_vendors(
     """
     # Initialize Vendor Identifier
     identifier = VendorIdentifier()
+    
+    # Initialize LLM backends
+    await identifier._initialize_llm_backends()
     
     # Identify vendors in each content item
     vendor_results = []
