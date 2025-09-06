@@ -168,9 +168,9 @@ class VendorResearchTool(Tool):
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.serper_api_key = os.getenv("SERPER_API_KEY")
+        self.serper_api_key = os.getenv("SCOUT_SERPER_API_KEY")
         if not self.serper_api_key:
-            raise ValueError("SERPER_API_KEY environment variable is required")
+            raise ValueError("SCOUT_SERPER_API_KEY environment variable is required")
         
         # Setup logging
         import logging
