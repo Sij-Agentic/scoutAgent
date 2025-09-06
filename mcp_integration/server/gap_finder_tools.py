@@ -7,6 +7,7 @@ from pathlib import Path
 
 from mcp.server.fastmcp import FastMCP
 from mcp.types import TextContent
+from scout_agent.mcp_integration.server.base import MCPServer
 
 from scout_agent.sources.serp_client import SerpApiClient
 from scout_agent.sources.web_content_extractor import WebContentExtractor
@@ -24,6 +25,11 @@ logger = get_logger("gap_finder_tools")
 # Create server instance directly using FastMCP like reddit_api.py
 # Use underscore instead of hyphen in the server name to match the client's expectations
 mcp = FastMCP("gap_finder", host="127.0.0.1", port=8000)
+
+# Create server variable for import by run_gap_finder_tools_server.py
+server = MCPServer(name="gap_finder")
+# Use the same mcp instance for both
+server._mcp = mcp
 
 
 @mcp.tool()
@@ -200,31 +206,43 @@ class ContentTriager:
                 logger.info(f"Using cached classification for {url}")
                 return cached
         
-        # Prepare input for LLM
-        prompt = self.prompt_template.replace("{{CONTENT}}", content)
+        # Prepare input for LLM (format like standalone version)
+        input_text = f"URL: {url}\nTitle: {url.split('/')[-1] if url else 'Unknown'}\nContent: {content[:3000]}..."  # Truncate content to avoid token limits
         
         # Call LLM
         try:
             llm_request = LLMRequest(
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.1,
-                max_tokens=1000
+                messages=[{"role": "user", "content": input_text}],
+                system_prompt=self.prompt_template,
+                temperature=0.2,
+                max_tokens=500
             )
             loop = asyncio.get_event_loop()
-            response_obj = await loop.create_task(self.llm_manager.generate(llm_request))
-            response = response_obj.content if response_obj.success else ""
+            
+            # Add timeout to prevent indefinite waiting
+            try:
+                task = loop.create_task(self.llm_manager.generate(llm_request))
+                response_obj = await asyncio.wait_for(task, timeout=30.0)  # 30 second timeout
+                response = response_obj.content if response_obj.success else ""
+            except asyncio.TimeoutError:
+                logger.error(f"LLM request timed out for URL: {url}")
+                return {"success": False, "error": "LLM request timed out after 30 seconds"}
+            
+            if not response_obj.success:
+                logger.error(f"LLM request failed: {response_obj.error if hasattr(response_obj, 'error') else 'Unknown error'}")
+                return {"success": False, "error": f"LLM request failed: {response_obj.error if hasattr(response_obj, 'error') else 'Unknown error'}"}
             
             # Parse response
             try:
                 classification = json.loads(response)
-            except json.JSONDecodeError:
+            except json.JSONDecodeError as e:
                 # Try to extract JSON from response
                 import re
                 json_match = re.search(r'\{[\s\S]*\}', response)
                 if json_match:
                     try:
                         classification = json.loads(json_match.group(0))
-                    except json.JSONDecodeError:
+                    except json.JSONDecodeError as e2:
                         return {"success": False, "error": "Failed to parse LLM response as JSON"}
                 else:
                     return {"success": False, "error": "Failed to parse LLM response as JSON"}
@@ -256,9 +274,13 @@ async def triage_content(
     Returns:
         Dictionary with triage results
     """
-    # Initialize Content Triager
-    triager = ContentTriager()
-    await triager._initialize_llm_backends()
+    # Use global triager to avoid conflicts during rapid calls
+    global global_triager
+    if global_triager is None:
+        global_triager = ContentTriager()
+        await global_triager._initialize_llm_backends()
+    
+    triager = global_triager
     
     # Triage each content item
     triage_results = []
@@ -324,81 +346,29 @@ class VendorIdentifier:
     
     async def _initialize_llm_backends(self) -> None:
         """Initialize LLM backends directly."""
-        from scout_agent.llm.backends import OpenAIBackend, ClaudeBackend, DeepSeekBackend, GeminiBackend
+        from scout_agent.llm.backends import DeepSeekBackend
         logger.info("Starting direct LLM backend initialization in VendorIdentifier")
         config = get_config()
         
-        # Try to register DeepSeek backend first
+        # Only try to register DeepSeek backend
         if config.api.deepseek_api_key:
-            # Try different DeepSeek models in order of preference
-            deepseek_models = ["deepseek-chat", "deepseek-coder"]
-            
-            for model in deepseek_models:
-                try:
-                    logger.info(f"Initializing DeepSeek backend with model {model}")
-                    # Create LLMConfig as a dataclass instance
-                    deepseek_config = LLMConfig(
-                        backend_type=LLMBackendType.DEEPSEEK,
-                        model_name=model,
-                        api_key=config.api.deepseek_api_key,
-                        temperature=0.7,
-                        max_tokens=4096
-                    )
-                    
-                    deepseek_backend = DeepSeekBackend(deepseek_config)
-                    await self.llm_manager.register_backend(deepseek_backend, is_default=True)
-                    logger.info(f"DeepSeek backend with model {model} registered successfully")
-                    return  # Return early if we successfully registered a backend
-                except Exception as e:
-                    logger.error(f"Failed to initialize DeepSeek backend with model {model}: {e}")
-        
-        # Try to register OpenAI backend as fallback
-        if config.api.openai_api_key:
-            # Try different OpenAI models in order of preference
-            openai_models = ["gpt-3.5-turbo", "gpt-3.5-turbo-0125"]
-            
-            for model in openai_models:
-                try:
-                    logger.info(f"Initializing OpenAI backend with model {model}")
-                    # Create LLMConfig as a dataclass instance
-                    openai_config = LLMConfig(
-                        backend_type=LLMBackendType.OPENAI,
-                        model_name=model,
-                        api_key=config.api.openai_api_key,
-                        temperature=0.7,
-                        max_tokens=4096
-                    )
-                    
-                    openai_backend = OpenAIBackend(openai_config)
-                    await self.llm_manager.register_backend(openai_backend, is_default=True)
-                    logger.info(f"OpenAI backend with model {model} registered successfully")
-                    return  # Return early if we successfully registered a backend
-                except Exception as e:
-                    logger.error(f"Failed to initialize OpenAI backend with model {model}: {e}")
-        
-        # Try to register Claude backend as last resort
-        if config.api.anthropic_api_key:
-            # Try different Claude models in order of preference
-            claude_models = ["claude-3-haiku-20240307", "claude-instant-1.2"]
-            
-            for model in claude_models:
-                try:
-                    logger.info(f"Initializing Claude backend with model {model}")
-                    # Create LLMConfig as a dataclass instance
-                    claude_config = LLMConfig(
-                        backend_type=LLMBackendType.CLAUDE,
-                        model_name=model,
-                        api_key=config.api.anthropic_api_key,
-                        temperature=0.7,
-                        max_tokens=4096
-                    )
-                    
-                    claude_backend = ClaudeBackend(claude_config)
-                    await self.llm_manager.register_backend(claude_backend, is_default=True)
-                    logger.info(f"Claude backend with model {model} registered successfully")
-                    return  # Return early if we successfully registered a backend
-                except Exception as e:
-                    logger.error(f"Failed to initialize Claude backend with model {model}: {e}")
+            try:
+                logger.info("Initializing DeepSeek backend")
+                # Create LLMConfig as a dataclass instance
+                deepseek_config = LLMConfig(
+                    backend_type=LLMBackendType.DEEPSEEK,
+                    model_name="deepseek-chat",
+                    api_key=config.api.deepseek_api_key,
+                    temperature=0.7,
+                    max_tokens=4096
+                )
+                
+                deepseek_backend = DeepSeekBackend(deepseek_config)
+                await self.llm_manager.register_backend(deepseek_backend, is_default=True)
+                logger.info("DeepSeek backend registered successfully")
+                return  # Return early if we successfully registered a backend
+            except Exception as e:
+                logger.error(f"Failed to initialize DeepSeek backend: {e}")
         
         logger.warning("No LLM backends were successfully initialized")
     
@@ -416,19 +386,31 @@ class VendorIdentifier:
         # Ensure LLM backends are initialized
         await self._initialize_llm_backends()
         
-        # Prepare input for LLM
-        prompt = self.prompt_template.replace("{{CONTENT}}", content)
+        # Prepare input for LLM - use content directly like triage_content
+        input_text = content[:3000]
         
         # Call LLM
         try:
             llm_request = LLMRequest(
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.1,
+                messages=[{"role": "user", "content": input_text}],
+                system_prompt=self.prompt_template,
+                temperature=0.2,
                 max_tokens=1000
             )
             loop = asyncio.get_event_loop()
-            response_obj = await loop.create_task(self.llm_manager.generate(llm_request))
-            response = response_obj.content if response_obj.success else ""
+            
+            # Add timeout to prevent indefinite waiting
+            try:
+                task = loop.create_task(self.llm_manager.generate(llm_request))
+                response_obj = await asyncio.wait_for(task, timeout=30.0)  # 30 second timeout
+                response = response_obj.content if response_obj.success else ""
+            except asyncio.TimeoutError:
+                logger.error(f"LLM request timed out for URL: {url}")
+                return {"success": False, "error": "LLM request timed out after 30 seconds"}
+            
+            if not response_obj.success:
+                logger.error(f"LLM request failed: {response_obj.error if hasattr(response_obj, 'error') else 'Unknown error'}")
+                return {"success": False, "error": f"LLM request failed: {response_obj.error if hasattr(response_obj, 'error') else 'Unknown error'}"}
             
             # Parse response
             try:
@@ -472,53 +454,101 @@ async def identify_vendors(
     Returns:
         Dictionary with vendor identification results
     """
-    # Initialize Vendor Identifier
-    identifier = VendorIdentifier()
-    
-    # Initialize LLM backends
-    await identifier._initialize_llm_backends()
-    
-    # Identify vendors in each content item
-    vendor_results = []
-    
-    for item in contents:
-        url = item.get("url", "")
-        content = item.get("content", "")
+    try:
+        logger.info(f"[IDENTIFY_VENDORS] Starting tool call with {len(contents)} content items, use_cache={use_cache}")
         
-        if not content or not item.get("success", False):
-            vendor_results.append({
-                "url": url,
-                "success": False,
-                "error": "No content to analyze or content extraction failed"
-            })
-            continue
+        # Use global identifier to avoid conflicts during rapid calls
+        global global_identifier
+        logger.info("[IDENTIFY_VENDORS] Checking global identifier instance")
         
-        # Identify vendors in the content
-        logger.info(f"Identifying vendors in content from: {url}")
-        vendor_result = await identifier.identify_vendors(
-            url=url,
-            content=content,
-            use_cache=use_cache
-        )
-        
-        # Add to results
-        vendor_entry = {
-            "url": url,
-            "success": vendor_result["success"]
-        }
-        
-        if vendor_result["success"]:
-            vendor_entry["vendors"] = vendor_result["vendors"]
+        if global_identifier is None:
+            logger.info("[IDENTIFY_VENDORS] Creating new VendorIdentifier instance")
+            global_identifier = VendorIdentifier()
+            logger.info("[IDENTIFY_VENDORS] Initializing LLM backends")
+            await global_identifier._initialize_llm_backends()
+            logger.info("[IDENTIFY_VENDORS] LLM backends initialized successfully")
         else:
-            vendor_entry["error"] = vendor_result["error"]
+            logger.info("[IDENTIFY_VENDORS] Using existing global identifier instance")
         
-        vendor_results.append(vendor_entry)
-    
-    return {
-        "content": [
-            TextContent(type="text", text=json.dumps({"vendor_results": vendor_results}))
-        ]
-    }
+        identifier = global_identifier
+        logger.info("[IDENTIFY_VENDORS] Identifier ready, starting content processing")
+        
+        # Identify vendors in each content item
+        vendor_results = []
+        logger.info(f"[IDENTIFY_VENDORS] Processing {len(contents)} content items")
+        
+        for i, item in enumerate(contents):
+            try:
+                url = item.get("url", "")
+                content = item.get("content", "")
+                logger.info(f"[IDENTIFY_VENDORS] Processing item {i+1}/{len(contents)}: {url[:100]}...")
+                
+                if not content:
+                    logger.warning(f"[IDENTIFY_VENDORS] Skipping item {i+1} - no content text")
+                    vendor_results.append({
+                        "url": url,
+                        "success": False,
+                        "error": "No content to analyze or content extraction failed"
+                    })
+                    continue
+                    
+                # If the item was directly provided (not from extract_content), assume success
+                if "success" not in item:
+                    item["success"] = True
+                
+                # Identify vendors in the content
+                logger.info(f"[IDENTIFY_VENDORS] Calling identifier.identify_vendors for item {i+1}")
+                
+                vendor_result = await identifier.identify_vendors(
+                    url=url,
+                    content=content,
+                    use_cache=use_cache
+                )
+                logger.info(f"[IDENTIFY_VENDORS] Successfully processed item {i+1}")
+                
+                # Add to results
+                vendor_entry = {
+                    "url": url,
+                    "success": vendor_result["success"]
+                }
+                
+                if vendor_result["success"]:
+                    vendor_entry["vendors"] = vendor_result["vendors"]
+                else:
+                    vendor_entry["error"] = vendor_result["error"]
+                
+                vendor_results.append(vendor_entry)
+                
+            except Exception as e:
+                logger.error(f"[IDENTIFY_VENDORS] Error processing item {i+1} ({url}): {e}")
+                # Continue processing other items even if one fails
+                vendor_results.append({
+                    "url": url,
+                    "success": False,
+                    "error": f"Processing error: {str(e)}"
+                })
+                continue
+        
+        logger.info(f"[IDENTIFY_VENDORS] Completed processing. Total results: {len(vendor_results)}")
+        
+        final_result = {
+            "content": [
+                TextContent(type="text", text=json.dumps({"vendor_results": vendor_results}))
+            ]
+        }
+        logger.info(f"[IDENTIFY_VENDORS] Returning final result with {len(vendor_results)} vendor results")
+        return final_result
+        
+    except Exception as e:
+        logger.error(f"[IDENTIFY_VENDORS] Unexpected error in identify_vendors: {e}")
+        return {
+            "content": [
+                TextContent(type="text", text=json.dumps({
+                    "error": f"Tool execution failed: {str(e)}",
+                    "success": False
+                }))
+            ]
+        }
 
 
 @mcp.tool()
@@ -557,20 +587,19 @@ async def vendor_research(
     # Parse the result to ensure it's a proper JSON object
     try:
         result_json = json.loads(result)
-        return {
-            "content": [
-                TextContent(type="text", text=json.dumps(result_json))
-            ]
-        }
+        return result_json
     except json.JSONDecodeError as e:
         error_msg = f"Error parsing vendor research result: {str(e)}"
         logger.error(error_msg)
-        return {
-            "content": [
-                TextContent(type="text", text=json.dumps({"error": error_msg}))
-            ]
-        }
+        return {"error": error_msg}
 
+
+# Create global instances to avoid conflicts during rapid calls
+global_triager = None
+global_identifier = None
+
+# Create ASGI app for uvicorn
+app = server.asgi_app()
 
 if __name__ == "__main__":
     # Run with SSE transport
