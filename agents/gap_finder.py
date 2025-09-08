@@ -13,8 +13,6 @@ from dataclasses import dataclass, asdict
 
 from .base import BaseAgent, AgentInput, AgentOutput, AgentState
 from llm.utils import LLMAgentMixin
-from .analysis_agent import AnalysisAgent
-from .research_agent import ResearchAgent
 from config import get_config
 
 
@@ -90,8 +88,8 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
     def __init__(self, agent_id: str = None):
         BaseAgent.__init__(self, name="gap_finder", agent_id=agent_id)
         LLMAgentMixin.__init__(self, preferred_backend='ollama')
-        self.analysis_agent = AnalysisAgent()
-        self.research_agent = ResearchAgent()
+        # self.analysis_agent = AnalysisAgent()  # Commented out - not needed for plan stage
+        # self.research_agent = ResearchAgent()  # Commented out - not needed for plan stage
         self.config = get_config()
         self.name = "gap_finder"
         self.preferred_backend = 'ollama'
@@ -253,7 +251,7 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                 # Load the discovery prompt template with substitutions
                 discovery_prompt = load_prompt_template(
                     "plan_discovery.prompt",
-                    agent_name=self.name,
+                    agent_name="gap_finder_agent",
                     substitutions=discovery_substitutions
                 )
                 
@@ -277,6 +275,10 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
         # Add discovery queries to the plan
         if discovery_queries:
             plan["discovery_queries"] = discovery_queries
+        
+        # Step 4: Generate DAG metadata for gap finder stages
+        dag_metadata = self._generate_dag_metadata(validated_pain_points, discovery_queries)
+        plan["dag_metadata"] = dag_metadata
         
         self.state.plan = plan
         return plan
@@ -316,6 +318,309 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
         except Exception as e:
             self.logger.error(f"Error extracting JSON: {str(e)}")
             return {}
+    
+    def _generate_dag_metadata(self, validated_pain_points: List[Dict[str, Any]], discovery_queries: Dict[str, Any]) -> Dict[str, Any]:
+        """Generate DAG metadata for gap finder stages with proper dependencies and parallelization."""
+        from scout_agent.dag.node import NodeType, NodeConfig
+        import uuid
+        
+        nodes = []
+        edges = []
+        
+        # Generate unique node IDs to prevent overwrites
+        def generate_node_id(base_name: str, suffix: str = "") -> str:
+            unique_id = str(uuid.uuid4())[:8]
+            return f"{base_name}_{unique_id}{suffix}" if suffix else f"{base_name}_{unique_id}"
+        
+        # Step 1: Create search_links nodes (parallel for each pain point)
+        search_link_nodes = []
+        for i, pain_point in enumerate(validated_pain_points):
+            pain_point_text = ""
+            if isinstance(pain_point, dict):
+                pain_point_text = pain_point.get("pain_point", "") or pain_point.get("description", "")
+            elif isinstance(pain_point, str):
+                pain_point_text = pain_point
+            
+            if not pain_point_text:
+                continue
+                
+            # Get queries for this pain point
+            queries_for_pain_point = discovery_queries.get(pain_point_text, {})
+            all_queries = []
+            for category_queries in queries_for_pain_point.values():
+                if isinstance(category_queries, list):
+                    all_queries.extend(category_queries)
+            
+            # If no queries found, use default queries based on pain point
+            if not all_queries:
+                # Generate default search queries from pain point description
+                pain_point_keywords = pain_point_text.lower().replace(',', ' ').split()
+                key_terms = [word for word in pain_point_keywords if len(word) > 3 and word not in ['with', 'from', 'that', 'this', 'they', 'have', 'been', 'will', 'when', 'where', 'what', 'how']]
+                if key_terms:
+                    all_queries = [
+                        f"{' '.join(key_terms[:3])} solutions",
+                        f"{' '.join(key_terms[:2])} tools",
+                        f"{' '.join(key_terms[:2])} problems"
+                    ]
+                else:
+                    all_queries = [f"solutions for {pain_point_text[:30]}"]
+                
+            node_id = generate_node_id("search_links", f"_pp{i+1}")
+            search_link_nodes.append({
+                "node_id": node_id,
+                "name": f"search_links_pp{i+1}",
+                "description": f"Search for links related to pain point {i+1}: {pain_point_text[:50]}...",
+                "node_type": "TOOL",
+                "tool_name": "search_links",
+                "dependencies": [],
+                "inputs": {
+                    "queries": all_queries,
+                    "pain_point_id": f"pp{i+1}",
+                    "pain_point_title": pain_point_text,
+                    "num_results": 3,
+                    "use_cache": True
+                },
+                "config": {
+                    "timeout_seconds": 300,
+                    "retry_count": 2,
+                    "metadata": {
+                        "stage": "search_links",
+                        "pain_point_index": i,
+                        "pain_point_id": f"pp{i+1}"
+                    }
+                },
+                "output_manifest_key": f"search_links_pp{i+1}_output"
+            })
+        
+        nodes.extend(search_link_nodes)
+        
+        # Step 2: Create extract_content nodes (parallel for each search_links output)
+        extract_content_nodes = []
+        for search_node in search_link_nodes:
+            node_id = generate_node_id("extract_content", f"_pp{search_node['config']['metadata']['pain_point_index']+1}")
+            extract_content_nodes.append({
+                "node_id": node_id,
+                "name": f"extract_content_pp{search_node['config']['metadata']['pain_point_index']+1}",
+                "description": f"Extract content from URLs found for pain point {search_node['config']['metadata']['pain_point_index']+1}",
+                "node_type": "TOOL",
+                "tool_name": "extract_content",
+                "dependencies": [search_node["node_id"]],
+                "inputs": {
+                    "urls": f"${{{search_node['output_manifest_key']}.query_results[*].results[*].link}}",  # Reference to search output URLs
+                    "use_cache": True,
+                    "include_comments": False,
+                    "include_tables": True,
+                    "include_links": True,
+                    "include_images": False
+                },
+                "config": {
+                    "timeout_seconds": 600,
+                    "retry_count": 2,
+                    "metadata": {
+                        "stage": "extract_content",
+                        "pain_point_index": search_node['config']['metadata']['pain_point_index'],
+                        "pain_point_id": search_node['config']['metadata']['pain_point_id']
+                    }
+                },
+                "output_manifest_key": f"extract_content_pp{search_node['config']['metadata']['pain_point_index']+1}_output"
+            })
+            
+            # Add edge from search_links to extract_content
+            edges.append({
+                "from_node": search_node["node_id"],
+                "to_node": node_id,
+                "edge_type": "data_flow"
+            })
+        
+        nodes.extend(extract_content_nodes)
+        
+        # Step 3: Create triage_content nodes (parallel for each extract_content output)
+        triage_content_nodes = []
+        for extract_node in extract_content_nodes:
+            node_id = generate_node_id("triage_content", f"_pp{extract_node['config']['metadata']['pain_point_index']+1}")
+            triage_content_nodes.append({
+                "node_id": node_id,
+                "name": f"triage_content_pp{extract_node['config']['metadata']['pain_point_index']+1}",
+                "description": f"Triage extracted content for pain point {extract_node['config']['metadata']['pain_point_index']+1}",
+                "node_type": "TOOL",
+                "tool_name": "triage_content",
+                "dependencies": [extract_node["node_id"]],
+                "inputs": {
+                    "contents": f"${{{extract_node['output_manifest_key']}.contents}}",  # Reference to extract output contents
+                    "use_cache": True
+                },
+                "config": {
+                    "timeout_seconds": 400,
+                    "retry_count": 2,
+                    "metadata": {
+                        "stage": "triage_content",
+                        "pain_point_index": extract_node['config']['metadata']['pain_point_index'],
+                        "pain_point_id": extract_node['config']['metadata']['pain_point_id']
+                    }
+                },
+                "output_manifest_key": f"triage_content_pp{extract_node['config']['metadata']['pain_point_index']+1}_output"
+            })
+            
+            # Add edge from extract_content to triage_content
+            edges.append({
+                "from_node": extract_node["node_id"],
+                "to_node": node_id,
+                "edge_type": "data_flow"
+            })
+        
+        nodes.extend(triage_content_nodes)
+        
+        # Step 4: Create identify_vendors nodes (parallel for each triage_content output)
+        identify_vendors_nodes = []
+        for triage_node in triage_content_nodes:
+            node_id = generate_node_id("identify_vendors", f"_pp{triage_node['config']['metadata']['pain_point_index']+1}")
+            identify_vendors_nodes.append({
+                "node_id": node_id,
+                "name": f"identify_vendors_pp{triage_node['config']['metadata']['pain_point_index']+1}",
+                "description": f"Identify vendors from triaged content for pain point {triage_node['config']['metadata']['pain_point_index']+1}",
+                "node_type": "TOOL",
+                "tool_name": "identify_vendors",
+                "dependencies": [triage_node["node_id"]],
+                "inputs": {
+                    "contents": f"${{{triage_node['output_manifest_key']}.contents}}",  # Reference to triage output contents
+                    "use_cache": True
+                },
+                "config": {
+                    "timeout_seconds": 300,
+                    "retry_count": 2,
+                    "metadata": {
+                        "stage": "identify_vendors",
+                        "pain_point_index": triage_node['config']['metadata']['pain_point_index'],
+                        "pain_point_id": triage_node['config']['metadata']['pain_point_id']
+                    }
+                },
+                "output_manifest_key": f"identify_vendors_pp{triage_node['config']['metadata']['pain_point_index']+1}_output"
+            })
+            
+            # Add edge from triage_content to identify_vendors
+            edges.append({
+                "from_node": triage_node["node_id"],
+                "to_node": node_id,
+                "edge_type": "data_flow"
+            })
+        
+        nodes.extend(identify_vendors_nodes)
+        
+        # Step 5: Create vendor_research nodes (one per pain point, handling multiple vendors via iteration)
+        vendor_research_nodes = []
+        for vendor_node in identify_vendors_nodes:
+            node_id = generate_node_id("vendor_research", f"_pp{vendor_node['config']['metadata']['pain_point_index']+1}")
+            
+            # Get pain point text for the research context
+            pain_point_index = vendor_node['config']['metadata']['pain_point_index']
+            pain_point_text = ""
+            if isinstance(validated_pain_points[pain_point_index], dict):
+                pain_point_text = validated_pain_points[pain_point_index].get("pain_point", "") or validated_pain_points[pain_point_index].get("description", "")
+            elif isinstance(validated_pain_points[pain_point_index], str):
+                pain_point_text = validated_pain_points[pain_point_index]
+            
+            vendor_research_nodes.append({
+                "node_id": node_id,
+                "name": f"vendor_research_pp{vendor_node['config']['metadata']['pain_point_index']+1}",
+                "description": f"Research identified vendors for pain point {vendor_node['config']['metadata']['pain_point_index']+1}",
+                "node_type": "ITERATOR",  # Changed to ITERATOR to handle multiple vendors
+                "tool_name": "vendor_research",
+                "dependencies": [vendor_node["node_id"]],
+                "inputs": {
+                    "vendors_list": f"${{{vendor_node['output_manifest_key']}.vendors}}",  # Reference to all identified vendors
+                    "pain_point": pain_point_text,
+                    "iteration_template": {
+                        "vendor_name": "${item.name}",
+                        "pain_point": pain_point_text,
+                        "url": "${item.url}"
+                    }
+                },
+                "config": {
+                    "timeout_seconds": 900,
+                    "retry_count": 2,
+                    "iteration_strategy": "parallel",
+                    "max_concurrent": 3,
+                    "metadata": {
+                        "stage": "vendor_research",
+                        "pain_point_index": vendor_node['config']['metadata']['pain_point_index'],
+                        "pain_point_id": vendor_node['config']['metadata']['pain_point_id']
+                    }
+                },
+                "output_manifest_key": f"vendor_research_pp{vendor_node['config']['metadata']['pain_point_index']+1}_output"
+            })
+            
+            # Add edge from identify_vendors to vendor_research
+            edges.append({
+                "from_node": vendor_node["node_id"],
+                "to_node": node_id,
+                "edge_type": "data_flow"
+            })
+        
+        nodes.extend(vendor_research_nodes)
+        
+        # Step 6: Create aggregation node to collect all vendor research outputs
+        aggregation_node_id = generate_node_id("aggregate_research")
+        aggregation_node = {
+            "node_id": aggregation_node_id,
+            "name": "aggregate_research_results",
+            "description": "Aggregate all vendor research results for final analysis",
+            "node_type": "AGGREGATOR",
+            "dependencies": [node["node_id"] for node in vendor_research_nodes],
+            "inputs": {
+                "research_outputs": [f"${{{node['output_manifest_key']}.research_data}}" for node in vendor_research_nodes],
+                "pain_points": validated_pain_points,
+                "merge_strategy": "by_pain_point_id",
+                "output_format": "comprehensive_gap_analysis"
+            },
+            "config": {
+                "timeout_seconds": 300,
+                "retry_count": 1,
+                "metadata": {
+                    "stage": "aggregation",
+                    "final_stage": True
+                }
+            },
+            "output_manifest_key": "gap_finder_final_output"
+        }
+        
+        nodes.append(aggregation_node)
+        
+        # Add edges from all vendor_research nodes to aggregation
+        for vendor_research_node in vendor_research_nodes:
+            edges.append({
+                "from_node": vendor_research_node["node_id"],
+                "to_node": aggregation_node_id,
+                "edge_type": "data_flow"
+            })
+        
+        return {
+            "nodes": nodes,
+            "edges": edges,
+            "execution_strategy": "parallel_by_pain_point",
+            "total_nodes": len(nodes),
+            "parallel_chains": len(validated_pain_points),
+            "stages": ["search_links", "extract_content", "triage_content", "identify_vendors", "vendor_research", "aggregation"],
+            "manifest_keys": {
+                "search_links": [node["output_manifest_key"] for node in search_link_nodes],
+                "extract_content": [node["output_manifest_key"] for node in extract_content_nodes],
+                "triage_content": [node["output_manifest_key"] for node in triage_content_nodes],
+                "identify_vendors": [node["output_manifest_key"] for node in identify_vendors_nodes],
+                "vendor_research": [node["output_manifest_key"] for node in vendor_research_nodes],
+                "final_output": aggregation_node["output_manifest_key"]
+            },
+            "manifest_handling": {
+                "use_unique_keys": True,
+                "merge_strategy": "by_output_key",
+                "prevent_overwrites": True,
+                "parallel_node_outputs": {
+                    "search_links": "merge_by_pain_point",
+                    "extract_content": "merge_by_pain_point",
+                    "triage_content": "merge_by_pain_point",
+                    "identify_vendors": "merge_by_pain_point",
+                    "vendor_research": "merge_by_pain_point"
+                }
+            }
+        }
     
     def _create_fallback_plan(self, input_data: GapFinderInput) -> Dict[str, Any]:
         """Create a fallback plan if LLM generation fails."""
