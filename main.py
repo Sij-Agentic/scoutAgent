@@ -19,6 +19,7 @@ from typing import Dict, Any, List, Optional
 from scout_agent.agents.scout import ScoutAgent
 from scout_agent.agents.screener import ScreenerAgent
 from scout_agent.agents.validator import ValidatorAgent
+from scout_agent.agents.gap_finder import GapFinderAgent
 from scout_agent.agents.base import AgentInput
 from scout_agent.orchestration import AgentOrchestrator, create_orchestrator, AGENT_STAGE_CONFIGS
 from scout_agent.custom_logging.logger import get_logger
@@ -116,6 +117,10 @@ async def run_orchestrated_workflow(
     # Register the ValidatorAgent
     validator_agent = ValidatorAgent(agent_id="validator")
     orchestrator.register_agent("validator", AGENT_STAGE_CONFIGS["validator"], validator_agent)
+
+    # Register the GapFinderAgent
+    gap_finder_agent = GapFinderAgent(agent_id="gap_finder")
+    orchestrator.register_agent("gap_finder", AGENT_STAGE_CONFIGS["gap_finder"], gap_finder_agent)
     
     # Initialize the orchestrator
     await orchestrator.initialize(agent_input)

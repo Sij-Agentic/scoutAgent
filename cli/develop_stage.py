@@ -65,7 +65,11 @@ async def develop_stages(
         agent_module = importlib.import_module(module_name)
         
         # Get the agent class (assuming it follows the naming convention)
-        agent_class_name = f"{agent_id.capitalize()}Agent"
+        # Handle underscore-separated agent IDs properly
+        if '_' in agent_id:
+            agent_class_name = ''.join(word.capitalize() for word in agent_id.split('_')) + 'Agent'
+        else:
+            agent_class_name = f"{agent_id.capitalize()}Agent"
         if hasattr(agent_module, agent_class_name):
             agent_class = getattr(agent_module, agent_class_name)
             agent_instance = agent_class(agent_id=agent_id)
@@ -113,7 +117,11 @@ async def develop_stages(
                 dep_agent_module = importlib.import_module(dep_module_name)
                 
                 # Get the dependency agent class
-                dep_agent_class_name = f"{dep_agent_id.capitalize()}Agent"
+                # Handle underscore-separated agent IDs properly
+                if '_' in dep_agent_id:
+                    dep_agent_class_name = ''.join(word.capitalize() for word in dep_agent_id.split('_')) + 'Agent'
+                else:
+                    dep_agent_class_name = f"{dep_agent_id.capitalize()}Agent"
                 if hasattr(dep_agent_module, dep_agent_class_name):
                     dep_agent_class = getattr(dep_agent_module, dep_agent_class_name)
                     dep_agent_instance = dep_agent_class(agent_id=dep_agent_id)

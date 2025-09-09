@@ -487,8 +487,8 @@ class EnhancedDevelopmentOrchestrator(DevelopmentOrchestrator):
                                 # Store in agent state
                                 setattr(agent.state, f"{prev_stage}_output", prev_data)
                     
-                    # Special direct execution for screener agent
-                    if agent_id == "screener":
+                    # Special direct execution for screener and gap_finder agents
+                    if agent_id == "gap_finder":
                         # Get the method to call
                         method_name = stage
                         if not hasattr(agent, method_name):
@@ -496,22 +496,31 @@ class EnhancedDevelopmentOrchestrator(DevelopmentOrchestrator):
                         
                         method = getattr(agent, method_name)
                         
-                        # For screener think stage
-                        if stage == "think":
-                            logger.info("Direct execution of screener think stage")
+                        # For gap_finder plan stage
+                        if stage == "plan":
+                            logger.info("Direct execution of gap_finder plan stage")
                             start_time = datetime.now()
                             
                             try:
-                                # Create screener input
-                                from scout_agent.agents.screener import ScreenerInput
-                                screener_input = ScreenerInput(
-                                    pain_points=self.agent_input.data or [],
-                                    target_market=self.agent_input.context.get("target_market", "Software Development"),
-                                    top_k=self.agent_input.context.get("top_k", 5)
-                                )
+                                # Get the properly configured GapFinderInput from agent state
+                                gap_finder_input = getattr(agent.state, "gap_finder_input", None)
                                 
-                                # Call the method directly
-                                result = await method(screener_input)
+                                if not gap_finder_input:
+                                    # Fallback: create gap_finder input if not found in state
+                                    from scout_agent.agents.gap_finder import GapFinderInput
+                                    gap_finder_input = GapFinderInput(
+                                        validated_pain_points=self.agent_input.data or [],
+                                        market_context=self.agent_input.context.get("market_context", ""),
+                                        analysis_scope=self.agent_input.context.get("analysis_scope", "comprehensive"),
+                                        include_competitive_analysis=bool(self.agent_input.context.get("include_competitive_analysis", True)),
+                                        include_market_sizing=bool(self.agent_input.context.get("include_market_sizing", True)),
+                                        context=self.agent_input.context,
+                                        metadata=self.agent_input.metadata
+                                    )
+                                    logger.info("Created fallback GapFinderInput")
+                                
+                                # Call the method with proper input and run_id
+                                result = await method(gap_finder_input, run_id=self.run_id)
                                 
                                 # Create success result
                                 end_time = datetime.now()
@@ -528,8 +537,61 @@ class EnhancedDevelopmentOrchestrator(DevelopmentOrchestrator):
                                 # Store result
                                 self._stage_outputs[node_id] = result
                                 
-                                # Store in agent state for act stage
-                                setattr(agent.state, "evaluations", result)
+                                # Store result in manifest with agent-prefixed stage name
+                                if self.manifest_manager:
+                                    stage_id = f"gap_finder_plan"
+                                    self.manifest_manager.store_node_output(stage_id, result)
+                                    self.manifest_manager.update_node_status(stage_id, NodeStatus.COMPLETED)
+                                    logger.info(f"Stored gap_finder plan output to manifest under {stage_id}")
+                                
+                                logger.info(f"Direct execution of {node_id} completed successfully")
+                                return node_result
+                                
+                            except Exception as e:
+                                # Create failure result
+                                end_time = datetime.now()
+                                logger.error(f"Error in direct execution of {node_id}: {str(e)}")
+                                return NodeResult(
+                                    success=False,
+                                    error=str(e),
+                                    start_time=start_time,
+                                    end_time=end_time
+                                )
+                    
+                    elif agent_id == "screener":
+                        # Get the method to call
+                        method_name = stage
+                        if not hasattr(agent, method_name):
+                            return await super()._execute_node(node, inputs)
+                        
+                        method = getattr(agent, method_name)
+                        
+                        # For screener think stage
+                        if stage == "think":
+                            logger.info("Direct execution of screener think stage")
+                            start_time = datetime.now()
+                            
+                            try:
+                                # Create input for screener think
+                                screener_input = self.agent_input
+                                
+                                # Call the method with proper input and run_id
+                                result = await method(screener_input, run_id=self.run_id)
+                                
+                                # Create success result
+                                end_time = datetime.now()
+                                node_result = NodeResult(
+                                    success=True,
+                                    output=result,
+                                    start_time=start_time,
+                                    end_time=end_time
+                                )
+                                
+                                # Update node status
+                                node.update_status(NodeStatus.COMPLETED, node_result)
+                                
+                                # Store result
+                                self._stage_outputs[node_id] = result
                                 
                                 logger.info(f"Direct execution of {node_id} completed successfully")
                                 return node_result
@@ -551,30 +613,11 @@ class EnhancedDevelopmentOrchestrator(DevelopmentOrchestrator):
                             start_time = datetime.now()
                             
                             try:
-                                # Create screener input
-                                from scout_agent.agents.screener import ScreenerInput
-                                screener_input = ScreenerInput(
-                                    pain_points=self.agent_input.data or [],
-                                    target_market=self.agent_input.context.get("target_market", "Software Development"),
-                                    top_k=self.agent_input.context.get("top_k", 5)
-                                )
+                                # Create input for screener act
+                                screener_input = self.agent_input
                                 
-                                # Get evaluations from agent state
-                                evaluations = getattr(agent.state, "evaluations", None)
-                                
-                                if not evaluations:
-                                    # Try to get from stage outputs
-                                    evaluations = self._stage_outputs.get("screener_think")
-                                
-                                if not evaluations:
-                                    logger.warning("No evaluations found for act stage")
-                                    evaluations = {
-                                        "evaluations": [],
-                                        "evaluation_summary": "No evaluations available"
-                                    }
-                                
-                                # Call the method directly
-                                result = await method(screener_input, evaluations)
+                                # Call the method with proper input and run_id
+                                result = await method(screener_input, run_id=self.run_id)
                                 
                                 # Create success result
                                 end_time = datetime.now()
@@ -604,9 +647,9 @@ class EnhancedDevelopmentOrchestrator(DevelopmentOrchestrator):
                                     start_time=start_time,
                                     end_time=end_time
                                 )
-        
-        # Execute normally
-        return await super()._execute_node(node, inputs)
+                
+                # If no special handling, use parent implementation
+                return await super()._execute_node(node, inputs)
     
     def _setup_agent_input(self, agent: BaseAgent, stage: str) -> None:
         """
@@ -633,6 +676,25 @@ class EnhancedDevelopmentOrchestrator(DevelopmentOrchestrator):
             setattr(agent.state, "screener_input", screener_input)
             
             logger.info(f"Set up screener input with {len(screener_input.pain_points)} pain points")
+        
+        elif agent_id == "gap_finder":
+            from scout_agent.agents.gap_finder import GapFinderInput
+            
+            # Create gap_finder input
+            gap_finder_input = GapFinderInput(
+                validated_pain_points=self.agent_input.data or [],
+                market_context=self.agent_input.context.get("market_context", ""),
+                analysis_scope=self.agent_input.context.get("analysis_scope", "comprehensive"),
+                include_competitive_analysis=bool(self.agent_input.context.get("include_competitive_analysis", True)),
+                include_market_sizing=bool(self.agent_input.context.get("include_market_sizing", True)),
+                context=self.agent_input.context,
+                metadata=self.agent_input.metadata
+            )
+            
+            # Store in agent state
+            setattr(agent.state, "gap_finder_input", gap_finder_input)
+            
+            logger.info(f"Set up gap_finder input with {len(gap_finder_input.validated_pain_points)} validated pain points")
         
         # Add other agent types as needed
     
