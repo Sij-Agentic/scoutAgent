@@ -12,8 +12,8 @@ from datetime import datetime
 from dataclasses import dataclass, asdict
 
 from .base import BaseAgent, AgentInput, AgentOutput, AgentState
-from llm.utils import LLMAgentMixin
-from config import get_config
+from scout_agent.llm.utils import LLMAgentMixin
+from scout_agent.config import get_config
 
 
 @dataclass
@@ -143,9 +143,13 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                 error=str(e),
             )
     
-    async def plan(self, input_data: GapFinderInput) -> Dict[str, Any]:
+    async def plan(self, input_data: GapFinderInput, run_id: Optional[str] = None) -> Dict[str, Any]:
         """Plan the market gap analysis process."""
         self.logger.info(f"Planning market gap analysis for {len(input_data.validated_pain_points)} pain points")
+        
+        # Store run_id in state if provided
+        if run_id:
+            self.state.run_id = run_id
         
         # Step 1: Retrieve data from validator act stage if not provided directly
         validated_pain_points = input_data.validated_pain_points
@@ -157,8 +161,8 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                 # Determine run directory
                 from pathlib import Path
                 project_root = Path(__file__).resolve().parents[2]
-                run_id = getattr(self.state, "run_id", "latest")
-                run_dir = project_root / "data" / "runs" / run_id
+                current_run_id = run_id or getattr(self.state, "run_id", "latest")
+                run_dir = project_root / "data" / "runs" / current_run_id
                 manifest_path = run_dir / "run_manifest.json"
                 
                 # Try to load from manifest
