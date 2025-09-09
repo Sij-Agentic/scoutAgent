@@ -284,44 +284,124 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
         dag_metadata = self._generate_dag_metadata(validated_pain_points, discovery_queries)
         plan["dag_metadata"] = dag_metadata
         
+        # Step 5: Add execution strategy based on analysis scope and requirements
+        execution_strategy = self._generate_execution_strategy(input_data, len(validated_pain_points))
+        plan["execution_strategy"] = execution_strategy
+        
         self.state.plan = plan
         return plan
         
     def _extract_json(self, text: str) -> Dict[str, Any]:
-        """Extract JSON from text."""
+        """Extract JSON from text with enhanced error handling and fallback strategies."""
+        if not text or not text.strip():
+            self.logger.warning("Empty or whitespace-only text provided to _extract_json")
+            return {}
+            
+        import re
+        import json
+        
+        # Log the input for debugging
+        self.logger.debug(f"Extracting JSON from text (first 200 chars): {text[:200]}...")
+        
+        # Strategy 1: Direct JSON parsing
         try:
-            # Find JSON-like content between curly braces
-            import re
-            import json
-            
-            # First try direct JSON parsing
-            try:
-                return json.loads(text)
-            except json.JSONDecodeError:
-                pass
-            
-            # Look for content between outermost curly braces
-            match = re.search(r'\{[\s\S]*?\}(?=\s*$|\n)', text) or re.search(r'\{[\s\S]*\}', text)
-            if match:
-                json_str = match.group(0)
+            result = json.loads(text.strip())
+            self.logger.debug("Successfully parsed JSON directly")
+            return result
+        except json.JSONDecodeError as e:
+            self.logger.debug(f"Direct JSON parsing failed: {e}")
+        
+        # Strategy 2: Extract from markdown code blocks
+        code_block_patterns = [
+            r'```(?:json)?\s*([\s\S]*?)\s*```',  # Standard markdown
+            r'`([^`]+)`',  # Inline code
+        ]
+        
+        for pattern in code_block_patterns:
+            matches = re.findall(pattern, text, re.IGNORECASE)
+            for match in matches:
                 try:
-                    return json.loads(json_str)
+                    result = json.loads(match.strip())
+                    self.logger.debug(f"Successfully parsed JSON from code block: {pattern}")
+                    return result
                 except json.JSONDecodeError:
-                    # Try to clean up the JSON string
-                    cleaned_json = re.sub(r'\s+', ' ', json_str)
-                    cleaned_json = re.sub(r',\s*\}', '}', cleaned_json)
-                    return json.loads(cleaned_json)
-            
-            # Look for markdown code blocks with JSON
-            code_block_match = re.search(r'```(?:json)?\s*([\s\S]*?)\s*```', text)
-            if code_block_match:
-                json_str = code_block_match.group(1)
-                return json.loads(json_str)
-                
-            return {}
+                    continue
+        
+        # Strategy 3: Find JSON objects between curly braces
+        json_patterns = [
+            r'\{[\s\S]*\}',  # Greedy match for complete JSON
+            r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}',  # Nested braces
+        ]
+        
+        for pattern in json_patterns:
+            matches = re.findall(pattern, text)
+            for match in matches:
+                try:
+                    # Clean up common formatting issues
+                    cleaned = self._clean_json_string(match)
+                    result = json.loads(cleaned)
+                    self.logger.debug(f"Successfully parsed JSON after cleaning: {pattern}")
+                    return result
+                except json.JSONDecodeError:
+                    continue
+        
+        # Strategy 4: Try to extract key-value pairs and reconstruct JSON
+        try:
+            reconstructed = self._reconstruct_json_from_text(text)
+            if reconstructed:
+                self.logger.debug("Successfully reconstructed JSON from text patterns")
+                return reconstructed
         except Exception as e:
-            self.logger.error(f"Error extracting JSON: {str(e)}")
-            return {}
+            self.logger.debug(f"JSON reconstruction failed: {e}")
+        
+        self.logger.warning(f"Failed to extract valid JSON from text. Text preview: {text[:100]}...")
+        return {}
+    
+    def _clean_json_string(self, json_str: str) -> str:
+        """Clean common JSON formatting issues."""
+        import re
+        
+        # Remove extra whitespace
+        cleaned = re.sub(r'\s+', ' ', json_str.strip())
+        
+        # Fix trailing commas
+        cleaned = re.sub(r',\s*([}\]])', r'\1', cleaned)
+        
+        # Fix missing quotes around keys (common LLM mistake)
+        cleaned = re.sub(r'([{,]\s*)([a-zA-Z_][a-zA-Z0-9_]*)\s*:', r'\1"\2":', cleaned)
+        
+        # Fix single quotes to double quotes
+        cleaned = re.sub(r"'([^']*)'\s*:", r'"\1":', cleaned)
+        cleaned = re.sub(r":\s*'([^']*)'", r': "\1"', cleaned)
+        
+        return cleaned
+    
+    def _reconstruct_json_from_text(self, text: str) -> Dict[str, Any]:
+        """Attempt to reconstruct JSON from text patterns."""
+        import re
+        
+        result = {}
+        
+        # Look for key-value patterns
+        patterns = [
+            r'"([^"]+)"\s*:\s*"([^"]+)"',  # "key": "value"
+            r'"([^"]+)"\s*:\s*([\d.]+)',    # "key": number
+            r'"([^"]+)"\s*:\s*(true|false)', # "key": boolean
+            r'([a-zA-Z_][a-zA-Z0-9_]*)\s*:\s*"([^"]+)"',  # key: "value"
+        ]
+        
+        for pattern in patterns:
+            matches = re.findall(pattern, text, re.IGNORECASE)
+            for key, value in matches:
+                # Try to convert value to appropriate type
+                if value.lower() in ('true', 'false'):
+                    result[key] = value.lower() == 'true'
+                elif value.replace('.', '').replace('-', '').isdigit():
+                    result[key] = float(value) if '.' in value else int(value)
+                else:
+                    result[key] = value
+        
+        return result if result else None
     
     def _generate_dag_metadata(self, validated_pain_points: List[Dict[str, Any]], discovery_queries: Dict[str, Any]) -> Dict[str, Any]:
         """Generate DAG metadata for gap finder stages with proper dependencies and parallelization."""
@@ -628,7 +708,7 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
     
     def _create_fallback_plan(self, input_data: GapFinderInput) -> Dict[str, Any]:
         """Create a fallback plan if LLM generation fails."""
-        return {
+        fallback_plan = {
             "operation": "market_gap_analysis",
             "phases": [
                 "pain_point_clustering",
@@ -651,6 +731,82 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                 f"Include competitive analysis: {input_data.include_competitive_analysis}",
                 f"Include market sizing: {input_data.include_market_sizing}"
             ]
+        }
+        
+        # Add execution strategy to fallback plan
+        fallback_plan["execution_strategy"] = self._generate_execution_strategy(input_data, len(input_data.validated_pain_points))
+        
+        return fallback_plan
+    
+    def _generate_execution_strategy(self, input_data: GapFinderInput, pain_point_count: int) -> Dict[str, Any]:
+        """Generate execution strategy based on input parameters and pain point count."""
+        # Determine parallelization strategy based on pain point count
+        if pain_point_count <= 2:
+            parallelization = "sequential"
+            max_concurrent = 1
+        elif pain_point_count <= 5:
+            parallelization = "limited_parallel"
+            max_concurrent = 2
+        else:
+            parallelization = "full_parallel"
+            max_concurrent = min(pain_point_count, 4)  # Cap at 4 for resource management
+        
+        # Determine timeout strategy based on analysis scope
+        timeout_multipliers = {
+            "quick": 0.5,
+            "focused": 1.0,
+            "comprehensive": 2.0
+        }
+        base_timeout = 300  # 5 minutes base
+        timeout_multiplier = timeout_multipliers.get(input_data.analysis_scope, 1.0)
+        node_timeout = int(base_timeout * timeout_multiplier)
+        
+        # Determine retry strategy
+        retry_strategy = {
+            "max_retries": 2 if input_data.analysis_scope == "comprehensive" else 1,
+            "retry_delay": 30,  # seconds
+            "exponential_backoff": True
+        }
+        
+        # Resource allocation based on requirements
+        resource_allocation = {
+            "memory_limit": "2GB",
+            "cpu_limit": "2 cores",
+            "disk_space": "1GB"
+        }
+        
+        # Adjust for competitive analysis and market sizing
+        if input_data.include_competitive_analysis:
+            resource_allocation["memory_limit"] = "3GB"
+            node_timeout = int(node_timeout * 1.5)
+        
+        if input_data.include_market_sizing:
+            resource_allocation["cpu_limit"] = "3 cores"
+            node_timeout = int(node_timeout * 1.3)
+        
+        return {
+            "execution_mode": "dag_based",
+            "parallelization": parallelization,
+            "max_concurrent_nodes": max_concurrent,
+            "timeout_per_node": node_timeout,
+            "total_timeout": node_timeout * pain_point_count * 2,  # Conservative estimate
+            "retry_strategy": retry_strategy,
+            "resource_allocation": resource_allocation,
+            "error_handling": {
+                "continue_on_error": True,
+                "partial_results_acceptable": True,
+                "fallback_to_simplified": input_data.analysis_scope != "quick"
+            },
+            "optimization": {
+                "cache_intermediate_results": True,
+                "reuse_similar_queries": True,
+                "batch_similar_operations": parallelization != "sequential"
+            },
+            "monitoring": {
+                "progress_reporting": True,
+                "performance_metrics": True,
+                "resource_usage_tracking": True
+            }
         }
     
     async def think(self, input_data: GapFinderInput) -> Dict[str, Any]:
