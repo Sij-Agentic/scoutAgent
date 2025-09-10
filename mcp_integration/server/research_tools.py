@@ -7,7 +7,7 @@ from mcp.types import TextContent
 from scout_agent.mcp_integration.server.base import MCPServer
 from scout_agent.sources.validation_data_manager import ValidationDataManager
 from scout_agent.sources.hn_client import HNClient
-from scout_agent.sources.serp_client import SerpApiClient
+from scout_agent.sources.serper_client import SerperApiClient
 from scout_agent.sources.twitter_client import TwitterClient
 from scout_agent.sources.review_client import ReviewSitesClient
 from scout_agent.sources.reddit_client import RedditClient
@@ -21,9 +21,7 @@ mcp = server._mcp
 # Initialize data sources
 validation_manager = ValidationDataManager()
 
-# Main block to make the file runnable as a module
-if __name__ == "__main__":
-    mcp.run(transport="sse")
+# Main block to make the file runnable as a module - removed mcp.run() to avoid port conflict
 
 
 @server.tool()
@@ -218,7 +216,7 @@ async def google_research(
         Dictionary with web search results, news, trends, and autocomplete suggestions
     """
     if validation_manager.serp_client is None:
-        validation_manager.serp_client = SerpApiClient()
+        validation_manager.serp_client = SerperApiClient()
     
     result = {}
     

@@ -12,7 +12,7 @@ from scout_agent.config import get_config
 from scout_agent.custom_logging import get_logger
 from scout_agent.sources.reddit_client import RedditClient
 from scout_agent.sources.hn_client import HNClient
-from scout_agent.sources.serp_client import SerpApiClient
+from scout_agent.sources.serper_client import SerperApiClient
 from scout_agent.sources.twitter_client import TwitterClient
 from scout_agent.sources.review_client import ReviewSitesClient
 
@@ -42,7 +42,7 @@ class ValidationDataManager:
             self.hn_client = None
         
         try:
-            self.serp_client = SerpApiClient()
+            self.serp_client = SerperApiClient()
             logger.info("SERP API client initialized")
         except Exception as e:
             logger.warning(f"Failed to initialize SERP API client: {e}")

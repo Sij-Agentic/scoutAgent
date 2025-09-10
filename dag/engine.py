@@ -206,7 +206,19 @@ class DAGEngine:
         for predecessor in self.graph.predecessors(node_id):
             pred_node = self.graph.nodes[predecessor]["node"]
             if pred_node.result and pred_node.result.success:
+                # Use actual node ID as primary key
                 inputs[predecessor] = pred_node.outputs
+                
+                # Also create mapping for expected template keys
+                # Check if node has output_manifest_key for template resolution
+                output_manifest_key = getattr(pred_node, 'output_manifest_key', None)
+                if output_manifest_key:
+                    inputs[output_manifest_key] = pred_node.outputs
+                
+                # Also try node name as fallback for template resolution
+                node_name = getattr(pred_node, 'name', None)
+                if node_name and node_name != predecessor:
+                    inputs[f"{node_name}_output"] = pred_node.outputs
         
         return inputs
     

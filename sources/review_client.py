@@ -7,7 +7,7 @@ from typing import Any, Dict, List, Optional, Union
 from scout_agent.config import get_config
 from scout_agent.custom_logging import get_logger
 from scout_agent.data_cache.file_cache import FileCache
-from scout_agent.sources.serp_client import SerpApiClient
+from scout_agent.sources.serper_client import SerperApiClient
 
 logger = get_logger("sources.review_client")
 
@@ -33,7 +33,7 @@ class ReviewSitesClient:
     
     def __init__(self) -> None:
         self.cfg = get_config()
-        self.serp_client = SerpApiClient()
+        self.serp_client = SerperApiClient()
         self.cache = FileCache(base_subdir="reviews_cache")
     
     @staticmethod

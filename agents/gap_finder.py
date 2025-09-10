@@ -14,6 +14,8 @@ from dataclasses import dataclass, asdict
 from .base import BaseAgent, AgentInput, AgentOutput, AgentState
 from scout_agent.llm.utils import LLMAgentMixin
 from scout_agent.config import get_config
+from scout_agent.services.execution.code_executor import AgentCodeExecutor
+from scout_agent.memory.manifest_manager import ManifestManager
 
 
 @dataclass
@@ -886,6 +888,333 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
             recommendations=recommendations,
             risk_assessment=risk_assessment
         )
+
+    async def collect(self, plan: Dict[str, Any], run_id: Optional[str] = None) -> Dict[str, Any]:
+        """Execute the collect stage - build and execute DAG nodes from plan stage."""
+        self.logger.info("Starting gap_finder collect stage...")
+        
+        try:
+            # Execute DAG tool nodes using the plan from the plan stage
+            await self._execute_plan_non_agent_nodes(plan, run_id)
+            
+            # Aggregate and process final results
+            final_output = await self._aggregate_collect_results(plan, run_id)
+            
+            # Store final output to manifest
+            await self._write_stage_output("gapfinder_collect", final_output, run_id)
+            
+            self.logger.info("Gap finder collect stage completed successfully")
+            return final_output
+            
+        except Exception as e:
+            self.logger.error(f"Error in gap_finder collect stage: {str(e)}")
+            raise
+    
+    async def _execute_plan_non_agent_nodes(self, plan: Dict[str, Any], run_id: Optional[str] = None):
+        """Execute tool nodes from the DAG plan by directly calling MCP tools."""
+        self.logger.info("Executing DAG tool nodes via direct MCP calls...")
+        
+        # Import MCP client for direct tool calls
+        from scout_agent.mcp_integration.client.multi import MultiMCPClient
+        from scout_agent.mcp_integration.config import load_server_configs
+        
+        # Get DAG nodes from plan
+        self.logger.info(f"Plan structure keys: {list(plan.keys())}")
+        
+        # Try different possible locations for DAG nodes
+        dag_nodes = []
+        if "stages" in plan and "scout_plan" in plan["stages"]:
+            dag_nodes = plan.get("stages", {}).get("scout_plan", {}).get("data", {}).get("dag", {}).get("nodes", [])
+            self.logger.info(f"Found {len(dag_nodes)} nodes in stages.scout_plan.data.dag.nodes")
+        elif "dag_metadata" in plan:
+            dag_nodes = plan.get("dag_metadata", {}).get("nodes", [])
+            self.logger.info(f"Found {len(dag_nodes)} nodes in dag_metadata.nodes")
+        elif "dag" in plan:
+            dag_nodes = plan.get("dag", {}).get("nodes", [])
+            self.logger.info(f"Found {len(dag_nodes)} nodes in dag.nodes")
+        
+        # Filter tool nodes
+        tool_nodes = [node for node in dag_nodes if "tool_name" in node]
+        self.logger.info(f"Found {len(tool_nodes)} tool nodes to execute")
+        
+        if not tool_nodes:
+            self.logger.info("No tool nodes found to execute")
+            return
+        
+        # Initialize MCP client
+        try:
+            configs = load_server_configs()
+            multi_client = MultiMCPClient(configs)
+            await multi_client.initialize()
+            self.logger.info("MCP client initialized successfully")
+        except Exception as e:
+            self.logger.error(f"Failed to initialize MCP client: {e}")
+            return
+        
+        # Execute each tool node
+        manifest_manager = ManifestManager(run_id or "default")
+        
+        for i, node in enumerate(tool_nodes):
+            try:
+                node_id = node.get("node_id") or f"tool_node_{i}_{node.get('tool_name', 'unknown')}"
+                tool_name = node.get("tool_name")
+                inputs = node.get("inputs", {})
+                
+                self.logger.info(f"Executing tool node: {node_id} with tool: {tool_name}")
+                
+                # Resolve template variables in inputs before calling MCP tool
+                resolved_inputs = self._resolve_template_variables(inputs, manifest_manager)
+                
+                # Make direct MCP tool call
+                result = await multi_client.call_tool(tool_name, resolved_inputs)
+                
+                # Process and store result
+                if result:
+                    # Extract content from MCP response
+                    if hasattr(result, 'content') and result.content:
+                        content_item = result.content[0] if isinstance(result.content, list) else result.content
+                        if hasattr(content_item, 'text'):
+                            try:
+                                # Try to parse as JSON
+                                result_data = json.loads(content_item.text)
+                            except json.JSONDecodeError:
+                                # If not JSON, store as text
+                                result_data = {"output": content_item.text}
+                        else:
+                            result_data = {"raw_result": str(content_item)}
+                    else:
+                        result_data = {"raw_result": str(result)}
+                    
+                    # Store to manifest
+                    output_key = node.get("output_manifest_key", f"{node_id}_output")
+                    manifest_manager.store_node_output(output_key, result_data)
+                    
+                    self.logger.info(f"Successfully executed and stored results for node: {node_id}")
+                else:
+                    self.logger.error(f"Tool node {node_id} returned no result")
+                    
+            except Exception as e:
+                self.logger.error(f"Error executing tool node {node.get('node_id', 'unknown')}: {str(e)}")
+                # Continue with other nodes even if one fails
+                continue
+        
+        # Cleanup MCP client
+        try:
+            await multi_client.shutdown()
+            self.logger.info("MCP client shutdown successfully")
+        except Exception as e:
+            self.logger.error(f"Error shutting down MCP client: {e}")
+    
+    async def _aggregate_collect_results(self, plan: Dict[str, Any], run_id: Optional[str] = None) -> Dict[str, Any]:
+        """Aggregate results from executed tool nodes and generate final collect output."""
+        self.logger.info("Aggregating collect stage results...")
+        
+        manifest_manager = ManifestManager(run_id or "default")
+        
+        # Get all tool node results from manifest
+        dag_nodes = plan.get("dag_metadata", {}).get("nodes", [])
+        tool_nodes = [node for node in dag_nodes if node.get("node_type") == "TOOL"]
+        
+        aggregated_data = {
+            "market_research_data": {},
+            "competitive_analysis": {},
+            "market_sizing_data": {},
+            "vendor_analysis": {},
+            "execution_metadata": {
+                "total_nodes_executed": len(tool_nodes),
+                "execution_timestamp": datetime.now().isoformat(),
+                "run_id": run_id or "default"
+            }
+        }
+        
+        # Collect results from each tool node
+        for node in tool_nodes:
+            try:
+                node_id = node.get("node_id")
+                # Use the output_manifest_key to get the actual stored result
+                output_key = node.get("output_manifest_key", f"{node_id}_output")
+                node_result = manifest_manager.get_node_output(output_key)
+                
+                if node_result:
+                    # Categorize results based on node type/purpose
+                    if "market_research" in node_id.lower():
+                        aggregated_data["market_research_data"][node_id] = node_result
+                    elif "competitive" in node_id.lower():
+                        aggregated_data["competitive_analysis"][node_id] = node_result
+                    elif "sizing" in node_id.lower() or "market_size" in node_id.lower():
+                        aggregated_data["market_sizing_data"][node_id] = node_result
+                    elif "vendor" in node_id.lower():
+                        aggregated_data["vendor_analysis"][node_id] = node_result
+                    else:
+                        # Generic tool results
+                        if "tool_results" not in aggregated_data:
+                            aggregated_data["tool_results"] = {}
+                        aggregated_data["tool_results"][node_id] = node_result
+                    
+                    self.logger.info(f"Retrieved results for node: {node_id} using key: {output_key}")
+                else:
+                    self.logger.warning(f"No results found for node: {node_id} using key: {output_key}")
+                        
+            except Exception as e:
+                self.logger.error(f"Error retrieving results for node {node.get('node_id', 'unknown')}: {str(e)}")
+                continue
+        
+        # Generate summary insights
+        aggregated_data["summary"] = self._generate_collect_summary(aggregated_data)
+        
+        return aggregated_data
+    
+    def _generate_collect_summary(self, aggregated_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Generate summary insights from collected data."""
+        return {
+            "data_sources_collected": len([k for k in aggregated_data.keys() if k != "execution_metadata" and k != "summary"]),
+            "market_research_sources": len(aggregated_data.get("market_research_data", {})),
+            "competitive_analysis_sources": len(aggregated_data.get("competitive_analysis", {})),
+            "market_sizing_sources": len(aggregated_data.get("market_sizing_data", {})),
+            "vendor_analysis_sources": len(aggregated_data.get("vendor_analysis", {})),
+            "collection_status": "completed",
+            "next_stage_ready": True
+        }
+    
+    def _resolve_template_variables(self, inputs: Dict[str, Any], manifest_manager: ManifestManager) -> Dict[str, Any]:
+        """Resolve ${...} template variables in tool inputs using manifest data."""
+        import re
+        
+        resolved_inputs = {}
+        
+        for key, value in inputs.items():
+            if isinstance(value, str) and "${" in value:
+                # Find all template variables in the format ${variable_name}
+                template_pattern = r'\$\{([^}]+)\}'
+                matches = re.findall(template_pattern, value)
+                
+                # Check if the entire value is a single template variable
+                if len(matches) == 1 and value.strip() == f"${{{matches[0]}}}":
+                    # Direct replacement - preserve original data type
+                    match = matches[0]
+                    try:
+                        # Parse the template variable (e.g., "triage_content_pp1_output.contents")
+                        if '.' in match:
+                            node_key, field_path = match.split('.', 1)
+                        else:
+                            node_key, field_path = match, None
+                        
+                        # Get the node output from manifest
+                        node_output = manifest_manager.get_node_output(node_key)
+                        
+                        if node_output:
+                            # Navigate to the specific field if specified
+                            if field_path:
+                                field_value = self._get_nested_field(node_output, field_path)
+                            else:
+                                field_value = node_output
+                            
+                            if field_value is not None:
+                                # Direct assignment preserves data type (list, dict, etc.)
+                                resolved_inputs[key] = field_value
+                                self.logger.info(f"Resolved template variable ${{{match}}} to {type(field_value).__name__} with {len(field_value) if isinstance(field_value, (list, dict)) else 'N/A'} items")
+                            else:
+                                self.logger.warning(f"Template variable ${{{match}}} resolved to None")
+                                resolved_inputs[key] = value  # Keep original if resolution fails
+                        else:
+                            self.logger.warning(f"No data found for template variable ${{{match}}}")
+                            resolved_inputs[key] = value  # Keep original if no data found
+                            
+                    except Exception as e:
+                        self.logger.error(f"Error resolving template variable ${{{match}}}: {str(e)}")
+                        resolved_inputs[key] = value  # Keep original on error
+                else:
+                    # String interpolation - convert to string
+                    resolved_value = value
+                    for match in matches:
+                        try:
+                            # Parse the template variable
+                            if '.' in match:
+                                node_key, field_path = match.split('.', 1)
+                            else:
+                                node_key, field_path = match, None
+                            
+                            # Get the node output from manifest
+                            node_output = manifest_manager.get_node_output(node_key)
+                            
+                            if node_output:
+                                # Navigate to the specific field if specified
+                                if field_path:
+                                    field_value = self._get_nested_field(node_output, field_path)
+                                else:
+                                    field_value = node_output
+                                
+                                # Replace the template variable with string representation
+                                template_var = f"${{{match}}}"
+                                if field_value is not None:
+                                    resolved_value = resolved_value.replace(template_var, str(field_value))
+                                    self.logger.info(f"Interpolated template variable {template_var} as string")
+                                else:
+                                    self.logger.warning(f"Template variable {template_var} resolved to None")
+                            else:
+                                self.logger.warning(f"No data found for template variable {template_var}")
+                                
+                        except Exception as e:
+                            self.logger.error(f"Error resolving template variable ${{{match}}}: {str(e)}")
+                            continue
+                    
+                    resolved_inputs[key] = resolved_value
+            else:
+                # Non-template values pass through unchanged
+                resolved_inputs[key] = value
+        
+        return resolved_inputs
+    
+    def _get_nested_field(self, data: Dict[str, Any], field_path: str) -> Any:
+        """Get a nested field from data using dot notation (e.g., 'results[*].link')."""
+        try:
+            # Handle array indexing like 'results[*].link'
+            if '[*]' in field_path:
+                parts = field_path.split('[*]')
+                current = data
+                
+                # Navigate to the array
+                for part in parts[0].split('.') if parts[0] else []:
+                    if part:
+                        current = current[part]
+                
+                # Extract values from array elements
+                if isinstance(current, list):
+                    remaining_path = parts[1].lstrip('.')
+                    if remaining_path:
+                        # Get the field from each array element
+                        values = []
+                        for item in current:
+                            try:
+                                item_value = self._get_nested_field(item, remaining_path)
+                                if item_value is not None:
+                                    values.append(item_value)
+                            except (KeyError, TypeError):
+                                continue
+                        return values
+                    else:
+                        return current
+            else:
+                # Simple dot notation navigation
+                current = data
+                for part in field_path.split('.'):
+                    if part:
+                        current = current[part]
+                return current
+                
+        except (KeyError, TypeError, IndexError) as e:
+            self.logger.warning(f"Could not resolve field path '{field_path}': {str(e)}")
+            return None
+    
+    async def _write_stage_output(self, stage_name: str, output_data: Dict[str, Any], run_id: Optional[str] = None):
+        """Write stage output to manifest storage."""
+        try:
+            manifest_manager = ManifestManager(run_id or "default")
+            manifest_manager.store_node_output(stage_name, output_data)
+            self.logger.info(f"Successfully stored {stage_name} output to manifest")
+        except Exception as e:
+            self.logger.error(f"Error storing {stage_name} output: {str(e)}")
+            raise
 
     async def _analyze_market_context(self, market_context: str, *args, **kwargs) -> Dict[str, Any]:
         """Analyze the overall market context and trends."""
