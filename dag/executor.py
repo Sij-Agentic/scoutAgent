@@ -14,6 +14,7 @@ from .node import DAGNode, NodeStatus, NodeResult, NodeType
 from ..agents.base import AgentRegistry, get_agent_class
 from ..custom_logging.logger import get_logger
 from ..agents.base import AgentInput
+from ..utils.template_resolver import TemplateResolver
 
 
 class NodeExecutor:
@@ -22,6 +23,7 @@ class NodeExecutor:
     def __init__(self):
         self.logger = get_logger("NodeExecutor")
         self.registry = AgentRegistry()
+        self.template_resolver = TemplateResolver()
     
     async def execute_node(self, node: DAGNode, inputs: Dict[str, Any]) -> NodeResult:
         """Execute a single DAG node based on its type."""
@@ -30,14 +32,17 @@ class NodeExecutor:
         try:
             self.logger.info(f"Executing {node.node_type.value} node: {node.name}")
             
+            # Resolve template variables in node inputs before execution
+            resolved_node_inputs = self._resolve_node_inputs(node, inputs)
+            
             if node.node_type == NodeType.AGENT:
-                result = await self._execute_agent_node(node, inputs)
+                result = await self._execute_agent_node(node, inputs, resolved_node_inputs)
             elif node.node_type == NodeType.FUNCTION:
-                result = await self._execute_function_node(node, inputs)
+                result = await self._execute_function_node(node, inputs, resolved_node_inputs)
             elif node.node_type == NodeType.CONDITIONAL:
-                result = await self._execute_conditional_node(node, inputs)
+                result = await self._execute_conditional_node(node, inputs, resolved_node_inputs)
             elif node.node_type == NodeType.LOOP:
-                result = await self._execute_loop_node(node, inputs)
+                result = await self._execute_loop_node(node, inputs, resolved_node_inputs)
             elif node.node_type == NodeType.ROOT:
                 result = await self._execute_root_node(node, inputs)
             else:
@@ -72,7 +77,24 @@ class NodeExecutor:
                 metadata={"traceback": traceback.format_exc()}
             )
     
-    async def _execute_agent_node(self, node: DAGNode, inputs: Dict[str, Any]) -> Any:
+    def _resolve_node_inputs(self, node: DAGNode, dependency_inputs: Dict[str, Any]) -> Dict[str, Any]:
+        """Resolve template variables in node inputs using dependency outputs."""
+        try:
+            # Create context for template resolution from dependency inputs
+            context = {}
+            for dep_id, dep_output in dependency_inputs.items():
+                context[dep_id] = dep_output
+            
+            # Resolve template variables in node inputs
+            resolved_inputs = self.template_resolver.resolve_template_variables(node.inputs, context)
+            self.logger.debug(f"Resolved inputs for node {node.name}: {resolved_inputs}")
+            return resolved_inputs
+        except Exception as e:
+            self.logger.warning(f"Failed to resolve templates for node {node.name}: {e}")
+            # Return original inputs if template resolution fails
+            return node.inputs
+    
+    async def _execute_agent_node(self, node: DAGNode, inputs: Dict[str, Any], resolved_inputs: Dict[str, Any] = None) -> Any:
         """Execute an agent-based node."""
         if not node.agent_name:
             raise ValueError("Agent node missing agent_name")
@@ -84,8 +106,9 @@ class NodeExecutor:
         # Create agent instance
         agent = agent_class()
         
-        # Prepare agent inputs
-        prepared = self._prepare_agent_inputs(inputs, node.inputs)
+        # Prepare agent inputs using resolved inputs
+        node_inputs = resolved_inputs if resolved_inputs is not None else node.inputs
+        prepared = self._prepare_agent_inputs(inputs, node_inputs)
         # Wrap into standard AgentInput expected by BaseAgent.execute
         agent_input = AgentInput(
             data=prepared,
@@ -106,7 +129,7 @@ class NodeExecutor:
             timeout=node.config.timeout_seconds,
         )
     
-    async def _execute_function_node(self, node: DAGNode, inputs: Dict[str, Any]) -> Any:
+    async def _execute_function_node(self, node: DAGNode, inputs: Dict[str, Any], resolved_inputs: Dict[str, Any] = None) -> Any:
         """Execute a custom function node."""
         if not node.function:
             raise ValueError("Function node missing function name")
@@ -116,8 +139,9 @@ class NodeExecutor:
         if not func:
             raise ValueError(f"Unknown function: {node.function}")
         
-        # Prepare function inputs
-        func_inputs = self._prepare_function_inputs(inputs, node.inputs)
+        # Prepare function inputs using resolved inputs
+        node_inputs = resolved_inputs if resolved_inputs is not None else node.inputs
+        func_inputs = self._prepare_function_inputs(inputs, node_inputs)
         
         self.logger.info(f"Running function: {node.function}")
         
@@ -135,7 +159,7 @@ class NodeExecutor:
                 timeout=node.config.timeout_seconds
             )
     
-    async def _execute_conditional_node(self, node: DAGNode, inputs: Dict[str, Any]) -> Any:
+    async def _execute_conditional_node(self, node: DAGNode, inputs: Dict[str, Any], resolved_inputs: Dict[str, Any] = None) -> Any:
         """Execute a conditional branching node."""
         # For now, implement basic conditional logic
         # This can be extended with more complex branching
@@ -158,7 +182,7 @@ class NodeExecutor:
         
         return {"branch": true_branch if result else false_branch, "condition_result": result}
     
-    async def _execute_loop_node(self, node: DAGNode, inputs: Dict[str, Any]) -> Any:
+    async def _execute_loop_node(self, node: DAGNode, inputs: Dict[str, Any], resolved_inputs: Dict[str, Any] = None) -> Any:
         """Execute a loop node."""
         # Basic loop implementation
         items = node.inputs.get("items", [])

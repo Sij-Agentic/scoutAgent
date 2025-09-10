@@ -557,6 +557,70 @@ class EnhancedDevelopmentOrchestrator(DevelopmentOrchestrator):
                                     start_time=start_time,
                                     end_time=end_time
                                 )
+                        
+                        # For gap_finder collect stage
+                        elif stage == "collect":
+                            logger.info("Direct execution of gap_finder collect stage")
+                            start_time = datetime.now()
+                            
+                            try:
+                                # Get the plan output from previous stage
+                                plan_output = self._stage_outputs.get("gap_finder_plan")
+                                if not plan_output:
+                                    # Try to get from manifest
+                                    plan_output = self.manifest_manager.get_node_output("gap_finder_plan")
+                                
+                                if not plan_output:
+                                    raise ValueError("No plan output found for gap_finder collect stage")
+                                
+                                # FIXED: Execute prerequisite nodes before collect stage
+                                # The collect method expects prerequisite node outputs in the manifest.
+                                # When using --source-run, we need to execute these nodes first.
+                                logger.info("Executing prerequisite nodes before gap_finder collect stage")
+                                
+                                # Execute prerequisite nodes in dependency order
+                                await self._execute_prerequisite_nodes(plan_output)
+                                
+                                logger.info(f"Executing gap_finder collect with plan from source run and new run_id: {self.run_id}")
+                                
+                                # Call the collect method with plan and run_id
+                                result = await method(plan_output, run_id=self.run_id)
+                                
+                                # Create success result
+                                end_time = datetime.now()
+                                node_result = NodeResult(
+                                    success=True,
+                                    output=result,
+                                    start_time=start_time,
+                                    end_time=end_time
+                                )
+                                
+                                # Update node status
+                                node.update_status(NodeStatus.COMPLETED, node_result)
+                                
+                                # Store result
+                                self._stage_outputs[node_id] = result
+                                
+                                # Store result in manifest with agent-prefixed stage name
+                                if self.manifest_manager:
+                                    stage_id = f"gap_finder_collect"
+                                    self.manifest_manager.store_node_output(stage_id, result)
+                                    self.manifest_manager.update_node_status(stage_id, NodeStatus.COMPLETED)
+                                    logger.info(f"Stored gap_finder collect output to manifest under {stage_id}")
+                                
+                                logger.info(f"Direct execution of {node_id} completed successfully")
+                                return node_result
+                                
+                            except Exception as e:
+                                # Create failure result
+                                end_time = datetime.now()
+                                logger.error(f"Error in direct execution of {node_id}: {str(e)}")
+                                return NodeResult(
+                                    success=False,
+                                    error=str(e),
+                                    start_time=start_time,
+                                    end_time=end_time
+                                )
                     
                     elif agent_id == "screener":
                         # Get the method to call
@@ -698,6 +762,23 @@ class EnhancedDevelopmentOrchestrator(DevelopmentOrchestrator):
         
         # Add other agent types as needed
     
+    def _get_external_dependency(self) -> Optional[str]:
+        """
+        Override external dependency for isolated testing.
+        
+        For gap_finder isolated testing, we don't want external dependencies
+        that would block execution.
+        
+        Returns:
+            Node ID of the dependency or None
+        """
+        # For isolated testing, gap_finder should have no external dependencies
+        if self.dev_agent_id == "gap_finder":
+            return None
+            
+        # For other agents, use the parent implementation
+        return super()._get_external_dependency()
+    
     def _get_previous_stage(self, agent_id: str, current_stage: str) -> Optional[str]:
         """
         Get the previous stage for an agent.
@@ -723,6 +804,109 @@ class EnhancedDevelopmentOrchestrator(DevelopmentOrchestrator):
             
         return None
     
+    async def _execute_prerequisite_nodes(self, plan_output: Dict[str, Any]) -> None:
+        """Execute prerequisite nodes in dependency order before collect stage"""
+        logger.info("Starting execution of prerequisite nodes")
+        
+        # Extract DAG from plan output - handle nested structure
+        output_data = plan_output.get("output", plan_output)
+        dag_metadata = output_data.get("dag_metadata", {})
+        
+        if not dag_metadata:
+            logger.warning("No DAG metadata found in plan output")
+            return
+        
+        # Get nodes array from dag_metadata
+        nodes = dag_metadata.get("nodes", [])
+        if not nodes:
+            logger.warning("No nodes found in DAG metadata")
+            return
+        
+        # Define prerequisite node types in dependency order
+        prerequisite_types = ["search_links", "extract_content", "triage_content", "identify_vendors"]
+        
+        # Group nodes by type
+        nodes_by_type = {}
+        for node_data in nodes:
+            tool_name = node_data.get("tool_name", "")
+            if tool_name in prerequisite_types:
+                if tool_name not in nodes_by_type:
+                    nodes_by_type[tool_name] = []
+                nodes_by_type[tool_name].append(node_data)
+        
+        # Execute nodes in dependency order
+        for node_type in prerequisite_types:
+            if node_type not in nodes_by_type:
+                continue
+                
+            logger.info(f"Executing {node_type} nodes")
+            
+            # Execute all nodes of this type in parallel
+            tasks = []
+            for node_data in nodes_by_type[node_type]:
+                node_id = node_data.get("node_id")
+                task = self._execute_prerequisite_node(node_id, node_data)
+                tasks.append(task)
+            
+            if tasks:
+                await asyncio.gather(*tasks)
+                logger.info(f"Completed execution of {len(tasks)} {node_type} nodes")
+    
+    async def _execute_prerequisite_node(self, node_id: str, node_data: Dict[str, Any]) -> None:
+        """Execute a single prerequisite node"""
+        try:
+            logger.info(f"Executing prerequisite node: {node_id}")
+            
+            # Create DAG node from metadata
+            tool_name = node_data.get("tool_name")
+            node_config = NodeConfig(
+                node_id=node_id,
+                node_type=NodeType.TOOL,
+                config={
+                    "tool_name": tool_name,
+                    "tool_config": node_data.get("tool_config", {})
+                }
+            )
+            
+            dag_node = DAGNode(node_config)
+            
+            # Prepare inputs by resolving template variables
+            inputs = node_data.get("inputs", {})
+            resolved_inputs = await self._resolve_template_variables(inputs)
+            
+            # Execute the node
+            result = await self._execute_node(dag_node, resolved_inputs)
+            
+            if result.success:
+                # Store result in manifest
+                if self.manifest_manager:
+                    self.manifest_manager.store_node_output(node_id, result.output)
+                    self.manifest_manager.update_node_status(node_id, NodeStatus.COMPLETED)
+                    logger.info(f"Stored output for prerequisite node: {node_id}")
+            else:
+                logger.error(f"Failed to execute prerequisite node {node_id}: {result.error}")
+                
+        except Exception as e:
+            logger.error(f"Error executing prerequisite node {node_id}: {str(e)}")
+    
+    async def _resolve_template_variables(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
+        """Resolve template variables in node inputs"""
+        resolved = {}
+        
+        for key, value in inputs.items():
+            if isinstance(value, str) and "${" in value:
+                # Try to resolve template variable from manifest
+                try:
+                    resolved_value = self.manifest_manager.resolve_template_variable(value)
+                    resolved[key] = resolved_value
+                except Exception as e:
+                    logger.warning(f"Could not resolve template variable {value}: {str(e)}")
+                    resolved[key] = value
+            else:
+                resolved[key] = value
+        
+        return resolved
+
     def dump_debug_info(self, output_dir: Optional[str] = None) -> None:
         """
         Dump debug information to files.

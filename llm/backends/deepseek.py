@@ -15,6 +15,7 @@ except ImportError:
     AsyncOpenAI = None
 
 from ..base import LLMBackend, LLMRequest, LLMResponse, LLMConfig, LLMBackendError, LLMTimeoutError, LLMRateLimitError
+from ..token_utils import truncate_messages_to_context, validate_request_tokens
 
 
 class DeepSeekBackend(LLMBackend):
@@ -66,6 +67,38 @@ class DeepSeekBackend(LLMBackend):
             # Prepare the request
             messages = self._prepare_messages(request)
             config = self._get_effective_config(request)
+            
+            # Validate and truncate messages if needed to fit context limits
+            model_name = request.extra_params.get("model_name_override", self.config.model_name) if request and request.extra_params else self.config.model_name
+            max_output_tokens = config["max_tokens"]
+            
+            # Check if request fits within context limits
+            validation = validate_request_tokens(
+                messages, 
+                model_name, 
+                max_output_tokens, 
+                request.system_prompt
+            )
+            
+            if validation["needs_truncation"]:
+                self.logger.warning(
+                    f"Streaming request exceeds context limit ({validation['total_tokens']} > {validation['context_limit']}), "
+                    f"truncating messages. Input: {validation['total_input_tokens']} tokens, "
+                    f"Output: {max_output_tokens} tokens"
+                )
+                
+                messages, was_truncated = truncate_messages_to_context(
+                    messages, 
+                    model_name, 
+                    max_output_tokens, 
+                    request.system_prompt
+                )
+                
+                if was_truncated:
+                    self.logger.info(f"Truncated messages for streaming to fit context limit")
+            
+            if not messages:
+                raise LLMBackendError("No messages remaining after context truncation")
             
             # Build DeepSeek request parameters (allow per-request model override)
             model_name = request.extra_params.get("model_name_override", self.config.model_name) if request and request.extra_params else self.config.model_name
@@ -152,6 +185,38 @@ class DeepSeekBackend(LLMBackend):
             # Prepare the request
             messages = self._prepare_messages(request)
             config = self._get_effective_config(request)
+            
+            # Validate and truncate messages if needed to fit context limits
+            model_name = request.extra_params.get("model_name_override", self.config.model_name) if request and request.extra_params else self.config.model_name
+            max_output_tokens = config["max_tokens"]
+            
+            # Check if request fits within context limits
+            validation = validate_request_tokens(
+                messages, 
+                model_name, 
+                max_output_tokens, 
+                request.system_prompt
+            )
+            
+            if validation["needs_truncation"]:
+                self.logger.warning(
+                    f"Streaming request exceeds context limit ({validation['total_tokens']} > {validation['context_limit']}), "
+                    f"truncating messages. Input: {validation['total_input_tokens']} tokens, "
+                    f"Output: {max_output_tokens} tokens"
+                )
+                
+                messages, was_truncated = truncate_messages_to_context(
+                    messages, 
+                    model_name, 
+                    max_output_tokens, 
+                    request.system_prompt
+                )
+                
+                if was_truncated:
+                    self.logger.info(f"Truncated messages for streaming to fit context limit")
+            
+            if not messages:
+                raise LLMBackendError("No messages remaining after context truncation for streaming")
             
             # Build DeepSeek request parameters (allow per-request model override)
             model_name = request.extra_params.get("model_name_override", self.config.model_name) if request and request.extra_params else self.config.model_name

@@ -84,6 +84,7 @@ class DAGNode:
     # Input/output handling
     inputs: Dict[str, Any] = field(default_factory=dict)
     outputs: Dict[str, Any] = field(default_factory=dict)
+    output_manifest_key: Optional[str] = None  # Expected key for template resolution
     
     # Dependencies
     dependencies: List[str] = field(default_factory=list)
@@ -140,6 +141,7 @@ class DAGNode:
             } if self.result else None,
             "inputs": self.inputs,
             "outputs": self.outputs,
+            "output_manifest_key": self.output_manifest_key,
             "dependencies": self.dependencies,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat()
@@ -158,7 +160,8 @@ class DAGNode:
             config=NodeConfig(**data.get("config", {})),
             dependencies=data.get("dependencies", []),
             inputs=data.get("inputs", {}),
-            outputs=data.get("outputs", {})
+            outputs=data.get("outputs", {}),
+            output_manifest_key=data.get("output_manifest_key")
         )
         
         if data.get("result"):

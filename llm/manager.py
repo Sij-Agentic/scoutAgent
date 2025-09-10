@@ -143,8 +143,16 @@ class LLMManager:
         if not target_backend:
             raise LLMError("No LLM backends available")
         
+        # Handle missing backend with fallback
         if target_backend not in self.backends:
-            raise LLMError(f"Backend not available: {target_backend}")
+            # Try to find a healthy fallback backend
+            available_backends = list(self.backends.keys())
+            if available_backends:
+                fallback_backend = available_backends[0]  # Use first available
+                self.logger.warning(f"Backend '{target_backend}' not available, using fallback: {fallback_backend}")
+                target_backend = fallback_backend
+            else:
+                raise LLMError(f"Backend not available: {target_backend}")
         
         # Check backend health
         if not self.health_status[target_backend].is_healthy:
@@ -230,8 +238,16 @@ class LLMManager:
         if not target_backend:
             raise LLMError("No LLM backends available")
         
+        # Handle missing backend with fallback
         if target_backend not in self.backends:
-            raise LLMError(f"Backend not available: {target_backend}")
+            # Try to find a healthy fallback backend
+            available_backends = list(self.backends.keys())
+            if available_backends:
+                fallback_backend = available_backends[0]  # Use first available
+                self.logger.warning(f"Backend '{target_backend}' not available, using fallback: {fallback_backend}")
+                target_backend = fallback_backend
+            else:
+                raise LLMError(f"Backend not available: {target_backend}")
         
         backend = self.backends[target_backend]
         start_time = asyncio.get_event_loop().time()

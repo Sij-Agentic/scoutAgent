@@ -85,6 +85,7 @@ class APIConfig:
     openai_api_key: Optional[str] = None
     anthropic_api_key: Optional[str] = None
     serpapi_key: Optional[str] = None
+    serper_api_key: Optional[str] = None
     bing_api_key: Optional[str] = None
     gemini_api_key: Optional[str] = None
     deepseek_api_key: Optional[str] = None
@@ -324,6 +325,7 @@ class ConfigManager:
             f"{prefix}OPENAI_API_KEY": ["api", "openai_api_key"],
             f"{prefix}ANTHROPIC_API_KEY": ["api", "anthropic_api_key"],
             f"{prefix}SERPAPI_KEY": ["api", "serpapi_key"],
+            f"{prefix}SERPER_API_KEY": ["api", "serper_api_key"],
             f"{prefix}BING_API_KEY": ["api", "bing_api_key"],
             f"{prefix}GEMINI_API_KEY": ["api", "gemini_api_key"],
             f"{prefix}DEEPSEEK_API_KEY": ["api", "deepseek_api_key"],

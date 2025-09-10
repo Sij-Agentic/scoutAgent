@@ -10,14 +10,14 @@ This package contains clients for various data sources used by the validation ag
 
 from scout_agent.sources.reddit_client import RedditClient
 from scout_agent.sources.hn_client import HNClient
-from scout_agent.sources.serp_client import SerpApiClient
+from scout_agent.sources.serper_client import SerperApiClient
 from scout_agent.sources.twitter_client import TwitterClient
 from scout_agent.sources.review_client import ReviewSitesClient
 
 __all__ = [
     'RedditClient',
     'HNClient',
-    'SerpApiClient',
+    'SerperApiClient',
     'TwitterClient',
     'ReviewSitesClient',
 ]
