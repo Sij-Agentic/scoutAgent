@@ -395,7 +395,8 @@ class ManifestManager:
         self._save()
         
     def get_node_output(self, node_id: str) -> Optional[Dict[str, Any]]:
-        """Get a node's output data.
+        """
+        Get a node's output data.
         
         Args:
             node_id: ID of the node
@@ -403,9 +404,67 @@ class ManifestManager:
         Returns:
             The node's output data or None if not found
         """
+        # Strategy 1: Check direct stages location
         if node_id in self._manifest["stages"] and "data" in self._manifest["stages"][node_id]:
             return self._manifest["stages"][node_id]["data"]
+        
+        # Strategy 2: Check for nodes stored directly in stages with content structure
+        if node_id in self._manifest["stages"]:
+            stage_data = self._manifest["stages"][node_id]
+            if "content" in stage_data:
+                return self._parse_tool_result(stage_data)
+        
+        # Strategy 3: Pattern matching for template keys like "search_links_pp1_output"
+        if node_id.endswith("_output"):
+            base_name = node_id.replace("_output", "")
+            # Extract the base tool name and pain point (e.g., "search_links_pp1" -> "search_links" + "pp1")
+            if "_pp" in base_name:
+                tool_name, pp_part = base_name.rsplit("_pp", 1)
+                pp_id = "pp" + pp_part
+                
+                # Look for keys in stages that match pattern: tool_name_<hash>_pp_id
+                for key in self._manifest["stages"].keys():
+                    if key.startswith(tool_name + "_") and key.endswith("_" + pp_id):
+                        stage_data = self._manifest["stages"][key]
+                        if "content" in stage_data:
+                            return self._parse_tool_result(stage_data)
+                        elif "data" in stage_data:
+                            return stage_data["data"]
+        
+        # Strategy 4: Check gap_finder_collect tool_results (legacy support)
+        manifest = self.get_manifest()
+        if "gap_finder_collect" in manifest["stages"]:
+            collect_data = manifest["stages"]["gap_finder_collect"].get("data", {})
+            tool_results = collect_data.get("tool_results", {})
+            
+            # Try exact match first
+            if node_id in tool_results:
+                return self._parse_tool_result(tool_results[node_id])
+            
+            # Try pattern matching for template keys
+            if node_id.endswith("_output"):
+                base_name = node_id.replace("_output", "")
+                if "_pp" in base_name:
+                    tool_name, pp_part = base_name.rsplit("_pp", 1)
+                    pp_id = "pp" + pp_part
+                    
+                    # Look for keys that match pattern: tool_name_<hash>_pp_id
+                    for key in tool_results.keys():
+                        if key.startswith(tool_name + "_") and key.endswith("_" + pp_id):
+                            return self._parse_tool_result(tool_results[key])
+        
         return None
+    
+    def _parse_tool_result(self, tool_result: Dict) -> Dict:
+        """Parse tool result content into usable data"""
+        if "content" in tool_result and tool_result["content"]:
+            content = tool_result["content"][0]
+            if "text" in content:
+                try:
+                    return json.loads(content["text"])
+                except json.JSONDecodeError:
+                    return {"raw_text": content["text"]}
+        return tool_result
     
     def _get_node(self, node_id: str) -> Optional[Dict[str, Any]]:
         """Get a node by ID.
