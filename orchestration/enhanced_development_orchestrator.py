@@ -578,12 +578,9 @@ class EnhancedDevelopmentOrchestrator(DevelopmentOrchestrator):
                                 # When using --source-run, we need to execute these nodes first.
                                 logger.info("Executing prerequisite nodes before gap_finder collect stage")
                                 
-                                # Execute prerequisite nodes in dependency order
-                                await self._execute_prerequisite_nodes(plan_output)
-                                
                                 logger.info(f"Executing gap_finder collect with plan from source run and new run_id: {self.run_id}")
                                 
-                                # Call the collect method with plan and run_id
+                                # Call the collect method with plan and run_id - it will handle all nodes with proper template resolution
                                 result = await method(plan_output, run_id=self.run_id)
                                 
                                 # Create success result
@@ -890,22 +887,22 @@ class EnhancedDevelopmentOrchestrator(DevelopmentOrchestrator):
             logger.error(f"Error executing prerequisite node {node_id}: {str(e)}")
     
     async def _resolve_template_variables(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
-        """Resolve template variables in node inputs"""
-        resolved = {}
+        """Resolve template variables in node inputs using gap_finder's template resolution"""
+        # Import gap_finder agent for template resolution
+        from scout_agent.agents.gap_finder import GapFinderAgent
         
-        for key, value in inputs.items():
-            if isinstance(value, str) and "${" in value:
-                # Try to resolve template variable from manifest
-                try:
-                    resolved_value = self.manifest_manager.resolve_template_variable(value)
-                    resolved[key] = resolved_value
-                except Exception as e:
-                    logger.warning(f"Could not resolve template variable {value}: {str(e)}")
-                    resolved[key] = value
-            else:
-                resolved[key] = value
+        # Create a temporary gap_finder instance for template resolution
+        gap_finder = GapFinderAgent()
         
-        return resolved
+        try:
+            # Use gap_finder's template resolution method
+            resolved = gap_finder._resolve_template_variables(inputs, self.manifest_manager)
+            logger.info(f"Successfully resolved template variables: {list(inputs.keys())}")
+            return resolved
+        except Exception as e:
+            logger.error(f"Failed to resolve template variables: {str(e)}")
+            # Fallback to original inputs if resolution fails
+            return inputs
 
     def dump_debug_info(self, output_dir: Optional[str] = None) -> None:
         """

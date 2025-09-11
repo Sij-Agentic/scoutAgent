@@ -951,10 +951,46 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
             self.logger.error(f"Failed to initialize MCP client: {e}")
             return
         
-        # Execute each tool node
+        # Execute each tool node in dependency order
         manifest_manager = ManifestManager(run_id or "default")
         
-        for i, node in enumerate(tool_nodes):
+        # Sort nodes by dependency order
+        def get_dependency_order(nodes):
+            """Sort nodes by dependency order using topological sort."""
+            # Create dependency graph
+            node_map = {node.get("node_id"): node for node in nodes}
+            in_degree = {node.get("node_id"): 0 for node in nodes}
+            
+            # Calculate in-degrees
+            for node in nodes:
+                node_id = node.get("node_id")
+                dependencies = node.get("dependencies", [])
+                for dep in dependencies:
+                    if dep in in_degree:
+                        in_degree[node_id] += 1
+            
+            # Topological sort
+            queue = [node_id for node_id, degree in in_degree.items() if degree == 0]
+            result = []
+            
+            while queue:
+                current = queue.pop(0)
+                result.append(node_map[current])
+                
+                # Update in-degrees of dependent nodes
+                for node in nodes:
+                    if current in node.get("dependencies", []):
+                        in_degree[node.get("node_id")] -= 1
+                        if in_degree[node.get("node_id")] == 0:
+                            queue.append(node.get("node_id"))
+            
+            return result
+        
+        # Sort tool nodes by dependency order
+        ordered_nodes = get_dependency_order(tool_nodes)
+        self.logger.info(f"Executing {len(ordered_nodes)} tool nodes in dependency order")
+        
+        for i, node in enumerate(ordered_nodes):
             try:
                 node_id = node.get("node_id") or f"tool_node_{i}_{node.get('tool_name', 'unknown')}"
                 tool_name = node.get("tool_name")
@@ -1099,8 +1135,33 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                         else:
                             node_key, field_path = match, None
                         
-                        # Get the node output from manifest
+                        # First try to get the node output using the key directly
                         node_output = manifest_manager.get_node_output(node_key)
+                        
+                        # If not found, try to find the actual node_id that maps to this output key
+                        if not node_output:
+                            # Look through all stages to find a node that has this output_manifest_key
+                            manifest = manifest_manager.get_manifest()
+                            for stage_key, stage_data in manifest.get("stages", {}).items():
+                                # Check if this stage was stored with the output key we're looking for
+                                if stage_key == node_key and "data" in stage_data:
+                                    node_output = stage_data["data"]
+                                    break
+                        
+                        # Handle MCP tool output format: {"content": [{"type": "text", "text": "{...}"}]}
+                        if node_output and isinstance(node_output, dict) and "content" in node_output:
+                            content_list = node_output.get("content", [])
+                            if content_list and isinstance(content_list, list) and len(content_list) > 0:
+                                first_content = content_list[0]
+                                if isinstance(first_content, dict) and first_content.get("type") == "text":
+                                    text_content = first_content.get("text", "")
+                                    if text_content:
+                                        try:
+                                            # Parse the JSON string to get the actual data
+                                            node_output = json.loads(text_content)
+                                        except json.JSONDecodeError:
+                                            # If it's not valid JSON, keep the original text
+                                            pass
                         
                         if node_output:
                             # Navigate to the specific field if specified
@@ -1166,34 +1227,54 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
         return resolved_inputs
     
     def _get_nested_field(self, data: Dict[str, Any], field_path: str) -> Any:
-        """Get a nested field from data using dot notation (e.g., 'results[*].link')."""
+        """Get a nested field from data using dot notation with support for multiple [*] expressions."""
         try:
-            # Handle array indexing like 'results[*].link'
+            # Handle multiple array indexing like 'query_results[*].results[*].link'
             if '[*]' in field_path:
+                # Split by [*] to get all parts
                 parts = field_path.split('[*]')
                 current = data
                 
-                # Navigate to the array
-                for part in parts[0].split('.') if parts[0] else []:
-                    if part:
-                        current = current[part]
-                
-                # Extract values from array elements
-                if isinstance(current, list):
-                    remaining_path = parts[1].lstrip('.')
-                    if remaining_path:
-                        # Get the field from each array element
-                        values = []
-                        for item in current:
-                            try:
-                                item_value = self._get_nested_field(item, remaining_path)
-                                if item_value is not None:
-                                    values.append(item_value)
-                            except (KeyError, TypeError):
-                                continue
-                        return values
+                # Process each part
+                for i, part in enumerate(parts):
+                    # Clean up the part (remove leading dots)
+                    clean_part = part.lstrip('.')
+                    
+                    if i == 0:
+                        # First part: navigate to the first array
+                        if clean_part:
+                            for subpart in clean_part.split('.'):
+                                if subpart:
+                                    current = current[subpart]
                     else:
-                        return current
+                        # Subsequent parts: we're dealing with arrays
+                        if isinstance(current, list):
+                            new_current = []
+                            for item in current:
+                                if clean_part:
+                                    # Navigate through the remaining path in each item
+                                    try:
+                                        item_value = item
+                                        for subpart in clean_part.split('.'):
+                                            if subpart:
+                                                item_value = item_value[subpart]
+                                        
+                                        # If this results in a list, extend; otherwise append
+                                        if isinstance(item_value, list):
+                                            new_current.extend(item_value)
+                                        else:
+                                            new_current.append(item_value)
+                                    except (KeyError, TypeError):
+                                        continue
+                                else:
+                                    # No remaining path, just add the item
+                                    new_current.append(item)
+                            current = new_current
+                        else:
+                            # Not a list, can't process [*]
+                            return None
+                
+                return current
             else:
                 # Simple dot notation navigation
                 current = data
