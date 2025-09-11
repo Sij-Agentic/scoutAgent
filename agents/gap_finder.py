@@ -568,7 +568,7 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                 "tool_name": "identify_vendors",
                 "dependencies": [triage_node["node_id"]],
                 "inputs": {
-                    "contents": f"${{{triage_node['output_manifest_key']}.contents}}",  # Reference to triage output contents
+                    "contents": f"${{{triage_node['output_manifest_key']}.triage_results}}",  # Reference to triage output results
                     "use_cache": True
                 },
                 "config": {
@@ -592,7 +592,7 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
         
         nodes.extend(identify_vendors_nodes)
         
-        # Step 5: Create vendor_research nodes (one per pain point, handling multiple vendors via iteration)
+        # Step 5: Create vendor_research nodes (one per pain point, handling multiple vendors via deduplication)
         vendor_research_nodes = []
         for vendor_node in identify_vendors_nodes:
             node_id = generate_node_id("vendor_research", f"_pp{vendor_node['config']['metadata']['pain_point_index']+1}")
@@ -609,26 +609,18 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                 "node_id": node_id,
                 "name": f"vendor_research_pp{vendor_node['config']['metadata']['pain_point_index']+1}",
                 "description": f"Research identified vendors for pain point {vendor_node['config']['metadata']['pain_point_index']+1}",
-                "node_type": "ITERATOR",  # Changed to ITERATOR to handle multiple vendors
-                "tool_name": "vendor_research",
+                "node_type": "FUNCTION",  # Changed to FUNCTION to work with DAG engine
+                "tool_name": "vendor_research_batch",  # Use batch processing tool
                 "dependencies": [vendor_node["node_id"]],
                 "inputs": {
-                    "vendors_list": f"${{{vendor_node['output_manifest_key']}.vendors}}",  # Reference to all identified vendors
+                    "vendors_list": f"${{{vendor_node['output_manifest_key']}.vendor_results}}",  # Reference to all identified vendors
                     "pain_point": pain_point_text,
-                    "iteration_template": {
-                        "vendor_name": "${item.name}",
-                        "pain_point": pain_point_text,
-                        "url": "${item.url}"
-                    }
+                    "deduplicate": True  # Enable vendor deduplication
                 },
                 "config": {
-                    "timeout_seconds": 900,
+                    "timeout_seconds": 300,
                     "retry_count": 2,
-                    "iteration_strategy": "parallel",
-                    "max_concurrent": 3,
                     "metadata": {
-                        "stage": "vendor_research",
-                        "pain_point_index": vendor_node['config']['metadata']['pain_point_index'],
                         "pain_point_id": vendor_node['config']['metadata']['pain_point_id']
                     }
                 },
@@ -650,7 +642,8 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
             "node_id": aggregation_node_id,
             "name": "aggregate_research_results",
             "description": "Aggregate all vendor research results for final analysis",
-            "node_type": "AGGREGATOR",
+            "node_type": "FUNCTION",
+            "tool_name": "aggregate_gap_analysis",
             "dependencies": [node["node_id"] for node in vendor_research_nodes],
             "inputs": {
                 "research_outputs": [f"${{{node['output_manifest_key']}.research_data}}" for node in vendor_research_nodes],
@@ -1132,6 +1125,10 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                         # Parse the template variable (e.g., "triage_content_pp1_output.contents")
                         if '.' in match:
                             node_key, field_path = match.split('.', 1)
+                            # Backward compatibility: convert .contents to .triage_results
+                            if field_path == 'contents':
+                                field_path = 'triage_results'
+                                self.logger.info(f"Converting deprecated .contents to .triage_results for {node_key}")
                         else:
                             node_key, field_path = match, None
                         
@@ -1178,8 +1175,17 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                                 self.logger.warning(f"Template variable ${{{match}}} resolved to None")
                                 resolved_inputs[key] = value  # Keep original if resolution fails
                         else:
-                            self.logger.warning(f"No data found for template variable ${{{match}}}")
-                            resolved_inputs[key] = value  # Keep original if no data found
+                            self.logger.warning(f"No data found for template variable ${{{match}}} - using empty default")
+                            # For missing triage_content data, provide appropriate defaults
+                            if 'triage_content' in match:
+                                if isinstance(value, list):
+                                    resolved_inputs[key] = []  # Empty list for list inputs
+                                elif isinstance(value, dict):
+                                    resolved_inputs[key] = {}  # Empty dict for dict inputs
+                                else:
+                                    resolved_inputs[key] = ""  # Empty string for string inputs
+                            else:
+                                resolved_inputs[key] = value  # Keep original for other missing data
                             
                     except Exception as e:
                         self.logger.error(f"Error resolving template variable ${{{match}}}: {str(e)}")
@@ -1213,7 +1219,10 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                                 else:
                                     self.logger.warning(f"Template variable {template_var} resolved to None")
                             else:
-                                self.logger.warning(f"No data found for template variable {template_var}")
+                                self.logger.warning(f"No data found for template variable {template_var} - removing from string")
+                                # For missing triage_content data in string interpolation, remove the template variable
+                                if 'triage_content' in match:
+                                    resolved_value = resolved_value.replace(template_var, "")
                                 
                         except Exception as e:
                             self.logger.error(f"Error resolving template variable ${{{match}}}: {str(e)}")
