@@ -246,7 +246,7 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                     continue
                 
                 # Default number of queries per category
-                n_queries = 3
+                n_queries = 1
                 
                 # Prepare substitutions for the discovery prompt
                 discovery_substitutions = {
@@ -532,7 +532,7 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                 "tool_name": "triage_content",
                 "dependencies": [extract_node["node_id"]],
                 "inputs": {
-                    "contents": f"${{{extract_node['output_manifest_key']}.contents}}",  # Reference to extract output contents
+                    "contents": f"${{{extract_node['output_manifest_key']}.content}}",  # Reference to extract output content
                     "use_cache": True
                 },
                 "config": {
@@ -558,7 +558,8 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
         
         # Step 4: Create identify_vendors nodes (parallel for each triage_content output)
         identify_vendors_nodes = []
-        for triage_node in triage_content_nodes:
+        for i, triage_node in enumerate(triage_content_nodes):
+            extract_node = extract_content_nodes[i]  # Get corresponding extract_content node
             node_id = generate_node_id("identify_vendors", f"_pp{triage_node['config']['metadata']['pain_point_index']+1}")
             identify_vendors_nodes.append({
                 "node_id": node_id,
@@ -566,9 +567,9 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                 "description": f"Identify vendors from triaged content for pain point {triage_node['config']['metadata']['pain_point_index']+1}",
                 "node_type": "TOOL",
                 "tool_name": "identify_vendors",
-                "dependencies": [triage_node["node_id"]],
+                "dependencies": [triage_node["node_id"], extract_node["node_id"]],  # Depend on both triage and extract
                 "inputs": {
-                    "contents": f"${{{triage_node['output_manifest_key']}.triage_results}}",  # Reference to triage output results
+                    "contents": f"${{{extract_node['output_manifest_key']}.content}}",  # Reference to extract_content output with actual content
                     "use_cache": True
                 },
                 "config": {
@@ -583,9 +584,14 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                 "output_manifest_key": f"identify_vendors_pp{triage_node['config']['metadata']['pain_point_index']+1}_output"
             })
             
-            # Add edge from triage_content to identify_vendors
+            # Add edges from both triage_content and extract_content to identify_vendors
             edges.append({
                 "from_node": triage_node["node_id"],
+                "to_node": node_id,
+                "edge_type": "data_flow"
+            })
+            edges.append({
+                "from_node": extract_node["node_id"],
                 "to_node": node_id,
                 "edge_type": "data_flow"
             })
@@ -1125,10 +1131,24 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                         # Parse the template variable (e.g., "triage_content_pp1_output.contents")
                         if '.' in match:
                             node_key, field_path = match.split('.', 1)
-                            # Backward compatibility: convert .contents to .triage_results
+                            # Backward compatibility: convert .contents based on node type
                             if field_path == 'contents':
-                                field_path = 'triage_results'
-                                self.logger.info(f"Converting deprecated .contents to .triage_results for {node_key}")
+                                # For extract_content nodes, use 'content' field
+                                if 'extract_content' in node_key:
+                                    field_path = 'content'
+                                    self.logger.info(f"Converting .contents to .content for extract_content node {node_key}")
+                                # For triage_content nodes, use 'content' field
+                                elif 'triage_content' in node_key:
+                                    field_path = 'content'
+                                    self.logger.info(f"Converting deprecated .contents to .content for {node_key}")
+                                else:
+                                    # Default fallback - use 'content' field
+                                    field_path = 'content'
+                                    self.logger.warning(f"Unknown node type for {node_key}, defaulting to 'content' field")
+                            elif field_path == 'triage_results':
+                                # Convert triage_results to content for all node types
+                                field_path = 'content'
+                                self.logger.info(f"Converting .triage_results to .content for {node_key}")
                         else:
                             node_key, field_path = match, None
                         
@@ -1144,6 +1164,25 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                                 if stage_key == node_key and "data" in stage_data:
                                     node_output = stage_data["data"]
                                     break
+                            
+                            # If still not found, search through DAG nodes to find the one with matching output_manifest_key
+                            if not node_output:
+                                dag = manifest.get("dag", {})
+                                nodes = dag.get("nodes", [])
+                                for node in nodes:
+                                    if node.get("output_manifest_key") == node_key:
+                                        # Found the node, now get its data from the manifest
+                                        actual_node_id = node.get("node_id")
+                                        if actual_node_id:
+                                            # Try to get the node output using the actual node_id
+                                            node_output = manifest_manager.get_node_output(actual_node_id)
+                                            if not node_output:
+                                                # Look in stages for the actual node_id
+                                                for stage_key, stage_data in manifest.get("stages", {}).items():
+                                                    if stage_key == actual_node_id and "data" in stage_data:
+                                                        node_output = stage_data["data"]
+                                                        break
+                                        break
                         
                         # Handle MCP tool output format: {"content": [{"type": "text", "text": "{...}"}]}
                         if node_output and isinstance(node_output, dict) and "content" in node_output:
@@ -1164,6 +1203,34 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                             # Navigate to the specific field if specified
                             if field_path:
                                 field_value = self._get_nested_field(node_output, field_path)
+                                # Enhanced fallback logic for field resolution failures
+                                if field_value is None:
+                                    # Define field mapping based on node type and requested field
+                                    fallback_fields = []
+                                    
+                                    if field_path == 'contents':
+                                        if 'extract_content' in node_key:
+                                            fallback_fields = ['content']
+                                        elif 'triage_content' in node_key:
+                                            fallback_fields = ['triage_results']
+                                        else:
+                                            # Unknown node type, try common fields
+                                            fallback_fields = ['content', 'triage_results', 'results', 'data']
+                                    elif field_path == 'content':
+                                        fallback_fields = ['contents', 'data', 'results']
+                                    elif field_path == 'triage_results':
+                                        fallback_fields = ['results', 'content', 'contents', 'data']
+                                    elif field_path == 'vendor_results':
+                                        fallback_fields = ['results', 'vendors', 'data', 'content']
+                                    elif field_path == 'results':
+                                        fallback_fields = ['content', 'data', 'triage_results']
+                                    
+                                    # Try fallback fields
+                                    for fallback_field in fallback_fields:
+                                        field_value = self._get_nested_field(node_output, fallback_field)
+                                        if field_value is not None:
+                                            self.logger.info(f"Resolved field '{field_path}' using fallback '{fallback_field}' for node {node_key}")
+                                            break
                             else:
                                 field_value = node_output
                             
