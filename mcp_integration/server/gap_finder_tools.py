@@ -448,7 +448,7 @@ async def identify_vendors(
     Identify vendors mentioned in the content.
     
     Args:
-        contents: List of content items with URL and content text
+        contents: List of content items with URL and content text, or extract_content output format
         use_cache: Whether to use cached vendor identification results
         
     Returns:
@@ -473,15 +473,41 @@ async def identify_vendors(
         identifier = global_identifier
         logger.info("[IDENTIFY_VENDORS] Identifier ready, starting content processing")
         
+        # Parse extract_content output format if needed
+        processed_contents = []
+        for item in contents:
+            if "content" in item and isinstance(item["content"], list):
+                # This is extract_content output format - parse the JSON content
+                for content_item in item["content"]:
+                    if content_item.get("type") == "text":
+                        try:
+                            # Parse the JSON string to get individual content items
+                            content_data = json.loads(content_item["text"])
+                            if "contents" in content_data:
+                                processed_contents.extend(content_data["contents"])
+                            elif isinstance(content_data, list):
+                                processed_contents.extend(content_data)
+                            else:
+                                processed_contents.append(content_data)
+                        except json.JSONDecodeError:
+                            # If not JSON, treat as plain text content
+                            processed_contents.append({
+                                "url": item.get("url", ""),
+                                "content": content_item["text"]
+                            })
+            else:
+                # Standard format with url and content fields
+                processed_contents.append(item)
+        
         # Identify vendors in each content item
         vendor_results = []
-        logger.info(f"[IDENTIFY_VENDORS] Processing {len(contents)} content items")
+        logger.info(f"[IDENTIFY_VENDORS] Processing {len(processed_contents)} processed content items")
         
-        for i, item in enumerate(contents):
+        for i, item in enumerate(processed_contents):
             try:
                 url = item.get("url", "")
                 content = item.get("content", "")
-                logger.info(f"[IDENTIFY_VENDORS] Processing item {i+1}/{len(contents)}: {url[:100]}...")
+                logger.info(f"[IDENTIFY_VENDORS] Processing item {i+1}/{len(processed_contents)}: {url[:100]}...")
                 
                 if not content:
                     logger.warning(f"[IDENTIFY_VENDORS] Skipping item {i+1} - no content text")
