@@ -376,21 +376,37 @@ class VendorIdentifier:
         # Generate cache key
         key = hashlib.md5(f"{url}:{content}".encode()).hexdigest()
         
+        logger.info(f"[VENDOR_IDENTIFIER] Starting vendor identification for URL: {url[:100]}...")
+        logger.info(f"[VENDOR_IDENTIFIER] Content length: {len(content)} chars, Cache key: {key[:16]}...")
+        logger.info(f"[VENDOR_IDENTIFIER] Use cache: {use_cache}")
+        
         # Check cache
         if use_cache:
+            logger.debug(f"[VENDOR_IDENTIFIER] Checking cache for key: {key}")
             cached = self.cache.load("vendors", key, None)
             if cached is not None:
-                logger.info(f"Using cached vendor identification for {url}")
+                logger.info(f"[VENDOR_IDENTIFIER] Using cached vendor identification for {url}")
+                logger.debug(f"[VENDOR_IDENTIFIER] Cached result success: {cached.get('success', False)}")
+                if cached.get('success') and 'vendors' in cached:
+                    vendors_data = cached['vendors']
+                    vendor_count = vendors_data.get('vendor_count', 0) if isinstance(vendors_data, dict) else len(vendors_data) if isinstance(vendors_data, list) else 0
+                    logger.info(f"[VENDOR_IDENTIFIER] Cached result contains {vendor_count} vendors")
                 return cached
+            else:
+                logger.debug(f"[VENDOR_IDENTIFIER] No cached result found")
         
         # Ensure LLM backends are initialized
+        logger.debug(f"[VENDOR_IDENTIFIER] Ensuring LLM backends are initialized")
         await self._initialize_llm_backends()
         
         # Prepare input for LLM - use content directly like triage_content
         input_text = content[:3000]
+        logger.info(f"[VENDOR_IDENTIFIER] Prepared LLM input text length: {len(input_text)} chars (truncated from {len(content)})")
+        logger.debug(f"[VENDOR_IDENTIFIER] Input text preview: {input_text[:200]}...")
         
         # Call LLM
         try:
+            logger.info(f"[VENDOR_IDENTIFIER] Creating LLM request")
             llm_request = LLMRequest(
                 messages=[{"role": "user", "content": input_text}],
                 system_prompt=self.prompt_template,
@@ -399,43 +415,82 @@ class VendorIdentifier:
             )
             loop = asyncio.get_event_loop()
             
+            logger.info(f"[VENDOR_IDENTIFIER] Sending request to LLM with 30s timeout")
             # Add timeout to prevent indefinite waiting
             try:
                 task = loop.create_task(self.llm_manager.generate(llm_request))
                 response_obj = await asyncio.wait_for(task, timeout=30.0)  # 30 second timeout
                 response = response_obj.content if response_obj.success else ""
+                logger.info(f"[VENDOR_IDENTIFIER] LLM request completed successfully")
+                logger.debug(f"[VENDOR_IDENTIFIER] Response length: {len(response)} chars")
+                logger.debug(f"[VENDOR_IDENTIFIER] Response preview: {response[:300]}...")
             except asyncio.TimeoutError:
-                logger.error(f"LLM request timed out for URL: {url}")
+                logger.error(f"[VENDOR_IDENTIFIER] LLM request timed out for URL: {url}")
                 return {"success": False, "error": "LLM request timed out after 30 seconds"}
             
             if not response_obj.success:
-                logger.error(f"LLM request failed: {response_obj.error if hasattr(response_obj, 'error') else 'Unknown error'}")
-                return {"success": False, "error": f"LLM request failed: {response_obj.error if hasattr(response_obj, 'error') else 'Unknown error'}"}
+                error_msg = response_obj.error if hasattr(response_obj, 'error') else 'Unknown error'
+                logger.error(f"[VENDOR_IDENTIFIER] LLM request failed: {error_msg}")
+                return {"success": False, "error": f"LLM request failed: {error_msg}"}
             
             # Parse response
+            logger.info(f"[VENDOR_IDENTIFIER] Parsing LLM response as JSON")
             try:
                 vendors = json.loads(response)
-            except json.JSONDecodeError:
+                logger.info(f"[VENDOR_IDENTIFIER] JSON parsing successful")
+                logger.debug(f"[VENDOR_IDENTIFIER] Parsed vendors keys: {list(vendors.keys()) if isinstance(vendors, dict) else 'not dict'}")
+                
+                # Log vendor details if available
+                if isinstance(vendors, dict):
+                    vendor_count = vendors.get('vendor_count', 0)
+                    vendors_found = vendors.get('vendors_found', False)
+                    vendor_list = vendors.get('vendors', [])
+                    
+                    logger.info(f"[VENDOR_IDENTIFIER] Vendors found: {vendors_found}")
+                    logger.info(f"[VENDOR_IDENTIFIER] Vendor count: {vendor_count}")
+                    logger.info(f"[VENDOR_IDENTIFIER] Vendor list length: {len(vendor_list)}")
+                    
+                    if vendor_list and len(vendor_list) > 0:
+                        sample_vendors = [v.get('name', 'Unknown') for v in vendor_list[:3]]
+                        logger.info(f"[VENDOR_IDENTIFIER] Sample vendor names: {sample_vendors}")
+                        
+            except json.JSONDecodeError as e:
+                logger.warning(f"[VENDOR_IDENTIFIER] Initial JSON parsing failed: {e}")
+                logger.info(f"[VENDOR_IDENTIFIER] Attempting to extract JSON from response using regex")
                 # Try to extract JSON from response
                 import re
                 json_match = re.search(r'\{[\s\S]*\}', response)
                 if json_match:
+                    logger.debug(f"[VENDOR_IDENTIFIER] Found JSON match: {json_match.group(0)[:200]}...")
                     try:
                         vendors = json.loads(json_match.group(0))
-                    except json.JSONDecodeError:
+                        logger.info(f"[VENDOR_IDENTIFIER] Regex-extracted JSON parsing successful")
+                    except json.JSONDecodeError as e2:
+                        logger.error(f"[VENDOR_IDENTIFIER] Regex-extracted JSON parsing also failed: {e2}")
                         return {"success": False, "error": "Failed to parse LLM response as JSON"}
                 else:
+                    logger.error(f"[VENDOR_IDENTIFIER] No JSON pattern found in response")
+                    logger.debug(f"[VENDOR_IDENTIFIER] Raw response: {response}")
                     return {"success": False, "error": "Failed to parse LLM response as JSON"}
             
             # Cache result
             result = {"success": True, "vendors": vendors}
-            if use_cache:
-                self.cache.save("vendors", key, result)
+            logger.info(f"[VENDOR_IDENTIFIER] Vendor identification successful, preparing to cache")
             
+            if use_cache:
+                logger.debug(f"[VENDOR_IDENTIFIER] Saving result to cache with key: {key}")
+                self.cache.save("vendors", key, result)
+                logger.info(f"[VENDOR_IDENTIFIER] Result cached successfully")
+            else:
+                logger.debug(f"[VENDOR_IDENTIFIER] Caching disabled, skipping cache save")
+            
+            logger.info(f"[VENDOR_IDENTIFIER] Vendor identification completed successfully for {url}")
             return result
+            
         except Exception as e:
             error_msg = f"Error identifying vendors: {str(e)}"
-            logger.error(error_msg)
+            logger.error(f"[VENDOR_IDENTIFIER] Exception during vendor identification: {error_msg}")
+            logger.error(f"[VENDOR_IDENTIFIER] Exception details", exc_info=True)
             return {"success": False, "error": error_msg}
 
 
@@ -456,6 +511,7 @@ async def identify_vendors(
     """
     try:
         logger.info(f"[IDENTIFY_VENDORS] Starting tool call with {len(contents)} content items, use_cache={use_cache}")
+        logger.debug(f"[IDENTIFY_VENDORS] Input contents structure: {[{k: type(v).__name__ for k, v in item.items()} for item in contents[:3]]}")
         
         # Use global identifier to avoid conflicts during rapid calls
         global global_identifier
@@ -475,39 +531,58 @@ async def identify_vendors(
         
         # Parse extract_content output format if needed
         processed_contents = []
-        for item in contents:
+        logger.info(f"[IDENTIFY_VENDORS] Parsing input format for {len(contents)} items")
+        
+        for idx, item in enumerate(contents):
+            logger.debug(f"[IDENTIFY_VENDORS] Processing input item {idx+1}: keys={list(item.keys())}")
+            
             if "content" in item and isinstance(item["content"], list):
+                logger.info(f"[IDENTIFY_VENDORS] Item {idx+1} detected as extract_content output format")
                 # This is extract_content output format - parse the JSON content
                 for content_item in item["content"]:
                     if content_item.get("type") == "text":
                         try:
                             # Parse the JSON string to get individual content items
                             content_data = json.loads(content_item["text"])
+                            logger.debug(f"[IDENTIFY_VENDORS] Parsed JSON content keys: {list(content_data.keys()) if isinstance(content_data, dict) else 'not dict'}")
+                            
                             if "contents" in content_data:
                                 processed_contents.extend(content_data["contents"])
+                                logger.info(f"[IDENTIFY_VENDORS] Extended with {len(content_data['contents'])} content items")
                             elif isinstance(content_data, list):
                                 processed_contents.extend(content_data)
+                                logger.info(f"[IDENTIFY_VENDORS] Extended with {len(content_data)} list items")
                             else:
                                 processed_contents.append(content_data)
-                        except json.JSONDecodeError:
+                                logger.info(f"[IDENTIFY_VENDORS] Appended single content data item")
+                        except json.JSONDecodeError as e:
+                            logger.warning(f"[IDENTIFY_VENDORS] JSON decode error for item {idx+1}: {e}")
                             # If not JSON, treat as plain text content
                             processed_contents.append({
                                 "url": item.get("url", ""),
                                 "content": content_item["text"]
                             })
             else:
+                logger.info(f"[IDENTIFY_VENDORS] Item {idx+1} detected as standard format")
                 # Standard format with url and content fields
                 processed_contents.append(item)
         
+        logger.info(f"[IDENTIFY_VENDORS] Content parsing complete. Processed {len(processed_contents)} content items from {len(contents)} input items")
+        
         # Identify vendors in each content item
         vendor_results = []
-        logger.info(f"[IDENTIFY_VENDORS] Processing {len(processed_contents)} processed content items")
+        logger.info(f"[IDENTIFY_VENDORS] Starting vendor identification for {len(processed_contents)} processed content items")
         
         for i, item in enumerate(processed_contents):
             try:
                 url = item.get("url", "")
                 content = item.get("content", "")
-                logger.info(f"[IDENTIFY_VENDORS] Processing item {i+1}/{len(processed_contents)}: {url[:100]}...")
+                content_preview = content[:200] + "..." if len(content) > 200 else content
+                
+                logger.info(f"[IDENTIFY_VENDORS] Processing item {i+1}/{len(processed_contents)}")
+                logger.info(f"[IDENTIFY_VENDORS] Item {i+1} - URL: {url}")
+                logger.info(f"[IDENTIFY_VENDORS] Item {i+1} - Content length: {len(content)} chars")
+                logger.debug(f"[IDENTIFY_VENDORS] Item {i+1} - Content preview: {content_preview}")
                 
                 if not content:
                     logger.warning(f"[IDENTIFY_VENDORS] Skipping item {i+1} - no content text")
@@ -530,7 +605,24 @@ async def identify_vendors(
                     content=content,
                     use_cache=use_cache
                 )
-                logger.info(f"[IDENTIFY_VENDORS] Successfully processed item {i+1}")
+                
+                logger.info(f"[IDENTIFY_VENDORS] Item {i+1} - Vendor identification completed")
+                logger.debug(f"[IDENTIFY_VENDORS] Item {i+1} - Result success: {vendor_result.get('success', False)}")
+                
+                if vendor_result.get("success"):
+                    vendors_data = vendor_result.get("vendors", {})
+                    vendor_count = vendors_data.get("vendor_count", 0) if isinstance(vendors_data, dict) else len(vendors_data) if isinstance(vendors_data, list) else 0
+                    logger.info(f"[IDENTIFY_VENDORS] Item {i+1} - Found {vendor_count} vendors")
+                    
+                    if vendor_count > 0:
+                        vendor_names = []
+                        if isinstance(vendors_data, dict) and "vendors" in vendors_data:
+                            vendor_names = [v.get("name", "Unknown") for v in vendors_data["vendors"][:3]]
+                        elif isinstance(vendors_data, list):
+                            vendor_names = [v.get("name", "Unknown") for v in vendors_data[:3]]
+                        logger.info(f"[IDENTIFY_VENDORS] Item {i+1} - Sample vendors: {vendor_names}")
+                else:
+                    logger.warning(f"[IDENTIFY_VENDORS] Item {i+1} - Vendor identification failed: {vendor_result.get('error', 'Unknown error')}")
                 
                 # Add to results
                 vendor_entry = {
@@ -544,9 +636,11 @@ async def identify_vendors(
                     vendor_entry["error"] = vendor_result["error"]
                 
                 vendor_results.append(vendor_entry)
+                logger.info(f"[IDENTIFY_VENDORS] Item {i+1} - Added to results (total: {len(vendor_results)})")
                 
             except Exception as e:
                 logger.error(f"[IDENTIFY_VENDORS] Error processing item {i+1} ({url}): {e}")
+                logger.error(f"[IDENTIFY_VENDORS] Item {i+1} - Exception details", exc_info=True)
                 # Continue processing other items even if one fails
                 vendor_results.append({
                     "url": url,
@@ -555,7 +649,26 @@ async def identify_vendors(
                 })
                 continue
         
-        logger.info(f"[IDENTIFY_VENDORS] Completed processing. Total results: {len(vendor_results)}")
+        # Summary logging
+        successful_results = [r for r in vendor_results if r.get("success", False)]
+        failed_results = [r for r in vendor_results if not r.get("success", False)]
+        total_vendors_found = 0
+        
+        for result in successful_results:
+            vendors_data = result.get("vendors", {})
+            if isinstance(vendors_data, dict):
+                total_vendors_found += vendors_data.get("vendor_count", 0)
+            elif isinstance(vendors_data, list):
+                total_vendors_found += len(vendors_data)
+        
+        logger.info(f"[IDENTIFY_VENDORS] Processing complete - Summary:")
+        logger.info(f"[IDENTIFY_VENDORS] - Total items processed: {len(processed_contents)}")
+        logger.info(f"[IDENTIFY_VENDORS] - Successful identifications: {len(successful_results)}")
+        logger.info(f"[IDENTIFY_VENDORS] - Failed identifications: {len(failed_results)}")
+        logger.info(f"[IDENTIFY_VENDORS] - Total vendors found: {total_vendors_found}")
+        
+        if failed_results:
+            logger.warning(f"[IDENTIFY_VENDORS] Failed URLs: {[r['url'] for r in failed_results[:5]]}")
         
         final_result = {
             "content": [
@@ -567,6 +680,7 @@ async def identify_vendors(
         
     except Exception as e:
         logger.error(f"[IDENTIFY_VENDORS] Unexpected error in identify_vendors: {e}")
+        logger.error(f"[IDENTIFY_VENDORS] Exception details", exc_info=True)
         return {
             "content": [
                 TextContent(type="text", text=json.dumps({
@@ -637,36 +751,88 @@ async def vendor_research_batch(
     Returns:
         Dictionary with batch vendor research results
     """
-    logger.info(f"Starting batch vendor research for {len(vendors_list)} vendors")
+    logger.info(f"[VENDOR_RESEARCH_BATCH] Starting batch vendor research")
+    logger.info(f"[VENDOR_RESEARCH_BATCH] Input vendors_list length: {len(vendors_list)}")
+    logger.info(f"[VENDOR_RESEARCH_BATCH] Input vendors_list content: {vendors_list}")
+    logger.info(f"[VENDOR_RESEARCH_BATCH] Pain point: {pain_point}")
+    logger.info(f"[VENDOR_RESEARCH_BATCH] Deduplicate: {deduplicate}")
+    
+    # Validate input
+    if not vendors_list:
+        logger.warning(f"[VENDOR_RESEARCH_BATCH] Empty vendors_list received")
+        return {
+            "research_results": [],
+            "summary": {
+                "total_vendors": 0,
+                "successful_research": 0,
+                "failed_research": 0,
+                "deduplication_enabled": deduplicate
+            },
+            "pain_point": pain_point,
+            "error": "Empty vendors list provided"
+        }
     
     # Deduplicate vendors if requested
     if deduplicate:
+        logger.info(f"[VENDOR_RESEARCH_BATCH] Starting deduplication process")
         seen_names = set()
         unique_vendors = []
-        for vendor in vendors_list:
-            vendor_name = vendor.get('name', '').lower().strip()
+        for i, vendor in enumerate(vendors_list):
+            # Handle both string and dictionary vendor inputs
+            if isinstance(vendor, str):
+                vendor_name = vendor.lower().strip()
+                logger.debug(f"[VENDOR_RESEARCH_BATCH] Processing string vendor {i}: '{vendor}' -> name: '{vendor_name}'")
+            elif isinstance(vendor, dict):
+                vendor_name = vendor.get('name', '').lower().strip()
+                logger.debug(f"[VENDOR_RESEARCH_BATCH] Processing dict vendor {i}: {vendor} -> name: '{vendor_name}'")
+            else:
+                logger.warning(f"[VENDOR_RESEARCH_BATCH] Unexpected vendor type {type(vendor)} at index {i}: {vendor}")
+                continue
+                
             if vendor_name and vendor_name not in seen_names:
                 seen_names.add(vendor_name)
                 unique_vendors.append(vendor)
+                logger.debug(f"[VENDOR_RESEARCH_BATCH] Added unique vendor: {vendor_name}")
+            else:
+                logger.debug(f"[VENDOR_RESEARCH_BATCH] Skipped duplicate/empty vendor: {vendor_name}")
         
-        logger.info(f"Deduplicated {len(vendors_list)} vendors to {len(unique_vendors)} unique vendors")
+        logger.info(f"[VENDOR_RESEARCH_BATCH] Deduplicated {len(vendors_list)} vendors to {len(unique_vendors)} unique vendors")
+        logger.info(f"[VENDOR_RESEARCH_BATCH] Unique vendors: {unique_vendors}")
         vendors_list = unique_vendors
     
     # Initialize Vendor Research Tool
+    logger.info(f"[VENDOR_RESEARCH_BATCH] Initializing VendorResearchTool")
     research_tool = VendorResearchTool()
+    logger.info(f"[VENDOR_RESEARCH_BATCH] VendorResearchTool initialized successfully")
     
     # Research each vendor
     research_results = []
     successful_research = 0
     failed_research = 0
     
-    for vendor in vendors_list:
+    logger.info(f"[VENDOR_RESEARCH_BATCH] Starting individual vendor research for {len(vendors_list)} vendors")
+    
+    for i, vendor in enumerate(vendors_list):
+        logger.info(f"[VENDOR_RESEARCH_BATCH] Processing vendor {i+1}/{len(vendors_list)}: {vendor}")
         try:
-            vendor_name = vendor.get('name', '')
-            vendor_url = vendor.get('url')
+            # Handle both string and dictionary vendor inputs
+            if isinstance(vendor, str):
+                vendor_name = vendor
+                vendor_url = None
+                logger.debug(f"[VENDOR_RESEARCH_BATCH] String vendor: name='{vendor_name}', url=None")
+            elif isinstance(vendor, dict):
+                vendor_name = vendor.get('name', '')
+                vendor_url = vendor.get('url')
+                logger.debug(f"[VENDOR_RESEARCH_BATCH] Dict vendor: name='{vendor_name}', url='{vendor_url}'")
+            else:
+                logger.error(f"[VENDOR_RESEARCH_BATCH] Invalid vendor type {type(vendor)}: {vendor}")
+                failed_research += 1
+                continue
+            
+            logger.info(f"[VENDOR_RESEARCH_BATCH] Vendor {i+1} - name: '{vendor_name}', url: '{vendor_url}'")
             
             if not vendor_name:
-                logger.warning("Skipping vendor with no name")
+                logger.warning(f"[VENDOR_RESEARCH_BATCH] Vendor {i+1} - Skipping vendor with no name: {vendor}")
                 continue
             
             # Prepare the input for the research tool
@@ -678,21 +844,42 @@ async def vendor_research_batch(
             if vendor_url:
                 tool_input['url'] = vendor_url
             
-            # Call the tool asynchronously
-            logger.info(f"Researching vendor: {vendor_name}")
-            result = await research_tool.forward(**tool_input)
+            logger.info(f"[VENDOR_RESEARCH_BATCH] Vendor {i+1} - Tool input prepared: {tool_input}")
+            
+            # Call the tool asynchronously with timeout and retry logic
+            logger.info(f"[VENDOR_RESEARCH_BATCH] Vendor {i+1} - Starting research for: {vendor_name}")
+            result = await _execute_vendor_research_with_retry(research_tool, tool_input, vendor_name, i+1)
+            
+            if result is None:
+                logger.error(f"[VENDOR_RESEARCH_BATCH] Vendor {i+1} - Research failed after retries for: {vendor_name}")
+                research_results.append({
+                    "vendor_name": vendor_name,
+                    "error": "Research failed after multiple retry attempts",
+                    "success": False
+                })
+                failed_research += 1
+                continue
+                
+            logger.info(f"[VENDOR_RESEARCH_BATCH] Vendor {i+1} - Research completed, result length: {len(result) if result else 0}")
+            logger.debug(f"[VENDOR_RESEARCH_BATCH] Vendor {i+1} - Raw result: {result[:500]}..." if result and len(result) > 500 else f"[VENDOR_RESEARCH_BATCH] Vendor {i+1} - Raw result: {result}")
             
             # Parse the result
             try:
                 result_json = json.loads(result)
+                logger.info(f"[VENDOR_RESEARCH_BATCH] Vendor {i+1} - JSON parsing successful")
+                logger.debug(f"[VENDOR_RESEARCH_BATCH] Vendor {i+1} - Parsed result keys: {list(result_json.keys()) if isinstance(result_json, dict) else 'Not a dict'}")
+                
                 research_results.append({
                     "vendor_name": vendor_name,
                     "research_data": result_json,
                     "success": True
                 })
                 successful_research += 1
+                logger.info(f"[VENDOR_RESEARCH_BATCH] Vendor {i+1} - Successfully added to results (total successful: {successful_research})")
+                
             except json.JSONDecodeError as e:
-                logger.error(f"Error parsing research result for {vendor_name}: {str(e)}")
+                logger.error(f"[VENDOR_RESEARCH_BATCH] Vendor {i+1} - JSON parsing error for {vendor_name}: {str(e)}")
+                logger.error(f"[VENDOR_RESEARCH_BATCH] Vendor {i+1} - Raw result that failed parsing: {result}")
                 research_results.append({
                     "vendor_name": vendor_name,
                     "error": f"JSON parsing error: {str(e)}",
@@ -701,7 +888,8 @@ async def vendor_research_batch(
                 failed_research += 1
                 
         except Exception as e:
-            logger.error(f"Error researching vendor {vendor.get('name', 'unknown')}: {str(e)}")
+            logger.error(f"[VENDOR_RESEARCH_BATCH] Vendor {i+1} - Exception during research for {vendor.get('name', 'unknown')}: {str(e)}")
+            logger.error(f"[VENDOR_RESEARCH_BATCH] Vendor {i+1} - Exception details", exc_info=True)
             research_results.append({
                 "vendor_name": vendor.get('name', 'unknown'),
                 "error": str(e),
@@ -709,7 +897,8 @@ async def vendor_research_batch(
             })
             failed_research += 1
     
-    return {
+    # Prepare final result
+    final_result = {
         "research_results": research_results,
         "summary": {
             "total_vendors": len(vendors_list),
@@ -719,6 +908,106 @@ async def vendor_research_batch(
         },
         "pain_point": pain_point
     }
+    
+    logger.info(f"[VENDOR_RESEARCH_BATCH] Research completed - Summary:")
+    logger.info(f"[VENDOR_RESEARCH_BATCH] - Total vendors processed: {len(vendors_list)}")
+    logger.info(f"[VENDOR_RESEARCH_BATCH] - Successful research: {successful_research}")
+    logger.info(f"[VENDOR_RESEARCH_BATCH] - Failed research: {failed_research}")
+    logger.info(f"[VENDOR_RESEARCH_BATCH] - Research results count: {len(research_results)}")
+    logger.info(f"[VENDOR_RESEARCH_BATCH] - Final result keys: {list(final_result.keys())}")
+    logger.debug(f"[VENDOR_RESEARCH_BATCH] - Complete final result: {final_result}")
+    
+    return final_result
+
+
+async def _execute_vendor_research_with_retry(research_tool, tool_input: Dict[str, Any], vendor_name: str, vendor_index: int, max_retries: int = 3, timeout_seconds: int = 480*4):
+    """Execute vendor research with enhanced timeout and retry logic.
+    
+    Increased timeout from 240s to 480s (8 minutes) to accommodate:
+    - Web scraping operations (10-30s)
+    - LLM analysis calls (30-90s)
+    - Review searches (20-60s)
+    - Network latency and retries
+    - Complex vendor analysis requiring multiple API calls
+    """
+    import asyncio
+    from httpx import ReadTimeout, ConnectTimeout
+    
+    for attempt in range(max_retries):
+        try:
+            logger.info(f"[VENDOR_RESEARCH_BATCH] Vendor {vendor_index} - Executing research for {vendor_name} (attempt {attempt + 1}/{max_retries}, timeout: {timeout_seconds}s)")
+            
+            # Execute with extended timeout to prevent premature connection closure
+            result = await asyncio.wait_for(
+                research_tool.forward(**tool_input),
+                timeout=timeout_seconds
+            )
+            
+            logger.info(f"[VENDOR_RESEARCH_BATCH] Vendor {vendor_index} - Successfully executed research for {vendor_name} on attempt {attempt + 1}")
+            return result
+            
+        except asyncio.TimeoutError:
+            logger.warning(f"[VENDOR_RESEARCH_BATCH] Vendor {vendor_index} - Timeout executing research for {vendor_name} (attempt {attempt + 1}/{max_retries}) after {timeout_seconds}s")
+            if attempt == max_retries - 1:
+                logger.error(f"[VENDOR_RESEARCH_BATCH] Vendor {vendor_index} - Research for {vendor_name} timed out after {max_retries} attempts")
+                # Return partial result instead of None to maintain progress
+                return {
+                    "vendor": {"canonical_name": vendor_name, "website": tool_input.get('url', ''), "disambiguation_notes": "Research timed out"},
+                    "business_profile": {"summary": "Analysis unavailable - operation timed out", "value_proposition": "Analysis unavailable - operation timed out", "features": [], "offerings": [], "pricing": "Not available", "faqs": [], "target_customers": []},
+                    "pain_point_alignment": {"given_pain_point": tool_input.get('pain_point', ''), "how_addressed": "Analysis unavailable - operation timed out", "notable_gaps": "Analysis unavailable - operation timed out"},
+                    "reviews_and_complaints": {"sources": [], "overall_sentiment": "Not available"},
+                    "evidence": [{"type": "timeout_error", "title": f"Research timeout for {vendor_name}", "url": tool_input.get('url', ''), "snippet": f"Research operation timed out after {timeout_seconds} seconds"}],
+                    "last_updated": "timeout"
+                }
+            # Longer backoff for timeout errors
+            await asyncio.sleep(min(10, 2 ** attempt))  # Cap at 10 seconds
+            
+        except (ReadTimeout, ConnectTimeout) as e:
+            logger.warning(f"[VENDOR_RESEARCH_BATCH] Vendor {vendor_index} - Connection timeout executing research for {vendor_name} (attempt {attempt + 1}/{max_retries}): {e}")
+            if attempt == max_retries - 1:
+                logger.error(f"[VENDOR_RESEARCH_BATCH] Vendor {vendor_index} - Research for {vendor_name} connection failed after {max_retries} attempts: {e}")
+                # Return partial result for connection timeouts
+                return {
+                    "vendor": {"canonical_name": vendor_name, "website": tool_input.get('url', ''), "disambiguation_notes": "Connection timeout"},
+                    "business_profile": {"summary": "Analysis unavailable - connection timeout", "value_proposition": "Analysis unavailable - connection timeout", "features": [], "offerings": [], "pricing": "Not available", "faqs": [], "target_customers": []},
+                    "pain_point_alignment": {"given_pain_point": tool_input.get('pain_point', ''), "how_addressed": "Analysis unavailable - connection timeout", "notable_gaps": "Analysis unavailable - connection timeout"},
+                    "reviews_and_complaints": {"sources": [], "overall_sentiment": "Not available"},
+                    "evidence": [{"type": "connection_error", "title": f"Connection timeout for {vendor_name}", "url": tool_input.get('url', ''), "snippet": f"Connection timeout: {str(e)}"}],
+                    "last_updated": "connection_timeout"
+                }
+            await asyncio.sleep(2 ** attempt)  # Exponential backoff
+            
+        except Exception as e:
+            error_str = str(e).lower()
+            if any(keyword in error_str for keyword in ["connection closed", "connection", "timeout", "network", "ssl", "certificate"]):
+                logger.warning(f"[VENDOR_RESEARCH_BATCH] Vendor {vendor_index} - Connection error executing research for {vendor_name} (attempt {attempt + 1}/{max_retries}): {e}")
+                if attempt == max_retries - 1:
+                    logger.error(f"[VENDOR_RESEARCH_BATCH] Vendor {vendor_index} - Research for {vendor_name} connection failed after {max_retries} attempts: {e}")
+                    # Return partial result for connection errors
+                    return {
+                        "vendor": {"canonical_name": vendor_name, "website": tool_input.get('url', ''), "disambiguation_notes": "Connection error"},
+                        "business_profile": {"summary": "Analysis unavailable - connection error", "value_proposition": "Analysis unavailable - connection error", "features": [], "offerings": [], "pricing": "Not available", "faqs": [], "target_customers": []},
+                        "pain_point_alignment": {"given_pain_point": tool_input.get('pain_point', ''), "how_addressed": "Analysis unavailable - connection error", "notable_gaps": "Analysis unavailable - connection error"},
+                        "reviews_and_complaints": {"sources": [], "overall_sentiment": "Not available"},
+                        "evidence": [{"type": "connection_error", "title": f"Connection error for {vendor_name}", "url": tool_input.get('url', ''), "snippet": f"Connection error: {str(e)}"}],
+                        "last_updated": "connection_error"
+                    }
+                await asyncio.sleep(2 ** attempt)  # Exponential backoff
+            else:
+                # Non-retryable error, log and return partial result
+                logger.error(f"[VENDOR_RESEARCH_BATCH] Vendor {vendor_index} - Non-retryable error executing research for {vendor_name}: {e}")
+                logger.error(f"[VENDOR_RESEARCH_BATCH] Vendor {vendor_index} - Exception details for {vendor_name}", exc_info=True)
+                return {
+                    "vendor": {"canonical_name": vendor_name, "website": tool_input.get('url', ''), "disambiguation_notes": "Processing error"},
+                    "business_profile": {"summary": f"Analysis failed: {str(e)}", "value_proposition": "Analysis unavailable - processing error", "features": [], "offerings": [], "pricing": "Not available", "faqs": [], "target_customers": []},
+                    "pain_point_alignment": {"given_pain_point": tool_input.get('pain_point', ''), "how_addressed": "Analysis unavailable - processing error", "notable_gaps": "Analysis unavailable - processing error"},
+                    "reviews_and_complaints": {"sources": [], "overall_sentiment": "Not available"},
+                    "evidence": [{"type": "processing_error", "title": f"Processing error for {vendor_name}", "url": tool_input.get('url', ''), "snippet": f"Processing error: {str(e)}"}],
+                    "last_updated": "processing_error"
+                }
+    
+    # Fallback - should not reach here
+    return None
 
 
 @mcp.tool()
@@ -740,26 +1029,53 @@ async def aggregate_gap_analysis(
     Returns:
         Aggregated analysis with market gaps, vendor landscape, and opportunities
     """
+    logger.info("[AGGREGATE_GAP_ANALYSIS] Starting gap analysis aggregation")
+    logger.info(f"[AGGREGATE_GAP_ANALYSIS] Input research_outputs length: {len(research_outputs)}")
+    logger.info(f"[AGGREGATE_GAP_ANALYSIS] Input pain_points length: {len(pain_points)}")
+    logger.info(f"[AGGREGATE_GAP_ANALYSIS] Merge strategy: {merge_strategy}")
+    logger.info(f"[AGGREGATE_GAP_ANALYSIS] Output format: {output_format}")
+    logger.debug(f"[AGGREGATE_GAP_ANALYSIS] Research outputs structure: {[{k: type(v).__name__ for k, v in item.items()} for item in research_outputs[:3]]}")
+    logger.debug(f"[AGGREGATE_GAP_ANALYSIS] Pain points structure: {[{k: type(v).__name__ for k, v in item.items()} for item in pain_points[:3]]}")
+    
     try:
         # Initialize aggregation containers
         all_vendors = []
         vendor_by_pain_point = {}
         pain_point_coverage = {}
         
+        logger.info(f"[AGGREGATE_GAP_ANALYSIS] Initialized aggregation containers")
+        
         # Process each research output
+        logger.info(f"[AGGREGATE_GAP_ANALYSIS] Processing {len(research_outputs)} research outputs")
+        
         for i, research_output in enumerate(research_outputs):
+            logger.info(f"[AGGREGATE_GAP_ANALYSIS] Processing research output {i+1}/{len(research_outputs)}")
+            logger.debug(f"[AGGREGATE_GAP_ANALYSIS] Output {i+1} type: {type(research_output)}")
+            logger.debug(f"[AGGREGATE_GAP_ANALYSIS] Output {i+1} keys: {list(research_output.keys()) if isinstance(research_output, dict) else 'not dict'}")
+            
             if not research_output or not isinstance(research_output, dict):
+                logger.warning(f"[AGGREGATE_GAP_ANALYSIS] Output {i+1} - Skipping invalid research output: {type(research_output)}")
                 continue
                 
             # Extract batch results if available
             batch_results = research_output.get("batch_results", [])
+            logger.info(f"[AGGREGATE_GAP_ANALYSIS] Output {i+1} - Found {len(batch_results)} batch results")
+            logger.debug(f"[AGGREGATE_GAP_ANALYSIS] Output {i+1} - Batch results structure: {[{k: type(v).__name__ for k, v in result.items()} for result in batch_results[:3]]}")
             
-            for result in batch_results:
+            successful_results = 0
+            for j, result in enumerate(batch_results):
+                logger.debug(f"[AGGREGATE_GAP_ANALYSIS] Output {i+1} - Processing batch result {j+1}/{len(batch_results)}")
+                logger.debug(f"[AGGREGATE_GAP_ANALYSIS] Output {i+1} - Result {j+1} success: {result.get('success', False)}")
+                
                 if not result.get("success", False):
+                    logger.warning(f"[AGGREGATE_GAP_ANALYSIS] Output {i+1} - Result {j+1} - Skipping unsuccessful result: {result.get('error', 'No error message')}")
                     continue
                     
                 vendor_data = result.get("vendor_data", {})
+                logger.debug(f"[AGGREGATE_GAP_ANALYSIS] Output {i+1} - Result {j+1} - Vendor data keys: {list(vendor_data.keys()) if vendor_data else 'No vendor data'}")
+                
                 if not vendor_data:
+                    logger.warning(f"[AGGREGATE_GAP_ANALYSIS] Output {i+1} - Result {j+1} - Skipping result with no vendor data")
                     continue
                     
                 # Add pain point context
@@ -767,23 +1083,59 @@ async def aggregate_gap_analysis(
                 vendor_data["associated_pain_point_id"] = pain_point_id
                 vendor_data["pain_point_context"] = pain_points[i] if i < len(pain_points) else {}
                 
+                vendor_name = vendor_data.get('name', 'Unknown')
+                logger.info(f"[AGGREGATE_GAP_ANALYSIS] Output {i+1} - Result {j+1} - Processing vendor: {vendor_name} for {pain_point_id}")
+                
                 all_vendors.append(vendor_data)
                 
                 # Group by pain point
                 if pain_point_id not in vendor_by_pain_point:
                     vendor_by_pain_point[pain_point_id] = []
+                    logger.debug(f"[AGGREGATE_GAP_ANALYSIS] Output {i+1} - Created new pain point group: {pain_point_id}")
                 vendor_by_pain_point[pain_point_id].append(vendor_data)
+                
+                successful_results += 1
+                logger.debug(f"[AGGREGATE_GAP_ANALYSIS] Output {i+1} - Result {j+1} - Added vendor {vendor_name} (total vendors: {len(all_vendors)})")
+            
+            logger.info(f"[AGGREGATE_GAP_ANALYSIS] Output {i+1} - Processed {successful_results}/{len(batch_results)} successful results")
+        
+        logger.info(f"[AGGREGATE_GAP_ANALYSIS] Research output processing complete")
+        logger.info(f"[AGGREGATE_GAP_ANALYSIS] - Total vendors collected: {len(all_vendors)}")
+        logger.info(f"[AGGREGATE_GAP_ANALYSIS] - Pain points with vendors: {len(vendor_by_pain_point)}")
+        logger.info(f"[AGGREGATE_GAP_ANALYSIS] - Pain point IDs: {list(vendor_by_pain_point.keys())}")
+        
+        for pp_id, vendors in vendor_by_pain_point.items():
+            vendor_names = [v.get('name', 'Unknown') for v in vendors[:3]]
+            logger.info(f"[AGGREGATE_GAP_ANALYSIS] - {pp_id}: {len(vendors)} vendors (sample: {vendor_names})")
         
         # Analyze vendor landscape
+        logger.info(f"[AGGREGATE_GAP_ANALYSIS] Analyzing vendor landscape with {len(all_vendors)} vendors")
         vendor_analysis = _analyze_vendor_landscape(all_vendors)
+        logger.info(f"[AGGREGATE_GAP_ANALYSIS] Vendor landscape analysis complete")
+        logger.debug(f"[AGGREGATE_GAP_ANALYSIS] Vendor analysis keys: {list(vendor_analysis.keys()) if isinstance(vendor_analysis, dict) else 'not dict'}")
         
         # Identify market gaps
+        logger.info(f"[AGGREGATE_GAP_ANALYSIS] Identifying market gaps")
         market_gaps = _identify_market_gaps(vendor_by_pain_point, pain_points)
+        logger.info(f"[AGGREGATE_GAP_ANALYSIS] Market gap identification complete - found {len(market_gaps)} gaps")
         
         # Generate opportunity assessment
+        logger.info(f"[AGGREGATE_GAP_ANALYSIS] Assessing opportunities")
         opportunities = _assess_opportunities(market_gaps, vendor_analysis)
+        logger.info(f"[AGGREGATE_GAP_ANALYSIS] Opportunity assessment complete - found {len(opportunities)} opportunities")
         
         # Create comprehensive analysis
+        logger.info(f"[AGGREGATE_GAP_ANALYSIS] Creating comprehensive analysis")
+        
+        coverage_percentage = (len(vendor_by_pain_point) / len(pain_points)) * 100 if pain_points else 0
+        unique_vendors = len(set(v.get("name", "").lower() for v in all_vendors if v.get("name")))
+        high_opportunity_gaps = len([g for g in market_gaps if g.get("opportunity_score", 0) > 70])
+        
+        logger.info(f"[AGGREGATE_GAP_ANALYSIS] Analysis metrics:")
+        logger.info(f"[AGGREGATE_GAP_ANALYSIS] - Coverage: {coverage_percentage:.1f}% ({len(vendor_by_pain_point)}/{len(pain_points)} pain points)")
+        logger.info(f"[AGGREGATE_GAP_ANALYSIS] - Unique vendors: {unique_vendors}")
+        logger.info(f"[AGGREGATE_GAP_ANALYSIS] - High opportunity gaps: {high_opportunity_gaps}")
+        
         analysis = {
             "market_gaps": market_gaps,
             "vendor_landscape": vendor_analysis,
@@ -791,12 +1143,12 @@ async def aggregate_gap_analysis(
             "pain_point_coverage": {
                 "total_pain_points": len(pain_points),
                 "covered_pain_points": len(vendor_by_pain_point),
-                "coverage_percentage": (len(vendor_by_pain_point) / len(pain_points)) * 100 if pain_points else 0
+                "coverage_percentage": coverage_percentage
             },
             "summary": {
                 "total_vendors_found": len(all_vendors),
-                "unique_vendors": len(set(v.get("name", "").lower() for v in all_vendors if v.get("name"))),
-                "high_opportunity_gaps": len([g for g in market_gaps if g.get("opportunity_score", 0) > 70]),
+                "unique_vendors": unique_vendors,
+                "high_opportunity_gaps": high_opportunity_gaps,
                 "competitive_intensity": vendor_analysis.get("competitive_intensity", "unknown")
             },
             "metadata": {
@@ -806,16 +1158,25 @@ async def aggregate_gap_analysis(
             }
         }
         
+        logger.info(f"[AGGREGATE_GAP_ANALYSIS] Gap analysis aggregation completed successfully")
+        logger.debug(f"[AGGREGATE_GAP_ANALYSIS] Final analysis keys: {list(analysis.keys())}")
+        
         return analysis
         
     except Exception as e:
-        return {
+        logger.error(f"[AGGREGATE_GAP_ANALYSIS] Exception during gap analysis aggregation: {str(e)}")
+        logger.error(f"[AGGREGATE_GAP_ANALYSIS] Exception details", exc_info=True)
+        
+        error_result = {
             "error": f"Failed to aggregate gap analysis: {str(e)}",
             "success": False,
             "market_gaps": [],
             "vendor_landscape": {},
             "opportunities": []
         }
+        
+        logger.info(f"[AGGREGATE_GAP_ANALYSIS] Returning error result")
+        return error_result
 
 
 def _analyze_vendor_landscape(vendors: List[Dict[str, Any]]) -> Dict[str, Any]:
