@@ -423,7 +423,13 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
         for i, pain_point in enumerate(validated_pain_points):
             pain_point_text = ""
             if isinstance(pain_point, dict):
-                pain_point_text = pain_point.get("pain_point", "") or pain_point.get("description", "")
+                # Try multiple possible field names for pain point text
+                pain_point_text = (
+                    pain_point.get("pain_point", "") or 
+                    pain_point.get("description", "") or
+                    pain_point.get("text", "") or
+                    pain_point.get("content", "")
+                )
             elif isinstance(pain_point, str):
                 pain_point_text = pain_point
             
@@ -607,7 +613,13 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
             pain_point_index = vendor_node['config']['metadata']['pain_point_index']
             pain_point_text = ""
             if isinstance(validated_pain_points[pain_point_index], dict):
-                pain_point_text = validated_pain_points[pain_point_index].get("pain_point", "") or validated_pain_points[pain_point_index].get("description", "")
+                # Try multiple possible field names for pain point text
+                pain_point_text = (
+                    validated_pain_points[pain_point_index].get("pain_point", "") or 
+                    validated_pain_points[pain_point_index].get("description", "") or
+                    validated_pain_points[pain_point_index].get("text", "") or
+                    validated_pain_points[pain_point_index].get("content", "")
+                )
             elif isinstance(validated_pain_points[pain_point_index], str):
                 pain_point_text = validated_pain_points[pain_point_index]
             
@@ -619,7 +631,7 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                 "tool_name": "vendor_research_batch",  # Use batch processing tool
                 "dependencies": [vendor_node["node_id"]],
                 "inputs": {
-                    "vendors_list": f"${{{vendor_node['output_manifest_key']}.vendor_results}}",  # Reference to all identified vendors
+                    "vendors_list": f"${{{vendor_node['output_manifest_key']}.vendors}}",  # Reference to extracted vendors from successful results
                     "pain_point": pain_point_text,
                     "deduplicate": True  # Enable vendor deduplication
                 },
@@ -652,7 +664,7 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
             "tool_name": "aggregate_gap_analysis",
             "dependencies": [node["node_id"] for node in vendor_research_nodes],
             "inputs": {
-                "research_outputs": [f"${{{node['output_manifest_key']}.research_data}}" for node in vendor_research_nodes],
+                "research_outputs": [f"${{{node['output_manifest_key']}.research_results}}" for node in vendor_research_nodes],
                 "pain_points": validated_pain_points,
                 "merge_strategy": "by_pain_point_id",
                 "output_format": "comprehensive_gap_analysis"
@@ -921,14 +933,28 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
         self.logger.info(f"Plan structure keys: {list(plan.keys())}")
         
         # Try different possible locations for DAG nodes
+        # FIXED: Check gap_finder dag_metadata location first, then fallback to scout locations
         dag_nodes = []
-        if "stages" in plan and "scout_plan" in plan["stages"]:
-            dag_nodes = plan.get("stages", {}).get("scout_plan", {}).get("data", {}).get("dag", {}).get("nodes", [])
-            self.logger.info(f"Found {len(dag_nodes)} nodes in stages.scout_plan.data.dag.nodes")
-        elif "dag_metadata" in plan:
+        
+        # Location 1: Check gap_finder dag_metadata first (where gap_finder nodes are stored)
+        if "stages" in plan and "gap_finder_plan" in plan["stages"]:
+            gap_finder_data = plan.get("stages", {}).get("gap_finder_plan", {}).get("data", {})
+            if "dag_metadata" in gap_finder_data:
+                dag_nodes = gap_finder_data.get("dag_metadata", {}).get("nodes", [])
+                self.logger.info(f"Found {len(dag_nodes)} nodes in stages.gap_finder_plan.data.dag_metadata.nodes")
+        
+        # Location 2: Check top-level dag_metadata (fallback)
+        if not dag_nodes and "dag_metadata" in plan:
             dag_nodes = plan.get("dag_metadata", {}).get("nodes", [])
             self.logger.info(f"Found {len(dag_nodes)} nodes in dag_metadata.nodes")
-        elif "dag" in plan:
+        
+        # Location 3: Fallback to scout_plan location (for backward compatibility)
+        if not dag_nodes and "stages" in plan and "scout_plan" in plan["stages"]:
+            dag_nodes = plan.get("stages", {}).get("scout_plan", {}).get("data", {}).get("dag", {}).get("nodes", [])
+            self.logger.info(f"Found {len(dag_nodes)} nodes in stages.scout_plan.data.dag.nodes")
+        
+        # Location 4: Check top-level dag
+        if not dag_nodes and "dag" in plan:
             dag_nodes = plan.get("dag", {}).get("nodes", [])
             self.logger.info(f"Found {len(dag_nodes)} nodes in dag.nodes")
         
@@ -940,12 +966,17 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
             self.logger.info("No tool nodes found to execute")
             return
         
-        # Initialize MCP client
+        # Initialize MCP client with enhanced connection parameters
         try:
             configs = load_server_configs()
-            multi_client = MultiMCPClient(configs)
+            multi_client = MultiMCPClient(
+                configs, 
+                max_retries=5,  # Increased retries for better resilience
+                connection_timeout=60,  # 60 second timeout for connections
+                sse_read_timeout=3600  # 1 hour timeout for vendor research operations
+            )
             await multi_client.initialize()
-            self.logger.info("MCP client initialized successfully")
+            self.logger.info("MCP client initialized successfully with enhanced connection parameters")
         except Exception as e:
             self.logger.error(f"Failed to initialize MCP client: {e}")
             return
@@ -1000,8 +1031,8 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                 # Resolve template variables in inputs before calling MCP tool
                 resolved_inputs = self._resolve_template_variables(inputs, manifest_manager)
                 
-                # Make direct MCP tool call
-                result = await multi_client.call_tool(tool_name, resolved_inputs)
+                # Make direct MCP tool call with timeout and retry logic
+                result = await self._execute_tool_with_retry(multi_client, tool_name, resolved_inputs, node_id)
                 
                 # Process and store result
                 if result:
@@ -1030,6 +1061,20 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                     
             except Exception as e:
                 self.logger.error(f"Error executing tool node {node.get('node_id', 'unknown')}: {str(e)}")
+                # Store error information in manifest for debugging
+                try:
+                    error_data = {
+                        "node_id": node.get('node_id', 'unknown'),
+                        "tool_name": tool_name,
+                        "error": str(e),
+                        "error_type": type(e).__name__,
+                        "timestamp": datetime.now().isoformat(),
+                        "inputs": resolved_inputs if 'resolved_inputs' in locals() else inputs
+                    }
+                    manifest_manager.store_node_result(node.get('node_id', 'unknown'), {"error": error_data})
+                    self.logger.info(f"Stored error data for node {node.get('node_id', 'unknown')} in manifest")
+                except Exception as store_error:
+                    self.logger.error(f"Failed to store error data for {node.get('node_id', 'unknown')}: {store_error}")
                 # Continue with other nodes even if one fails
                 continue
         
@@ -1039,6 +1084,52 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
             self.logger.info("MCP client shutdown successfully")
         except Exception as e:
             self.logger.error(f"Error shutting down MCP client: {e}")
+    
+    async def _execute_tool_with_retry(self, multi_client, tool_name: str, inputs: Dict[str, Any], node_id: str, max_retries: int = 3, timeout_seconds: int = 300):
+        """Execute tool with timeout and retry logic."""
+        import asyncio
+        from httpx import ReadTimeout, ConnectTimeout
+        
+        # Use longer timeout for vendor research operations
+        if "vendor_research" in tool_name.lower():
+            timeout_seconds = 3600  # 1 hour for vendor research
+            self.logger.info(f"Using extended timeout of {timeout_seconds}s for vendor research tool: {tool_name}")
+        
+        for attempt in range(max_retries):
+            try:
+                self.logger.info(f"Executing {tool_name} for node {node_id} (attempt {attempt + 1}/{max_retries})")
+                
+                # Execute with timeout
+                result = await asyncio.wait_for(
+                    multi_client.call_tool(tool_name, inputs),
+                    timeout=timeout_seconds
+                )
+                
+                self.logger.info(f"Successfully executed {tool_name} for node {node_id} on attempt {attempt + 1}")
+                return result
+                
+            except asyncio.TimeoutError:
+                self.logger.warning(f"Timeout executing {tool_name} for node {node_id} (attempt {attempt + 1}/{max_retries})")
+                if attempt == max_retries - 1:
+                    raise Exception(f"Tool {tool_name} timed out after {max_retries} attempts")
+                await asyncio.sleep(2 ** attempt)  # Exponential backoff
+                
+            except (ReadTimeout, ConnectTimeout) as e:
+                self.logger.warning(f"Connection timeout executing {tool_name} for node {node_id} (attempt {attempt + 1}/{max_retries}): {e}")
+                if attempt == max_retries - 1:
+                    raise Exception(f"Tool {tool_name} connection failed after {max_retries} attempts: {e}")
+                await asyncio.sleep(2 ** attempt)  # Exponential backoff
+                
+            except Exception as e:
+                if "Connection closed" in str(e) or "connection" in str(e).lower():
+                    self.logger.warning(f"Connection error executing {tool_name} for node {node_id} (attempt {attempt + 1}/{max_retries}): {e}")
+                    if attempt == max_retries - 1:
+                        raise Exception(f"Tool {tool_name} connection failed after {max_retries} attempts: {e}")
+                    await asyncio.sleep(2 ** attempt)  # Exponential backoff
+                else:
+                    # Non-retryable error, re-raise immediately
+                    self.logger.error(f"Non-retryable error executing {tool_name} for node {node_id}: {e}")
+                    raise
     
     async def _aggregate_collect_results(self, plan: Dict[str, Any], run_id: Optional[str] = None) -> Dict[str, Any]:
         """Aggregate results from executed tool nodes and generate final collect output."""
@@ -1093,6 +1184,55 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
             except Exception as e:
                 self.logger.error(f"Error retrieving results for node {node.get('node_id', 'unknown')}: {str(e)}")
                 continue
+        
+        # ENHANCEMENT: Direct manifest scanning for vendor research outputs
+        # This handles cases where vendor research nodes aren't in DAG metadata
+        try:
+            manifest = manifest_manager.get_manifest()
+            stages = manifest.get("stages", {})
+            
+            # Look for vendor research outputs using known patterns
+            vendor_research_patterns = [
+                "vendor_research_pp1_output",
+                "vendor_research_pp2_output", 
+                "vendor_research_pp3_output",
+                "vendor_research_pp4_output",
+                "vendor_research_pp5_output"
+            ]
+            
+            for pattern in vendor_research_patterns:
+                if pattern in stages:
+                    stage_data = stages[pattern]
+                    if isinstance(stage_data, dict) and "data" in stage_data:
+                        vendor_result = stage_data["data"]
+                        
+                        # Create a synthetic node ID for this result
+                        synthetic_node_id = pattern.replace("_output", "")
+                        
+                        # Only add if not already present from DAG processing
+                        if synthetic_node_id not in aggregated_data["vendor_analysis"]:
+                            aggregated_data["vendor_analysis"][synthetic_node_id] = vendor_result
+                            self.logger.info(f"Retrieved vendor research via direct manifest scan: {pattern}")
+                            
+                            # Update execution metadata
+                            aggregated_data["execution_metadata"]["total_nodes_executed"] += 1
+            
+            # Also check for any other vendor-related stages
+            for stage_name, stage_data in stages.items():
+                if ("vendor" in stage_name.lower() and 
+                    stage_name not in vendor_research_patterns and
+                    isinstance(stage_data, dict) and "data" in stage_data):
+                    
+                    vendor_result = stage_data["data"]
+                    synthetic_node_id = stage_name.replace("_output", "")
+                    
+                    if synthetic_node_id not in aggregated_data["vendor_analysis"]:
+                        aggregated_data["vendor_analysis"][synthetic_node_id] = vendor_result
+                        self.logger.info(f"Retrieved additional vendor data via manifest scan: {stage_name}")
+                        aggregated_data["execution_metadata"]["total_nodes_executed"] += 1
+                        
+        except Exception as e:
+            self.logger.error(f"Error during direct manifest scanning: {str(e)}")
         
         # Generate summary insights
         aggregated_data["summary"] = self._generate_collect_summary(aggregated_data)
@@ -1202,7 +1342,33 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                         if node_output:
                             # Navigate to the specific field if specified
                             if field_path:
-                                field_value = self._get_nested_field(node_output, field_path)
+                                # Special handling for vendors field - extract from vendor_results structure FIRST
+                                if field_path == 'vendors':
+                                    vendor_results = self._get_nested_field(node_output, 'vendor_results')
+                                    if vendor_results and isinstance(vendor_results, list):
+                                        # Extract vendors from each vendor_results item
+                                        all_vendors = []
+                                        for result in vendor_results:
+                                            if isinstance(result, dict) and result.get('success') and 'vendors' in result:
+                                                vendors_data = result['vendors']
+                                                # Handle nested vendors structure: vendors.vendors
+                                                if isinstance(vendors_data, dict) and 'vendors' in vendors_data:
+                                                    vendors = vendors_data['vendors']
+                                                    if isinstance(vendors, list):
+                                                        all_vendors.extend(vendors)
+                                                # Handle direct vendors list (fallback)
+                                                elif isinstance(vendors_data, list):
+                                                    all_vendors.extend(vendors_data)
+                                        if all_vendors:
+                                            field_value = all_vendors
+                                            self.logger.info(f"Extracted {len(all_vendors)} vendors from vendor_results structure for node {node_key}")
+                                        else:
+                                            field_value = None
+                                    else:
+                                        field_value = None
+                                else:
+                                    field_value = self._get_nested_field(node_output, field_path)
+                                
                                 # Enhanced fallback logic for field resolution failures
                                 if field_value is None:
                                     # Define field mapping based on node type and requested field
@@ -1222,6 +1388,8 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                                         fallback_fields = ['results', 'content', 'contents', 'data']
                                     elif field_path == 'vendor_results':
                                         fallback_fields = ['results', 'vendors', 'data', 'content']
+                                    elif field_path == 'vendors':
+                                        fallback_fields = ['vendor_results', 'results', 'data', 'content']
                                     elif field_path == 'results':
                                         fallback_fields = ['content', 'data', 'triage_results']
                                     

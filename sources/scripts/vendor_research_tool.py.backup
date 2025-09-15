@@ -7,12 +7,6 @@ import re
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
 
-# Import config for API keys
-try:
-    from scout_agent.config import config
-except ImportError:
-    config = None
-
 import requests
 import trafilatura
 from litellm import completion
@@ -178,16 +172,6 @@ class VendorResearchTool(Tool):
         if not self.serper_api_key:
             raise ValueError("SCOUT_SERPER_API_KEY environment variable is required")
         
-        # Get DeepSeek API key from config or environment
-        self.deepseek_api_key = None
-        if config and hasattr(config, 'api') and config.api.deepseek_api_key:
-            self.deepseek_api_key = config.api.deepseek_api_key
-        else:
-            self.deepseek_api_key = os.getenv("SCOUT_DEEPSEEK_API_KEY")
-        
-        if not self.deepseek_api_key:
-            self.logger.warning("DeepSeek API key not found - LLM analysis will be disabled")
-        
         # Setup logging
         import logging
         from pathlib import Path
@@ -340,10 +324,6 @@ class VendorResearchTool(Tool):
             
     def _analyze_with_llm(self, vendor_name: str, pain_point: str, content: str) -> Dict[str, Any]:
         """Analyze scraped content using DeepSeek LLM."""
-        if not self.deepseek_api_key:
-            self.logger.warning("DeepSeek API key not available - skipping LLM analysis")
-            return {}
-        
         try:
             prompt = VENDOR_ANALYSIS_PROMPT.format(
                 vendor_name=vendor_name,
@@ -351,31 +331,24 @@ class VendorResearchTool(Tool):
                 content=content[:15000]  # Limit content length
             )
             
-            # Use DeepSeek model with synchronous completion and API key
+            # Use DeepSeek model with synchronous completion
             response = completion(
                 model="deepseek-chat",
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.3,
                 max_tokens=2000,
-                api_base="https://api.deepseek.com/v1",  # DeepSeek API endpoint
-                api_key=self.deepseek_api_key  # Add API key
+                api_base="https://api.deepseek.com/v1"  # DeepSeek API endpoint
             )
             
             # Parse the LLM response into structured format
-            result = self._parse_llm_response(response.choices[0].message.content)
-            self.logger.info(f"LLM analysis completed successfully for {vendor_name}")
-            return result
+            return self._parse_llm_response(response.choices[0].message.content)
             
         except Exception as e:
-            self.logger.error(f"Error in LLM analysis for {vendor_name}: {str(e)}", exc_info=True)
+            self.logger.error(f"Error in LLM analysis: {str(e)}", exc_info=True)
             return {}
             
     def _parse_llm_response(self, llm_output: str) -> Dict[str, Any]:
-        """Parse the LLM's text response into structured data.
-        
-        NOTE: This method should ONLY be called when LLM analysis succeeds.
-        It does NOT extract fallback data from raw scraped content.
-        """
+        """Parse the LLM's text response into structured data."""
         result = {
             'vendor': {
                 'canonical_name': '',
@@ -385,8 +358,7 @@ class VendorResearchTool(Tool):
             'business_profile': {
                 'features': [],
                 'pricing': '',
-                'target_customers': [],
-                'value_proposition': ''  # Only populated from successful LLM analysis
+                'target_customers': []
             },
             'pain_point_alignment': {
                 'how_addressed': ''
@@ -408,13 +380,6 @@ class VendorResearchTool(Tool):
                              llm_output, re.IGNORECASE | re.DOTALL)
         if desc_match:
             result['vendor']['description'] = desc_match.group(1).strip()
-            
-        # Extract value proposition from Notable Strengths section
-        # ONLY from properly formatted LLM response, not raw scraped content
-        strengths_match = re.search(r'Notable Strengths[^:]*:\s*([\s\S]+?)(?:\n\s*\d+\.|$)', 
-                                  llm_output, re.IGNORECASE)
-        if strengths_match:
-            result['business_profile']['value_proposition'] = strengths_match.group(1).strip()
             
         # Extract features
         features_section = re.search(r'Key Features.*?:\s*([\s\S]+?)(?:\n\s*\d+\.|$)', 
@@ -539,9 +504,7 @@ class VendorResearchTool(Tool):
                             if llm_analysis.get('vendor', {}).get('description'):
                                 result['business_profile']['summary'] = llm_analysis['vendor']['description']
                             
-                            # Update business profile - ONLY use LLM analysis results
-                            if llm_analysis.get('business_profile', {}).get('value_proposition'):
-                                result['business_profile']['value_proposition'] = llm_analysis['business_profile']['value_proposition']
+                            # Update business profile
                             if llm_analysis.get('business_profile', {}).get('features'):
                                 result['business_profile']['features'] = llm_analysis['business_profile']['features']
                             if llm_analysis.get('business_profile', {}).get('pricing'):
@@ -562,12 +525,7 @@ class VendorResearchTool(Tool):
                             
                             self.logger.info("Successfully processed website with LLM analysis")
                         else:
-                            self.logger.warning(f"LLM analysis failed for {vendor_name} - no value proposition will be extracted")
-                            # DO NOT extract value proposition from raw content when LLM fails
-                            # This prevents stock/cached data from being used as fallback
-                            result['business_profile']['value_proposition'] = 'Analysis unavailable - LLM service failed'
-                            result['pain_point_alignment']['how_addressed'] = 'Analysis unavailable - LLM service failed'
-                            result['pain_point_alignment']['notable_gaps'] = 'Analysis unavailable - LLM service failed'
+                            self.logger.warning("LLM analysis returned no results")
                     else:
                         self.logger.warning("No content extracted from the website")
                 else:
@@ -586,9 +544,27 @@ class VendorResearchTool(Tool):
         # Get reviews and complaints
         result['reviews_and_complaints'] = self._get_reviews(vendor_name)
         
-        # Note: Removed fallback web search for features/value proposition
-        # This ensures we can clearly identify when LLM analysis fails
-        # rather than getting misleading generic data from web snippets
+        # Search for features and value proposition if not already found
+        if not result['business_profile']['features'] or not result['business_profile']['value_proposition']:
+            feature_query = f"{vendor_name} features and value proposition"
+            feature_results = self._search_web(feature_query)
+            if feature_results:
+                for r in feature_results:
+                    result['evidence'].append({
+                        'type': 'web',
+                        'title': r['title'],
+                        'url': r['link'],
+                        'snippet': r['snippet']
+                    })
+                    
+                    # Extract features from the snippet if not already found
+                    if not result['business_profile']['features'] and ('feature' in r['snippet'].lower() or 'includes' in r['snippet'].lower()):
+                        features = [f.strip() for f in r['snippet'].split('.') if f.strip() and len(f.split()) < 10]
+                        result['business_profile']['features'].extend(features[:5])
+                    
+                    # Extract value proposition if not already found
+                    if not result['business_profile']['value_proposition'] and 'value' in r['snippet'].lower():
+                        result['business_profile']['value_proposition'] = r['snippet'][:200] + '...'
         
         return result
     

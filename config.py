@@ -40,7 +40,7 @@ class DAGConfig:
     """DAG execution configuration."""
     max_depth: int = 10
     max_agents: int = 50
-    timeout_seconds: int = 300
+    timeout_seconds: int = 2000
     enable_parallel: bool = True
     max_concurrent: int = 5
     retry_attempts: int = 3
