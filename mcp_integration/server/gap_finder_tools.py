@@ -2,6 +2,7 @@ import json
 import os
 import hashlib
 import asyncio
+from datetime import datetime
 from typing import Dict, Any, List, Optional
 from pathlib import Path
 
@@ -799,6 +800,12 @@ async def vendor_research_batch(
         logger.info(f"[VENDOR_RESEARCH_BATCH] Deduplicated {len(vendors_list)} vendors to {len(unique_vendors)} unique vendors")
         logger.info(f"[VENDOR_RESEARCH_BATCH] Unique vendors: {unique_vendors}")
         vendors_list = unique_vendors
+    
+    # TEMPORARY: Limit to 2 vendors to reduce costs
+    if len(vendors_list) > 2:
+        logger.info(f"[VENDOR_RESEARCH_BATCH] COST LIMITING: Reducing {len(vendors_list)} vendors to 2 for cost control")
+        vendors_list = vendors_list[:2]
+        logger.info(f"[VENDOR_RESEARCH_BATCH] Limited vendor list: {vendors_list}")
     
     # Initialize Vendor Research Tool
     logger.info(f"[VENDOR_RESEARCH_BATCH] Initializing VendorResearchTool")

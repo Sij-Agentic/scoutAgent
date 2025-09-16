@@ -10,6 +10,7 @@ import json
 from typing import Dict, List, Any, Optional
 from datetime import datetime
 from dataclasses import dataclass, asdict
+from pathlib import Path
 
 from .base import BaseAgent, AgentInput, AgentOutput, AgentState
 from scout_agent.llm.utils import LLMAgentMixin
@@ -914,6 +915,16 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
             # Store final output to manifest
             await self._write_stage_output("gapfinder_collect", final_output, run_id)
             
+            # Also store in outputs section for easy access
+            # Use the same manifest path construction as in other methods
+            project_root = Path(__file__).resolve().parents[2]
+            current_run_id = run_id or getattr(self.state, "run_id", "latest")
+            run_dir = project_root / "data" / "runs" / current_run_id
+            manifest_path = run_dir / "run_manifest.json"
+            
+            manifest_manager = ManifestManager(manifest_path, create_if_missing=False)
+            manifest_manager.store_final_output("gap_finder_final_output", final_output)
+            
             self.logger.info("Gap finder collect stage completed successfully")
             return final_output
             
@@ -921,6 +932,40 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
             self.logger.error(f"Error in gap_finder collect stage: {str(e)}")
             raise
     
+    def _store_tool_output_in_collect_stage(self, manifest_manager, output_key: str, result_data: Dict[str, Any]):
+        """Store tool output within the gap_finder_collect stage data structure."""
+        try:
+            # Get current manifest
+            manifest = manifest_manager.get_manifest()
+            
+            # Ensure gap_finder_collect stage exists
+            if "stages" not in manifest:
+                manifest["stages"] = {}
+            if "gap_finder_collect" not in manifest["stages"]:
+                manifest["stages"]["gap_finder_collect"] = {
+                    "data": {},
+                    "updated_at": datetime.now().isoformat(),
+                    "status": "in_progress"
+                }
+            
+            # Store the tool output within gap_finder_collect data
+            collect_data = manifest["stages"]["gap_finder_collect"]["data"]
+            if "tool_results" not in collect_data:
+                collect_data["tool_results"] = {}
+            
+            collect_data["tool_results"][output_key] = result_data
+            manifest["stages"]["gap_finder_collect"]["updated_at"] = datetime.now().isoformat()
+            
+            # Save the updated manifest
+            manifest_manager._save()
+            self.logger.info(f"Stored tool output {output_key} within gap_finder_collect stage")
+            
+        except Exception as e:
+            self.logger.error(f"Error storing tool output in collect stage: {e}")
+            import traceback
+            self.logger.error(f"Traceback: {traceback.format_exc()}")
+            raise
+
     async def _execute_plan_non_agent_nodes(self, plan: Dict[str, Any], run_id: Optional[str] = None):
         """Execute tool nodes from the DAG plan by directly calling MCP tools."""
         self.logger.info("Executing DAG tool nodes via direct MCP calls...")
@@ -943,6 +988,13 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                 dag_nodes = gap_finder_data.get("dag_metadata", {}).get("nodes", [])
                 self.logger.info(f"Found {len(dag_nodes)} nodes in stages.gap_finder_plan.data.dag_metadata.nodes")
         
+        # Location 1b: Also check gap_finder_plan.data.dag.nodes (alternative structure)
+        if not dag_nodes and "stages" in plan and "gap_finder_plan" in plan["stages"]:
+            gap_finder_data = plan.get("stages", {}).get("gap_finder_plan", {}).get("data", {})
+            if "dag" in gap_finder_data:
+                dag_nodes = gap_finder_data.get("dag", {}).get("nodes", [])
+                self.logger.info(f"Found {len(dag_nodes)} nodes in stages.gap_finder_plan.data.dag.nodes")
+        
         # Location 2: Check top-level dag_metadata (fallback)
         if not dag_nodes and "dag_metadata" in plan:
             dag_nodes = plan.get("dag_metadata", {}).get("nodes", [])
@@ -958,9 +1010,13 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
             dag_nodes = plan.get("dag", {}).get("nodes", [])
             self.logger.info(f"Found {len(dag_nodes)} nodes in dag.nodes")
         
-        # Filter tool nodes
+        # Filter tool nodes (both TOOL and FUNCTION node types with tool_name)
         tool_nodes = [node for node in dag_nodes if "tool_name" in node]
-        self.logger.info(f"Found {len(tool_nodes)} tool nodes to execute")
+        self.logger.info(f"Found {len(tool_nodes)} tool nodes to execute (including FUNCTION nodes)")
+        
+        # Log node types for debugging
+        for node in tool_nodes:
+            self.logger.info(f"  Node {node.get('node_id')}: type={node.get('node_type')}, tool={node.get('tool_name')}")
         
         if not tool_nodes:
             self.logger.info("No tool nodes found to execute")
@@ -972,7 +1028,7 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
             multi_client = MultiMCPClient(
                 configs, 
                 max_retries=5,  # Increased retries for better resilience
-                connection_timeout=60,  # 60 second timeout for connections
+                connection_timeout=300,  # 300 second timeout for connections
                 sse_read_timeout=3600  # 1 hour timeout for vendor research operations
             )
             await multi_client.initialize()
@@ -982,7 +1038,13 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
             return
         
         # Execute each tool node in dependency order
-        manifest_manager = ManifestManager(run_id or "default")
+        # Use the same manifest path construction as in other methods
+        project_root = Path(__file__).resolve().parents[2]
+        current_run_id = run_id or getattr(self.state, "run_id", "latest")
+        run_dir = project_root / "data" / "runs" / current_run_id
+        manifest_path = run_dir / "run_manifest.json"
+        
+        manifest_manager = ManifestManager(manifest_path, create_if_missing=False)
         
         # Sort nodes by dependency order
         def get_dependency_order(nodes):
@@ -1053,9 +1115,42 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                     
                     # Store to manifest
                     output_key = node.get("output_manifest_key", f"{node_id}_output")
-                    manifest_manager.store_node_output(output_key, result_data)
                     
-                    self.logger.info(f"Successfully executed and stored results for node: {node_id}")
+                    # Check if this is a final output node (aggregate node)
+                    config_metadata = node.get("config", {}).get("metadata", {})
+                    final_stage_flag = config_metadata.get("final_stage") == True
+                    aggregate_in_tool = "aggregate" in tool_name.lower()
+                    is_final_key = output_key == "gap_finder_final_output"
+                    
+                    is_final_output = final_stage_flag or aggregate_in_tool or is_final_key
+                    
+                    self.logger.info(f"Storage decision for {node_id}: final_stage={final_stage_flag}, aggregate_tool={aggregate_in_tool}, final_key={is_final_key}, is_final_output={is_final_output}")
+                    
+                    if is_final_output:
+                        # Use store_final_output for aggregate/final nodes
+                        try:
+                            self.logger.info(f"About to call store_final_output with key: {output_key}")
+                            manifest_manager.store_final_output(output_key, result_data)
+                            self.logger.info(f"store_final_output completed successfully for key: {output_key}")
+                            
+                            # Verify it was stored
+                            updated_manifest = manifest_manager.get_manifest()
+                            if "outputs" in updated_manifest and output_key in updated_manifest["outputs"]:
+                                self.logger.info(f"✓ Verified {output_key} exists in outputs section")
+                            else:
+                                self.logger.error(f"✗ {output_key} not found in outputs section after storage")
+                                
+                        except Exception as e:
+                            self.logger.error(f"Error in store_final_output for {output_key}: {e}")
+                            import traceback
+                            self.logger.error(f"Traceback: {traceback.format_exc()}")
+                            
+                        self.logger.info(f"Successfully executed and stored final output for node: {node_id} with key: {output_key}")
+                    else:
+                        # Store tool outputs within gap_finder_collect stage context
+                        self._store_tool_output_in_collect_stage(manifest_manager, output_key, result_data)
+                        self.logger.info(f"Successfully executed and stored results for node: {node_id} within collect stage")
+                    
                 else:
                     self.logger.error(f"Tool node {node_id} returned no result")
                     
@@ -1135,10 +1230,31 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
         """Aggregate results from executed tool nodes and generate final collect output."""
         self.logger.info("Aggregating collect stage results...")
         
-        manifest_manager = ManifestManager(run_id or "default")
+        # Use the same manifest path construction as in other methods
+        project_root = Path(__file__).resolve().parents[2]
+        current_run_id = run_id or getattr(self.state, "run_id", "latest")
+        run_dir = project_root / "data" / "runs" / current_run_id
+        manifest_path = run_dir / "run_manifest.json"
+        
+        manifest_manager = ManifestManager(manifest_path, create_if_missing=False)
         
         # Get all tool node results from manifest
-        dag_nodes = plan.get("dag_metadata", {}).get("nodes", [])
+        # Try different possible locations for DAG nodes
+        dag_nodes = []
+        
+        # Location 1: Check gap_finder dag_metadata first (where gap_finder nodes are stored)
+        if "stages" in plan and "gap_finder_plan" in plan["stages"]:
+            gap_finder_data = plan.get("stages", {}).get("gap_finder_plan", {}).get("data", {})
+            if "dag_metadata" in gap_finder_data:
+                dag_nodes = gap_finder_data.get("dag_metadata", {}).get("nodes", [])
+                self.logger.info(f"Found {len(dag_nodes)} nodes in stages.gap_finder_plan.data.dag_metadata.nodes")
+        
+        # Location 2: Fallback to direct dag_metadata (legacy support)
+        if not dag_nodes:
+            dag_nodes = plan.get("dag_metadata", {}).get("nodes", [])
+            if dag_nodes:
+                self.logger.info(f"Found {len(dag_nodes)} nodes in direct dag_metadata.nodes")
+        
         tool_nodes = [node for node in dag_nodes if node.get("node_type") == "TOOL"]
         
         aggregated_data = {
@@ -1258,7 +1374,68 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
         resolved_inputs = {}
         
         for key, value in inputs.items():
-            if isinstance(value, str) and "${" in value:
+            if isinstance(value, list):
+                # Handle lists that may contain template strings
+                resolved_list = []
+                for item in value:
+                    if isinstance(item, str) and "${" in item:
+                        # Process the template string
+                        template_pattern = r'\$\{([^}]+)\}'
+                        matches = re.findall(template_pattern, item)
+                        
+                        if len(matches) == 1 and item.strip() == f"${{{matches[0]}}}":
+                            match = matches[0]
+                            try:
+                                # Parse the template variable
+                                if '.' in match:
+                                    node_key, field_path = match.split('.', 1)
+                                else:
+                                    node_key, field_path = match, None
+                                
+                                # Get node output using the same logic as string templates
+                                manifest = manifest_manager.get_manifest()
+                                node_output = None
+                                
+                                # Check gap_finder_collect stage first
+                                collect_stage = manifest.get("stages", {}).get("gap_finder_collect", {})
+                                if "data" in collect_stage and "tool_results" in collect_stage["data"]:
+                                    tool_results = collect_stage["data"]["tool_results"]
+                                    if node_key in tool_results:
+                                        node_output = tool_results[node_key]
+                                        self.logger.info(f"Found tool output {node_key} in gap_finder_collect stage")
+                                
+                                if node_output and field_path:
+                                    # Extract the field
+                                    if isinstance(node_output, dict) and field_path in node_output:
+                                        field_value = node_output[field_path]
+                                        # If the resolved value is a list, extend instead of append to flatten
+                                        if isinstance(field_value, list):
+                                            resolved_list.extend(field_value)
+                                            self.logger.info(f"Flattened list template variable ${{{match}}} - extended {len(field_value)} items")
+                                        else:
+                                            resolved_list.append(field_value)
+                                            self.logger.info(f"Resolved list template variable ${{{match}}} to {type(field_value).__name__}")
+                                    else:
+                                        resolved_list.append(item)  # Keep original
+                                elif node_output:
+                                    # If the resolved value is a list, extend instead of append to flatten
+                                    if isinstance(node_output, list):
+                                        resolved_list.extend(node_output)
+                                        self.logger.info(f"Flattened list template variable ${{{match}}} - extended {len(node_output)} items")
+                                    else:
+                                        resolved_list.append(node_output)
+                                else:
+                                    resolved_list.append(item)  # Keep original
+                                    
+                            except Exception as e:
+                                self.logger.error(f"Error processing list template {match}: {e}")
+                                resolved_list.append(item)  # Keep original on error
+                        else:
+                            resolved_list.append(item)  # Keep non-template items
+                    else:
+                        resolved_list.append(item)  # Keep non-string items
+                resolved_inputs[key] = resolved_list
+            elif isinstance(value, str) and "${" in value:
                 # Find all template variables in the format ${variable_name}
                 template_pattern = r'\$\{([^}]+)\}'
                 matches = re.findall(template_pattern, value)
@@ -1292,13 +1469,25 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                         else:
                             node_key, field_path = match, None
                         
-                        # First try to get the node output using the key directly
-                        node_output = manifest_manager.get_node_output(node_key)
+                        # First try to get the node output from gap_finder_collect stage tool_results
+                        manifest = manifest_manager.get_manifest()
+                        node_output = None
                         
-                        # If not found, try to find the actual node_id that maps to this output key
+                        # Check gap_finder_collect stage first
+                        collect_stage = manifest.get("stages", {}).get("gap_finder_collect", {})
+                        if "data" in collect_stage and "tool_results" in collect_stage["data"]:
+                            tool_results = collect_stage["data"]["tool_results"]
+                            if node_key in tool_results:
+                                node_output = tool_results[node_key]
+                                self.logger.info(f"Found tool output {node_key} in gap_finder_collect stage")
+                        
+                        # If not found in collect stage, try the original logic
+                        if not node_output:
+                            node_output = manifest_manager.get_node_output(node_key)
+                        
+                        # If still not found, try to find the actual node_id that maps to this output key
                         if not node_output:
                             # Look through all stages to find a node that has this output_manifest_key
-                            manifest = manifest_manager.get_manifest()
                             for stage_key, stage_data in manifest.get("stages", {}).items():
                                 # Check if this stage was stored with the output key we're looking for
                                 if stage_key == node_key and "data" in stage_data:
@@ -1307,9 +1496,18 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                             
                             # If still not found, search through DAG nodes to find the one with matching output_manifest_key
                             if not node_output:
-                                dag = manifest.get("dag", {})
-                                nodes = dag.get("nodes", [])
-                                for node in nodes:
+                                # First try gap_finder dag_metadata nodes (where gap_finder nodes are stored)
+                                dag_nodes = []
+                                gap_finder_data = manifest.get("stages", {}).get("gap_finder_plan", {}).get("data", {})
+                                if "dag_metadata" in gap_finder_data:
+                                    dag_nodes = gap_finder_data.get("dag_metadata", {}).get("nodes", [])
+                                
+                                # Fallback to top-level dag nodes if not found
+                                if not dag_nodes:
+                                    dag = manifest.get("dag", {})
+                                    dag_nodes = dag.get("nodes", [])
+                                
+                                for node in dag_nodes:
                                     if node.get("output_manifest_key") == node_key:
                                         # Found the node, now get its data from the manifest
                                         actual_node_id = node.get("node_id")

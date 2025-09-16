@@ -423,7 +423,7 @@ class EnhancedDevelopmentOrchestrator(DevelopmentOrchestrator):
     
     async def _execute_node(self, node: DAGNode, inputs: Dict[str, Any]) -> NodeResult:
         """
-        Enhanced node execution with proper data passing.
+        Enhanced node execution with proper data passing and TOOL node handling.
         
         Args:
             node: The node to execute
@@ -451,6 +451,73 @@ class EnhancedDevelopmentOrchestrator(DevelopmentOrchestrator):
                 start_time=start_time,
                 end_time=end_time
             )
+        
+        # Handle TOOL nodes (NodeType.FUNCTION)
+        if node.node_type == NodeType.FUNCTION:
+            logger.info(f"Executing TOOL node: {node.node_id}")
+            start_time = datetime.now()
+            
+            try:
+                # Get tool configuration
+                tool_name = node.config.get("tool_name")
+                if not tool_name:
+                    logger.error(f"No tool_name specified for TOOL node {node.node_id}")
+                    return NodeResult(
+                        success=False,
+                        error="No tool_name specified for TOOL node",
+                        start_time=start_time,
+                        end_time=datetime.now()
+                    )
+                
+                logger.info(f"Executing MCP tool: {tool_name} for node {node.node_id}")
+                
+                # Initialize MCP client
+                from scout_agent.mcp_integration.client.multi import MultiMCPClient
+                from scout_agent.mcp_integration.config import load_server_configs
+                
+                configs = load_server_configs()
+                mcp_client = MultiMCPClient(configs)
+                await mcp_client.initialize()
+                
+                try:
+                    # Execute the MCP tool
+                    result = await mcp_client.call_tool(tool_name, inputs)
+                    
+                    # Extract content from MCP response
+                    output_data = {}
+                    if result and hasattr(result, 'content') and result.content:
+                        try:
+                            import json
+                            content_text = result.content[0].text
+                            output_data = json.loads(content_text)
+                            logger.info(f"Successfully executed MCP tool {tool_name} for node {node.node_id}")
+                        except (json.JSONDecodeError, AttributeError, IndexError) as e:
+                            logger.warning(f"Failed to parse MCP tool result as JSON: {e}")
+                            output_data = {"raw_result": str(result)}
+                    else:
+                        logger.warning(f"MCP tool {tool_name} returned empty or invalid result")
+                        output_data = {"empty_result": True}
+                    
+                    end_time = datetime.now()
+                    return NodeResult(
+                        success=True,
+                        output=output_data,
+                        start_time=start_time,
+                        end_time=end_time
+                    )
+                    
+                finally:
+                    await mcp_client.shutdown()
+                
+            except Exception as e:
+                logger.error(f"Error executing TOOL node {node.node_id}: {str(e)}")
+                end_time = datetime.now()
+                return NodeResult(
+                    success=False,
+                    error=str(e),
+                    start_time=start_time,
+                    end_time=end_time
+                )
         
         # For agent nodes, ensure proper setup
         if node.node_type == NodeType.AGENT:
@@ -577,6 +644,7 @@ class EnhancedDevelopmentOrchestrator(DevelopmentOrchestrator):
                                 # The collect method expects prerequisite node outputs in the manifest.
                                 # When using --source-run, we need to execute these nodes first.
                                 logger.info("Executing prerequisite nodes before gap_finder collect stage")
+                                await self._execute_prerequisite_nodes(plan_output)
                                 
                                 logger.info(f"Executing gap_finder collect with plan from source run and new run_id: {self.run_id}")
                                 
@@ -820,7 +888,7 @@ class EnhancedDevelopmentOrchestrator(DevelopmentOrchestrator):
             return
         
         # Define prerequisite node types in dependency order
-        prerequisite_types = ["search_links", "extract_content", "triage_content", "identify_vendors"]
+        prerequisite_types = ["search_links", "extract_content", "triage_content", "identify_vendors", "vendor_research", "aggregate_gap_analysis"]
         
         # Group nodes by type
         nodes_by_type = {}
@@ -875,11 +943,12 @@ class EnhancedDevelopmentOrchestrator(DevelopmentOrchestrator):
             result = await self._execute_node(dag_node, resolved_inputs)
             
             if result.success:
-                # Store result in manifest
+                # Store result in manifest using output_manifest_key if specified
                 if self.manifest_manager:
-                    self.manifest_manager.store_node_output(node_id, result.output)
+                    output_key = node_data.get("output_manifest_key", node_id)
+                    self.manifest_manager.store_node_output(output_key, result.output)
                     self.manifest_manager.update_node_status(node_id, NodeStatus.COMPLETED)
-                    logger.info(f"Stored output for prerequisite node: {node_id}")
+                    logger.info(f"Stored output for prerequisite node: {node_id} -> {output_key}")
             else:
                 logger.error(f"Failed to execute prerequisite node {node_id}: {result.error}")
                 
