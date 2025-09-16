@@ -394,6 +394,47 @@ class ManifestManager:
         # Save the manifest
         self._save()
         
+    def store_final_output(self, output_key: str, data: Dict[str, Any]) -> None:
+        """Store final output data in the outputs section of the manifest.
+        
+        Args:
+            output_key: The key to store the output under
+            data: The output data to store
+        """
+        logger = get_logger(__name__)
+        logger.info(f"store_final_output called with key: {output_key}")
+        
+        manifest = self.get_manifest()
+        
+        # Ensure outputs section exists
+        if "outputs" not in manifest:
+            manifest["outputs"] = {}
+            logger.info("Created new outputs section")
+        else:
+            logger.info(f"Existing outputs keys: {list(manifest['outputs'].keys())}")
+            
+        # Store the output data
+        manifest["outputs"][output_key] = data
+        logger.info(f"Stored data under key {output_key}")
+        
+        # Update timestamp
+        manifest["run_metadata"]["updated_at"] = datetime.datetime.now().isoformat()
+        
+        # Save the manifest
+        logger.info(f"About to save manifest to {self.manifest_path}")
+        self._save()
+        logger.info(f"Manifest saved successfully")
+        
+        # Verify the save worked by reading back from disk
+        try:
+            disk_manifest = json.loads(self.manifest_path.read_text())
+            if output_key in disk_manifest.get("outputs", {}):
+                logger.info(f"✓ Verified {output_key} exists on disk after save")
+            else:
+                logger.error(f"✗ {output_key} NOT found on disk after save! Disk outputs: {list(disk_manifest.get('outputs', {}).keys())}")
+        except Exception as e:
+            logger.error(f"Error verifying save: {e}")
+        
     def get_node_output(self, node_id: str) -> Optional[Dict[str, Any]]:
         """
         Get a node's output data.
@@ -431,24 +472,40 @@ class ManifestManager:
                         elif "data" in stage_data:
                             return stage_data["data"]
         
-        # Strategy 4: Check gap_finder_collect tool_results (legacy support)
+        # Strategy 4: Check gap_finder_collect vendor_analysis (correct location)
         manifest = self.get_manifest()
         if "gap_finder_collect" in manifest["stages"]:
             collect_data = manifest["stages"]["gap_finder_collect"].get("data", {})
-            tool_results = collect_data.get("tool_results", {})
+            vendor_analysis = collect_data.get("vendor_analysis", {})
             
             # Try exact match first
-            if node_id in tool_results:
-                return self._parse_tool_result(tool_results[node_id])
+            if node_id in vendor_analysis:
+                return self._parse_tool_result(vendor_analysis[node_id])
             
-            # Try pattern matching for template keys
+            # Try pattern matching for template keys like "vendor_research_pp1_output"
             if node_id.endswith("_output"):
                 base_name = node_id.replace("_output", "")
                 if "_pp" in base_name:
                     tool_name, pp_part = base_name.rsplit("_pp", 1)
                     pp_id = "pp" + pp_part
                     
-                    # Look for keys that match pattern: tool_name_<hash>_pp_id
+                    # Look for keys that match pattern: tool_name_<hash>_pp_id or tool_name_pp_id
+                    for key in vendor_analysis.keys():
+                        if (key.startswith(tool_name + "_") and key.endswith("_" + pp_id)) or key == f"{tool_name}_{pp_id}":
+                            return self._parse_tool_result(vendor_analysis[key])
+            
+            # Also check tool_results for backward compatibility
+            tool_results = collect_data.get("tool_results", {})
+            if node_id in tool_results:
+                return self._parse_tool_result(tool_results[node_id])
+            
+            # Pattern matching in tool_results too
+            if node_id.endswith("_output"):
+                base_name = node_id.replace("_output", "")
+                if "_pp" in base_name:
+                    tool_name, pp_part = base_name.rsplit("_pp", 1)
+                    pp_id = "pp" + pp_part
+                    
                     for key in tool_results.keys():
                         if key.startswith(tool_name + "_") and key.endswith("_" + pp_id):
                             return self._parse_tool_result(tool_results[key])
