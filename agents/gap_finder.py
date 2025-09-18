@@ -1028,7 +1028,7 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
             multi_client = MultiMCPClient(
                 configs, 
                 max_retries=5,  # Increased retries for better resilience
-                connection_timeout=300,  # 300 second timeout for connections
+                connection_timeout=600,  # 300 second timeout for connections
                 sse_read_timeout=3600  # 1 hour timeout for vendor research operations
             )
             await multi_client.initialize()
@@ -1127,25 +1127,23 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                     self.logger.info(f"Storage decision for {node_id}: final_stage={final_stage_flag}, aggregate_tool={aggregate_in_tool}, final_key={is_final_key}, is_final_output={is_final_output}")
                     
                     if is_final_output:
-                        # Use store_final_output for aggregate/final nodes
+                        # NUCLEAR APPROACH: Store raw aggregate output directly to gap_finder_collect tool_results
                         try:
-                            self.logger.info(f"About to call store_final_output with key: {output_key}")
-                            manifest_manager.store_final_output(output_key, result_data)
-                            self.logger.info(f"store_final_output completed successfully for key: {output_key}")
+                            self.logger.info(f"NUCLEAR: Storing raw aggregate output directly to tool_results with key: {output_key}")
+                            self.logger.info(f"NUCLEAR: Raw result_data type: {type(result_data)}")
+                            self.logger.info(f"NUCLEAR: Raw result_data content: {json.dumps(result_data, indent=2) if isinstance(result_data, dict) else str(result_data)}")
                             
-                            # Verify it was stored
-                            updated_manifest = manifest_manager.get_manifest()
-                            if "outputs" in updated_manifest and output_key in updated_manifest["outputs"]:
-                                self.logger.info(f"✓ Verified {output_key} exists in outputs section")
-                            else:
-                                self.logger.error(f"✗ {output_key} not found in outputs section after storage")
-                                
+                            # Store directly in gap_finder_collect tool_results - NO PROCESSING
+                            self._store_tool_output_in_collect_stage(manifest_manager, output_key, result_data)
+                            
+                            self.logger.info(f"NUCLEAR: Raw aggregate output stored successfully for key: {output_key}")
+                            
                         except Exception as e:
-                            self.logger.error(f"Error in store_final_output for {output_key}: {e}")
+                            self.logger.error(f"NUCLEAR: Error storing raw aggregate output for {output_key}: {e}")
                             import traceback
-                            self.logger.error(f"Traceback: {traceback.format_exc()}")
+                            self.logger.error(f"NUCLEAR: Traceback: {traceback.format_exc()}")
                             
-                        self.logger.info(f"Successfully executed and stored final output for node: {node_id} with key: {output_key}")
+                        self.logger.info(f"NUCLEAR: Successfully stored raw aggregate output for node: {node_id} with key: {output_key}")
                     else:
                         # Store tool outputs within gap_finder_collect stage context
                         self._store_tool_output_in_collect_stage(manifest_manager, output_key, result_data)
@@ -1350,14 +1348,44 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
         except Exception as e:
             self.logger.error(f"Error during direct manifest scanning: {str(e)}")
         
+        # Retrieve and include final output from manifest if available
+        try:
+            project_root = Path(__file__).resolve().parents[2]
+            current_run_id = run_id or getattr(self.state, "run_id", "latest")
+            run_dir = project_root / "data" / "runs" / current_run_id
+            manifest_path = run_dir / "run_manifest.json"
+            
+            manifest_manager = ManifestManager(manifest_path, create_if_missing=False)
+            manifest = manifest_manager.get_manifest()
+            
+            # Check if gap_finder_final_output exists in manifest
+            if "gap_finder_final_output" in manifest.get("outputs", {}):
+                final_output = manifest["outputs"]["gap_finder_final_output"]
+                self.logger.info(f"DEBUG: Found gap_finder_final_output in manifest")
+                
+                # Include the final output data in aggregated_data
+                if isinstance(final_output, dict) and "data" in final_output:
+                    final_data = final_output["data"]
+                    if isinstance(final_data, dict) and "summary" in final_data:
+                        aggregated_data["aggregate_summary"] = final_data["summary"]
+                        self.logger.info(f"DEBUG: Added aggregate_summary to aggregated_data: {final_data['summary']}")
+                        
+        except Exception as e:
+            self.logger.error(f"Error retrieving final output from manifest: {str(e)}")
+        
         # Generate summary insights
+        self.logger.info(f"DEBUG: Before _generate_collect_summary, aggregated_data keys: {list(aggregated_data.keys())}")
+        if "summary" in aggregated_data:
+            self.logger.info(f"DEBUG: Existing summary in aggregated_data: {aggregated_data['summary']}")
         aggregated_data["summary"] = self._generate_collect_summary(aggregated_data)
+        self.logger.info(f"DEBUG: After _generate_collect_summary: {aggregated_data['summary']}")
         
         return aggregated_data
     
     def _generate_collect_summary(self, aggregated_data: Dict[str, Any]) -> Dict[str, Any]:
         """Generate summary insights from collected data."""
-        return {
+        # Start with basic collection metrics
+        summary = {
             "data_sources_collected": len([k for k in aggregated_data.keys() if k != "execution_metadata" and k != "summary"]),
             "market_research_sources": len(aggregated_data.get("market_research_data", {})),
             "competitive_analysis_sources": len(aggregated_data.get("competitive_analysis", {})),
@@ -1366,6 +1394,37 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
             "collection_status": "completed",
             "next_stage_ready": True
         }
+        
+        # Preserve vendor data from aggregate results if available
+        if "summary" in aggregated_data:
+            existing_summary = aggregated_data["summary"]
+            if isinstance(existing_summary, dict):
+                # Preserve vendor-related fields from aggregate function
+                vendor_fields = ["total_vendors_found", "unique_vendors", "high_opportunity_gaps", 
+                               "competitive_intensity", "total_vendors_analyzed"]
+                for field in vendor_fields:
+                    if field in existing_summary:
+                        summary[field] = existing_summary[field]
+                        self.logger.info(f"Preserved {field}: {existing_summary[field]} from aggregate results")
+        
+        # Include vendor data from aggregate summary if available
+        if "aggregate_summary" in aggregated_data:
+            aggregate_summary = aggregated_data["aggregate_summary"]
+            if isinstance(aggregate_summary, dict):
+                # Include vendor-related fields from aggregate summary - OVERRIDE calculated values
+                vendor_fields = ["total_vendors_found", "unique_vendors", "high_opportunity_gaps", 
+                               "competitive_intensity", "total_vendors_analyzed"]
+                for field in vendor_fields:
+                    if field in aggregate_summary:
+                        summary[field] = aggregate_summary[field]
+                        self.logger.info(f"OVERRIDING {field}: {aggregate_summary[field]} from aggregate summary")
+                        
+                # Special priority for total_vendors_found from aggregate results
+                if "total_vendors_found" in aggregate_summary and aggregate_summary["total_vendors_found"] > 0:
+                    summary["total_vendors_found"] = aggregate_summary["total_vendors_found"]
+                    self.logger.info(f"CRITICAL: Using aggregate total_vendors_found: {aggregate_summary['total_vendors_found']} (overriding calculated value)")
+        
+        return summary
     
     def _resolve_template_variables(self, inputs: Dict[str, Any], manifest_manager: ManifestManager) -> Dict[str, Any]:
         """Resolve ${...} template variables in tool inputs using manifest data."""
