@@ -915,15 +915,8 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
             # Store final output to manifest
             await self._write_stage_output("gapfinder_collect", final_output, run_id)
             
-            # Also store in outputs section for easy access
-            # Use the same manifest path construction as in other methods
-            project_root = Path(__file__).resolve().parents[2]
-            current_run_id = run_id or getattr(self.state, "run_id", "latest")
-            run_dir = project_root / "data" / "runs" / current_run_id
-            manifest_path = run_dir / "run_manifest.json"
-            
-            manifest_manager = ManifestManager(manifest_path, create_if_missing=False)
-            manifest_manager.store_final_output("gap_finder_final_output", final_output)
+            # NOTE: Removed outputs section save - gap_finder_final_output is now stored
+            # directly in gap_finder_collect.data.tool_results via nuclear approach
             
             self.logger.info("Gap finder collect stage completed successfully")
             return final_output
