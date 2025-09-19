@@ -1095,6 +1095,12 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                     if hasattr(result, 'content') and result.content:
                         content_item = result.content[0] if isinstance(result.content, list) else result.content
                         if hasattr(content_item, 'text'):
+                            # Check if this is an error response from the tool
+                            if content_item.text.startswith("Error executing tool"):
+                                self.logger.error(f"Tool {tool_name} returned error: {content_item.text}")
+                                # Don't store error responses as successful results
+                                continue
+                            
                             try:
                                 # Try to parse as JSON
                                 result_data = json.loads(content_item.text)
@@ -1108,39 +1114,14 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                     
                     # Store to manifest
                     output_key = node.get("output_manifest_key", f"{node_id}_output")
-                    
-                    # Check if this is a final output node (aggregate node)
-                    config_metadata = node.get("config", {}).get("metadata", {})
-                    final_stage_flag = config_metadata.get("final_stage") == True
-                    aggregate_in_tool = "aggregate" in tool_name.lower()
-                    is_final_key = output_key == "gap_finder_final_output"
-                    
-                    is_final_output = final_stage_flag or aggregate_in_tool or is_final_key
-                    
-                    self.logger.info(f"Storage decision for {node_id}: final_stage={final_stage_flag}, aggregate_tool={aggregate_in_tool}, final_key={is_final_key}, is_final_output={is_final_output}")
-                    
-                    if is_final_output:
-                        # NUCLEAR APPROACH: Store raw aggregate output directly to gap_finder_collect tool_results
-                        try:
-                            self.logger.info(f"NUCLEAR: Storing raw aggregate output directly to tool_results with key: {output_key}")
-                            self.logger.info(f"NUCLEAR: Raw result_data type: {type(result_data)}")
-                            self.logger.info(f"NUCLEAR: Raw result_data content: {json.dumps(result_data, indent=2) if isinstance(result_data, dict) else str(result_data)}")
-                            
-                            # Store directly in gap_finder_collect tool_results - NO PROCESSING
-                            self._store_tool_output_in_collect_stage(manifest_manager, output_key, result_data)
-                            
-                            self.logger.info(f"NUCLEAR: Raw aggregate output stored successfully for key: {output_key}")
-                            
-                        except Exception as e:
-                            self.logger.error(f"NUCLEAR: Error storing raw aggregate output for {output_key}: {e}")
-                            import traceback
-                            self.logger.error(f"NUCLEAR: Traceback: {traceback.format_exc()}")
-                            
-                        self.logger.info(f"NUCLEAR: Successfully stored raw aggregate output for node: {node_id} with key: {output_key}")
-                    else:
-                        # Store tool outputs within gap_finder_collect stage context
+                    if tool_name == "aggregate_gap_analysis" or output_key == "gap_finder_final_output":
+                        # Store the aggregate output directly with no post-processing
                         self._store_tool_output_in_collect_stage(manifest_manager, output_key, result_data)
-                        self.logger.info(f"Successfully executed and stored results for node: {node_id} within collect stage")
+                        self.logger.info(f"Stored aggregate output for node: {node_id} (key={output_key})")
+                    else:
+                        # Store other tool outputs within gap_finder_collect stage context
+                        self._store_tool_output_in_collect_stage(manifest_manager, output_key, result_data)
+                        self.logger.info(f"Stored results for node: {node_id} within collect stage (key={output_key})")
                     
                 else:
                     self.logger.error(f"Tool node {node_id} returned no result")
@@ -1341,30 +1322,7 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
         except Exception as e:
             self.logger.error(f"Error during direct manifest scanning: {str(e)}")
         
-        # Retrieve and include final output from manifest if available
-        try:
-            project_root = Path(__file__).resolve().parents[2]
-            current_run_id = run_id or getattr(self.state, "run_id", "latest")
-            run_dir = project_root / "data" / "runs" / current_run_id
-            manifest_path = run_dir / "run_manifest.json"
-            
-            manifest_manager = ManifestManager(manifest_path, create_if_missing=False)
-            manifest = manifest_manager.get_manifest()
-            
-            # Check if gap_finder_final_output exists in manifest
-            if "gap_finder_final_output" in manifest.get("outputs", {}):
-                final_output = manifest["outputs"]["gap_finder_final_output"]
-                self.logger.info(f"DEBUG: Found gap_finder_final_output in manifest")
-                
-                # Include the final output data in aggregated_data
-                if isinstance(final_output, dict) and "data" in final_output:
-                    final_data = final_output["data"]
-                    if isinstance(final_data, dict) and "summary" in final_data:
-                        aggregated_data["aggregate_summary"] = final_data["summary"]
-                        self.logger.info(f"DEBUG: Added aggregate_summary to aggregated_data: {final_data['summary']}")
-                        
-        except Exception as e:
-            self.logger.error(f"Error retrieving final output from manifest: {str(e)}")
+        # NOTE: Removed reading from outputs['gap_finder_final_output'] to avoid stale data influence
         
         # Generate summary insights
         self.logger.info(f"DEBUG: Before _generate_collect_summary, aggregated_data keys: {list(aggregated_data.keys())}")
@@ -1447,6 +1405,25 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                                 # Get node output using the same logic as string templates
                                 manifest = manifest_manager.get_manifest()
                                 node_output = None
+                                
+                                # Special handling for vendor_research_pp1_output template
+                                if node_key == "vendor_research_pp1_output":
+                                    # Look for vendor_research_pp1 in vendor_analysis
+                                    # Try both gap_finder_collect and gapfinder_collect naming conventions
+                                    collect_stage_data = None
+                                    for collect_key in ["gap_finder_collect", "gapfinder_collect"]:
+                                        if collect_key in manifest.get("stages", {}):
+                                            collect_stage_data = manifest["stages"][collect_key].get("data", {})
+                                            break
+                                    
+                                    if collect_stage_data:
+                                        vendor_analysis = collect_stage_data.get("vendor_analysis", {})
+                                        if "vendor_research_pp1" in vendor_analysis:
+                                            node_output = vendor_analysis["vendor_research_pp1"]
+                                            self.logger.info(f"Found vendor_research_pp1_output in vendor_analysis")
+                                        elif "vendor_research_batch" in vendor_analysis:
+                                            node_output = vendor_analysis["vendor_research_batch"]
+                                            self.logger.info(f"Found vendor_research_pp1_output via vendor_research_batch")
                                 
                                 # Check gap_finder_collect stage first
                                 collect_stage = manifest.get("stages", {}).get("gap_finder_collect", {})

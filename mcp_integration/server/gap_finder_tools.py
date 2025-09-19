@@ -15,7 +15,7 @@ from scout_agent.sources.web_content_extractor import WebContentExtractor
 from scout_agent.data_cache.file_cache import FileCache
 from scout_agent.custom_logging import get_logger
 from scout_agent.config import init_config, get_config
-from scout_agent.llm.manager import LLMManager
+from scout_agent.llm.manager import LLMManager, get_llm_manager, initialize_llm_backends
 from scout_agent.llm.base import LLMRequest, LLMConfig, LLMBackendType
 from scout_agent.sources.scripts.vendor_research_tool import VendorResearchTool
 
@@ -208,7 +208,7 @@ class ContentTriager:
                 return cached
         
         # Prepare input for LLM (format like standalone version)
-        input_text = f"URL: {url}\nTitle: {url.split('/')[-1] if url else 'Unknown'}\nContent: {content[:3000]}..."  # Truncate content to avoid token limits
+        input_text = f"URL: {url}\nTitle: {url.split('/')[-1] if url else 'Unknown'}\nContent: {content}..."  # Truncate content to avoid token limits
         
         # Call LLM
         try:
@@ -1025,1199 +1025,128 @@ async def aggregate_gap_analysis(
     output_format: str = "comprehensive_gap_analysis"
 ) -> Dict[str, Any]:
     """
-    Aggregate vendor research results for comprehensive gap analysis using LLM synthesis.
+    Simplified aggregate gap analysis - saves LLM response directly to manifest.
+    No post-processing, no heuristics, no fallbacks.
     
     Args:
         research_outputs: List of vendor research results from different pain points
         pain_points: Original pain points data for context
-        merge_strategy: Strategy for merging results (by_pain_point_id, by_vendor, comprehensive)
-        output_format: Format of the output (comprehensive_gap_analysis, summary, detailed)
+        merge_strategy: Strategy for merging results (unused in simplified version)
+        output_format: Format of the output (unused in simplified version)
     
     Returns:
-        Aggregated analysis with market gaps, vendor landscape, and opportunities
+        Raw LLM response as JSON (no transformation)
     """
-    
-    # TEMPLATE RESOLUTION FIX: Handle template strings in research_outputs
-    logger.info(f"[AGGREGATE_GAP_ANALYSIS] Raw research_outputs type: {type(research_outputs)}")
-    logger.info(f"[AGGREGATE_GAP_ANALYSIS] Raw research_outputs content: {research_outputs[:2] if isinstance(research_outputs, list) else 'not list'}")
-    
-    # Check if research_outputs contains template strings that need resolution
-    resolved_research_outputs = []
-    for i, output in enumerate(research_outputs):
-        if isinstance(output, str) and output.startswith('${'):
-            logger.warning(f"[AGGREGATE_GAP_ANALYSIS] Found unresolved template string: {output}")
-            logger.warning(f"[AGGREGATE_GAP_ANALYSIS] This indicates a template resolution issue in the workflow")
-            # For now, skip this output as it's not resolved
-            continue
-        else:
-            resolved_research_outputs.append(output)
-    
-    research_outputs = resolved_research_outputs
-    logger.info(f"[AGGREGATE_GAP_ANALYSIS] After template resolution - research_outputs length: {len(research_outputs)}")
 
-    logger.info("[AGGREGATE_GAP_ANALYSIS] Starting gap analysis aggregation")
-    logger.info(f"[AGGREGATE_GAP_ANALYSIS] Input research_outputs length: {len(research_outputs)}")
-    logger.info(f"[AGGREGATE_GAP_ANALYSIS] Input pain_points length: {len(pain_points)}")
-    logger.info(f"[AGGREGATE_GAP_ANALYSIS] Merge strategy: {merge_strategy}")
-    logger.info(f"[AGGREGATE_GAP_ANALYSIS] Output format: {output_format}")
-    logger.debug(f"[AGGREGATE_GAP_ANALYSIS] Research outputs structure: {[{k: type(v).__name__ for k, v in item.items()} if isinstance(item, dict) else f'list_with_{len(item)}_items' for item in research_outputs[:3]]}")
-    logger.debug(f"[AGGREGATE_GAP_ANALYSIS] Pain points structure: {[{k: type(v).__name__ for k, v in item.items()} for item in pain_points[:3]]}")
+    from scout_agent.llm.backends import DeepSeekBackend
+    
+    logger.info(f"[AGGREGATE_GAP_ANALYSIS] Starting simplified gap analysis aggregation")
+    logger.info(f"[AGGREGATE_GAP_ANALYSIS] - Research outputs: {len(research_outputs) if isinstance(research_outputs, list) else 'not_list'}")
+    logger.info(f"[AGGREGATE_GAP_ANALYSIS] - Pain points: {len(pain_points) if isinstance(pain_points, list) else 'not_list'}")
     
     try:
-        # Initialize aggregation containers
-        all_vendors = []
-        vendor_by_pain_point = {}
-        pain_point_coverage = {}
+        # Initialize LLM manager
+        llm_manager = LLMManager()
+        config = get_config()
         
-        logger.info(f"[AGGREGATE_GAP_ANALYSIS] Initialized aggregation containers")
+        # Initialize DeepSeek backend
+        if not config.api.deepseek_api_key:
+            raise Exception("No DeepSeek API key found in configuration")
         
-        # Process each research output
-        logger.info(f"[AGGREGATE_GAP_ANALYSIS] Processing {len(research_outputs)} research outputs")
+        deepseek_config = LLMConfig(
+            backend_type=LLMBackendType.DEEPSEEK,
+            model_name="deepseek-chat",
+            api_key=config.api.deepseek_api_key,
+            temperature=0.2,
+            max_tokens=8192
+        )
         
-        for i, research_output in enumerate(research_outputs):
-            logger.info(f"[AGGREGATE_GAP_ANALYSIS] Processing research output {i+1}/{len(research_outputs)}")
-            logger.debug(f"[AGGREGATE_GAP_ANALYSIS] Output {i+1} type: {type(research_output)}")
-            logger.debug(f"[AGGREGATE_GAP_ANALYSIS] Output {i+1} keys: {list(research_output.keys()) if isinstance(research_output, dict) else 'not dict'}")
-            
-            if not research_output or not isinstance(research_output, (dict, list)):
-                logger.warning(f"[AGGREGATE_GAP_ANALYSIS] Output {i+1} - Skipping invalid research output: {type(research_output)}")
-                continue
-                
-            # Extract batch results - handle both direct array and wrapped object formats
-            if isinstance(research_output, list):
-                # Handle direct array from template (e.g., ${vendor_research_pp1_output.research_results})
-                batch_results = research_output
-                logger.info(f"[AGGREGATE_GAP_ANALYSIS] Output {i+1} - Processing direct array with {len(batch_results)} items")
-            elif isinstance(research_output, dict):
-                # Handle wrapped object format - try both field names for compatibility
-                batch_results = research_output.get("batch_results", research_output.get("research_results", []))
-                logger.info(f"[AGGREGATE_GAP_ANALYSIS] Output {i+1} - Processing wrapped object with {len(batch_results)} items")
-                if "research_results" in research_output and "batch_results" not in research_output:
-                    logger.info(f"[AGGREGATE_GAP_ANALYSIS] Output {i+1} - Using 'research_results' field (vendor_research_batch format)")
-            else:
-                batch_results = []
-                logger.warning(f"[AGGREGATE_GAP_ANALYSIS] Output {i+1} - Unexpected research_output type: {type(research_output)}")
-            
-            logger.debug(f"[AGGREGATE_GAP_ANALYSIS] Output {i+1} - Batch results structure: {[{k: type(v).__name__ for k, v in result.items()} for result in batch_results[:3]] if batch_results else 'empty'}")
-            
-            successful_results = 0
-            for j, result in enumerate(batch_results):
-                logger.debug(f"[AGGREGATE_GAP_ANALYSIS] Output {i+1} - Processing batch result {j+1}/{len(batch_results)}")
-                logger.debug(f"[AGGREGATE_GAP_ANALYSIS] Output {i+1} - Result {j+1} success: {result.get('success', False)}")
-                
-                if not result.get("success", False):
-                    logger.warning(f"[AGGREGATE_GAP_ANALYSIS] Output {i+1} - Result {j+1} - Skipping unsuccessful result: {result.get('error', 'No error message')}")
-                    continue
-                    
-                # Handle both vendor_data (expected format) and research_data (vendor_research_batch format)
-                vendor_data = result.get("vendor_data", {})
-                if not vendor_data and "research_data" in result:
-                    # Convert vendor_research_batch format to expected format
-                    research_data = result.get("research_data", {})
-                    vendor_name_from_result = result.get("vendor_name", "Unknown")
-                    
-                    # Flatten the research_data structure
-                    vendor_data = {
-                        "name": vendor_name_from_result,
-                        "business_profile": research_data.get("business_profile", {}),
-                        "features": research_data.get("features", {}),
-                        "pricing": research_data.get("pricing", {}),
-                        "target_customers": research_data.get("target_customers", {}),
-                        "pain_point_address": research_data.get("pain_point_address", {}),
-                        "strengths": research_data.get("strengths", {}),
-                        "limitations": research_data.get("limitations", {}),
-                        "reviews": research_data.get("reviews", {}),
-                        "evidence": research_data.get("evidence", {})
-                    }
-                    logger.info(f"[AGGREGATE_GAP_ANALYSIS] Output {i+1} - Result {j+1} - Converted research_data format for vendor: {vendor_name_from_result}")
-                
-                logger.debug(f"[AGGREGATE_GAP_ANALYSIS] Output {i+1} - Result {j+1} - Vendor data keys: {list(vendor_data.keys()) if vendor_data else 'No vendor data'}")
-                
-                if not vendor_data:
-                    logger.warning(f"[AGGREGATE_GAP_ANALYSIS] Output {i+1} - Result {j+1} - Skipping result with no vendor data")
-                    continue
-                    
-                # Add pain point context
-                pain_point_id = f"pp_{i + 1}"
-                vendor_data["associated_pain_point_id"] = pain_point_id
-                vendor_data["pain_point_context"] = pain_points[i] if i < len(pain_points) else {}
-                
-                vendor_name = vendor_data.get('name', 'Unknown')
-                logger.info(f"[AGGREGATE_GAP_ANALYSIS] Output {i+1} - Result {j+1} - Processing vendor: {vendor_name} for {pain_point_id}")
-                
-                all_vendors.append(vendor_data)
-                
-                # Group by pain point
-                if pain_point_id not in vendor_by_pain_point:
-                    vendor_by_pain_point[pain_point_id] = []
-                    logger.debug(f"[AGGREGATE_GAP_ANALYSIS] Output {i+1} - Created new pain point group: {pain_point_id}")
-                vendor_by_pain_point[pain_point_id].append(vendor_data)
-                
-                successful_results += 1
-                logger.debug(f"[AGGREGATE_GAP_ANALYSIS] Output {i+1} - Result {j+1} - Added vendor {vendor_name} (total vendors: {len(all_vendors)})")
-            
-            logger.info(f"[AGGREGATE_GAP_ANALYSIS] Output {i+1} - Processed {successful_results}/{len(batch_results)} successful results")
+        deepseek_backend = DeepSeekBackend(deepseek_config)
+        await llm_manager.register_backend(deepseek_backend, is_default=True)
+        logger.info("[AGGREGATE_GAP_ANALYSIS] DeepSeek backend initialized")
         
-        logger.info(f"[AGGREGATE_GAP_ANALYSIS] Research output processing complete")
-        logger.info(f"[AGGREGATE_GAP_ANALYSIS] - Total vendors collected: {len(all_vendors)}")
-        logger.info(f"[AGGREGATE_GAP_ANALYSIS] - Pain points with vendors: {len(vendor_by_pain_point)}")
-        logger.info(f"[AGGREGATE_GAP_ANALYSIS] - Pain point IDs: {list(vendor_by_pain_point.keys())}")
-        
-        for pp_id, vendors in vendor_by_pain_point.items():
-            vendor_names = [v.get('name', 'Unknown') for v in vendors[:3]]
-            logger.info(f"[AGGREGATE_GAP_ANALYSIS] - {pp_id}: {len(vendors)} vendors (sample: {vendor_names})")
-        
-        # Create comprehensive vendor summary for gap finder stages
-        logger.info(f"[AGGREGATE_GAP_ANALYSIS] Creating comprehensive vendor summary with {len(all_vendors)} vendors")
-        
-        vendor_summary = _create_comprehensive_vendor_summary(all_vendors, vendor_by_pain_point, pain_points)
-        
-        # Use enhanced LLM synthesis with proper error handling
-        logger.info(f"[AGGREGATE_GAP_ANALYSIS] Starting enhanced LLM-based synthesis")
-        
-        try:
-            # Initialize LLM manager with proper configuration
-            llm_manager = LLMManager()
-            
-            # Initialize DeepSeek backend like other functions do
-            from scout_agent.llm.backends import DeepSeekBackend
-            logger.info("[AGGREGATE_GAP_ANALYSIS] Starting LLM backend initialization")
-            config = get_config()
-            
-            # Only try to register DeepSeek backend
-            if config.api.deepseek_api_key:
-                try:
-                    logger.info("[AGGREGATE_GAP_ANALYSIS] Initializing DeepSeek backend")
-                    # Create LLMConfig as a dataclass instance
-                    deepseek_config = LLMConfig(
-                        backend_type=LLMBackendType.DEEPSEEK,
-                        model_name="deepseek-chat",
-                        api_key=config.api.deepseek_api_key,
-                        temperature=0.7,
-                        max_tokens=4096
-                    )
-                    
-                    deepseek_backend = DeepSeekBackend(deepseek_config)
-                    await llm_manager.register_backend(deepseek_backend, is_default=True)
-                    logger.info("[AGGREGATE_GAP_ANALYSIS] DeepSeek backend registered successfully")
-                except Exception as e:
-                    logger.error(f"[AGGREGATE_GAP_ANALYSIS] Failed to initialize DeepSeek backend: {e}")
-                    raise Exception(f"Failed to initialize DeepSeek backend: {e}")
-            else:
-                logger.error("[AGGREGATE_GAP_ANALYSIS] No DeepSeek API key found in configuration")
-                raise Exception("No DeepSeek API key found in configuration")
-            
-            # Prepare comprehensive synthesis data
-            synthesis_data = {
-                "vendor_research_outputs": research_outputs,
-                "pain_points": pain_points,
-                "vendor_summary": vendor_summary,
-                "analysis_context": {
-                    "total_vendors": len(all_vendors),
-                    "unique_vendors": len(set(v.get('name', '').lower() for v in all_vendors if v.get('name'))),
-                    "pain_points_covered": len(vendor_by_pain_point),
-                    "analysis_timestamp": datetime.now().isoformat()
-                }
-            }
-            
-            # Load and prepare the synthesis prompt with proper substitutions
-            prompt_path = Path(__file__).parent.parent.parent / "prompts" / "gap_finder_agent" / "collect_aggregate.prompt"
-            
-            if prompt_path.exists():
-                with open(prompt_path, 'r') as f:
-                    prompt_template = f.read()
-                
-                # Prepare substitutions for the prompt
-                substitutions = {
-                    "research_outputs_count": str(len(research_outputs)),
-                    "pain_points_count": str(len(pain_points)),
-                    "market_context": "Software testing and quality assurance tools market",
-                    "analysis_scope": "Competitive landscape analysis and gap identification"
-                }
-                
-                # Replace template variables
-                prompt_content = prompt_template
-                for key, value in substitutions.items():
-                    prompt_content = prompt_content.replace(f"{{{{{key}}}}}", value)
-                
-                # Append the actual research data
-                prompt_content += f"\n\nResearch Data to Analyze:\n{json.dumps(synthesis_data, indent=2)}"
-                
-                # Create LLM request with proper configuration - no token limits for production
-                llm_request = LLMRequest(
-                    messages=[{"role": "user", "content": prompt_content}],
-                    system_prompt="You are an expert market analyst specializing in competitive intelligence and gap analysis. Analyze the provided vendor research data and return a comprehensive JSON analysis following the specified format.",
-                    temperature=0.2
-                    # No max_tokens limit - let DeepSeek use full context window for comprehensive analysis
-                )
-                
-                # Generate synthesis using LLM
-                logger.info(f"[AGGREGATE_GAP_ANALYSIS] Sending enhanced synthesis request to LLM")
-                llm_response = await llm_manager.generate(llm_request)
-                
-                # Debug logging for LLM response
-                logger.info(f"[AGGREGATE_GAP_ANALYSIS] LLM response received: {llm_response is not None}")
-                if llm_response:
-                    logger.info(f"[AGGREGATE_GAP_ANALYSIS] LLM response success: {llm_response.success}")
-                    logger.info(f"[AGGREGATE_GAP_ANALYSIS] LLM response content length: {len(llm_response.content) if llm_response.content else 0}")
-                    logger.debug(f"[AGGREGATE_GAP_ANALYSIS] LLM response content preview: {llm_response.content[:200] if llm_response.content else 'None'}...")
-                    if hasattr(llm_response, 'error') and llm_response.error:
-                        logger.error(f"[AGGREGATE_GAP_ANALYSIS] LLM response error: {llm_response.error}")
-                
-                if llm_response and llm_response.success and llm_response.content:
-                    logger.info(f"[AGGREGATE_GAP_ANALYSIS] LLM response content (first 500 chars): {llm_response.content[:500]}")
-                    
-                    # Parse LLM response as JSON
-                    try:
-                        synthesis_result = json.loads(llm_response.content)
-                        logger.info(f"[AGGREGATE_GAP_ANALYSIS] LLM synthesis completed successfully")
-                        
-                        # Extract components from LLM synthesis
-                        market_gaps = synthesis_result.get("market_gaps", [])
-                        vendor_analysis = synthesis_result.get("competitive_landscape", {})
-                        opportunities = synthesis_result.get("opportunities", [])
-                        executive_summary = synthesis_result.get("executive_summary", {})
-                        
-                    except json.JSONDecodeError as e:
-                        logger.error(f"[AGGREGATE_GAP_ANALYSIS] Failed to parse LLM response as JSON: {e}")
-                        logger.error(f"[AGGREGATE_GAP_ANALYSIS] Raw LLM response: '{llm_response.content}'")
-                        logger.error(f"[AGGREGATE_GAP_ANALYSIS] Response length: {len(llm_response.content)}")
-                        logger.error(f"[AGGREGATE_GAP_ANALYSIS] Response type: {type(llm_response.content)}")
-                        
-                        # Try to extract JSON from response, handling markdown code blocks
-                        import re
-                        
-                        # First try to extract from ```json code blocks
-                        code_block_match = re.search(r'```(?:json)?\s*\n?([\s\S]*?)\n?```', llm_response.content)
-                        if code_block_match:
-                            logger.info(f"[AGGREGATE_GAP_ANALYSIS] Found JSON in code block, attempting to parse")
-                            try:
-                                synthesis_result = json.loads(code_block_match.group(1).strip())
-                                logger.info(f"[AGGREGATE_GAP_ANALYSIS] Code block JSON parsing successful")
-                                
-                                # Extract components from LLM synthesis
-                                market_gaps = synthesis_result.get("market_gaps", [])
-                                vendor_analysis = synthesis_result.get("competitive_landscape", {})
-                                opportunities = synthesis_result.get("opportunities", [])
-                                executive_summary = synthesis_result.get("executive_summary", {})
-                            except json.JSONDecodeError as e2:
-                                logger.error(f"[AGGREGATE_GAP_ANALYSIS] Code block JSON parsing failed: {e2}")
-                                # Fall back to original regex pattern
-                                json_match = re.search(r'\{[\s\S]*\}', llm_response.content)
-                                if json_match:
-                                    logger.info(f"[AGGREGATE_GAP_ANALYSIS] Trying fallback JSON pattern")
-                                    try:
-                                        synthesis_result = json.loads(json_match.group(0))
-                                        logger.info(f"[AGGREGATE_GAP_ANALYSIS] Fallback JSON parsing successful")
-                                        
-                                        # Extract components from LLM synthesis
-                                        market_gaps = synthesis_result.get("market_gaps", [])
-                                        vendor_analysis = synthesis_result.get("competitive_landscape", {})
-                                        opportunities = synthesis_result.get("opportunities", [])
-                                        executive_summary = synthesis_result.get("executive_summary", {})
-                                    except json.JSONDecodeError as e3:
-                                        logger.error(f"[AGGREGATE_GAP_ANALYSIS] All JSON parsing attempts failed: {e3}")
-                                        raise json.JSONDecodeError(f"Failed to parse LLM response as JSON: {e}", llm_response.content, 0)
-                                else:
-                                    logger.error(f"[AGGREGATE_GAP_ANALYSIS] No JSON pattern found in response")
-                                    raise json.JSONDecodeError(f"Failed to parse LLM response as JSON: {e}", llm_response.content, 0)
-                        else:
-                            # Fall back to original regex pattern if no code blocks found
-                            json_match = re.search(r'\{[\s\S]*\}', llm_response.content)
-                            if json_match:
-                                logger.info(f"[AGGREGATE_GAP_ANALYSIS] Found JSON match, attempting to parse")
-                                try:
-                                    synthesis_result = json.loads(json_match.group(0))
-                                    logger.info(f"[AGGREGATE_GAP_ANALYSIS] Regex-extracted JSON parsing successful")
-                                    
-                                    # Extract components from LLM synthesis
-                                    market_gaps = synthesis_result.get("market_gaps", [])
-                                    vendor_analysis = synthesis_result.get("competitive_landscape", {})
-                                    opportunities = synthesis_result.get("opportunities", [])
-                                    executive_summary = synthesis_result.get("executive_summary", {})
-                                except json.JSONDecodeError as e2:
-                                    logger.error(f"[AGGREGATE_GAP_ANALYSIS] Regex-extracted JSON parsing also failed: {e2}")
-                                    raise json.JSONDecodeError(f"Failed to parse LLM response as JSON: {e}", llm_response.content, 0)
-                            else:
-                                logger.error(f"[AGGREGATE_GAP_ANALYSIS] No JSON pattern found in response")
-                                raise json.JSONDecodeError(f"Failed to parse LLM response as JSON: {e}", llm_response.content, 0)
-                elif llm_response and not llm_response.success:
-                    logger.error(f"[AGGREGATE_GAP_ANALYSIS] LLM request failed: {llm_response.error if hasattr(llm_response, 'error') else 'Unknown error'}")
-                    raise ValueError(f"LLM request failed: {llm_response.error if hasattr(llm_response, 'error') else 'Unknown error'}")
-                else:
-                    logger.error(f"[AGGREGATE_GAP_ANALYSIS] Empty or invalid LLM response")
-                    logger.error(f"[AGGREGATE_GAP_ANALYSIS] llm_response is None: {llm_response is None}")
-                    if llm_response:
-                        logger.error(f"[AGGREGATE_GAP_ANALYSIS] llm_response.content: '{llm_response.content}'")
-                        logger.error(f"[AGGREGATE_GAP_ANALYSIS] llm_response.success: {llm_response.success}")
-                    raise ValueError("Empty or invalid LLM response")
-            else:
-                logger.error(f"[AGGREGATE_GAP_ANALYSIS] Prompt template not found at {prompt_path}")
-                raise FileNotFoundError(f"Prompt template not found at {prompt_path}")
-                
-        except Exception as e:
-            logger.error(f"[AGGREGATE_GAP_ANALYSIS] Error during LLM synthesis: {str(e)}")
-            logger.error(f"[AGGREGATE_GAP_ANALYSIS] Exception details", exc_info=True)
-            raise Exception(f"Error during LLM synthesis: {str(e)}")
-        
-        logger.info(f"[AGGREGATE_GAP_ANALYSIS] Analysis complete - found {len(market_gaps)} gaps and {len(opportunities)} opportunities")
-        
-        # Create comprehensive analysis
-        logger.info(f"[AGGREGATE_GAP_ANALYSIS] Creating comprehensive analysis")
-        
-        coverage_percentage = (len(vendor_by_pain_point) / len(pain_points)) * 100 if pain_points else 0
-        
-        # Extract vendor count from LLM response (check multiple possible locations)
-        llm_vendor_count = 0
-        llm_vendors_list = []
-        
-        # Try to extract from vendor_analysis first
-        if isinstance(vendor_analysis, dict):
-            llm_vendor_count = vendor_analysis.get("vendor_count", 0)
-            llm_vendors_list = vendor_analysis.get("key_players", [])
-        
-        # If not found, try to extract from market_gaps competitive_landscape
-        if llm_vendor_count == 0 and isinstance(market_gaps, list) and len(market_gaps) > 0:
-            for gap in market_gaps:
-                if isinstance(gap, dict) and "competitive_landscape" in gap:
-                    comp_landscape = gap["competitive_landscape"]
-                    if isinstance(comp_landscape, dict):
-                        gap_vendor_count = comp_landscape.get("vendor_count", 0)
-                        gap_vendors_list = comp_landscape.get("key_players", [])
-                        if gap_vendor_count > llm_vendor_count:
-                            llm_vendor_count = gap_vendor_count
-                            llm_vendors_list = gap_vendors_list
-        
-        # Calculate unique vendors from the extracted list
-        if isinstance(llm_vendors_list, list) and len(llm_vendors_list) > 0:
-            # Handle both string names and dict objects
-            unique_vendors = len(set(
-                (v.get("name", "").lower() if isinstance(v, dict) else str(v).lower())
-                for v in llm_vendors_list if v
-            ))
-        else:
-            unique_vendors = 0
-        
-        # If LLM didn't provide vendor count, fall back to all_vendors
-        if llm_vendor_count == 0 and len(all_vendors) > 0:
-            llm_vendor_count = len(all_vendors)
-            unique_vendors = len(set(v.get("name", "").lower() for v in all_vendors if v.get("name")))
-        
-        high_opportunity_gaps = len([g for g in market_gaps if g.get("opportunity_score", 0) > 70])
-        
-        logger.info(f"[AGGREGATE_GAP_ANALYSIS] Analysis metrics:")
-        logger.info(f"[AGGREGATE_GAP_ANALYSIS] - Coverage: {coverage_percentage:.1f}% ({len(vendor_by_pain_point)}/{len(pain_points)} pain points)")
-        logger.info(f"[AGGREGATE_GAP_ANALYSIS] - LLM vendor count: {llm_vendor_count}")
-        logger.info(f"[AGGREGATE_GAP_ANALYSIS] - Unique vendors: {unique_vendors}")
-        logger.info(f"[AGGREGATE_GAP_ANALYSIS] - High opportunity gaps: {high_opportunity_gaps}")
-        
-        analysis = {
-            "market_gaps": market_gaps,
-            "vendor_landscape": vendor_analysis,
-            "opportunities": opportunities,
-            "vendor_summary": vendor_summary,  # Comprehensive vendor information for gap finder stages
-            "executive_summary": executive_summary,  # High-level insights and recommendations
-            "pain_point_coverage": {
-                "total_pain_points": len(pain_points),
-                "covered_pain_points": len(vendor_by_pain_point),
-                "coverage_percentage": coverage_percentage
-            },
-            "summary": {
-                "total_vendors_found": llm_vendor_count,  # Use LLM vendor count instead of empty all_vendors
-                "unique_vendors": unique_vendors,
-                "high_opportunity_gaps": high_opportunity_gaps,
-                "competitive_intensity": vendor_analysis.get("competitive_intensity", "unknown")
-            },
-            "metadata": {
-                "merge_strategy": merge_strategy,
-                "output_format": output_format,
-                "analysis_timestamp": datetime.now().isoformat()
+        # Prepare synthesis data
+        synthesis_data = {
+            "vendor_research_outputs": research_outputs,
+            "pain_points": pain_points,
+            "analysis_context": {
+                "analysis_timestamp": datetime.now().isoformat(),
+                "total_research_outputs": len(research_outputs),
+                "total_pain_points": len(pain_points)
             }
         }
         
-        logger.info(f"[AGGREGATE_GAP_ANALYSIS] Gap analysis aggregation completed successfully")
-        logger.debug(f"[AGGREGATE_GAP_ANALYSIS] Final analysis keys: {list(analysis.keys())}")
+        # Load prompt template
+        prompt_path = Path(__file__).parent.parent.parent / "prompts" / "gap_finder_agent" / "collect_aggregate.prompt"
         
-        return analysis
+        if not prompt_path.exists():
+            raise FileNotFoundError(f"Prompt template not found at {prompt_path}")
+        
+        with open(prompt_path, 'r') as f:
+            prompt_template = f.read()
+        
+        # Prepare substitutions for the prompt
+        substitutions = {
+            "research_outputs_count": str(len(research_outputs)),
+            "pain_points_count": str(len(pain_points)),
+            "market_context": "Software testing and quality assurance tools market",
+            "analysis_scope": "Competitive landscape analysis and gap identification"
+        }
+        
+        # Replace template variables
+        prompt_content = prompt_template
+        for key, value in substitutions.items():
+            prompt_content = prompt_content.replace(f"{{{{{key}}}}}", value)
+        
+        # Append the actual research data
+        prompt_content += f"\n\nResearch Data to Analyze:\n{json.dumps(synthesis_data, indent=2)}"
+        
+        # Create LLM request
+        llm_request = LLMRequest(
+            messages=[{"role": "user", "content": prompt_content}],
+            system_prompt="You are an expert market analyst. Return ONLY valid JSON following the specified format. Do not include any markdown formatting or code blocks.",
+            temperature=0.2
+        )
+        
+        # Generate synthesis using LLM
+        logger.info(f"[AGGREGATE_GAP_ANALYSIS] Sending request to LLM")
+        llm_response = await llm_manager.generate(llm_request)
+        
+        if not llm_response or not llm_response.success or not llm_response.content:
+            raise Exception(f"LLM request failed: {llm_response.error if llm_response and hasattr(llm_response, 'error') else 'Unknown error'}")
+        
+        logger.info(f"[AGGREGATE_GAP_ANALYSIS] LLM response received (length: {len(llm_response.content)})")
+        
+        # Try to parse as JSON directly
+        try:
+            result = json.loads(llm_response.content)
+            logger.info(f"[AGGREGATE_GAP_ANALYSIS] Direct JSON parsing successful")
+        except json.JSONDecodeError:
+            # Try to extract JSON from markdown code blocks
+            import re
+            code_block_match = re.search(r'```(?:json)?\s*\n?([\s\S]*?)\n?```', llm_response.content)
+            if code_block_match:
+                logger.info(f"[AGGREGATE_GAP_ANALYSIS] Extracting JSON from code block")
+                result = json.loads(code_block_match.group(1).strip())
+            else:
+                # Try to find JSON object in the response
+                json_match = re.search(r'\{[\s\S]*\}', llm_response.content)
+                if json_match:
+                    logger.info(f"[AGGREGATE_GAP_ANALYSIS] Extracting JSON from response")
+                    result = json.loads(json_match.group(0))
+                else:
+                    raise Exception("Could not extract valid JSON from LLM response")
+        
+        logger.info(f"[AGGREGATE_GAP_ANALYSIS] Successfully parsed LLM response")
+        logger.info(f"[AGGREGATE_GAP_ANALYSIS] Result keys: {list(result.keys()) if isinstance(result, dict) else 'not_dict'}")
+        
+        # Return the LLM response directly - no post-processing
+        return result
         
     except Exception as e:
-        logger.error(f"[AGGREGATE_GAP_ANALYSIS] Exception during gap analysis aggregation: {str(e)}")
+        logger.error(f"[AGGREGATE_GAP_ANALYSIS] Error during gap analysis: {str(e)}")
         logger.error(f"[AGGREGATE_GAP_ANALYSIS] Exception details", exc_info=True)
-        
-        error_result = {
-            "error": f"Failed to aggregate gap analysis: {str(e)}",
-            "success": False,
-            "market_gaps": [],
-            "vendor_landscape": {},
-            "opportunities": []
-        }
-        
-        logger.info(f"[AGGREGATE_GAP_ANALYSIS] Returning error result")
-        return error_result
-
-
-def _create_comprehensive_vendor_summary(all_vendors: List[Dict[str, Any]], vendor_by_pain_point: Dict[str, List], pain_points: List[Dict]) -> Dict[str, Any]:
-    """Create comprehensive vendor summary for gap finder stages."""
-    logger.info("[AGGREGATE_GAP_ANALYSIS] Creating comprehensive vendor summary")
-    
-    # Organize vendors by categories
-    vendor_categories = {
-        "enterprise": [],
-        "smb": [],
-        "niche": [],
-        "emerging": []
-    }
-    
-    # Analyze pricing models and features across all vendors
-    pricing_models = set()
-    feature_categories = set()
-    target_segments = set()
-    
-    # Detailed vendor profiles
-    vendor_profiles = []
-    
-    for vendor in all_vendors:
-        vendor_name = vendor.get('name', 'Unknown')
-        
-        # Extract key information
-        business_profile = vendor.get('business_profile', {})
-        features = vendor.get('features', {})
-        pricing = vendor.get('pricing', {})
-        target_customers = vendor.get('target_customers', {})
-        pain_point_address = vendor.get('pain_point_address', {})
-        strengths = vendor.get('strengths', {})
-        limitations = vendor.get('limitations', {})
-        
-        # Categorize vendor
-        company_size = business_profile.get('company_size', '').lower()
-        if 'enterprise' in company_size or 'large' in company_size:
-            vendor_categories['enterprise'].append(vendor_name)
-        elif 'small' in company_size or 'startup' in company_size:
-            vendor_categories['emerging'].append(vendor_name)
-        elif 'medium' in company_size or 'smb' in company_size:
-            vendor_categories['smb'].append(vendor_name)
-        else:
-            vendor_categories['niche'].append(vendor_name)
-        
-        # Extract pricing models
-        if pricing:
-            pricing_model = pricing.get('model', '').lower()
-            if pricing_model:
-                pricing_models.add(pricing_model)
-        
-        # Extract feature categories
-        if features:
-            for feature_key in features.keys():
-                feature_categories.add(feature_key)
-        
-        # Extract target segments
-        if target_customers:
-            segments = target_customers.get('segments', [])
-            if isinstance(segments, list):
-                target_segments.update(segments)
-            elif isinstance(segments, str):
-                target_segments.add(segments)
-        
-        # Create detailed vendor profile
-        vendor_profile = {
-            "name": vendor_name,
-            "category": _categorize_vendor(vendor),
-            "business_profile": business_profile,
-            "key_features": _extract_key_features(features),
-            "pricing_summary": _extract_pricing_summary(pricing),
-            "target_segments": _extract_target_segments(target_customers),
-            "pain_point_alignment": _extract_pain_point_alignment(pain_point_address),
-            "competitive_strengths": _extract_strengths(strengths),
-            "limitations": _extract_limitations(limitations),
-            "associated_pain_point": vendor.get('associated_pain_point_id', 'unknown')
-        }
-        
-        vendor_profiles.append(vendor_profile)
-    
-    # Create market landscape analysis
-    market_landscape = {
-        "total_vendors": len(all_vendors),
-        "vendor_distribution": {
-            category: len(vendors) for category, vendors in vendor_categories.items()
-        },
-        "pricing_models": list(pricing_models),
-        "feature_categories": list(feature_categories),
-        "target_segments": list(target_segments),
-        "competitive_intensity": _assess_competitive_intensity(all_vendors, vendor_by_pain_point)
-    }
-    
-    # Create pain point analysis
-    pain_point_analysis = []
-    for pp_id, vendors in vendor_by_pain_point.items():
-        pp_index = int(pp_id.split('_')[1]) - 1 if '_' in pp_id else 0
-        pain_point = pain_points[pp_index] if pp_index < len(pain_points) else {}
-        
-        analysis = {
-            "pain_point_id": pp_id,
-            "pain_point_title": pain_point.get('title', 'Unknown'),
-            "vendor_count": len(vendors),
-            "vendor_names": [v.get('name', 'Unknown') for v in vendors],
-            "solution_diversity": _assess_solution_diversity(vendors),
-            "market_maturity": _assess_market_maturity(vendors),
-            "average_pricing": _calculate_average_pricing(vendors)
-        }
-        pain_point_analysis.append(analysis)
-    
-    return {
-        "vendor_profiles": vendor_profiles,
-        "market_landscape": market_landscape,
-        "pain_point_analysis": pain_point_analysis,
-        "synthesis_metadata": {
-            "total_vendors_analyzed": len(all_vendors),
-            "pain_points_covered": len(vendor_by_pain_point),
-            "analysis_timestamp": datetime.now().isoformat(),
-            "data_quality": "comprehensive"
-        }
-    }
-
-
-def _create_enhanced_fallback_synthesis(all_vendors: List[Dict[str, Any]], vendor_by_pain_point: Dict[str, List], pain_points: List[Dict], vendor_summary: Dict[str, Any]) -> tuple:
-    """Create enhanced fallback synthesis using comprehensive heuristic analysis when LLM synthesis fails."""
-    logger.info("[AGGREGATE_GAP_ANALYSIS] Using enhanced fallback heuristic synthesis")
-    
-    # Create comprehensive market gaps analysis
-    market_gaps = []
-    for pp_id, vendors in vendor_by_pain_point.items():
-        pp_index = int(pp_id.split('_')[1]) - 1 if '_' in pp_id else 0
-        pain_point = pain_points[pp_index] if pp_index < len(pain_points) else {}
-        
-        # Analyze competitive landscape for this pain point
-        competitive_landscape = {
-            "market_maturity": _assess_market_maturity(vendors),
-            "competitive_intensity": "high" if len(vendors) > 5 else "medium" if len(vendors) > 2 else "low",
-            "vendor_count": len(vendors),
-            "key_players": [v.get('name', 'Unknown') for v in vendors[:3]],
-            "solution_categories": list(set(_categorize_vendor(v) for v in vendors)),
-            "pricing_models": list(set(_extract_pricing_model(v) for v in vendors if _extract_pricing_model(v)))
-        }
-        
-        # Identify gaps based on vendor analysis
-        identified_gaps = _identify_market_gaps(vendors, pain_point)
-        
-        # Assess opportunity
-        opportunity_analysis = {
-            "market_size_estimate": "medium",  # Heuristic assessment
-            "competition_level": competitive_landscape["competitive_intensity"],
-            "technical_feasibility": "medium",
-            "gtm_complexity": "medium",
-            "differentiation_potential": "high" if len(identified_gaps) > 2 else "medium",
-            "opportunity_score": _calculate_opportunity_score(competitive_landscape, identified_gaps)
-        }
-        
-        # Strategic recommendations
-        strategic_recommendations = {
-            "priority_level": "high" if opportunity_analysis["opportunity_score"] > 70 else "medium",
-            "market_entry_strategy": _suggest_market_entry_strategy(competitive_landscape),
-            "competitive_positioning": _suggest_competitive_positioning(vendors),
-            "partnership_opportunities": _identify_partnership_opportunities(vendors),
-            "key_risks": _identify_key_risks(competitive_landscape, vendors)
-        }
-        
-        gap_analysis = {
-            "pain_point_id": pp_id,
-            "pain_point": pain_point.get('title', 'Unknown'),
-            "competitive_landscape": competitive_landscape,
-            "identified_gaps": identified_gaps,
-            "opportunity_analysis": opportunity_analysis,
-            "strategic_recommendations": strategic_recommendations
-        }
-        
-        market_gaps.append(gap_analysis)
-    
-    # Create vendor landscape analysis
-    vendor_analysis = {
-        "market_overview": {
-            "total_vendors": len(all_vendors),
-            "market_segments": vendor_summary["market_landscape"]["vendor_distribution"],
-            "pricing_diversity": len(vendor_summary["market_landscape"]["pricing_models"]),
-            "feature_diversity": len(vendor_summary["market_landscape"]["feature_categories"])
-        },
-        "competitive_intensity": vendor_summary["market_landscape"]["competitive_intensity"],
-        "market_trends": _identify_market_trends(all_vendors),
-        "vendor_positioning": _analyze_vendor_positioning(vendor_summary["vendor_profiles"])
-    }
-    
-    # Create opportunities analysis
-    opportunities = []
-    for gap in market_gaps:
-        if gap["opportunity_analysis"]["opportunity_score"] > 60:
-            opportunity = {
-                "title": f"Market opportunity in {gap['pain_point']}",
-                "description": f"Gap identified in {gap['pain_point']} with {gap['opportunity_analysis']['opportunity_score']} opportunity score",
-                "market_size": gap["opportunity_analysis"]["market_size_estimate"],
-                "competition_level": gap["opportunity_analysis"]["competition_level"],
-                "recommended_approach": gap["strategic_recommendations"]["market_entry_strategy"],
-                "priority": gap["strategic_recommendations"]["priority_level"]
-            }
-            opportunities.append(opportunity)
-    
-    # Create executive summary
-    executive_summary = {
-        "key_insights": [
-            f"Analyzed {len(all_vendors)} vendors across {len(pain_points)} pain points",
-            f"Identified {len([g for g in market_gaps if g['opportunity_analysis']['opportunity_score'] > 70])} high-opportunity gaps",
-            f"Market shows {vendor_analysis['competitive_intensity']} competitive intensity"
-        ],
-        "top_opportunities": [op["title"] for op in opportunities[:3]],
-        "market_trends": vendor_analysis["market_trends"],
-        "recommended_focus_areas": [
-            gap["pain_point"] for gap in market_gaps 
-            if gap["strategic_recommendations"]["priority_level"] == "high"
-        ][:3]
-    }
-    
-    return vendor_analysis, market_gaps, opportunities, executive_summary
-
-
-# Helper functions for vendor analysis
-def _categorize_vendor(vendor: Dict[str, Any]) -> str:
-    """Categorize vendor based on business profile."""
-    business_profile = vendor.get('business_profile', {})
-    company_size = business_profile.get('company_size', '').lower()
-    
-    if 'enterprise' in company_size or 'large' in company_size:
-        return 'enterprise'
-    elif 'small' in company_size or 'startup' in company_size:
-        return 'emerging'
-    elif 'medium' in company_size or 'smb' in company_size:
-        return 'smb'
-    else:
-        return 'niche'
-
-
-def _extract_key_features(features: Dict[str, Any]) -> List[str]:
-    """Extract key features from vendor feature data."""
-    if not features:
-        return []
-    
-    key_features = []
-    for category, feature_data in features.items():
-        if isinstance(feature_data, dict):
-            key_features.extend(feature_data.keys())
-        elif isinstance(feature_data, list):
-            key_features.extend(feature_data)
-        elif isinstance(feature_data, str):
-            key_features.append(feature_data)
-    
-    return key_features[:10]  # Limit to top 10 features
-
-
-def _extract_pricing_summary(pricing: Dict[str, Any]) -> Dict[str, Any]:
-    """Extract pricing summary from vendor pricing data."""
-    if not pricing:
-        return {"model": "unknown", "range": "unknown"}
-    
-    return {
-        "model": pricing.get('model', 'unknown'),
-        "range": pricing.get('range', 'unknown'),
-        "currency": pricing.get('currency', 'USD')
-    }
-
-
-def _extract_target_segments(target_customers: Dict[str, Any]) -> List[str]:
-    """Extract target segments from vendor target customer data."""
-    if not target_customers:
-        return []
-    
-    segments = target_customers.get('segments', [])
-    if isinstance(segments, list):
-        return segments
-    elif isinstance(segments, str):
-        return [segments]
-    else:
-        return []
-
-
-def _extract_pain_point_alignment(pain_point_address: Dict[str, Any]) -> Dict[str, Any]:
-    """Extract pain point alignment information."""
-    if not pain_point_address:
-        return {"alignment_score": "unknown", "addressed_aspects": []}
-    
-    return {
-        "alignment_score": pain_point_address.get('alignment_score', 'unknown'),
-        "addressed_aspects": pain_point_address.get('addressed_aspects', []),
-        "gaps": pain_point_address.get('gaps', [])
-    }
-
-
-def _extract_strengths(strengths: Dict[str, Any]) -> List[str]:
-    """Extract competitive strengths."""
-    if not strengths:
-        return []
-    
-    if isinstance(strengths, dict):
-        return list(strengths.keys())[:5]
-    elif isinstance(strengths, list):
-        return strengths[:5]
-    else:
-        return [str(strengths)]
-
-
-def _extract_limitations(limitations: Dict[str, Any]) -> List[str]:
-    """Extract vendor limitations."""
-    if not limitations:
-        return []
-    
-    if isinstance(limitations, dict):
-        return list(limitations.keys())[:5]
-    elif isinstance(limitations, list):
-        return limitations[:5]
-    else:
-        return [str(limitations)]
-
-
-def _assess_competitive_intensity(all_vendors: List[Dict[str, Any]], vendor_by_pain_point: Dict[str, List]) -> str:
-    """Assess overall competitive intensity."""
-    avg_vendors_per_pain_point = sum(len(vendors) for vendors in vendor_by_pain_point.values()) / len(vendor_by_pain_point) if vendor_by_pain_point else 0
-    
-    if avg_vendors_per_pain_point > 5:
-        return "high"
-    elif avg_vendors_per_pain_point > 2:
-        return "medium"
-    else:
-        return "low"
-
-
-def _assess_solution_diversity(vendors: List[Dict[str, Any]]) -> str:
-    """Assess diversity of solutions for a pain point."""
-    categories = set(_categorize_vendor(v) for v in vendors)
-    
-    if len(categories) > 2:
-        return "high"
-    elif len(categories) > 1:
-        return "medium"
-    else:
-        return "low"
-
-
-def _assess_market_maturity(vendors: List[Dict[str, Any]]) -> str:
-    """Assess market maturity based on vendor characteristics."""
-    enterprise_count = sum(1 for v in vendors if _categorize_vendor(v) == 'enterprise')
-    total_vendors = len(vendors)
-    
-    if enterprise_count / total_vendors > 0.5:
-        return "mature"
-    elif total_vendors > 3:
-        return "growing"
-    else:
-        return "emerging"
-
-
-def _calculate_average_pricing(vendors: List[Dict[str, Any]]) -> str:
-    """Calculate average pricing range."""
-    pricing_data = [v.get('pricing', {}) for v in vendors if v.get('pricing')]
-    
-    if not pricing_data:
-        return "unknown"
-    
-    # Simple heuristic based on pricing models
-    subscription_count = sum(1 for p in pricing_data if 'subscription' in p.get('model', '').lower())
-    
-    if subscription_count > len(pricing_data) / 2:
-        return "subscription-based"
-    else:
-        return "mixed-pricing"
-
-
-def _extract_pricing_model(vendor: Dict[str, Any]) -> str:
-    """Extract pricing model from vendor data."""
-    pricing = vendor.get('pricing', {})
-    return pricing.get('model', '') if pricing else ''
-
-
-def _identify_market_gaps(vendors: List[Dict[str, Any]], pain_point: Dict[str, Any]) -> List[Dict[str, Any]]:
-    """Identify market gaps based on vendor analysis."""
-    gaps = []
-    
-    # Feature gaps
-    all_features = set()
-    for vendor in vendors:
-        features = vendor.get('features', {})
-        if features:
-            all_features.update(features.keys())
-    
-    if len(all_features) < 5:  # Heuristic: if few feature categories, there might be gaps
-        gaps.append({
-            "gap_type": "feature",
-            "description": "Limited feature diversity in current solutions",
-            "affected_segments": ["all"],
-            "severity": "medium"
-        })
-    
-    # Pricing gaps
-    pricing_models = set(_extract_pricing_model(v) for v in vendors if _extract_pricing_model(v))
-    if len(pricing_models) < 2:
-        gaps.append({
-            "gap_type": "pricing",
-            "description": "Limited pricing model diversity",
-            "affected_segments": ["price-sensitive"],
-            "severity": "medium"
-        })
-    
-    # Segment gaps
-    categories = set(_categorize_vendor(v) for v in vendors)
-    if 'smb' not in categories:
-        gaps.append({
-            "gap_type": "segment",
-            "description": "Underserved SMB market segment",
-            "affected_segments": ["smb"],
-            "severity": "high"
-        })
-    
-    return gaps
-
-
-def _calculate_opportunity_score(competitive_landscape: Dict[str, Any], identified_gaps: List[Dict[str, Any]]) -> int:
-    """Calculate opportunity score based on competitive landscape and gaps."""
-    base_score = 50
-    
-    # Adjust based on competitive intensity
-    intensity = competitive_landscape.get("competitive_intensity", "medium")
-    if intensity == "low":
-        base_score += 20
-    elif intensity == "high":
-        base_score -= 10
-    
-    # Adjust based on number of gaps
-    gap_bonus = min(len(identified_gaps) * 10, 30)
-    base_score += gap_bonus
-    
-    # Adjust based on gap severity
-    high_severity_gaps = sum(1 for gap in identified_gaps if gap.get("severity") == "high")
-    base_score += high_severity_gaps * 5
-    
-    return min(max(base_score, 0), 100)
-
-
-def _suggest_market_entry_strategy(competitive_landscape: Dict[str, Any]) -> str:
-    """Suggest market entry strategy based on competitive landscape."""
-    intensity = competitive_landscape.get("competitive_intensity", "medium")
-    vendor_count = competitive_landscape.get("vendor_count", 0)
-    
-    if intensity == "low" and vendor_count < 3:
-        return "Direct competition with differentiated features"
-    elif intensity == "high":
-        return "Niche market focus with specialized solution"
-    else:
-        return "Partnership-based entry with existing players"
-
-
-def _suggest_competitive_positioning(vendors: List[Dict[str, Any]]) -> str:
-    """Suggest competitive positioning based on existing vendors."""
-    categories = [_categorize_vendor(v) for v in vendors]
-    
-    if 'enterprise' in categories and 'smb' not in categories:
-        return "SMB-focused solution with simplified features"
-    elif 'smb' in categories and 'enterprise' not in categories:
-        return "Enterprise-grade solution with advanced features"
-    else:
-        return "Mid-market solution bridging enterprise and SMB needs"
-
-
-def _identify_partnership_opportunities(vendors: List[Dict[str, Any]]) -> List[str]:
-    """Identify potential partnership opportunities."""
-    partnerships = []
-    
-    vendor_names = [v.get('name', 'Unknown') for v in vendors]
-    
-    # Suggest partnerships with complementary vendors
-    if len(vendor_names) > 0:
-        partnerships.append(f"Integration partnership with {vendor_names[0]}")
-    
-    if len(vendor_names) > 1:
-        partnerships.append(f"Channel partnership with {vendor_names[1]}")
-    
-    return partnerships[:3]
-
-
-def _identify_key_risks(competitive_landscape: Dict[str, Any], vendors: List[Dict[str, Any]]) -> List[str]:
-    """Identify key risks in the market."""
-    risks = []
-    
-    intensity = competitive_landscape.get("competitive_intensity", "medium")
-    if intensity == "high":
-        risks.append("High competitive pressure from established players")
-    
-    vendor_count = competitive_landscape.get("vendor_count", 0)
-    if vendor_count > 5:
-        risks.append("Market saturation risk")
-    
-    enterprise_vendors = [v for v in vendors if _categorize_vendor(v) == 'enterprise']
-    if len(enterprise_vendors) > 2:
-        risks.append("Dominant enterprise players may expand to other segments")
-    
-    return risks[:3]
-
-
-def _identify_market_trends(all_vendors: List[Dict[str, Any]]) -> List[str]:
-    """Identify market trends based on vendor analysis."""
-    trends = []
-    
-    # Analyze pricing trends
-    subscription_count = sum(1 for v in all_vendors if 'subscription' in _extract_pricing_model(v).lower())
-    if subscription_count > len(all_vendors) / 2:
-        trends.append("Shift towards subscription-based pricing models")
-    
-    # Analyze vendor categories
-    categories = [_categorize_vendor(v) for v in all_vendors]
-    emerging_count = categories.count('emerging')
-    if emerging_count > len(all_vendors) / 3:
-        trends.append("Increasing number of emerging/startup solutions")
-    
-    # Feature trends
-    all_features = set()
-    for vendor in all_vendors:
-        features = vendor.get('features', {})
-        if features:
-            all_features.update(features.keys())
-    
-    if 'ai' in ' '.join(all_features).lower() or 'automation' in ' '.join(all_features).lower():
-        trends.append("Growing focus on AI and automation capabilities")
-    
-    return trends[:5]
-
-
-def _analyze_vendor_positioning(vendor_profiles: List[Dict[str, Any]]) -> Dict[str, Any]:
-    """Analyze vendor positioning in the market."""
-    positioning = {
-        "market_leaders": [],
-        "challengers": [],
-        "niche_players": [],
-        "emerging_vendors": []
-    }
-    
-    for profile in vendor_profiles:
-        vendor_name = profile.get('name', 'Unknown')
-        category = profile.get('category', 'niche')
-        
-        if category == 'enterprise':
-            positioning['market_leaders'].append(vendor_name)
-        elif category == 'smb':
-            positioning['challengers'].append(vendor_name)
-        elif category == 'emerging':
-            positioning['emerging_vendors'].append(vendor_name)
-        else:
-            positioning['niche_players'].append(vendor_name)
-    
-    return positioning
-    # Return individual components as expected by the calling function
-    return vendor_analysis, market_gaps, opportunities, executive_summary
-
-
-def _analyze_vendor_landscape_heuristic(vendors: List[Dict[str, Any]]) -> Dict[str, Any]:
-    """Analyze the overall vendor landscape using heuristics (fallback method)."""
-    if not vendors:
-        return {"competitive_intensity": "low", "vendor_categories": [], "market_maturity": "emerging"}
-    
-    # Categorize vendors by business model/type
-    categories = {}
-    total_funding = 0
-    funded_vendors = 0
-    
-    for vendor in vendors:
-        # Extract business model or category
-        business_profile = vendor.get("business_profile", {})
-        category = business_profile.get("category", "unknown")
-        
-        if category not in categories:
-            categories[category] = []
-        categories[category].append(vendor)
-        
-        # Track funding information if available
-        funding = business_profile.get("funding_info", {})
-        if funding and funding.get("total_funding"):
-            try:
-                total_funding += float(funding["total_funding"])
-                funded_vendors += 1
-            except (ValueError, TypeError):
-                pass
-    
-    # Determine competitive intensity
-    vendor_count = len(vendors)
-    if vendor_count > 20:
-        intensity = "very_high"
-    elif vendor_count > 10:
-        intensity = "high"
-    elif vendor_count > 5:
-        intensity = "medium"
-    else:
-        intensity = "low"
-    
-    return {
-        "vendor_count": vendor_count,
-        "competitive_intensity": intensity,
-        "vendor_categories": list(categories.keys()),
-        "category_distribution": {k: len(v) for k, v in categories.items()},
-        "market_maturity": "mature" if vendor_count > 15 else "growing" if vendor_count > 5 else "emerging",
-        "funding_landscape": {
-            "total_funding": total_funding,
-            "funded_vendors": funded_vendors,
-            "average_funding": total_funding / funded_vendors if funded_vendors > 0 else 0
-        }
-    }
-
-
-def _identify_market_gaps_heuristic(vendor_by_pain_point: Dict[str, List], pain_points: List[Dict]) -> List[Dict[str, Any]]:
-    """Identify market gaps based on vendor coverage and pain point analysis (heuristic fallback)."""
-    gaps = []
-    
-    for i, pain_point in enumerate(pain_points):
-        pain_point_id = f"pp_{i + 1}"
-        vendors = vendor_by_pain_point.get(pain_point_id, [])
-        
-        # Analyze gap characteristics
-        vendor_count = len(vendors)
-        
-        # Calculate opportunity score based on pain point severity and vendor coverage
-        pain_severity = pain_point.get("severity_score", 50)
-        market_size_indicator = pain_point.get("market_size_indicator", 50)
-        
-        # Lower vendor count + higher pain severity = higher opportunity
-        coverage_score = max(0, 100 - (vendor_count * 10))  # Decreases as vendor count increases
-        opportunity_score = (pain_severity * 0.4) + (coverage_score * 0.4) + (market_size_indicator * 0.2)
-        
-        gap = {
-            "pain_point_id": pain_point_id,
-            "pain_point": pain_point,
-            "vendor_count": vendor_count,
-            "opportunity_score": min(100, max(0, opportunity_score)),
-            "gap_type": _classify_gap_type(vendor_count, pain_severity),
-            "market_readiness": _assess_market_readiness(pain_point, vendors),
-            "competitive_landscape": "crowded" if vendor_count > 10 else "moderate" if vendor_count > 3 else "sparse",
-            "vendors": vendors[:5]  # Include top 5 vendors for context
-        }
-        
-        gaps.append(gap)
-    
-    # Sort by opportunity score
-    gaps.sort(key=lambda x: x["opportunity_score"], reverse=True)
-    
-    return gaps
-
-
-def _classify_gap_type(vendor_count: int, pain_severity: float) -> str:
-    """Classify the type of market gap."""
-    if vendor_count == 0:
-        return "blue_ocean" if pain_severity > 70 else "unvalidated_need"
-    elif vendor_count <= 2:
-        return "emerging_market" if pain_severity > 60 else "niche_opportunity"
-    elif vendor_count <= 5:
-        return "competitive_gap" if pain_severity > 70 else "incremental_opportunity"
-    else:
-        return "saturated_market"
-
-
-def _assess_market_readiness(pain_point: Dict, vendors: List[Dict]) -> str:
-    """Assess how ready the market is for solutions."""
-    # Simple heuristic based on pain point characteristics and vendor presence
-    urgency = pain_point.get("urgency_score", 50)
-    frequency = pain_point.get("frequency_score", 50)
-    vendor_count = len(vendors)
-    
-    readiness_score = (urgency + frequency) / 2
-    
-    if readiness_score > 80 and vendor_count > 0:
-        return "ready"
-    elif readiness_score > 60:
-        return "developing"
-    elif readiness_score > 40:
-        return "early"
-    else:
-        return "nascent"
-
-
-def _assess_opportunities_heuristic(gaps: List[Dict], vendor_analysis: Dict) -> List[Dict[str, Any]]:
-    """Assess and prioritize opportunities based on gaps and market analysis (heuristic fallback)."""
-    opportunities = []
-    
-    for gap in gaps:
-        if gap["opportunity_score"] < 30:  # Skip low-opportunity gaps
-            continue
-            
-        opportunity = {
-            "gap_id": gap["pain_point_id"],
-            "opportunity_type": gap["gap_type"],
-            "priority": "high" if gap["opportunity_score"] > 70 else "medium" if gap["opportunity_score"] > 50 else "low",
-            "market_entry_difficulty": _assess_entry_difficulty(gap, vendor_analysis),
-            "recommended_approach": _recommend_approach(gap),
-            "key_differentiators": _identify_differentiators(gap),
-            "risk_factors": _identify_risk_factors(gap),
-            "opportunity_score": gap["opportunity_score"]
-        }
-        
-        opportunities.append(opportunity)
-    
-    return opportunities
-
-
-def _assess_entry_difficulty(gap: Dict, vendor_analysis: Dict) -> str:
-    """Assess difficulty of market entry."""
-    vendor_count = gap["vendor_count"]
-    competitive_intensity = vendor_analysis.get("competitive_intensity", "low")
-    
-    if competitive_intensity == "very_high" or vendor_count > 15:
-        return "very_high"
-    elif competitive_intensity == "high" or vendor_count > 8:
-        return "high"
-    elif competitive_intensity == "medium" or vendor_count > 3:
-        return "medium"
-    else:
-        return "low"
-
-
-def _recommend_approach(gap: Dict) -> str:
-    """Recommend market approach based on gap characteristics."""
-    gap_type = gap["gap_type"]
-    vendor_count = gap["vendor_count"]
-    
-    if gap_type == "blue_ocean":
-        return "pioneer_and_educate"
-    elif gap_type == "emerging_market":
-        return "fast_follower"
-    elif gap_type == "competitive_gap":
-        return "differentiate_and_specialize"
-    elif vendor_count > 10:
-        return "niche_focus_or_avoid"
-    else:
-        return "direct_competition"
-
-
-def _identify_differentiators(gap: Dict) -> List[str]:
-    """Identify potential differentiators based on gap analysis."""
-    differentiators = []
-    
-    pain_point = gap["pain_point"]
-    vendors = gap["vendors"]
-    
-    # Generic differentiators based on gap type
-    if gap["gap_type"] == "blue_ocean":
-        differentiators.extend(["first_mover_advantage", "market_education", "category_creation"])
-    elif gap["vendor_count"] < 3:
-        differentiators.extend(["superior_ux", "better_pricing", "specialized_features"])
-    else:
-        differentiators.extend(["niche_specialization", "integration_capabilities", "customer_service"])
-    
-    return differentiators
-
-
-def _identify_risk_factors(gap: Dict) -> List[str]:
-    """Identify risk factors for the opportunity."""
-    risks = []
-    
-    if gap["gap_type"] == "blue_ocean":
-        risks.extend(["market_validation_risk", "customer_education_cost"])
-    elif gap["vendor_count"] > 10:
-        risks.extend(["high_competition", "price_pressure", "customer_acquisition_cost"])
-    
-    if gap["market_readiness"] in ["early", "nascent"]:
-        risks.append("market_timing_risk")
-    
-    return risks
+        raise e
 
 
 # Create global instances to avoid conflicts during rapid calls
