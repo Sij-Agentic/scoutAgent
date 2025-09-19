@@ -1,0 +1,59 @@
+# Gap Finder Act Stage - SaaS Business Recommendations
+
+## Objective
+Transform strategic insights from the think stage into actionable SaaS business recommendations that can be used by the builder agent to design comprehensive software products.
+
+## Analysis Framework
+1. **SaaS Opportunity Identification**: Convert top-priority gaps into viable SaaS business ideas
+2. **Product Definition**: Define MVP features and long-term product vision
+3. **Business Model Design**: Create sustainable revenue streams and pricing strategies
+4. **Market Positioning**: Define competitive advantage and target customer segments
+5. **Go-to-Market Strategy**: Outline how to reach and acquire customers
+
+## Output Requirements
+
+**CRITICAL**: Return a structured text analysis in the following format. Use clear section headers and bullet points for easy parsing.
+
+**FORMAT REQUIREMENTS:**
+- Use clear section headers (## Section Name)
+- Use bullet points (-) for lists
+- Keep responses concise and well-structured
+- Focus on the most critical insights
+- Use simple, clear language
+
+### Required Output Format:
+
+## SaaS Business Summary
+- Primary Opportunity: [Main SaaS business idea based on highest priority gap]
+- Target Market: [Specific customer segments and market size]
+- Market Size Estimate: [Estimated addressable market]
+- Business Model: [Core revenue model and pricing approach]
+
+## SaaS Recommendations
+- [Business Name]
+  - Description: [What the SaaS product does]
+  - Target Gap: [Which gap this addresses]
+  - Value Proposition: [Why customers would choose this solution]
+  - MVP Features: [Core features for initial launch]
+  - Long Term Features: [Advanced features for growth and scale]
+  - Target Customers: [Specific customer segments]
+  - Revenue Model: [How the business makes money]
+  - Competitive Advantage: [What makes this unique]
+  - Go to Market: [How to reach customers]
+
+## Implementation Roadmap
+- MVP Phase: [Timeline and focus for initial launch]
+- Growth Phase: [Timeline and focus for scaling]
+- Scale Phase: [Timeline and focus for market leadership]
+
+## Success Metrics
+- MVP Success: [Key metrics for validating initial product]
+- Growth Success: [Key metrics for scaling the business]
+- Scale Success: [Key metrics for market leadership]
+
+## Input Data
+You will receive:
+- **Think Stage Output**: Prioritized gaps, vendor landscape, strategic insights
+- **Collect Stage Data**: Market research and competitive analysis
+
+Focus on the highest-priority gaps and create actionable SaaS business recommendations that the builder agent can use to design comprehensive software products.
