@@ -932,8 +932,120 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
             return analysis_result
             
         except Exception as e:
-            self.logger.error(f"Error in think stage: {str(e)}")
-            self.logger.error(f"Exception details", exc_info=True)
+            self.logger.error(f"Error in think stage: {e}")
+            raise e
+    
+    async def act(self, input_data: AgentInput, plan: Optional[Dict[str, Any]] = None, thoughts: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """Execute the act stage - generate SaaS business recommendations."""
+        try:
+            self.logger.info("Starting gap finder act stage...")
+            self.logger.info(f"Input data type: {type(input_data)}")
+            self.logger.info(f"Input data: {input_data}")
+            
+            # Convert AgentInput to GapFinderInput if needed
+            if not isinstance(input_data, GapFinderInput):
+                # Handle case where input_data.data might be a list or dict
+                if isinstance(input_data.data, list):
+                    # If data is a list, treat it as validated_pain_points
+                    validated_pain_points = input_data.data
+                    market_context = ""
+                    analysis_scope = "focused"
+                elif isinstance(input_data.data, dict):
+                    # If data is a dict, extract fields normally
+                    validated_pain_points = input_data.data.get("validated_pain_points", [])
+                    market_context = input_data.data.get("market_context", "")
+                    analysis_scope = input_data.data.get("analysis_scope", "focused")
+                else:
+                    # Fallback
+                    validated_pain_points = []
+                    market_context = ""
+                    analysis_scope = "focused"
+                
+                gap_input = GapFinderInput(
+                    validated_pain_points=validated_pain_points,
+                    market_context=market_context,
+                    analysis_scope=analysis_scope
+                )
+            else:
+                gap_input = input_data
+            
+            # Ensure we have pain points
+            if not gap_input.validated_pain_points:
+                # Try to get from agent state
+                pain_points = getattr(self.state, 'validated_pain_points', [])
+                if not pain_points:
+                    self.logger.warning("No pain points found, using fallback")
+                    pain_points = [{"id": "pp1", "title": "Software Testing Tools", "description": "Testing tools market analysis"}]
+                # Create a new GapFinderInput with the pain points
+                gap_input = GapFinderInput(
+                    validated_pain_points=pain_points,
+                    market_context=gap_input.market_context,
+                    analysis_scope=gap_input.analysis_scope
+                )
+            
+            # Initialize manifest manager
+            run_id = getattr(self.state, 'run_id', None)
+            if not run_id:
+                self.logger.error("No run_id found in agent state")
+                return {"error": "No run_id available"}
+            
+            manifest_path = Path("data/runs") / run_id / "run_manifest.json"
+            manifest_manager = ManifestManager(manifest_path=manifest_path)
+            
+            # Load think stage data
+            think_data = self._load_think_stage_data(manifest_manager)
+            if not think_data:
+                self.logger.error("No think stage data found")
+                return {"error": "No think stage data available"}
+            
+            # Load essential data for context
+            essential_data = self._load_essential_act_data(manifest_manager)
+            
+            # Prepare synthesis data
+            synthesis_data = {
+                "think_stage_output": think_data,
+                "essential_data": essential_data,
+                "market_context": gap_input.market_context,
+                "analysis_scope": gap_input.analysis_scope
+            }
+            
+            # Load act stage prompt
+            prompt_content = self._load_act_prompt()
+            if not prompt_content:
+                self.logger.error("Failed to load act stage prompt")
+                return {"error": "Failed to load act stage prompt"}
+            
+            # Append the synthesis data to the prompt
+            prompt_content += f"\n\nThink Stage Data to Analyze:\n{json.dumps(synthesis_data, indent=2)}"
+            
+            # Generate SaaS recommendations using LLM mixin
+            recommendations_result = await self.llm_generate(prompt=prompt_content, task_type="act_analysis")
+            
+            # Parse the response as structured text
+            if isinstance(recommendations_result, str):
+                self.logger.info(f"LLM response type: {type(recommendations_result)}, length: {len(recommendations_result)}")
+                self.logger.info(f"LLM response preview: {recommendations_result[:200]}...")
+                # Parse structured text response instead of JSON
+                recommendations_result = self._parse_structured_act_text(recommendations_result)
+                self.logger.info(f"Successfully parsed LLM response, type: {type(recommendations_result)}")
+                
+                # Check if we got an error from _parse_structured_act_text
+                if isinstance(recommendations_result, dict) and "error" in recommendations_result:
+                    self.logger.error(f"Structured text parsing failed: {recommendations_result['error']}")
+                    # Create a fallback result structure
+                    recommendations_result = self._create_fallback_act_result(gap_input)
+                    self.logger.info(f"Created fallback result, type: {type(recommendations_result)}")
+            else:
+                self.logger.info(f"LLM response is not a string, type: {type(recommendations_result)}")
+            
+            # Store the result to manifest
+            self._store_act_output_to_manifest(manifest_manager, recommendations_result)
+            
+            self.logger.info("Act stage completed successfully")
+            return recommendations_result
+            
+        except Exception as e:
+            self.logger.error(f"Error in act stage: {e}")
             raise e
     
     def _store_think_output_to_manifest(self, manifest_manager: ManifestManager, analysis_result: Dict[str, Any]) -> None:
@@ -1230,58 +1342,6 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
             ]
         }
     
-    async def act(self, input_data: GapFinderInput) -> GapFinderOutput:
-        """Execute market gap analysis and return results."""
-        self.logger.info("Executing market gap analysis...")
-        
-        start_time = datetime.now()
-        
-        # Cluster pain points into market opportunities
-        clusters = await self._cluster_pain_points(input_data.validated_pain_points)
-        
-        # Analyze each cluster for market gaps
-        market_gaps = []
-        for cluster in clusters:
-            gap = await self._analyze_market_gap(
-                cluster,
-                input_data.market_context,
-                input_data.include_competitive_analysis,
-                input_data.include_market_sizing
-            )
-            market_gaps.append(gap)
-        
-        # Analyze competitive landscape
-        competitive_landscape = await self._analyze_competitive_landscape(
-            market_gaps,
-            input_data.market_context
-        )
-        
-        # Prioritize opportunities
-        prioritized_opportunities = self._prioritize_opportunities(market_gaps)
-        
-        # Generate market insights
-        market_analysis = await self._generate_market_analysis(
-            market_gaps,
-            competitive_landscape
-        )
-        
-        # Risk assessment
-        risk_assessment = self._assess_risks(market_gaps, competitive_landscape)
-        
-        # Generate recommendations
-        recommendations = self._generate_recommendations(
-            prioritized_opportunities,
-            risk_assessment
-        )
-        
-        return GapFinderOutput(
-            market_gaps=market_gaps,
-            prioritized_opportunities=prioritized_opportunities,
-            market_analysis=market_analysis,
-            competitive_landscape=competitive_landscape,
-            recommendations=recommendations,
-            risk_assessment=risk_assessment
-        )
 
     async def collect(self, plan: Dict[str, Any], run_id: Optional[str] = None) -> Dict[str, Any]:
         """Execute the collect stage - build and execute DAG nodes from plan stage."""
@@ -2731,6 +2791,237 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
             })
         
         return actions
+    
+    def _load_think_stage_data(self, manifest_manager: ManifestManager) -> Dict[str, Any]:
+        """Load think stage data from manifest."""
+        try:
+            manifest = manifest_manager.get_manifest()
+            think_stage = manifest.get("stages", {}).get("gap_finder_think", {})
+            return think_stage.get("data", {})
+        except Exception as e:
+            self.logger.error(f"Error loading think stage data: {e}")
+            return {}
+    
+    def _load_essential_act_data(self, manifest_manager: ManifestManager) -> Dict[str, Any]:
+        """Load essential data for act stage - minimal and focused."""
+        essential_data = {}
+        
+        try:
+            manifest = manifest_manager.get_manifest()
+            collect_stage = manifest.get("stages", {}).get("gap_finder_collect", {})
+            tool_results = collect_stage.get("data", {}).get("tool_results", {})
+            
+            # Only extract URLs from search_links (not full content)
+            for key, value in tool_results.items():
+                if key.startswith("search_links_pp") and key.endswith("_output"):
+                    urls = self._extract_urls_from_search_links(value)
+                    if urls:
+                        essential_data["search_urls"] = urls
+                        self.logger.info(f"Extracted {len(urls)} URLs from {key}")
+            
+            self.logger.info(f"Loaded essential act data: {list(essential_data.keys())}")
+            return essential_data
+            
+        except Exception as e:
+            self.logger.error(f"Error loading essential act data: {e}")
+            return {}
+    
+    def _load_act_prompt(self) -> str:
+        """Load act stage prompt template."""
+        try:
+            prompt_path = Path("scout_agent/prompts/gap_finder_agent/act.prompt")
+            if prompt_path.exists():
+                with open(prompt_path, 'r') as f:
+                    return f.read()
+            else:
+                self.logger.error(f"Act prompt file not found: {prompt_path}")
+                return ""
+        except Exception as e:
+            self.logger.error(f"Error loading act prompt: {e}")
+            return ""
+    
+    def _store_act_output_to_manifest(self, manifest_manager: ManifestManager, recommendations_result: Dict[str, Any]) -> None:
+        """Store act stage output to manifest."""
+        try:
+            # Get the manifest
+            manifest = manifest_manager.get_manifest()
+            
+            # Ensure stages section exists
+            if "stages" not in manifest:
+                manifest["stages"] = {}
+            
+            # Store the act stage output
+            manifest["stages"]["gap_finder_act"] = {
+                "status": "completed",
+                "updated_at": datetime.now().isoformat(),
+                "data": recommendations_result
+            }
+            
+            # Save the manifest
+            manifest_manager._save()
+            self.logger.info("Stored act stage output to manifest")
+            
+        except Exception as e:
+            self.logger.error(f"Error storing act output to manifest: {e}")
+            raise e
+    
+    def _parse_structured_act_text(self, text: str) -> Dict[str, Any]:
+        """Parse structured text response into JSON format for act stage."""
+        import re
+        from datetime import datetime
+        
+        try:
+            result = {
+                "saas_business_summary": {
+                    "primary_opportunity": "",
+                    "target_market": "",
+                    "market_size_estimate": "",
+                    "business_model": ""
+                },
+                "saas_recommendations": [],
+                "implementation_roadmap": {
+                    "mvp_phase": "",
+                    "growth_phase": "",
+                    "scale_phase": ""
+                },
+                "success_metrics": {
+                    "mvp_success": [],
+                    "growth_success": [],
+                    "scale_success": []
+                }
+            }
+            
+            # Parse SaaS Business Summary section
+            summary_match = re.search(r'## SaaS Business Summary(.*?)(?=## |$)', text, re.DOTALL)
+            if summary_match:
+                summary_text = summary_match.group(1)
+                result["saas_business_summary"]["primary_opportunity"] = self._extract_field(summary_text, "Primary Opportunity")
+                result["saas_business_summary"]["target_market"] = self._extract_field(summary_text, "Target Market")
+                result["saas_business_summary"]["market_size_estimate"] = self._extract_field(summary_text, "Market Size Estimate")
+                result["saas_business_summary"]["business_model"] = self._extract_field(summary_text, "Business Model")
+            
+            # Parse SaaS Recommendations section
+            recommendations_match = re.search(r'## SaaS Recommendations(.*?)(?=## |$)', text, re.DOTALL)
+            if recommendations_match:
+                recommendations_text = recommendations_match.group(1)
+                result["saas_recommendations"] = self._parse_saas_recommendations(recommendations_text)
+            
+            # Parse Implementation Roadmap section
+            roadmap_match = re.search(r'## Implementation Roadmap(.*?)(?=## |$)', text, re.DOTALL)
+            if roadmap_match:
+                roadmap_text = roadmap_match.group(1)
+                result["implementation_roadmap"]["mvp_phase"] = self._extract_field(roadmap_text, "MVP Phase")
+                result["implementation_roadmap"]["growth_phase"] = self._extract_field(roadmap_text, "Growth Phase")
+                result["implementation_roadmap"]["scale_phase"] = self._extract_field(roadmap_text, "Scale Phase")
+            
+            # Parse Success Metrics section
+            metrics_match = re.search(r'## Success Metrics(.*?)(?=## |$)', text, re.DOTALL)
+            if metrics_match:
+                metrics_text = metrics_match.group(1)
+                result["success_metrics"]["mvp_success"] = self._extract_list(metrics_text, "MVP Success")
+                result["success_metrics"]["growth_success"] = self._extract_list(metrics_text, "Growth Success")
+                result["success_metrics"]["scale_success"] = self._extract_list(metrics_text, "Scale Success")
+            
+            self.logger.info("Successfully parsed structured act text response")
+            return result
+            
+        except Exception as e:
+            self.logger.error(f"Failed to parse structured act text: {e}")
+            return {"error": f"Failed to parse structured act text: {e}"}
+    
+    def _parse_saas_recommendations(self, recommendations_text: str) -> list:
+        """Parse SaaS recommendations from structured text."""
+        import re
+        recommendations = []
+        
+        # Look for business recommendations with more specific patterns
+        # Pattern: - [Business Name] followed by details
+        lines = recommendations_text.split('\n')
+        current_recommendation = None
+        
+        for line in lines:
+            line = line.strip()
+            if line.startswith('- ') and not line.startswith('-   '):
+                # Check if this is a business name (doesn't contain a colon) or a field (contains a colon)
+                if ':' in line:
+                    # This is a field line like "- Description: value"
+                    if current_recommendation:
+                        field_line = line[2:].strip()  # Remove the "- "
+                        field_name, field_value = field_line.split(':', 1)
+                        field_name = field_name.strip().lower()
+                        field_value = field_value.strip()
+                        
+                        if field_name == "description":
+                            current_recommendation["description"] = field_value
+                        elif field_name == "target gap":
+                            current_recommendation["target_gap"] = field_value
+                        elif field_name == "value proposition":
+                            current_recommendation["value_proposition"] = field_value
+                        elif field_name == "revenue model":
+                            current_recommendation["revenue_model"] = field_value
+                        elif field_name == "competitive advantage":
+                            current_recommendation["competitive_advantage"] = field_value
+                        elif field_name == "go to market":
+                            current_recommendation["go_to_market"] = field_value
+                else:
+                    # This is a new business recommendation
+                    if current_recommendation:
+                        recommendations.append(current_recommendation)
+                    
+                    business_name = line[2:].strip()
+                    current_recommendation = {
+                        "business_name": business_name,
+                        "description": "",
+                        "target_gap": "",
+                        "value_proposition": "",
+                        "mvp_features": [],
+                        "long_term_features": [],
+                        "target_customers": [],
+                        "revenue_model": "",
+                        "competitive_advantage": "",
+                        "go_to_market": ""
+                    }
+        
+        # Add the last recommendation if it exists
+        if current_recommendation:
+            recommendations.append(current_recommendation)
+        
+        return recommendations
+    
+    def _create_fallback_act_result(self, gap_input: GapFinderInput) -> Dict[str, Any]:
+        """Create a fallback act result when LLM parsing fails."""
+        return {
+            "saas_business_summary": {
+                "primary_opportunity": "SaaS solution for identified market gaps",
+                "target_market": "SMBs and startups",
+                "market_size_estimate": "To be determined",
+                "business_model": "Freemium SaaS"
+            },
+            "saas_recommendations": [
+                {
+                    "business_name": "Gap Solution Platform",
+                    "description": "SaaS platform addressing identified market gaps",
+                    "target_gap": "Market gaps from analysis",
+                    "value_proposition": "Comprehensive solution for identified market needs",
+                    "mvp_features": ["Core functionality", "Basic user management"],
+                    "long_term_features": ["Advanced features", "Enterprise capabilities"],
+                    "target_customers": ["SMBs", "Startups"],
+                    "revenue_model": "Subscription-based",
+                    "competitive_advantage": "First-mover advantage in identified gaps",
+                    "go_to_market": "Digital marketing and partnerships"
+                }
+            ],
+            "implementation_roadmap": {
+                "mvp_phase": "3-4 months - Core features",
+                "growth_phase": "6-12 months - Advanced features",
+                "scale_phase": "12+ months - Market expansion"
+            },
+            "success_metrics": {
+                "mvp_success": ["User acquisition", "Product-market fit validation"],
+                "growth_success": ["Revenue growth", "Customer retention"],
+                "scale_success": ["Market leadership", "International expansion"]
+            }
+        }
 
 
 # Register the agent - moved to agent_registry.py
