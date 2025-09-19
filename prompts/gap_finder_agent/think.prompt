@@ -1,0 +1,78 @@
+# Gap Finder Think Stage - Strategic Analysis
+
+## Objective
+Analyze the aggregate gap analysis data to provide strategic insights for market opportunity prioritization and competitive positioning.
+
+## Analysis Framework
+1. **Gap Prioritization**: Score gaps by urgency, feasibility, and impact
+2. **Vendor Assessment**: Map vendors to gaps and assess competitive positioning  
+3. **Opportunity Identification**: Find whitespace opportunities with validation paths
+4. **Strategic Insights**: Extract key trends, barriers, and success factors
+
+## Output Requirements
+
+**CRITICAL**: Return a structured text analysis in the following format. Use clear section headers and bullet points for easy parsing.
+
+**FORMAT REQUIREMENTS:**
+- Use clear section headers (## Section Name)
+- Use bullet points (-) for lists
+- Keep responses concise and well-structured
+- Focus on the most critical insights
+- Use simple, clear language
+
+### Required Output Format:
+
+## Summary
+- Analysis Objective: [Brief description of what was analyzed]
+- Methodology: [How the analysis was conducted]
+- Total Vendors Analyzed: [Number]
+- Total Gaps Identified: [Number]
+- Analysis Confidence: [High/Medium/Low]
+- Key Findings: [List 3-5 key insights]
+
+## Prioritized Gaps
+- Gap 1: [Title] - Urgency: [1-10], Feasibility: [1-10], Impact: [1-10]
+  - Rationale: [Why this gap is important]
+  - Validation Path: [How to validate this gap]
+- Gap 2: [Title] - Urgency: [1-10], Feasibility: [1-10], Impact: [1-10]
+  - Rationale: [Why this gap is important]
+  - Validation Path: [How to validate this gap]
+
+## Vendor Landscape
+- [Vendor Name] ([Category])
+  - Strengths: [List key strengths]
+  - Limitations: [List key limitations]
+  - Market Position: [Brief description]
+  - Addressed Gaps: [Which gaps this vendor addresses]
+
+## Whitespace Opportunities
+- [Opportunity Title]
+  - Description: [What this opportunity is]
+  - Validation Path: [How to validate this opportunity]
+  - Potential Impact: [Expected impact]
+  - Feasibility: [Assessment of feasibility]
+
+## Strategic Insights
+- Market Trends: [List key trends]
+- Emerging Patterns: [List emerging patterns]
+- Competitive Dynamics: [Brief description]
+- Barriers to Entry: [List key barriers]
+- Success Factors: [List factors for success]
+
+## Risks and Unknowns
+- [Risk Description] - Impact: [High/Medium/Low], Likelihood: [High/Medium/Low]
+  - Mitigation Strategy: [How to address this risk]
+  - Data Needed: [What additional data is needed]
+
+## Next Actions
+- [Action Description] - Priority: [High/Medium/Low]
+  - Owner: [Who should handle this]
+  - Expected Outcome: [What success looks like]
+  - Timeline: [When this should be done]
+
+## Input Data
+You will receive:
+- **Aggregate Gap Analysis**: Comprehensive vendor research and market analysis
+- **Essential Data**: Key URLs from search results for evidence traceability
+
+Focus on extracting actionable insights and clear recommendations from this data.

@@ -804,7 +804,7 @@ async def vendor_research_batch(
     # TEMPORARY: Limit to 2 vendors to reduce costs during testing
     if len(vendors_list) > 2:
         logger.info(f"[VENDOR_RESEARCH_BATCH] COST LIMITING: Reducing {len(vendors_list)} vendors to 2 for cost control during testing")
-        vendors_list = vendors_list[:2]
+        vendors_list = vendors_list[:10]
         logger.info(f"[VENDOR_RESEARCH_BATCH] Limited vendor list: {vendors_list}")
     
     # Initialize Vendor Research Tool
@@ -1046,30 +1046,30 @@ async def aggregate_gap_analysis(
     
     try:
         # Initialize LLM manager
-        llm_manager = LLMManager()
-        config = get_config()
-        
+            llm_manager = LLMManager()
+            config = get_config()
+            
         # Initialize DeepSeek backend
         if not config.api.deepseek_api_key:
             raise Exception("No DeepSeek API key found in configuration")
         
-        deepseek_config = LLMConfig(
-            backend_type=LLMBackendType.DEEPSEEK,
-            model_name="deepseek-chat",
-            api_key=config.api.deepseek_api_key,
+                    deepseek_config = LLMConfig(
+                        backend_type=LLMBackendType.DEEPSEEK,
+                        model_name="deepseek-chat",
+                        api_key=config.api.deepseek_api_key,
             temperature=0.2,
             max_tokens=8192
-        )
-        
-        deepseek_backend = DeepSeekBackend(deepseek_config)
-        await llm_manager.register_backend(deepseek_backend, is_default=True)
+                    )
+                    
+                    deepseek_backend = DeepSeekBackend(deepseek_config)
+                    await llm_manager.register_backend(deepseek_backend, is_default=True)
         logger.info("[AGGREGATE_GAP_ANALYSIS] DeepSeek backend initialized")
         
         # Prepare synthesis data
-        synthesis_data = {
-            "vendor_research_outputs": research_outputs,
-            "pain_points": pain_points,
-            "analysis_context": {
+            synthesis_data = {
+                "vendor_research_outputs": research_outputs,
+                "pain_points": pain_points,
+                "analysis_context": {
                 "analysis_timestamp": datetime.now().isoformat(),
                 "total_research_outputs": len(research_outputs),
                 "total_pain_points": len(pain_points)
@@ -1077,41 +1077,41 @@ async def aggregate_gap_analysis(
         }
         
         # Load prompt template
-        prompt_path = Path(__file__).parent.parent.parent / "prompts" / "gap_finder_agent" / "collect_aggregate.prompt"
-        
+            prompt_path = Path(__file__).parent.parent.parent / "prompts" / "gap_finder_agent" / "collect_aggregate.prompt"
+            
         if not prompt_path.exists():
             raise FileNotFoundError(f"Prompt template not found at {prompt_path}")
         
-        with open(prompt_path, 'r') as f:
-            prompt_template = f.read()
-        
-        # Prepare substitutions for the prompt
-        substitutions = {
-            "research_outputs_count": str(len(research_outputs)),
-            "pain_points_count": str(len(pain_points)),
-            "market_context": "Software testing and quality assurance tools market",
-            "analysis_scope": "Competitive landscape analysis and gap identification"
-        }
-        
-        # Replace template variables
-        prompt_content = prompt_template
-        for key, value in substitutions.items():
-            prompt_content = prompt_content.replace(f"{{{{{key}}}}}", value)
-        
-        # Append the actual research data
-        prompt_content += f"\n\nResearch Data to Analyze:\n{json.dumps(synthesis_data, indent=2)}"
-        
+                with open(prompt_path, 'r') as f:
+                    prompt_template = f.read()
+                
+                # Prepare substitutions for the prompt
+                substitutions = {
+                    "research_outputs_count": str(len(research_outputs)),
+                    "pain_points_count": str(len(pain_points)),
+                    "market_context": "Software testing and quality assurance tools market",
+                    "analysis_scope": "Competitive landscape analysis and gap identification"
+                }
+                
+                # Replace template variables
+                prompt_content = prompt_template
+                for key, value in substitutions.items():
+                    prompt_content = prompt_content.replace(f"{{{{{key}}}}}", value)
+                
+                # Append the actual research data
+                prompt_content += f"\n\nResearch Data to Analyze:\n{json.dumps(synthesis_data, indent=2)}"
+                
         # Create LLM request
-        llm_request = LLMRequest(
-            messages=[{"role": "user", "content": prompt_content}],
+                llm_request = LLMRequest(
+                    messages=[{"role": "user", "content": prompt_content}],
             system_prompt="You are an expert market analyst. Return ONLY valid JSON following the specified format. Do not include any markdown formatting or code blocks.",
-            temperature=0.2
-        )
-        
-        # Generate synthesis using LLM
+                    temperature=0.2
+                )
+                
+                # Generate synthesis using LLM
         logger.info(f"[AGGREGATE_GAP_ANALYSIS] Sending request to LLM")
-        llm_response = await llm_manager.generate(llm_request)
-        
+                llm_response = await llm_manager.generate(llm_request)
+                
         if not llm_response or not llm_response.success or not llm_response.content:
             raise Exception(f"LLM request failed: {llm_response.error if llm_response and hasattr(llm_response, 'error') else 'Unknown error'}")
         
@@ -1123,18 +1123,18 @@ async def aggregate_gap_analysis(
             logger.info(f"[AGGREGATE_GAP_ANALYSIS] Direct JSON parsing successful")
         except json.JSONDecodeError:
             # Try to extract JSON from markdown code blocks
-            import re
-            code_block_match = re.search(r'```(?:json)?\s*\n?([\s\S]*?)\n?```', llm_response.content)
-            if code_block_match:
+                        import re
+                        code_block_match = re.search(r'```(?:json)?\s*\n?([\s\S]*?)\n?```', llm_response.content)
+                        if code_block_match:
                 logger.info(f"[AGGREGATE_GAP_ANALYSIS] Extracting JSON from code block")
                 result = json.loads(code_block_match.group(1).strip())
-            else:
+                                else:
                 # Try to find JSON object in the response
-                json_match = re.search(r'\{[\s\S]*\}', llm_response.content)
-                if json_match:
+                            json_match = re.search(r'\{[\s\S]*\}', llm_response.content)
+                            if json_match:
                     logger.info(f"[AGGREGATE_GAP_ANALYSIS] Extracting JSON from response")
                     result = json.loads(json_match.group(0))
-                else:
+                            else:
                     raise Exception("Could not extract valid JSON from LLM response")
         
         logger.info(f"[AGGREGATE_GAP_ANALYSIS] Successfully parsed LLM response")
