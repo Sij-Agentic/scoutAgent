@@ -823,30 +823,412 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
             }
         }
     
-    async def think(self, input_data: GapFinderInput) -> Dict[str, Any]:
-        """Analyze pain points to identify market gaps."""
-        self.logger.info("Analyzing market gaps and opportunities...")
+    async def think(self, input_data, run_id: str = None) -> Dict[str, Any]:
+        """Analyze aggregate gap analysis data to prioritize opportunities and assess competitive positioning."""
+        self.logger.info("Starting gap finder think stage...")
         
-        # Cluster similar pain points
-        clusters = await self._cluster_pain_points(input_data.validated_pain_points)
+        try:
+            # Convert AgentInput to GapFinderInput if needed
+            if hasattr(input_data, 'data') and hasattr(input_data, 'context'):
+                # This is an AgentInput, convert to GapFinderInput
+                ctx = input_data.context or {}
+                data = input_data.data or {}
+                validated = []
+                market_ctx = ""
+                if isinstance(data, dict):
+                    validated = data.get("validated_pain_points") or data.get("pain_points") or []
+                    market_ctx = data.get("market_context") or ctx.get("market_context", "")
+                
+                # Debug logging
+                self.logger.info(f"AgentInput data keys: {list(data.keys()) if isinstance(data, dict) else 'not_dict'}")
+                self.logger.info(f"AgentInput context keys: {list(ctx.keys())}")
+                self.logger.info(f"Found validated pain points: {len(validated)}")
+                
+                # If no validated pain points found, try to get from agent state
+                if not validated:
+                    validated = getattr(self.state, 'validated_pain_points', [])
+                    self.logger.info(f"Got {len(validated)} pain points from agent state")
+                
+                # If still no pain points, create a fallback
+                if not validated:
+                    validated = [{"pain_point": "Market analysis for software testing tools", "description": "General market analysis"}]
+                    self.logger.warning("No pain points found, using fallback")
+                
+                gap_input = GapFinderInput(
+                    validated_pain_points=validated,
+                    market_context=market_ctx or "Software testing and quality assurance tools market",
+                    analysis_scope=ctx.get("analysis_scope", "comprehensive"),
+                    include_competitive_analysis=bool(ctx.get("include_competitive_analysis", True)),
+                    include_market_sizing=bool(ctx.get("include_market_sizing", True)),
+                    context=input_data.context,
+                    metadata=input_data.metadata,
+                )
+            else:
+                # This is already a GapFinderInput
+                gap_input = input_data
+            
+            # Get run_id from parameter or agent state
+            current_run_id = run_id or getattr(self.state, 'run_id', None)
+            if not current_run_id:
+                raise Exception("No run_id provided for think stage")
+            
+            # Get manifest manager from agent state or create one
+            manifest_manager = getattr(self.state, 'manifest_manager', None)
+            if not manifest_manager:
+                manifest_path = Path("data/runs") / current_run_id / "run_manifest.json"
+                manifest_manager = ManifestManager(manifest_path=manifest_path)
+            
+            manifest = manifest_manager.get_manifest()
+            
+            # Load aggregate gap analysis from collect stage
+            aggregate_data = self._load_aggregate_data(manifest)
+            if not aggregate_data:
+                raise Exception("No aggregate gap analysis data found from collect stage")
+            
+            # Load essential data for think stage (minimal, focused)
+            essential_data = self._load_essential_think_data(manifest)
+            
+            # Prepare synthesis data
+            synthesis_data = {
+                "aggregate_gap_analysis": aggregate_data,
+                "essential_data": essential_data,
+                "analysis_context": {
+                    "analysis_timestamp": datetime.now().isoformat(),
+                    "market_context": gap_input.market_context,
+                    "analysis_scope": gap_input.analysis_scope
+                }
+            }
+            
+            # Load and process the think prompt
+            prompt_content = self._load_think_prompt()
+            
+            # Append the synthesis data to the prompt
+            prompt_content += f"\n\nResearch Data to Analyze:\n{json.dumps(synthesis_data, indent=2)}"
+            
+            # Generate analysis using LLM mixin
+            analysis_result = await self.llm_generate(prompt=prompt_content, task_type="think_analysis")
+            
+            # Parse the response as JSON
+            if isinstance(analysis_result, str):
+                self.logger.info(f"LLM response type: {type(analysis_result)}, length: {len(analysis_result)}")
+                self.logger.info(f"LLM response preview: {analysis_result[:200]}...")
+                # Parse structured text response instead of JSON
+                analysis_result = self._parse_structured_text(analysis_result)
+                self.logger.info(f"Successfully parsed LLM response, type: {type(analysis_result)}")
+                
+                # Check if we got an error from _parse_structured_text
+                if isinstance(analysis_result, dict) and "error" in analysis_result:
+                    self.logger.error(f"Structured text parsing failed: {analysis_result['error']}")
+                    # Create a fallback result structure
+                    analysis_result = self._create_fallback_think_result(gap_input)
+                    self.logger.info(f"Created fallback result, type: {type(analysis_result)}")
+            else:
+                self.logger.info(f"LLM response is not a string, type: {type(analysis_result)}")
+            
+            # Store the result to manifest
+            self._store_think_output_to_manifest(manifest_manager, analysis_result)
+            
+            self.logger.info("Think stage completed successfully")
+            return analysis_result
+            
+        except Exception as e:
+            self.logger.error(f"Error in think stage: {str(e)}")
+            self.logger.error(f"Exception details", exc_info=True)
+            raise e
+    
+    def _store_think_output_to_manifest(self, manifest_manager: ManifestManager, analysis_result: Dict[str, Any]) -> None:
+        """Store think stage output to manifest."""
+        try:
+            # Get the manifest
+            manifest = manifest_manager.get_manifest()
+            
+            # Ensure stages section exists
+            if "stages" not in manifest:
+                manifest["stages"] = {}
+            
+            # Store the think stage output
+            manifest["stages"]["gap_finder_think"] = {
+                "status": "completed",
+                "updated_at": datetime.now().isoformat(),
+                "data": analysis_result
+            }
+            
+            # Save the manifest
+            manifest_manager._save()
+            self.logger.info("Stored think stage output to manifest")
+            
+        except Exception as e:
+            self.logger.error(f"Error storing think output to manifest: {e}")
+            raise e
+    
+    def _load_aggregate_data(self, manifest: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """Load aggregate gap analysis data from collect stage output."""
+        try:
+            # Try to get from gap_finder_final_output in tool_results
+            collect_stage = manifest.get("stages", {}).get("gap_finder_collect", {})
+            tool_results = collect_stage.get("data", {}).get("tool_results", {})
+            aggregate_output = tool_results.get("gap_finder_final_output")
+            
+            if aggregate_output:
+                self.logger.info("Found aggregate data in gap_finder_collect tool_results")
+                return aggregate_output
+            
+            # Fallback: try outputs section
+            outputs = manifest.get("outputs", {})
+            aggregate_output = outputs.get("gap_finder_final_output")
+            
+            if aggregate_output:
+                self.logger.info("Found aggregate data in outputs section")
+                return aggregate_output.get("data") if isinstance(aggregate_output, dict) else aggregate_output
+            
+            self.logger.warning("No aggregate gap analysis data found")
+            return None
+            
+        except Exception as e:
+            self.logger.error(f"Error loading aggregate data: {e}")
+            return None
+    
+    def _load_essential_think_data(self, manifest: Dict[str, Any]) -> Dict[str, Any]:
+        """Load only essential data for think stage - minimal and focused."""
+        essential_data = {}
         
-        # Analyze market context
-        market_context = await self._analyze_market_context(
-            input_data.market_context,
-            clusters
-        )
+        try:
+            collect_stage = manifest.get("stages", {}).get("gap_finder_collect", {})
+            tool_results = collect_stage.get("data", {}).get("tool_results", {})
+            
+            # Only extract URLs from search_links (not full content)
+            for key, value in tool_results.items():
+                if key.startswith("search_links_pp") and key.endswith("_output"):
+                    urls = self._extract_urls_from_search_links(value)
+                    if urls:
+                        essential_data["search_urls"] = urls
+                        self.logger.info(f"Extracted {len(urls)} URLs from {key}")
+            
+            self.logger.info(f"Loaded essential data: {list(essential_data.keys())}")
+            return essential_data
+            
+        except Exception as e:
+            self.logger.error(f"Error loading essential think data: {e}")
+            return {}
+    
+    def _extract_urls_from_search_links(self, search_links_data: Any) -> List[Dict[str, str]]:
+        """Extract just URLs and titles from search_links data."""
+        urls = []
         
-        # Prepare gap analysis strategy
-        analysis_strategy = {
-            "cluster_count": len(clusters),
-            "market_segments": list(set(p.get("market", "") for p in input_data.validated_pain_points)),
-            "analysis_approach": self._determine_analysis_approach(input_data.analysis_scope),
-            "competitive_intensity": "medium",  # Will be updated
-            "market_maturity": "growing",  # Will be analyzed
-            "expected_gaps": min(len(clusters), 5)
+        try:
+            # Parse MCP response format
+            if isinstance(search_links_data, dict) and "content" in search_links_data:
+                for content_item in search_links_data["content"]:
+                    if isinstance(content_item, dict) and "text" in content_item:
+                        try:
+                            search_data = json.loads(content_item["text"])
+                            if "query_results" in search_data:
+                                for query_result in search_data["query_results"]:
+                                    if "results" in query_result:
+                                        for result in query_result["results"]:
+                                            if "link" in result and "title" in result:
+                                                urls.append({
+                                                    "url": result["link"],
+                                                    "title": result["title"],
+                                                    "query": query_result.get("query", "")
+                                                })
+                        except json.JSONDecodeError:
+                            continue
+            
+            return urls
+            
+        except Exception as e:
+            self.logger.error(f"Error extracting URLs from search_links: {e}")
+            return []
+    
+    def _load_think_prompt(self) -> str:
+        """Load the think stage prompt template."""
+        try:
+            prompt_path = Path(__file__).parent.parent / "prompts" / "gap_finder_agent" / "think.prompt"
+            
+            if not prompt_path.exists():
+                raise FileNotFoundError(f"Think prompt not found at {prompt_path}")
+            
+            with open(prompt_path, 'r') as f:
+                prompt_content = f.read()
+            
+            self.logger.info("Loaded think stage prompt template")
+            return prompt_content
+            
+        except Exception as e:
+            self.logger.error(f"Error loading think prompt: {e}")
+            raise e
+    
+    def _extract_json(self, text: str) -> Dict[str, Any]:
+        """Extract JSON from text with robust error handling."""
+        import re
+        import json
+        
+        # Default fallback result - we'll create it when needed
+        default_result = None
+        
+        if not text or not isinstance(text, str):
+            self.logger.error("Empty or non-string response from LLM")
+            return {"error": "Empty or non-string response from LLM"}
+        
+        # Try to find JSON in markdown code blocks
+        code_block_pattern = r'```(?:json)?\s*(.+?)\s*```'
+        matches = re.search(code_block_pattern, text, re.DOTALL)
+        
+        if matches:
+            self.logger.info("Found JSON in code block")
+            json_str = matches.group(1)
+        else:
+            # Try to find JSON without code blocks
+            self.logger.info("No code block found, trying to parse entire response as JSON")
+            json_str = text.strip()
+            
+            # Try to find JSON object within the text using regex
+            json_pattern = r'\{[\s\S]*\}'
+            json_matches = re.search(json_pattern, text, re.DOTALL)
+            if json_matches:
+                self.logger.info("Found JSON-like structure in response")
+                json_str = json_matches.group(0)
+            else:
+                # As a final attempt, slice from first { to last }
+                first_idx = text.find('{')
+                last_idx = text.rfind('}')
+                if first_idx != -1 and last_idx != -1 and last_idx > first_idx:
+                    json_str = text[first_idx:last_idx+1]
+        
+        # Clean the JSON string with comprehensive comma fixing
+        json_str = re.sub(r',\s*([\]\}])', r'\1', json_str)  # Remove trailing commas
+        
+        # Fix missing commas between object properties (comprehensive)
+        json_str = re.sub(r'"\s*\n\s*"([^"]*)"\s*:', '",\n"\1":', json_str)
+        json_str = re.sub(r'"\s*"([^"]*)"\s*:', '", "\1":', json_str)
+        json_str = re.sub(r'}\s*\n\s*"', '},\n"', json_str)
+        json_str = re.sub(r']\s*\n\s*"', '],\n"', json_str)
+        json_str = re.sub(r'}\s*"', '}, "', json_str)
+        json_str = re.sub(r']\s*"', '], "', json_str)
+        
+        # Fix missing commas between array elements
+        json_str = re.sub(r'"\s*\n\s*"([^"]*)"\s*"', '",\n"\1", "', json_str)
+        json_str = re.sub(r'"\s*"([^"]*)"\s*"', '", "\1", "', json_str)
+        
+        # Fix missing commas after values before closing braces/brackets
+        json_str = re.sub(r'([^,}\]])\s*(\n\s*[}\]])', r'\1,\2', json_str)
+        json_str = re.sub(r'([^,}\]])\s*([}\]])', r'\1,\2', json_str)
+        
+        # Fix missing commas after strings before other properties
+        json_str = re.sub(r'"\s*\n\s*([a-zA-Z_][a-zA-Z0-9_]*\s*:)', '",\n\1', json_str)
+        json_str = re.sub(r'"\s*([a-zA-Z_][a-zA-Z0-9_]*\s*:)', '", \1', json_str)
+        
+        try:
+            parsed_json = json.loads(json_str)
+            self.logger.info("Successfully parsed JSON")
+            return parsed_json
+        except json.JSONDecodeError as e:
+            self.logger.error(f"JSON decode error: {e}")
+            try:
+                # Try again with more aggressive cleaning
+                self.logger.info("Attempting more aggressive JSON cleaning")
+                json_str = json_str.replace("'", '"')  # Replace single quotes with double quotes
+                json_str = re.sub(r'([{,]\s*)(\w+)(\s*:)', r'\1"\2"\3', json_str)  # Add quotes to keys
+                
+                parsed_json = json.loads(json_str)
+                self.logger.info("Successfully parsed JSON after aggressive cleaning")
+                return parsed_json
+            except Exception as e:
+                self.logger.error(f"Failed to parse JSON after cleaning: {e}")
+                return {"error": f"Failed to parse JSON after cleaning: {e}"}
+    
+    def _fix_json_syntax(self, json_str: str) -> str:
+        """Attempt to fix common JSON syntax issues."""
+        try:
+            import re
+            
+            # Remove any trailing commas before closing braces/brackets
+            json_str = re.sub(r',(\s*[}\]])', r'\1', json_str)
+            
+            # Fix missing commas between array/object elements
+            # Look for patterns like "value" "key" or } "key" or ] "key"
+            json_str = re.sub(r'(["\}\]])"([^"]*)"\s*:', r'\1, "\2":', json_str)
+            json_str = re.sub(r'(["\}\]])"([^"]*)"\s*"', r'\1, "\2", "', json_str)
+            
+            # Fix missing commas between object properties (enhanced)
+            json_str = re.sub(r'"\s*\n\s*"', '",\n"', json_str)
+            json_str = re.sub(r'}\s*\n\s*"', '},\n"', json_str)
+            json_str = re.sub(r']\s*\n\s*"', '],\n"', json_str)
+            
+            # Additional comma fixes for common patterns
+            json_str = re.sub(r'"\s*"([^"]*)"\s*:', '", "\1":', json_str)
+            json_str = re.sub(r'}\s*"', '}, "', json_str)
+            json_str = re.sub(r']\s*"', '], "', json_str)
+            
+            # Fix missing commas after values before closing braces
+            json_str = re.sub(r'([^,}\]])\s*(\n\s*[}\]])', r'\1,\2', json_str)
+            
+            # Fix unterminated strings by adding quotes at the end
+            json_str = re.sub(r'([^"])\s*$', r'\1"', json_str.strip())
+            
+            # Fix missing quotes around unquoted keys (but be careful not to quote values)
+            json_str = re.sub(r'(\w+):', r'"\1":', json_str)
+            
+            # Fix single quotes to double quotes
+            json_str = json_str.replace("'", '"')
+            
+            # Fix common issues with numbers and booleans
+            json_str = re.sub(r':\s*true\s*([^,}\]])(?=\s*[}\]])', r': true, \1', json_str)
+            json_str = re.sub(r':\s*false\s*([^,}\]])(?=\s*[}\]])', r': false, \1', json_str)
+            json_str = re.sub(r':\s*null\s*([^,}\]])(?=\s*[}\]])', r': null, \1', json_str)
+            
+            self.logger.info("Applied JSON syntax fixes")
+            return json_str
+            
+        except Exception as e:
+            self.logger.error(f"Failed to fix JSON syntax: {e}")
+            raise Exception(f"Could not fix malformed JSON: {e}")
+    
+    def _create_fallback_think_result(self, gap_input: GapFinderInput) -> Dict[str, Any]:
+        """Create a fallback think result when LLM parsing fails."""
+        return {
+            "summary": {
+                "analysis_objective": "Strategic market analysis",
+                "methodology": "LLM analysis with fallback structure",
+                "total_vendors_analyzed": 0,
+                "total_gaps_identified": 0,
+                "analysis_confidence": "low",
+                "key_findings": ["Analysis completed with fallback structure due to JSON parsing issues"],
+                "analysis_timestamp": datetime.now().isoformat()
+            },
+            "prioritized_gaps": [],
+            "vendor_landscape": [],
+            "whitespace_opportunities": [],
+            "strategic_insights": {
+                "market_trends": [],
+                "emerging_patterns": [],
+                "competitive_dynamics": "Analysis incomplete due to technical issues",
+                "barriers_to_entry": [],
+                "success_factors": []
+            },
+            "risks_and_unknowns": [
+                {
+                    "risk_id": "json_parsing_failure",
+                    "description": "LLM response could not be parsed as valid JSON",
+                    "impact": "high",
+                    "likelihood": "low",
+                    "mitigation_strategy": "Review and fix JSON formatting in LLM response",
+                    "data_needed": ["Valid JSON response from LLM"]
+                }
+            ],
+            "next_actions_recommendation": [
+                {
+                    "action_id": "retry_analysis",
+                    "action": "Retry think stage analysis with improved JSON formatting",
+                    "priority": "high",
+                    "owner": "system",
+                    "expected_outcome": "Valid JSON analysis result",
+                    "blocking_inputs": ["Fixed LLM response formatting"],
+                    "timeline": "immediate"
+                }
+            ]
         }
-        
-        return analysis_strategy
     
     async def act(self, input_data: GapFinderInput) -> GapFinderOutput:
         """Execute market gap analysis and return results."""
@@ -1424,7 +1806,7 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                                         elif "vendor_research_batch" in vendor_analysis:
                                             node_output = vendor_analysis["vendor_research_batch"]
                                             self.logger.info(f"Found vendor_research_pp1_output via vendor_research_batch")
-                                
+                                    
                                 # Check gap_finder_collect stage first
                                 collect_stage = manifest.get("stages", {}).get("gap_finder_collect", {})
                                 if "data" in collect_stage and "tool_results" in collect_stage["data"]:
@@ -2096,6 +2478,259 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
             "comprehensive": "Full market analysis with detailed modeling"
         }
         return approaches.get(scope, "focused")
+    
+    def _parse_structured_text(self, text: str) -> Dict[str, Any]:
+        """Parse structured text response into JSON format."""
+        import re
+        from datetime import datetime
+        
+        try:
+            result = {
+                "summary": {
+                    "analysis_objective": "",
+                    "methodology": "",
+                    "total_vendors_analyzed": 0,
+                    "total_gaps_identified": 0,
+                    "analysis_confidence": "medium",
+                    "key_findings": [],
+                    "analysis_timestamp": datetime.now().isoformat()
+                },
+                "prioritized_gaps": [],
+                "vendor_landscape": [],
+                "whitespace_opportunities": [],
+                "strategic_insights": {
+                    "market_trends": [],
+                    "emerging_patterns": [],
+                    "competitive_dynamics": "",
+                    "barriers_to_entry": [],
+                    "success_factors": []
+                },
+                "risks_and_unknowns": [],
+                "next_actions_recommendation": []
+            }
+            
+            # Parse Summary section
+            summary_match = re.search(r'## Summary(.*?)(?=## |$)', text, re.DOTALL)
+            if summary_match:
+                summary_text = summary_match.group(1)
+                result["summary"]["analysis_objective"] = self._extract_field(summary_text, "Analysis Objective")
+                result["summary"]["methodology"] = self._extract_field(summary_text, "Methodology")
+                result["summary"]["total_vendors_analyzed"] = self._extract_number(summary_text, "Total Vendors Analyzed")
+                result["summary"]["total_gaps_identified"] = self._extract_number(summary_text, "Total Gaps Identified")
+                result["summary"]["analysis_confidence"] = self._extract_field(summary_text, "Analysis Confidence", "medium")
+                result["summary"]["key_findings"] = self._extract_list(summary_text, "Key Findings")
+            
+            # Parse Prioritized Gaps section
+            gaps_match = re.search(r'## Prioritized Gaps(.*?)(?=## |$)', text, re.DOTALL)
+            if gaps_match:
+                gaps_text = gaps_match.group(1)
+                result["prioritized_gaps"] = self._parse_gaps(gaps_text)
+            
+            # Parse Vendor Landscape section
+            vendors_match = re.search(r'## Vendor Landscape(.*?)(?=## |$)', text, re.DOTALL)
+            if vendors_match:
+                vendors_text = vendors_match.group(1)
+                result["vendor_landscape"] = self._parse_vendors(vendors_text)
+            
+            # Parse Whitespace Opportunities section
+            opportunities_match = re.search(r'## Whitespace Opportunities(.*?)(?=## |$)', text, re.DOTALL)
+            if opportunities_match:
+                opportunities_text = opportunities_match.group(1)
+                result["whitespace_opportunities"] = self._parse_opportunities(opportunities_text)
+            
+            # Parse Strategic Insights section
+            insights_match = re.search(r'## Strategic Insights(.*?)(?=## |$)', text, re.DOTALL)
+            if insights_match:
+                insights_text = insights_match.group(1)
+                result["strategic_insights"]["market_trends"] = self._extract_list(insights_text, "Market Trends")
+                result["strategic_insights"]["emerging_patterns"] = self._extract_list(insights_text, "Emerging Patterns")
+                result["strategic_insights"]["competitive_dynamics"] = self._extract_field(insights_text, "Competitive Dynamics")
+                result["strategic_insights"]["barriers_to_entry"] = self._extract_list(insights_text, "Barriers to Entry")
+                result["strategic_insights"]["success_factors"] = self._extract_list(insights_text, "Success Factors")
+            
+            # Parse Risks and Unknowns section
+            risks_match = re.search(r'## Risks and Unknowns(.*?)(?=## |$)', text, re.DOTALL)
+            if risks_match:
+                risks_text = risks_match.group(1)
+                result["risks_and_unknowns"] = self._parse_risks(risks_text)
+            
+            # Parse Next Actions section
+            actions_match = re.search(r'## Next Actions(.*?)(?=## |$)', text, re.DOTALL)
+            if actions_match:
+                actions_text = actions_match.group(1)
+                result["next_actions_recommendation"] = self._parse_actions(actions_text)
+            
+            self.logger.info("Successfully parsed structured text response")
+            return result
+            
+        except Exception as e:
+            self.logger.error(f"Failed to parse structured text: {e}")
+            return {"error": f"Failed to parse structured text: {e}"}
+    
+    def _extract_field(self, text: str, field_name: str, default: str = "") -> str:
+        """Extract a field value from structured text."""
+        import re
+        pattern = rf'- {re.escape(field_name)}:\s*(.+?)(?:\n|$)'
+        match = re.search(pattern, text, re.MULTILINE)
+        return match.group(1).strip() if match else default
+    
+    def _extract_number(self, text: str, field_name: str, default: int = 0) -> int:
+        """Extract a number field from structured text."""
+        import re
+        pattern = rf'- {re.escape(field_name)}:\s*(\d+)'
+        match = re.search(pattern, text)
+        return int(match.group(1)) if match else default
+    
+    def _extract_list(self, text: str, field_name: str) -> list:
+        """Extract a list field from structured text."""
+        import re
+        pattern = rf'- {re.escape(field_name)}:\s*(.+?)(?:\n- |\n## |$)'
+        match = re.search(pattern, text, re.DOTALL)
+        if match:
+            list_text = match.group(1).strip()
+            # Split by newlines and clean up
+            items = [item.strip('- ').strip() for item in list_text.split('\n') if item.strip()]
+            return [item for item in items if item]
+        return []
+    
+    def _parse_gaps(self, gaps_text: str) -> list:
+        """Parse gaps from structured text."""
+        import re
+        gaps = []
+        gap_pattern = r'- Gap \d+:\s*(.+?)\s*-\s*Urgency:\s*(\d+),\s*Feasibility:\s*(\d+),\s*Impact:\s*(\d+)(.*?)(?=- Gap \d+:|$)'
+        matches = re.finditer(gap_pattern, gaps_text, re.DOTALL)
+        
+        for i, match in enumerate(matches, 1):
+            title = match.group(1).strip()
+            urgency = int(match.group(2))
+            feasibility = int(match.group(3))
+            impact = int(match.group(4))
+            details = match.group(5)
+            
+            rationale = self._extract_field(details, "Rationale")
+            validation_path = self._extract_field(details, "Validation Path")
+            
+            gaps.append({
+                "gap_id": f"gap_{i}",
+                "title": title,
+                "urgency_score": urgency,
+                "feasibility_score": feasibility,
+                "impact_score": impact,
+                "overall_priority": (urgency + feasibility + impact) // 3,
+                "rationale": rationale,
+                "validation_path": validation_path
+            })
+        
+        return gaps
+    
+    def _parse_vendors(self, vendors_text: str) -> list:
+        """Parse vendors from structured text."""
+        import re
+        vendors = []
+        vendor_pattern = r'- (.+?)\s*\((.+?)\)(.*?)(?=- .+?\(|$)'
+        matches = re.finditer(vendor_pattern, vendors_text, re.DOTALL)
+        
+        for match in matches:
+            vendor_name = match.group(1).strip()
+            category = match.group(2).strip()
+            details = match.group(3)
+            
+            strengths = self._extract_list(details, "Strengths")
+            limitations = self._extract_list(details, "Limitations")
+            market_position = self._extract_field(details, "Market Position")
+            addressed_gaps = self._extract_list(details, "Addressed Gaps")
+            
+            vendors.append({
+                "vendor_name": vendor_name,
+                "category": category,
+                "market_position": market_position,
+                "strengths": strengths,
+                "limitations": limitations,
+                "addressed_gaps": addressed_gaps
+            })
+        
+        return vendors
+    
+    def _parse_opportunities(self, opportunities_text: str) -> list:
+        """Parse opportunities from structured text."""
+        import re
+        opportunities = []
+        opp_pattern = r'- (.+?)(.*?)(?=- .+?|$)'
+        matches = re.finditer(opp_pattern, opportunities_text, re.DOTALL)
+        
+        for i, match in enumerate(matches, 1):
+            title = match.group(1).strip()
+            details = match.group(2)
+            
+            description = self._extract_field(details, "Description")
+            validation_path = self._extract_field(details, "Validation Path")
+            potential_impact = self._extract_field(details, "Potential Impact")
+            feasibility = self._extract_field(details, "Feasibility")
+            
+            opportunities.append({
+                "opportunity_id": f"opp_{i}",
+                "title": title,
+                "description": description,
+                "validation_path": validation_path,
+                "potential_impact": potential_impact,
+                "feasibility_assessment": feasibility
+            })
+        
+        return opportunities
+    
+    def _parse_risks(self, risks_text: str) -> list:
+        """Parse risks from structured text."""
+        import re
+        risks = []
+        risk_pattern = r'- (.+?)\s*-\s*Impact:\s*(.+?),\s*Likelihood:\s*(.+?)(.*?)(?=- .+?|$)'
+        matches = re.finditer(risk_pattern, risks_text, re.DOTALL)
+        
+        for i, match in enumerate(matches, 1):
+            description = match.group(1).strip()
+            impact = match.group(2).strip()
+            likelihood = match.group(3).strip()
+            details = match.group(4)
+            
+            mitigation_strategy = self._extract_field(details, "Mitigation Strategy")
+            data_needed = self._extract_list(details, "Data Needed")
+            
+            risks.append({
+                "risk_id": f"risk_{i}",
+                "description": description,
+                "impact": impact.lower(),
+                "likelihood": likelihood.lower(),
+                "mitigation_strategy": mitigation_strategy,
+                "data_needed": data_needed
+            })
+        
+        return risks
+    
+    def _parse_actions(self, actions_text: str) -> list:
+        """Parse actions from structured text."""
+        import re
+        actions = []
+        action_pattern = r'- (.+?)\s*-\s*Priority:\s*(.+?)(.*?)(?=- .+?|$)'
+        matches = re.finditer(action_pattern, actions_text, re.DOTALL)
+        
+        for i, match in enumerate(matches, 1):
+            action = match.group(1).strip()
+            priority = match.group(2).strip()
+            details = match.group(3)
+            
+            owner = self._extract_field(details, "Owner")
+            expected_outcome = self._extract_field(details, "Expected Outcome")
+            timeline = self._extract_field(details, "Timeline")
+            
+            actions.append({
+                "action_id": f"action_{i}",
+                "action": action,
+                "priority": priority.lower(),
+                "owner": owner,
+                "expected_outcome": expected_outcome,
+                "timeline": timeline
+            })
+        
+        return actions
 
 
 # Register the agent - moved to agent_registry.py
