@@ -634,6 +634,76 @@ class AgentOrchestrator:
                         analysis_scope=self.agent_input.context.get("analysis_scope", "focused")
                     )
                     result = await method(builder_input)
+            elif agent_id == "writer":
+                # For WriterAgent, get the builder output from BuilderAgent's act stage
+                builder_act_data = None
+                
+                # Try to get builder_act data from message service first
+                try:
+                    builder_act_data = self.message_service.consume_stage_input(
+                        workflow_id=self.run_id,
+                        stage_id="builder_act"
+                    )
+                    if builder_act_data:
+                        self.logger.info("Using message service builder_act data for writer think stage")
+                except Exception as e:
+                    self.logger.warning(f"Failed to get builder_act data from message service: {e}")
+                
+                # If not found in message service, try direct stage output
+                if not builder_act_data:
+                    builder_act_data = self._stage_outputs.get("builder_act")
+                    if builder_act_data:
+                        self.logger.info("Using direct stage output for builder_act data in writer think stage")
+                
+                # If still not found, try manifest
+                if not builder_act_data and self.manifest_manager:
+                    builder_act_data = self.manifest_manager.get_node_output("builder_act")
+                    if builder_act_data:
+                        self.logger.info("Using manifest fallback for builder_act data in writer think stage")
+                
+                # Extract builder output from builder_act data
+                builder_output = {}
+                if builder_act_data:
+                    # Extract builder output from different possible formats
+                    if isinstance(builder_act_data, dict):
+                        if "result" in builder_act_data and isinstance(builder_act_data["result"], dict):
+                            builder_output = builder_act_data["result"]
+                        elif "data" in builder_act_data:
+                            builder_output = builder_act_data["data"]
+                        else:
+                            builder_output = builder_act_data
+                    
+                    self.logger.info(f"Found builder output for writer from builder_act")
+                    
+                    # Set builder output as input data for writer
+                    self.agent_input.data = builder_output
+                
+                if builder_output:
+                    # Create a WriterInput object from the AgentInput
+                    from scout_agent.agents.writer import WriterInput
+                    writer_input = WriterInput(
+                        builder_output=builder_output,
+                        gap_finder_output=self.agent_input.context.get("gap_finder_output", {}),
+                        scout_output=self.agent_input.context.get("scout_output", {}),
+                        screener_output=self.agent_input.context.get("screener_output", {}),
+                        validator_output=self.agent_input.context.get("validator_output", {}),
+                        report_style=self.agent_input.context.get("report_style", "professional"),
+                        include_animations=self.agent_input.context.get("include_animations", True)
+                    )
+                    result = await method(writer_input)
+                else:
+                    # This should never happen with proper DAG dependencies, but keep as fallback
+                    from scout_agent.agents.writer import WriterInput
+                    writer_input = WriterInput(
+                        builder_output={},
+                        gap_finder_output=self.agent_input.context.get("gap_finder_output", {}),
+                        scout_output=self.agent_input.context.get("scout_output", {}),
+                        screener_output=self.agent_input.context.get("screener_output", {}),
+                        validator_output=self.agent_input.context.get("validator_output", {}),
+                        report_style=self.agent_input.context.get("report_style", "professional"),
+                        include_animations=self.agent_input.context.get("include_animations", True)
+                    )
+                    result = await method(writer_input)
             elif has_collect_stage:
                 # For agents with collect stage (like ScoutAgent), get collect data
                 # Get collect data from direct tool results first, then fallback to aggregated results
@@ -697,6 +767,19 @@ class AgentOrchestrator:
                     analysis_scope=self.agent_input.context.get("analysis_scope", "focused") if self.agent_input.context else "focused"
                 )
                 result = await method(builder_input, think_result)
+            elif agent_id == "writer":
+                # For WriterAgent, we need to create a WriterInput
+                from scout_agent.agents.writer import WriterInput
+                writer_input = WriterInput(
+                    builder_output=self.agent_input.data if hasattr(self.agent_input, 'data') else {},
+                    gap_finder_output=self.agent_input.context.get("gap_finder_output", {}) if self.agent_input.context else {},
+                    scout_output=self.agent_input.context.get("scout_output", {}) if self.agent_input.context else {},
+                    screener_output=self.agent_input.context.get("screener_output", {}) if self.agent_input.context else {},
+                    validator_output=self.agent_input.context.get("validator_output", {}) if self.agent_input.context else {},
+                    report_style=self.agent_input.context.get("report_style", "professional") if self.agent_input.context else "professional",
+                    include_animations=self.agent_input.context.get("include_animations", True) if self.agent_input.context else True
+                )
+                result = await method(writer_input, think_result)
             else:
                 result = await method(self.agent_input, plan_result, think_result)
         else:

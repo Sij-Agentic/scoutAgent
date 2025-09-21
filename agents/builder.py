@@ -63,12 +63,12 @@ class BuilderAgent(BaseAgent, LLMAgentMixin):
                     )
                 else:
                     self.logger.error("Invalid input data format")
-            return AgentOutput(
-                result=None,
-                metadata={'agent_id': self.agent_id, 'agent_name': self.name},
-                logs=self.execution_logs,
-                execution_time=0.0,
-                success=False,
+                    return AgentOutput(
+                        result=None,
+                        metadata={'agent_id': self.agent_id, 'agent_name': self.name},
+                        logs=self.execution_logs,
+                        execution_time=0.0,
+                        success=False,
                         error="Invalid input data format"
                     )
             else:
@@ -201,11 +201,11 @@ class BuilderAgent(BaseAgent, LLMAgentMixin):
             self._store_think_output_to_manifest(manifest_manager, analysis_result)
             
             self.logger.info("Think stage completed successfully")
-        return analysis_result
-    
+            return analysis_result
+            
         except Exception as e:
             self.logger.error(f"Error in think stage: {e}")
-            raise e
+            return {"error": f"Think stage failed: {str(e)}"}
     
     async def act(self, input_data: BuilderInput, think_result: Dict[str, Any] = None) -> Dict[str, Any]:
         """Create comprehensive business solutions and go-to-market strategies."""
@@ -279,17 +279,17 @@ class BuilderAgent(BaseAgent, LLMAgentMixin):
             manifest = manifest_manager.get_manifest()
             gap_finder_act = manifest.get("stages", {}).get("gap_finder_act", {})
             return gap_finder_act.get("data", {})
-            except Exception as e:
+        except Exception as e:
             self.logger.error(f"Error loading gap finder output: {e}")
             return {}
         
     def _load_think_stage_data(self, manifest_manager: ManifestManager) -> Dict[str, Any]:
         """Load think stage data from manifest."""
-            try:
+        try:
             manifest = manifest_manager.get_manifest()
             think_stage = manifest.get("stages", {}).get("builder_think", {})
             return think_stage.get("data", {})
-            except Exception as e:
+        except Exception as e:
             self.logger.error(f"Error loading think stage data: {e}")
             return {}
     
@@ -314,7 +314,7 @@ class BuilderAgent(BaseAgent, LLMAgentMixin):
             if prompt_path.exists():
                 with open(prompt_path, 'r') as f:
                     return f.read()
-        else:
+            else:
                 self.logger.error(f"Act prompt file not found: {prompt_path}")
                 return ""
         except Exception as e:
