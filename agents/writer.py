@@ -690,15 +690,44 @@ class WriterAgent(BaseAgent, LLMAgentMixin):
             gap_finder_output = synthesis_data.get("gap_finder_output", {})
             think_analysis = synthesis_data.get("think_analysis", {})
             
-            # Get business solution details
-            business_solution = builder_output.get("business_solution_summary", {})
-            product_strategy = builder_output.get("product_strategy", {})
-            business_model = builder_output.get("business_model_pricing", {})
-            go_to_market = builder_output.get("go_to_market_strategy", {})
+            # Get business solution details - try multiple sources
+            business_solution = {}
+            product_strategy = {}
+            business_model = {}
+            go_to_market = {}
             
-            # Get market gaps
-            market_gaps = gap_finder_output.get("identified_market_gaps", [])
-            strategic_recommendations = gap_finder_output.get("strategic_recommendations", [])
+            # Try builder_output first
+            if builder_output:
+                business_solution = builder_output.get("business_solution_summary", {})
+                product_strategy = builder_output.get("product_strategy", {})
+                business_model = builder_output.get("business_model_pricing", {})
+                go_to_market = builder_output.get("go_to_market_strategy", {})
+            # Try all_agent_data.builder_act
+            elif synthesis_data.get("all_agent_data", {}).get("builder_act"):
+                builder_act = synthesis_data["all_agent_data"]["builder_act"]
+                business_solution = builder_act.get("business_solution_summary", {})
+                product_strategy = builder_act.get("product_strategy", {})
+                business_model = builder_act.get("business_model_pricing", {})
+                go_to_market = builder_act.get("go_to_market_strategy", {})
+            
+            # Get market gaps - try multiple sources
+            market_gaps = []
+            strategic_recommendations = []
+            
+            # Try gap_finder_output first
+            if gap_finder_output and gap_finder_output.get("identified_market_gaps"):
+                market_gaps = gap_finder_output.get("identified_market_gaps", [])
+                strategic_recommendations = gap_finder_output.get("strategic_recommendations", [])
+            # Try all_agent_data.gap_finder_act
+            elif synthesis_data.get("all_agent_data", {}).get("gap_finder_act"):
+                gap_finder_act = synthesis_data["all_agent_data"]["gap_finder_act"]
+                market_gaps = gap_finder_act.get("identified_market_gaps", [])
+                strategic_recommendations = gap_finder_act.get("strategic_recommendations", [])
+            # Try all_agent_data.gap_finder_think
+            elif synthesis_data.get("all_agent_data", {}).get("gap_finder_think"):
+                gap_finder_think = synthesis_data["all_agent_data"]["gap_finder_think"]
+                market_gaps = gap_finder_think.get("identified_market_gaps", [])
+                strategic_recommendations = gap_finder_think.get("strategic_recommendations", [])
             
             html_content = f"""<!DOCTYPE html>
 <html lang="en">
