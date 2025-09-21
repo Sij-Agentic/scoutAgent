@@ -1866,7 +1866,7 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                                         elif "vendor_research_batch" in vendor_analysis:
                                             node_output = vendor_analysis["vendor_research_batch"]
                                             self.logger.info(f"Found vendor_research_pp1_output via vendor_research_batch")
-                                    
+                                            
                                 # Check gap_finder_collect stage first
                                 collect_stage = manifest.get("stages", {}).get("gap_finder_collect", {})
                                 if "data" in collect_stage and "tool_results" in collect_stage["data"]:
@@ -1897,9 +1897,8 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                                         resolved_list.append(node_output)
                                 else:
                                     resolved_list.append(item)  # Keep original
-                                    
                             except Exception as e:
-                                self.logger.error(f"Error processing list template {match}: {e}")
+                                self.logger.error(f"Error resolving template variable {match}: {e}")
                                 resolved_list.append(item)  # Keep original on error
                         else:
                             resolved_list.append(item)  # Keep non-template items
@@ -2872,55 +2871,68 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
         
         try:
             result = {
-                "saas_business_summary": {
-                    "primary_opportunity": "",
-                    "target_market": "",
-                    "market_size_estimate": "",
-                    "business_model": ""
+                "market_gaps_summary": {
+                    "primary_gap": "",
+                    "gap_count": "",
+                    "market_impact": "",
+                    "opportunity_size": ""
                 },
-                "saas_recommendations": [],
-                "implementation_roadmap": {
-                    "mvp_phase": "",
-                    "growth_phase": "",
-                    "scale_phase": ""
+                "identified_market_gaps": [],
+                "strategic_recommendations": [],
+                "market_intelligence": {
+                    "key_insights": [],
+                    "emerging_trends": [],
+                    "competitive_dynamics": "",
+                    "market_barriers": [],
+                    "enabling_factors": []
                 },
-                "success_metrics": {
-                    "mvp_success": [],
-                    "growth_success": [],
-                    "scale_success": []
+                "implementation_guidance": {
+                    "priority_order": [],
+                    "resource_requirements": [],
+                    "timeline_considerations": [],
+                    "success_metrics": []
                 }
             }
             
-            # Parse SaaS Business Summary section
-            summary_match = re.search(r'## SaaS Business Summary(.*?)(?=## |$)', text, re.DOTALL)
+            # Parse Market Gaps Summary section
+            summary_match = re.search(r'## Market Gaps Summary(.*?)(?=## |$)', text, re.DOTALL)
             if summary_match:
                 summary_text = summary_match.group(1)
-                result["saas_business_summary"]["primary_opportunity"] = self._extract_field(summary_text, "Primary Opportunity")
-                result["saas_business_summary"]["target_market"] = self._extract_field(summary_text, "Target Market")
-                result["saas_business_summary"]["market_size_estimate"] = self._extract_field(summary_text, "Market Size Estimate")
-                result["saas_business_summary"]["business_model"] = self._extract_field(summary_text, "Business Model")
+                result["market_gaps_summary"]["primary_gap"] = self._extract_field(summary_text, "Primary Gap")
+                result["market_gaps_summary"]["gap_count"] = self._extract_field(summary_text, "Gap Count")
+                result["market_gaps_summary"]["market_impact"] = self._extract_field(summary_text, "Market Impact")
+                result["market_gaps_summary"]["opportunity_size"] = self._extract_field(summary_text, "Opportunity Size")
             
-            # Parse SaaS Recommendations section
-            recommendations_match = re.search(r'## SaaS Recommendations(.*?)(?=## |$)', text, re.DOTALL)
+            # Parse Identified Market Gaps section
+            gaps_match = re.search(r'## Identified Market Gaps(.*?)(?=## |$)', text, re.DOTALL)
+            if gaps_match:
+                gaps_text = gaps_match.group(1)
+                result["identified_market_gaps"] = self._parse_market_gaps(gaps_text)
+            
+            # Parse Strategic Recommendations section
+            recommendations_match = re.search(r'## Strategic Recommendations(.*?)(?=## |$)', text, re.DOTALL)
             if recommendations_match:
                 recommendations_text = recommendations_match.group(1)
-                result["saas_recommendations"] = self._parse_saas_recommendations(recommendations_text)
+                result["strategic_recommendations"] = self._parse_strategic_recommendations(recommendations_text)
             
-            # Parse Implementation Roadmap section
-            roadmap_match = re.search(r'## Implementation Roadmap(.*?)(?=## |$)', text, re.DOTALL)
-            if roadmap_match:
-                roadmap_text = roadmap_match.group(1)
-                result["implementation_roadmap"]["mvp_phase"] = self._extract_field(roadmap_text, "MVP Phase")
-                result["implementation_roadmap"]["growth_phase"] = self._extract_field(roadmap_text, "Growth Phase")
-                result["implementation_roadmap"]["scale_phase"] = self._extract_field(roadmap_text, "Scale Phase")
+            # Parse Market Intelligence section
+            intelligence_match = re.search(r'## Market Intelligence(.*?)(?=## |$)', text, re.DOTALL)
+            if intelligence_match:
+                intelligence_text = intelligence_match.group(1)
+                result["market_intelligence"]["key_insights"] = self._extract_list(intelligence_text, "Key Insights")
+                result["market_intelligence"]["emerging_trends"] = self._extract_list(intelligence_text, "Emerging Trends")
+                result["market_intelligence"]["competitive_dynamics"] = self._extract_field(intelligence_text, "Competitive Dynamics")
+                result["market_intelligence"]["market_barriers"] = self._extract_list(intelligence_text, "Market Barriers")
+                result["market_intelligence"]["enabling_factors"] = self._extract_list(intelligence_text, "Enabling Factors")
             
-            # Parse Success Metrics section
-            metrics_match = re.search(r'## Success Metrics(.*?)(?=## |$)', text, re.DOTALL)
-            if metrics_match:
-                metrics_text = metrics_match.group(1)
-                result["success_metrics"]["mvp_success"] = self._extract_list(metrics_text, "MVP Success")
-                result["success_metrics"]["growth_success"] = self._extract_list(metrics_text, "Growth Success")
-                result["success_metrics"]["scale_success"] = self._extract_list(metrics_text, "Scale Success")
+            # Parse Implementation Guidance section
+            guidance_match = re.search(r'## Implementation Guidance(.*?)(?=## |$)', text, re.DOTALL)
+            if guidance_match:
+                guidance_text = guidance_match.group(1)
+                result["implementation_guidance"]["priority_order"] = self._extract_list(guidance_text, "Priority Order")
+                result["implementation_guidance"]["resource_requirements"] = self._extract_list(guidance_text, "Resource Requirements")
+                result["implementation_guidance"]["timeline_considerations"] = self._extract_list(guidance_text, "Timeline Considerations")
+                result["implementation_guidance"]["success_metrics"] = self._extract_list(guidance_text, "Success Metrics")
             
             self.logger.info("Successfully parsed structured act text response")
             return result
@@ -2929,6 +2941,122 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
             self.logger.error(f"Failed to parse structured act text: {e}")
             return {"error": f"Failed to parse structured act text: {e}"}
     
+    def _parse_market_gaps(self, gaps_text: str) -> list:
+        """Parse market gaps from structured text."""
+        import re
+        gaps = []
+        
+        # Look for gap entries with more specific patterns
+        lines = gaps_text.split('\n')
+        current_gap = None
+        
+        for line in lines:
+            line = line.strip()
+            if line.startswith('- ') and not line.startswith('-   '):
+                # Check if this is a gap name (doesn't contain a colon) or a field (contains a colon)
+                if ':' in line:
+                    # This is a field line like "- Description: value"
+                    if current_gap:
+                        field_line = line[2:].strip()  # Remove the "- "
+                        field_name, field_value = field_line.split(':', 1)
+                        field_name = field_name.strip().lower()
+                        field_value = field_value.strip()
+                        
+                        if field_name == "description":
+                            current_gap["description"] = field_value
+                        elif field_name == "severity":
+                            current_gap["severity"] = field_value
+                        elif field_name == "affected segments":
+                            current_gap["affected_segments"] = field_value
+                        elif field_name == "evidence":
+                            current_gap["evidence"] = field_value
+                        elif field_name == "opportunity score":
+                            current_gap["opportunity_score"] = field_value
+                        elif field_name == "competitive landscape":
+                            current_gap["competitive_landscape"] = field_value
+                        elif field_name == "market timing":
+                            current_gap["market_timing"] = field_value
+                else:
+                    # This is a new gap
+                    if current_gap:
+                        gaps.append(current_gap)
+                    
+                    gap_name = line[2:].strip()
+                    current_gap = {
+                        "gap_name": gap_name,
+                        "description": "",
+                        "severity": "",
+                        "affected_segments": "",
+                        "evidence": "",
+                        "opportunity_score": "",
+                        "competitive_landscape": "",
+                        "market_timing": ""
+                    }
+        
+        # Add the last gap if it exists
+        if current_gap:
+            gaps.append(current_gap)
+        
+        return gaps
+
+    def _parse_strategic_recommendations(self, recommendations_text: str) -> list:
+        """Parse strategic recommendations from structured text."""
+        import re
+        recommendations = []
+        
+        # Look for recommendation entries with more specific patterns
+        lines = recommendations_text.split('\n')
+        current_recommendation = None
+        
+        for line in lines:
+            line = line.strip()
+            if line.startswith('- ') and not line.startswith('-   '):
+                # Check if this is a recommendation name (doesn't contain a colon) or a field (contains a colon)
+                if ':' in line:
+                    # This is a field line like "- Target Gap: value"
+                    if current_recommendation:
+                        field_line = line[2:].strip()  # Remove the "- "
+                        field_name, field_value = field_line.split(':', 1)
+                        field_name = field_name.strip().lower()
+                        field_value = field_value.strip()
+                        
+                        if field_name == "target gap":
+                            current_recommendation["target_gap"] = field_value
+                        elif field_name == "approach":
+                            current_recommendation["approach"] = field_value
+                        elif field_name == "target market":
+                            current_recommendation["target_market"] = field_value
+                        elif field_name == "value proposition":
+                            current_recommendation["value_proposition"] = field_value
+                        elif field_name == "implementation strategy":
+                            current_recommendation["implementation_strategy"] = field_value
+                        elif field_name == "success criteria":
+                            current_recommendation["success_criteria"] = field_value
+                        elif field_name == "risk factors":
+                            current_recommendation["risk_factors"] = field_value
+                else:
+                    # This is a new recommendation
+                    if current_recommendation:
+                        recommendations.append(current_recommendation)
+                    
+                    recommendation_name = line[2:].strip()
+                    current_recommendation = {
+                        "recommendation_name": recommendation_name,
+                        "target_gap": "",
+                        "approach": "",
+                        "target_market": "",
+                        "value_proposition": "",
+                        "implementation_strategy": "",
+                        "success_criteria": "",
+                        "risk_factors": ""
+                    }
+        
+        # Add the last recommendation if it exists
+        if current_recommendation:
+            recommendations.append(current_recommendation)
+        
+        return recommendations
+
     def _parse_saas_recommendations(self, recommendations_text: str) -> list:
         """Parse SaaS recommendations from structured text."""
         import re
@@ -2991,35 +3119,48 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
     def _create_fallback_act_result(self, gap_input: GapFinderInput) -> Dict[str, Any]:
         """Create a fallback act result when LLM parsing fails."""
         return {
-            "saas_business_summary": {
-                "primary_opportunity": "SaaS solution for identified market gaps",
-                "target_market": "SMBs and startups",
-                "market_size_estimate": "To be determined",
-                "business_model": "Freemium SaaS"
+            "market_gaps_summary": {
+                "primary_gap": "Market gaps identified through analysis",
+                "gap_count": "Multiple gaps discovered",
+                "market_impact": "Significant market opportunity",
+                "opportunity_size": "To be determined through further analysis"
             },
-            "saas_recommendations": [
+            "identified_market_gaps": [
                 {
-                    "business_name": "Gap Solution Platform",
-                    "description": "SaaS platform addressing identified market gaps",
-                    "target_gap": "Market gaps from analysis",
-                    "value_proposition": "Comprehensive solution for identified market needs",
-                    "mvp_features": ["Core functionality", "Basic user management"],
-                    "long_term_features": ["Advanced features", "Enterprise capabilities"],
-                    "target_customers": ["SMBs", "Startups"],
-                    "revenue_model": "Subscription-based",
-                    "competitive_advantage": "First-mover advantage in identified gaps",
-                    "go_to_market": "Digital marketing and partnerships"
+                    "gap_name": "Primary Market Gap",
+                    "description": "Key market gap identified through research",
+                    "severity": "High",
+                    "affected_segments": "Multiple customer segments",
+                    "evidence": "Research findings support this gap",
+                    "opportunity_score": "8",
+                    "competitive_landscape": "Limited existing solutions",
+                    "market_timing": "Favorable market conditions"
                 }
             ],
-            "implementation_roadmap": {
-                "mvp_phase": "3-4 months - Core features",
-                "growth_phase": "6-12 months - Advanced features",
-                "scale_phase": "12+ months - Market expansion"
+            "strategic_recommendations": [
+                {
+                    "recommendation_name": "Gap-Filling Solution",
+                    "target_gap": "Primary Market Gap",
+                    "approach": "Comprehensive solution development",
+                    "target_market": "Underserved customer segments",
+                    "value_proposition": "Addresses identified market needs",
+                    "implementation_strategy": "Phased development approach",
+                    "success_criteria": "Market validation and customer adoption",
+                    "risk_factors": "Market timing and competitive response"
+                }
+            ],
+            "market_intelligence": {
+                "key_insights": ["Market gaps present significant opportunities"],
+                "emerging_trends": ["Growing demand for gap-filling solutions"],
+                "competitive_dynamics": "Limited competition in identified gaps",
+                "market_barriers": ["Development complexity", "Market education needs"],
+                "enabling_factors": ["Technology availability", "Market readiness"]
             },
-            "success_metrics": {
-                "mvp_success": ["User acquisition", "Product-market fit validation"],
-                "growth_success": ["Revenue growth", "Customer retention"],
-                "scale_success": ["Market leadership", "International expansion"]
+            "implementation_guidance": {
+                "priority_order": ["Address highest-impact gaps first"],
+                "resource_requirements": ["Development team", "Market research"],
+                "timeline_considerations": ["3-6 months for initial solution"],
+                "success_metrics": ["Market validation", "Customer adoption"]
             }
         }
 
