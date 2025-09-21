@@ -1866,7 +1866,7 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                                         elif "vendor_research_batch" in vendor_analysis:
                                             node_output = vendor_analysis["vendor_research_batch"]
                                             self.logger.info(f"Found vendor_research_pp1_output via vendor_research_batch")
-                                                
+                                                    
                                 # Check gap_finder_collect stage first
                                 collect_stage = manifest.get("stages", {}).get("gap_finder_collect", {})
                                 if "data" in collect_stage and "tool_results" in collect_stage["data"]:
