@@ -573,6 +573,67 @@ class AgentOrchestrator:
                         top_k=self.agent_input.context.get("top_k", 5)
                     )
                     result = await method(screener_input)
+            elif agent_id == "builder":
+                # For BuilderAgent, get the gap finder output from GapFinderAgent's act stage
+                gap_finder_act_data = None
+                
+                # Try to get gap_finder_act data from message service first
+                try:
+                    gap_finder_act_data = self.message_service.consume_stage_input(
+                        workflow_id=self.run_id,
+                        stage_id="gap_finder_act"
+                    )
+                    if gap_finder_act_data:
+                        self.logger.info("Using message service gap_finder_act data for builder think stage")
+                except Exception as e:
+                    self.logger.warning(f"Failed to get gap_finder_act data from message service: {e}")
+                
+                # If not found in message service, try direct stage output
+                if not gap_finder_act_data:
+                    gap_finder_act_data = self._stage_outputs.get("gap_finder_act")
+                    if gap_finder_act_data:
+                        self.logger.info("Using direct stage output for gap_finder_act data in builder think stage")
+                
+                # If still not found, try manifest
+                if not gap_finder_act_data and self.manifest_manager:
+                    gap_finder_act_data = self.manifest_manager.get_node_output("gap_finder_act")
+                    if gap_finder_act_data:
+                        self.logger.info("Using manifest fallback for gap_finder_act data in builder think stage")
+                
+                # Extract gap finder output from gap_finder_act data
+                gap_finder_output = {}
+                if gap_finder_act_data:
+                    # Extract gap finder output from different possible formats
+                    if isinstance(gap_finder_act_data, dict):
+                        if "result" in gap_finder_act_data and isinstance(gap_finder_act_data["result"], dict):
+                            gap_finder_output = gap_finder_act_data["result"]
+                        elif "data" in gap_finder_act_data:
+                            gap_finder_output = gap_finder_act_data["data"]
+                        else:
+                            gap_finder_output = gap_finder_act_data
+                    
+                    self.logger.info(f"Found gap finder output for builder from gap_finder_act")
+                    
+                    # Set gap finder output as input data for builder
+                    self.agent_input.data = gap_finder_output
+                
+                    # Create a BuilderInput object from the AgentInput
+                    from scout_agent.agents.builder import BuilderInput
+                    builder_input = BuilderInput(
+                        gap_finder_output=gap_finder_output,
+                        market_context=self.agent_input.context.get("market_context", ""),
+                        analysis_scope=self.agent_input.context.get("analysis_scope", "focused")
+                    )
+                    result = await method(builder_input)
+                else:
+                    # This should never happen with proper DAG dependencies, but keep as fallback
+                    from scout_agent.agents.builder import BuilderInput
+                    builder_input = BuilderInput(
+                        gap_finder_output={},
+                        market_context=self.agent_input.context.get("market_context", ""),
+                        analysis_scope=self.agent_input.context.get("analysis_scope", "focused")
+                    )
+                    result = await method(builder_input)
             elif has_collect_stage:
                 # For agents with collect stage (like ScoutAgent), get collect data
                 # Get collect data from direct tool results first, then fallback to aggregated results
@@ -627,6 +688,15 @@ class AgentOrchestrator:
                 from scout_agent.agents.screener import ScreenerInput
                 screener_input = ScreenerInput.from_agent_input(self.agent_input)
                 result = await method(screener_input, think_result)
+            elif agent_id == "builder":
+                # For BuilderAgent, we need to create a BuilderInput
+                from scout_agent.agents.builder import BuilderInput
+                builder_input = BuilderInput(
+                    gap_finder_output=self.agent_input.data if hasattr(self.agent_input, 'data') else {},
+                    market_context=self.agent_input.context.get("market_context", "") if self.agent_input.context else "",
+                    analysis_scope=self.agent_input.context.get("analysis_scope", "focused") if self.agent_input.context else "focused"
+                )
+                result = await method(builder_input, think_result)
             else:
                 result = await method(self.agent_input, plan_result, think_result)
         else:

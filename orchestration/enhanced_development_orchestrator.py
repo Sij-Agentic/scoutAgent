@@ -378,14 +378,22 @@ class EnhancedDevelopmentOrchestrator(DevelopmentOrchestrator):
         gaps = []
         
         if isinstance(data, dict):
-            # Direct gaps field
-            if "gaps" in data:
+            # Direct identified_market_gaps field (correct field name from gap_finder_act)
+            if "identified_market_gaps" in data:
+                gaps = data["identified_market_gaps"]
+                logger.info("Found gaps in identified_market_gaps field")
+                
+            # Legacy gaps field (for backward compatibility)
+            elif "gaps" in data:
                 gaps = data["gaps"]
                 logger.info("Found gaps in direct gaps field")
                 
             # Inside result field
             elif "result" in data and isinstance(data["result"], dict):
-                if "gaps" in data["result"]:
+                if "identified_market_gaps" in data["result"]:
+                    gaps = data["result"]["identified_market_gaps"]
+                    logger.info("Found gaps in result.identified_market_gaps field")
+                elif "gaps" in data["result"]:
                     gaps = data["result"]["gaps"]
                     logger.info("Found gaps in result.gaps field")
         

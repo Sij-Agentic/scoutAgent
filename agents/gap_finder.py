@@ -1558,7 +1558,7 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                     output_key = node.get("output_manifest_key", f"{node_id}_output")
                     if tool_name == "aggregate_gap_analysis" or output_key == "gap_finder_final_output":
                         # Store the aggregate output directly with no post-processing
-                        self._store_tool_output_in_collect_stage(manifest_manager, output_key, result_data)
+                            self._store_tool_output_in_collect_stage(manifest_manager, output_key, result_data)
                         self.logger.info(f"Stored aggregate output for node: {node_id} (key={output_key})")
                     else:
                         # Store other tool outputs within gap_finder_collect stage context
@@ -1847,27 +1847,27 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                                 # Get node output using the same logic as string templates
                                 manifest = manifest_manager.get_manifest()
                                 node_output = None
-                                
-                                # Special handling for vendor_research_pp1_output template
-                                if node_key == "vendor_research_pp1_output":
-                                    # Look for vendor_research_pp1 in vendor_analysis
-                                    # Try both gap_finder_collect and gapfinder_collect naming conventions
-                                    collect_stage_data = None
-                                    for collect_key in ["gap_finder_collect", "gapfinder_collect"]:
-                                        if collect_key in manifest.get("stages", {}):
-                                            collect_stage_data = manifest["stages"][collect_key].get("data", {})
-                                            break
-                                    
-                                    if collect_stage_data:
-                                        vendor_analysis = collect_stage_data.get("vendor_analysis", {})
-                                        if "vendor_research_pp1" in vendor_analysis:
-                                            node_output = vendor_analysis["vendor_research_pp1"]
-                                            self.logger.info(f"Found vendor_research_pp1_output in vendor_analysis")
-                                        elif "vendor_research_batch" in vendor_analysis:
-                                            node_output = vendor_analysis["vendor_research_batch"]
-                                            self.logger.info(f"Found vendor_research_pp1_output via vendor_research_batch")
+        
+                        # Special handling for vendor_research_pp1_output template
+                        if node_key == "vendor_research_pp1_output":
+                            # Look for vendor_research_pp1 in vendor_analysis
+                            # Try both gap_finder_collect and gapfinder_collect naming conventions
+                            collect_stage_data = None
+                            for collect_key in ["gap_finder_collect", "gapfinder_collect"]:
+                                if collect_key in manifest.get("stages", {}):
+                                    collect_stage_data = manifest["stages"][collect_key].get("data", {})
+                                    break
+                            
+                            if collect_stage_data:
+                                vendor_analysis = collect_stage_data.get("vendor_analysis", {})
+                                if "vendor_research_pp1" in vendor_analysis:
+                                    node_output = vendor_analysis["vendor_research_pp1"]
+                                    self.logger.info(f"Found vendor_research_pp1_output in vendor_analysis")
+                                elif "vendor_research_batch" in vendor_analysis:
+                                    node_output = vendor_analysis["vendor_research_batch"]
+                                    self.logger.info(f"Found vendor_research_pp1_output via vendor_research_batch")
                                             
-                                # Check gap_finder_collect stage first
+                        # Check gap_finder_collect stage first
                                 collect_stage = manifest.get("stages", {}).get("gap_finder_collect", {})
                                 if "data" in collect_stage and "tool_results" in collect_stage["data"]:
                                     tool_results = collect_stage["data"]["tool_results"]

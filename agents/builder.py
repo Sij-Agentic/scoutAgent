@@ -1,148 +1,133 @@
 """
-BuilderAgent - Solution Prototyping and Validation Agent
+Builder Agent - Business Solution Development
 
-This agent specializes in creating solution prototypes and validating
-them against discovered market gaps and pain points.
+This agent transforms market gaps from the gap finder into comprehensive business solutions,
+focusing on building viable SaaS businesses rather than just technical implementations.
 """
 
-import asyncio
 import json
+import re
 from typing import Dict, List, Any, Optional
 from datetime import datetime
-from dataclasses import dataclass, asdict
+from pathlib import Path
 
-from .base import BaseAgent, AgentInput, AgentOutput, AgentState
-from .analysis_agent import AnalysisAgent
-from config import get_config
-from llm.utils import LLMAgentMixin, load_prompt_template
-
-
-@dataclass
-class SolutionPrototype:
-    """Represents a solution prototype."""
-    solution_name: str
-    description: str
-    target_pain_points: List[str]
-    key_features: List[str]
-    technical_architecture: Dict[str, Any]
-    implementation_approach: str
-    estimated_development_time: str
-    estimated_cost: float
-    market_size: float
-    mvp_scope: List[str]
-    validation_plan: Dict[str, Any]
-    success_metrics: List[str]
-    risk_assessment: Dict[str, Any]
-    
-    def to_dict(self) -> Dict[str, Any]:
-        return asdict(self)
+from .base import BaseAgent, AgentInput, AgentOutput
+from ..llm.utils import LLMAgentMixin
+from ..memory.manifest_manager import ManifestManager
 
 
-@dataclass
+# Input class for the builder agent
 class BuilderInput:
     """Input for BuilderAgent."""
-    market_gaps: List[Dict[str, Any]]  # From GapFinderAgent
-    target_market: str
-    solution_type: str = "software"  # software, service, platform
-    budget_range: str = "moderate"  # low, moderate, high
-    timeline: str = "3-6 months"  # 1-3 months, 3-6 months, 6-12 months
-    technical_complexity: str = "moderate"  # low, moderate, high
-    context: Optional[Dict[str, Any]] = None
-    metadata: Dict[str, Any] = None
-    
-    def __post_init__(self):
-        if not self.market_gaps:
-            raise ValueError("Must provide market gaps for solution building")
-        if self.metadata is None:
-            self.metadata = {}
-
-
-@dataclass
-class BuilderOutput:
-    """Output from BuilderAgent."""
-    solution_prototypes: List[SolutionPrototype]
-    recommended_solution: Dict[str, Any]
-    implementation_roadmap: List[Dict[str, Any]]
-    technical_design: Dict[str, Any]
-    cost_analysis: Dict[str, float]
-    timeline_estimate: Dict[str, str]
-    feasibility_score: float
-    risk_factors: List[str]
-    success_metrics: List[str]
-    result: Any = None
-    metadata: Dict[str, Any] = None
-    logs: List[str] = None
-    execution_time: float = 0.0
-    success: bool = True
-    error: Optional[str] = None
-    
-    def __post_init__(self):
-        if self.metadata is None:
-            self.metadata = {}
-        if self.logs is None:
-            self.logs = []
+    def __init__(self, gap_finder_output: Dict[str, Any], market_context: str = "", analysis_scope: str = "focused"):
+        self.gap_finder_output = gap_finder_output
+        self.market_context = market_context
+        self.analysis_scope = analysis_scope
 
 
 class BuilderAgent(BaseAgent, LLMAgentMixin):
     """
-    BuilderAgent for creating and validating solution prototypes.
+    Builder Agent for creating comprehensive business solutions.
     
-    Uses technical analysis, cost estimation, and market validation
-    to create actionable solution prototypes for identified market gaps.
+    Transforms market gaps into viable business concepts with complete go-to-market strategies,
+    focusing on building successful SaaS businesses.
     """
     
     def __init__(self, agent_id: str = None):
         BaseAgent.__init__(self, name="builder", agent_id=agent_id)
-        LLMAgentMixin.__init__(self, preferred_backend='ollama')
-        self.code_service = None  # Will initialize in _initialize
-        self.analysis_agent = AnalysisAgent()
-        self.config = get_config()
-        self.name = "builder"  # Used for prompt directory name
+        LLMAgentMixin.__init__(self, preferred_backend='deepseek')
         
-        # Initialize the code service asynchronously later
-        asyncio.create_task(self._init_code_service())
-        self.preferred_backend = "ollama"  # Use ollama backend by default
-        
-        # Explicitly override task backend preferences to use Ollama for all tasks
+        # Initialize backend preferences
         self.task_backend_preferences = {
-            'planning': 'ollama',
-            'analysis': 'ollama',
-            'technical_design': 'ollama',
-            'default': 'ollama'
+            'think_analysis': 'deepseek',
+            'act_development': 'deepseek',
+            'default': 'deepseek'
         }
     
     async def execute(self, agent_input: AgentInput) -> AgentOutput:
-        """Adapter: accept AgentInput, coerce to BuilderInput, and run."""
+        """Main execution method - runs think and act stages."""
         try:
-            ctx = agent_input.context or {}
-            data = agent_input.data or {}
-            market_gaps = []
-            target_market = ctx.get("target_market", "")
-            if isinstance(data, dict):
-                market_gaps = data.get("market_gaps") or data.get("prioritized_opportunities") or data.get("gaps") or []
-                target_market = data.get("target_market", target_market)
-            b_input = BuilderInput(
-                market_gaps=market_gaps,
-                target_market=target_market or "general",
-                solution_type=ctx.get("solution_type", "software"),
-                budget_range=ctx.get("budget_range", "moderate"),
-                timeline=ctx.get("timeline", "3-6 months"),
-                technical_complexity=ctx.get("technical_complexity", "moderate"),
-                context=agent_input.context,
-                metadata=agent_input.metadata,
-            )
-            self._update_status('planning')
-            plan = await self.plan(b_input)
+            self.logger.info("Starting builder agent execution...")
+            self.logger.info(f"Input data type: {type(agent_input)}")
+            self.logger.info(f"Input data: {agent_input}")
+            
+            # Convert AgentInput to BuilderInput if needed
+            if not isinstance(agent_input, BuilderInput):
+                # Handle case where input_data.data might be a dict
+                if isinstance(agent_input.data, dict):
+                    gap_finder_output = agent_input.data
+                else:
+                    self.logger.error("Invalid input data format")
+            return AgentOutput(
+                result=None,
+                metadata={'agent_id': self.agent_id, 'agent_name': self.name},
+                logs=self.execution_logs,
+                execution_time=0.0,
+                success=False,
+                        error="Invalid input data format"
+                    )
+                
+                builder_input = BuilderInput(
+                    gap_finder_output=gap_finder_output,
+                    market_context=agent_input.context.get("market_context", "") if agent_input.context else "",
+                    analysis_scope=agent_input.context.get("analysis_scope", "focused") if agent_input.context else "focused"
+                )
+            else:
+                builder_input = agent_input
+            
+            # Ensure we have gap finder output
+            if not builder_input.gap_finder_output:
+                self.logger.error("No gap finder output found")
+                return AgentOutput(
+                    result=None,
+                    metadata={'agent_id': self.agent_id, 'agent_name': self.name},
+                    logs=self.execution_logs,
+                    execution_time=0.0,
+                    success=False,
+                    error="No gap finder output available"
+                )
+            
+            # Initialize manifest manager
+            run_id = getattr(self.state, 'run_id', None)
+            if not run_id:
+                self.logger.error("No run_id found in agent state")
+                return AgentOutput(
+                    result=None,
+                    metadata={'agent_id': self.agent_id, 'agent_name': self.name},
+                    logs=self.execution_logs,
+                    execution_time=0.0,
+                    success=False,
+                    error="No run_id available"
+                )
+            
+            manifest_path = Path("data/runs") / run_id / "run_manifest.json"
+            manifest_manager = ManifestManager(manifest_path=manifest_path)
+            
+            # Run think stage
             self._update_status('thinking')
-            thoughts = await self.think(b_input)
+            think_result = await self.think(builder_input, manifest_manager)
+            
+            # Run act stage
             self._update_status('acting')
-            output = await self.act(b_input)
+            act_result = await self.act(builder_input, manifest_manager, think_result)
+            
             self._update_status('completed')
-            # Ensure metadata captures plan/thoughts for observability
-            if isinstance(output, AgentOutput):
-                output.metadata = {**(output.metadata or {}), 'plan': plan, 'thoughts': thoughts, 'agent_name': self.name, 'agent_id': self.agent_id}
-            return output
+            
+            return AgentOutput(
+                result=act_result,
+                metadata={
+                    'agent_id': self.agent_id,
+                    'agent_name': self.name,
+                    'think_result': think_result,
+                    'act_result': act_result
+                },
+                logs=self.execution_logs,
+                execution_time=0.0,
+                success=True
+            )
+            
         except Exception as e:
+            self.logger.error(f"Error in builder agent execution: {e}")
             self._update_status('failed')
             return AgentOutput(
                 result=None,
@@ -150,1014 +135,588 @@ class BuilderAgent(BaseAgent, LLMAgentMixin):
                 logs=self.execution_logs,
                 execution_time=0.0,
                 success=False,
-                error=str(e),
+                error=str(e)
             )
-    
-    async def _init_code_service(self):
-        """Initialize the code execution service."""
-        try:
-            from service_registry import get_registry
-            registry = get_registry()
-            
-            # Try to get the service from the registry first
-            if registry and registry.has_service("code_execution"):
-                self.code_service = registry.get_service("code_execution")
-                self.logger.info("Using code_execution service from registry")
-            else:
-                # Fallback to factory method if not in registry
-                try:
-                    from services.agents.code import get_code_execution_service  # Lazy import to avoid hard dep
-                    self.code_service = get_code_execution_service()
-                except Exception as inner_e:
-                    self.logger.warning(f"Code execution service factory unavailable: {inner_e}")
-                    self.code_service = None
-                self.logger.info("Using code_execution service from factory")
-                
-            # Initialize the service if it hasn't been already
-            if hasattr(self.code_service, '_initialize') and callable(getattr(self.code_service, '_initialize')):
-                await self.code_service._initialize(None)
-                await self.code_service._start()
-                
-        except Exception as e:
-            self.logger.warning(f"Could not initialize code service: {str(e)}")
-            # Create a minimal mock to avoid NoneType errors
-            class MockCodeService:
-                async def execute_code(self, *args, **kwargs):
-                    return {"success": False, "output": "Code execution service not available"}
-                
-                async def generate_code(self, *args, **kwargs):
-                    return False, "Code generation service not available"
-                
-                def __getattr__(self, name):
-                    # Return an empty function for any attribute
-                    return lambda *args, **kwargs: None
-            
-            self.code_service = MockCodeService()
     
     async def plan(self, input_data: BuilderInput) -> Dict[str, Any]:
-        """Plan the solution building process using LLM prompt."""
-        self.logger.info(f"Planning solution building for {len(input_data.market_gaps) if input_data and input_data.market_gaps else 0} market gaps")
-        start_time = datetime.now()
-        
-        # Debug log to help identify None values
-        self.logger.info(f"BuilderInput DEBUG: market_gaps={input_data.market_gaps}, type={type(input_data.market_gaps)}")
-        
-        try:
-            # Prepare substitutions for the prompt template with safe handling of None values
-            substitutions = {
-                "market_gaps": json.dumps(input_data.market_gaps if hasattr(input_data, 'market_gaps') and input_data.market_gaps is not None else []),
-                "target_market": self._safe_string_operation(input_data.target_market) if hasattr(input_data, 'target_market') else "",
-                "solution_type": self._safe_string_operation(input_data.solution_type) if hasattr(input_data, 'solution_type') else "",
-                "budget_range": self._safe_string_operation(input_data.budget_range) if hasattr(input_data, 'budget_range') else "",
-                "timeline": self._safe_string_operation(input_data.timeline) if hasattr(input_data, 'timeline') else "",
-                "technical_complexity": self._safe_string_operation(input_data.technical_complexity) if hasattr(input_data, 'technical_complexity') else ""
-            }
-            
-            # Load prompt template with substitutions
-            prompt_content = load_prompt_template("plan.prompt", agent_name=self.name, substitutions=substitutions)
-            
-            # Generate plan using LLM
-            llm_response = await self.llm_generate(
-                prompt=prompt_content,
-                task_type="planning"
-            )
-            
-            # Extract JSON from LLM response
-            plan = self._extract_json(llm_response)
-            
-        except Exception as e:
-            self.logger.error(f"Error generating plan: {str(e)}")
-            # Fallback plan
-            plan = {
-                "phases": [
-                    "gap_analysis",
-                    "solution_design",
-                    "technical_architecture",
-                    "cost_estimation",
-                    "validation_planning",
-                    "risk_assessment",
-                    "roadmap_creation"
-                ],
-                "solution_type": input_data.solution_type,
-                "budget_range": input_data.budget_range,
-                "timeline": input_data.timeline,
-                "technical_complexity": input_data.technical_complexity,
-                "expected_duration": 1200,  # 20 minutes
-                "gap_count": len(input_data.market_gaps)
-            }
-        
-        execution_time = (datetime.now() - start_time).total_seconds()
-        self.logger.info(f"Plan generation completed in {execution_time:.2f} seconds")
-        
-        self.state.plan = plan
-        return plan
-        
-    def _extract_json(self, text: str) -> Dict[str, Any]:
-        """Extract JSON from LLM response text."""
-        try:
-            # First try to find JSON enclosed in triple backticks
-            import re
-            json_match = re.search(r'```(?:json)?([\s\S]*?)```', text)
-            result = {}
-            
-            if json_match:
-                json_str = json_match.group(1).strip()
-                # Remove trailing commas which can cause JSON parsing errors
-                json_str = re.sub(r',\s*}', '}', json_str)
-                json_str = re.sub(r',\s*]', ']', json_str)
-                result = json.loads(json_str)
-            else:
-                # If no JSON in backticks, try parsing the whole text
-                result = json.loads(text)
-                
-            # Ensure feasibility_score is always present
-            if 'feasibility_score' not in result:
-                result['feasibility_score'] = 7.5  # Default feasibility score
-                
-            return result
-        except Exception as e:
-            self.logger.warning(f"Could not parse LLM response as JSON: {str(text)[:50]}...")
-            # Return empty dict with feasibility_score to avoid KeyError
-            return {"feasibility_score": 7.5}
+        """Plan phase is not used in BuilderAgent."""
+        return {"status": "skipped", "reason": "BuilderAgent uses only think and act phases"}
     
     async def think(self, input_data: BuilderInput) -> Dict[str, Any]:
-        """Analyze market gaps to design solutions using LLM prompt."""
-        self.logger.info(f"Analyzing {len(input_data.market_gaps)} market gaps for solution design")
-        start_time = datetime.now()
-        
-        # Fetch or create plan
-        plan = self.state.plan or await self.plan(input_data)
-        
+        """Analyze market gaps to design business solutions."""
         try:
-            # Prepare substitutions for the prompt template
-            substitutions = {
-                "market_gaps": json.dumps(input_data.market_gaps),
-                "target_market": input_data.target_market,
-                "solution_type": input_data.solution_type,
-                "budget_range": input_data.budget_range,
-                "timeline": input_data.timeline,
-                "technical_complexity": input_data.technical_complexity,
-                "plan": json.dumps(plan)
+            self.logger.info("Starting builder think stage...")
+            
+            # Initialize manifest manager
+            run_id = getattr(self.state, 'run_id', None)
+            if not run_id:
+                self.logger.error("No run_id found in agent state")
+                return {"error": "No run_id available"}
+            
+            manifest_path = Path("data/runs") / run_id / "run_manifest.json"
+            manifest_manager = ManifestManager(manifest_path=manifest_path)
+            
+            # Load gap finder output
+            gap_finder_data = self._load_gap_finder_output(manifest_manager)
+            if not gap_finder_data:
+                self.logger.error("No gap finder output found")
+                return {"error": "No gap finder output available"}
+            
+            # Prepare synthesis data
+            synthesis_data = {
+                "gap_finder_output": gap_finder_data,
+                "market_context": input_data.market_context,
+                "analysis_scope": input_data.analysis_scope
             }
             
-            # Load prompt template with substitutions
-            prompt_content = load_prompt_template("think.prompt", agent_name=self.name, substitutions=substitutions)
+            # Load think stage prompt
+            prompt_content = self._load_think_prompt()
+            if not prompt_content:
+                self.logger.error("Failed to load think stage prompt")
+                return {"error": "Failed to load think stage prompt"}
             
-            # Generate analysis using LLM
-            llm_response = await self.llm_generate(
-                prompt=prompt_content,
-                task_type="analysis"
-            )
+            # Append the synthesis data to the prompt
+            prompt_content += f"\n\nGap Finder Data to Analyze:\n{json.dumps(synthesis_data, indent=2)}"
             
-            # Extract JSON from LLM response
-            analysis_result = self._extract_json(llm_response)
+            # Generate business analysis using LLM mixin
+            analysis_result = await self.llm_generate(prompt=prompt_content, task_type="think_analysis")
             
-        except Exception as e:
-            self.logger.error(f"Error analyzing market gaps: {str(e)}")
-            # Fallback analysis
-            gap_analysis = []
-            for gap in input_data.market_gaps:
-                # Make sure to use proper fallbacks for potentially null fields
-                gap_id = gap.get("id", str(len(gap_analysis) + 1))
-                gap_description = gap.get("gap_description", "") or gap.get("description", "")
+            # Parse the response as structured text
+            if isinstance(analysis_result, str):
+                self.logger.info(f"LLM response type: {type(analysis_result)}, length: {len(analysis_result)}")
+                self.logger.info(f"LLM response preview: {analysis_result[:200]}...")
+                # Parse structured text response instead of JSON
+                analysis_result = self._parse_structured_think_text(analysis_result)
+                self.logger.info(f"Successfully parsed LLM response, type: {type(analysis_result)}")
                 
-                gap_analysis.append({
-                    "gap_id": gap_id,
-                    "gap_description": gap_description,
-                    "feasibility_score": 7.5,
-                    "technical_requirements": ["Scalable architecture", "User-friendly interface"],
-                    "potential_approaches": ["Cloud-based solution", "Mobile application"],
-                    "estimated_complexity": "medium"
-                })
+                # Check if we got an error from _parse_structured_think_text
+                if isinstance(analysis_result, dict) and "error" in analysis_result:
+                    self.logger.error(f"Structured text parsing failed: {analysis_result['error']}")
+                    # Create a fallback result structure
+                    analysis_result = self._create_fallback_think_result(input_data)
+                    self.logger.info(f"Created fallback result, type: {type(analysis_result)}")
+            else:
+                self.logger.info(f"LLM response is not a string, type: {type(analysis_result)}")
             
-            analysis_result = {
-                "gap_analysis": gap_analysis,
-                "feasibility_score": 7.8,  # Ensure this key is always present
-                "technical_considerations": [
-                    "Scalability requirements",
-                    "Security implications",
-                    "Integration complexity"
-                ],
-                "resource_requirements": {
-                    "development_resources": ["Frontend developers", "Backend developers", "DevOps"],
-                    "testing_resources": ["QA engineers", "User testing participants"],
-                    "deployment_resources": ["Cloud infrastructure", "CI/CD pipeline"]
-                },
-                "recommended_technologies": [
-                    "React/Vue for frontend",
-                    "Node.js/Python for backend",
-                    "AWS/GCP for hosting"
-                ],
-                "implementation_strategy": "Agile development with 2-week sprints"
-            }
-        
-        execution_time = (datetime.now() - start_time).total_seconds()
-        self.logger.info(f"Gap analysis completed in {execution_time:.2f} seconds")
-        
-        self.state.analysis = analysis_result
+            # Store the result to manifest
+            self._store_think_output_to_manifest(manifest_manager, analysis_result)
+            
+            self.logger.info("Think stage completed successfully")
         return analysis_result
     
-    async def act(self, input_data: BuilderInput) -> BuilderOutput:
-        """Execute solution building and return prototypes using LLM prompt."""
-        try:
-            self.logger.info(f"Creating solution prototypes for {len(input_data.market_gaps) if input_data and input_data.market_gaps else 0} market gaps")
-            # Add debug logging to trace the exact nature of input_data
-            self.logger.info(f"BuilderInput act DEBUG: {input_data.__dict__ if hasattr(input_data, '__dict__') else 'No __dict__'}")
         except Exception as e:
-            self.logger.error(f"Exception in debug logging: {str(e)}")
-            
-        start_time = datetime.now()
-        
-        # Get plan and analysis or run if not available
-        plan = self.state.plan or await self.plan(input_data)
-        gap_analysis = getattr(self.state, 'analysis', None) or await self.think(input_data)
-        
+            self.logger.error(f"Error in think stage: {e}")
+            raise e
+    
+    async def act(self, input_data: BuilderInput, think_result: Dict[str, Any] = None) -> Dict[str, Any]:
+        """Create comprehensive business solutions and go-to-market strategies."""
         try:
-            # Prepare substitutions for the prompt template
-            substitutions = {
-                "market_gaps": json.dumps(input_data.market_gaps),
-                "target_market": input_data.target_market,
-                "solution_type": input_data.solution_type,
-                "budget_range": input_data.budget_range,
-                "timeline": input_data.timeline,
-                "technical_complexity": input_data.technical_complexity,
-                "plan": json.dumps(plan),
-                "gap_analysis": json.dumps(gap_analysis)
+            self.logger.info("Starting builder act stage...")
+            
+            # Initialize manifest manager
+            run_id = getattr(self.state, 'run_id', None)
+            if not run_id:
+                self.logger.error("No run_id found in agent state")
+                return {"error": "No run_id available"}
+            
+            manifest_path = Path("data/runs") / run_id / "run_manifest.json"
+            manifest_manager = ManifestManager(manifest_path=manifest_path)
+            
+            # Load think stage data
+            think_data = self._load_think_stage_data(manifest_manager)
+            if not think_data:
+                self.logger.error("No think stage data found")
+                return {"error": "No think stage data available"}
+            
+            # Prepare synthesis data
+            synthesis_data = {
+                "think_stage_output": think_data,
+                "market_context": input_data.market_context,
+                "analysis_scope": input_data.analysis_scope
             }
             
-            # Load prompt template with substitutions
-            prompt_content = load_prompt_template("act.prompt", agent_name=self.name, substitutions=substitutions)
+            # Load act stage prompt
+            prompt_content = self._load_act_prompt()
+            if not prompt_content:
+                self.logger.error("Failed to load act stage prompt")
+                return {"error": "Failed to load act stage prompt"}
             
-            # Generate solution prototypes using LLM
-            llm_response = await self.llm_generate(
-                prompt=prompt_content,
-                task_type="technical_design"
-            )
+            # Append the synthesis data to the prompt
+            prompt_content += f"\n\nThink Stage Data to Analyze:\n{json.dumps(synthesis_data, indent=2)}"
             
-            # Extract JSON from LLM response
-            solution_result = self._extract_json(llm_response)
+            # Generate business solutions using LLM mixin
+            solutions_result = await self.llm_generate(prompt=prompt_content, task_type="act_development")
             
-            # Convert LLM output to SolutionPrototypes
-            solution_prototypes = []
-            for solution_data in solution_result.get("solution_prototypes", []):
-                try:
-                    solution = SolutionPrototype(
-                        solution_name=solution_data.get("solution_name", ""),
-                        description=solution_data.get("description", ""),
-                        target_pain_points=solution_data.get("target_pain_points", []),
-                        key_features=solution_data.get("key_features", []),
-                        technical_architecture=solution_data.get("technical_architecture", {}),
-                        implementation_approach=solution_data.get("implementation_approach", ""),
-                        estimated_development_time=solution_data.get("estimated_development_time", ""),
-                        estimated_cost=float(solution_data.get("estimated_cost", 0)),
-                        market_size=float(solution_data.get("market_size", 0)),
-                        mvp_scope=solution_data.get("mvp_scope", []),
-                        validation_plan=solution_data.get("validation_plan", {}),
-                        success_metrics=solution_data.get("success_metrics", []),
-                        risk_assessment=solution_data.get("risk_assessment", {})
-                    )
-                    solution_prototypes.append(solution)
-                except Exception as e:
-                    self.logger.error(f"Error creating solution prototype: {str(e)}")
+            # Parse the response as structured text
+            if isinstance(solutions_result, str):
+                self.logger.info(f"LLM response type: {type(solutions_result)}, length: {len(solutions_result)}")
+                self.logger.info(f"LLM response preview: {solutions_result[:200]}...")
+                # Parse structured text response instead of JSON
+                solutions_result = self._parse_structured_act_text(solutions_result)
+                self.logger.info(f"Successfully parsed LLM response, type: {type(solutions_result)}")
+                
+                # Check if we got an error from _parse_structured_act_text
+                if isinstance(solutions_result, dict) and "error" in solutions_result:
+                    self.logger.error(f"Structured text parsing failed: {solutions_result['error']}")
+                    # Create a fallback result structure
+                    solutions_result = self._create_fallback_act_result(input_data)
+                    self.logger.info(f"Created fallback result, type: {type(solutions_result)}")
+            else:
+                self.logger.info(f"LLM response is not a string, type: {type(solutions_result)}")
             
-            # Create BuilderOutput
-            output = BuilderOutput(
-                solution_prototypes=solution_prototypes,
-                recommended_solution=solution_result.get("recommended_solution", {}),
-                implementation_roadmap=solution_result.get("implementation_roadmap", []),
-                technical_design=solution_result.get("technical_design", {}),
-                cost_analysis=solution_result.get("cost_analysis", {}),
-                timeline_estimate=solution_result.get("timeline_estimate", {}),
-                feasibility_score=float(solution_result.get("feasibility_score", 0)),
-                risk_factors=solution_result.get("risk_factors", []),
-                success_metrics=solution_result.get("success_metrics", []),
-                execution_time=(datetime.now() - start_time).total_seconds()
-            )
+            # Store the result to manifest
+            self._store_act_output_to_manifest(manifest_manager, solutions_result)
+            
+            self.logger.info("Act stage completed successfully")
+            return solutions_result
             
         except Exception as e:
-            self.logger.error(f"Error generating solution prototypes: {str(e)}")
-            # Fallback solution
-            default_solution = self._create_fallback_solution(input_data)
-            
-            # Create BuilderOutput with fallback solution
-            output = BuilderOutput(
-                solution_prototypes=[default_solution],
-                recommended_solution=default_solution.to_dict(),
-                implementation_roadmap=self._create_implementation_roadmap(),
-                technical_design=self._create_technical_design(default_solution),
-                cost_analysis=self._calculate_cost_analysis(default_solution),
-                timeline_estimate=self._estimate_timeline(default_solution, input_data.timeline),
-                feasibility_score=self._calculate_feasibility_score(default_solution),
-                risk_factors=["Technical complexity", "Market adoption"],
-                success_metrics=self._define_success_metrics(default_solution, input_data.target_market),
-                execution_time=(datetime.now() - start_time).total_seconds()
-            )
-        
-        self.logger.info(f"Solution generation completed in {output.execution_time:.2f} seconds")
-        return output
-        
-    def _safe_lower(self, value):
-        """Safely convert a value to lowercase, handling None and non-string types"""
-        # Extra logging to trace where this is being called from
-        import traceback
-        self.logger.debug(f"_safe_lower called with value type: {type(value)}, value: {repr(value)[:100]}")
-        self.logger.debug(f"Stack trace: {traceback.format_stack()[-3]}")
-        
-        # Handle None case first
-        if value is None:
-            self.logger.warning("None value passed to _safe_lower, returning empty string")
-            return ""
-            
-        # Convert to string if not already a string
-        string_value = ""
-        if isinstance(value, str):
-            string_value = value
-        else:
-            try:
-                string_value = str(value)
-                self.logger.info(f"Converted non-string value to string in _safe_lower: {type(value)} -> {repr(string_value)[:100]}")
-            except Exception as e:
-                self.logger.warning(f"Failed to convert value to string in _safe_lower: {e}")
-                return ""
-        
-        # Only lowercase the string if it's a valid string
-        if string_value and isinstance(string_value, str):
-            try:
-                return string_value.lower()
-            except Exception as e:
-                self.logger.error(f"Unexpected error lowercasing string: {e}")
-                return string_value  # Return original string if lowercasing fails
-        else:
-            self.logger.warning(f"Cannot lowercase empty or non-string value, returning as is: {repr(string_value)[:100]}")
-            return string_value
-            
-    def _safe_string_operation(self, value, default=""):
-        """Safely handle string operations on potentially None values"""
-        if value is None:
-            return default
+            self.logger.error(f"Error in act stage: {e}")
+            raise e
+    
+    def _load_gap_finder_output(self, manifest_manager: ManifestManager) -> Dict[str, Any]:
+        """Load gap finder act stage output from manifest."""
         try:
-            return str(value)
-        except Exception as e:
-            self.logger.warning(f"Failed to convert value to string: {e}")
-            return default
-    
-    def _create_fallback_solution(self, input_data: BuilderInput) -> SolutionPrototype:
-        """Create a fallback solution when LLM generation fails."""
-        if not input_data.market_gaps:
-            gap = {"description": "Unknown market gap"}
-        else:
-            gap = input_data.market_gaps[0]
-            
-        return SolutionPrototype(
-            solution_name=f"Solution for {input_data.target_market}",
-            description=f"A {input_data.solution_type} solution for {input_data.target_market}",
-            target_pain_points=[gap.get("pain_point", "Unspecified pain point")],
-            key_features=["Scalable architecture", "User-friendly interface"],
-            technical_architecture={
-                "components": ["Frontend", "Backend", "Database"],
-                "technologies": ["React", "Node.js", "PostgreSQL"],
-                "integrations": ["Payment gateway", "Analytics"],
-                "deployment": "Cloud-based"
-            },
-            implementation_approach="Agile development with 2-week sprints",
-            estimated_development_time="3-6 months",
-            estimated_cost=150000.0,
-            market_size=5000000.0,
-            mvp_scope=["Core feature 1", "Core feature 2"],
-            validation_plan={
-                "validation_methods": ["User testing", "Beta program"],
-                "success_criteria": ["Adoption rate", "User satisfaction"],
-                "testing_approach": "Iterative testing with target users"
-            },
-            success_metrics=["User adoption rate > 10%", "Customer satisfaction > 4.0/5.0"],
-            risk_assessment={
-                "risks": ["Technical complexity", "Market adoption"],
-                "mitigations": ["Prototype key components early", "Conduct user testing"]
-            },
-            timeline_estimate=timeline_estimate,
-            feasibility_score=feasibility_score,
-            risk_factors=risk_factors
-        )
-
-    def _evaluate_solution_feasibility(self, solution: Dict[str, Any], *args, **kwargs) -> Dict[str, Any]:
-        """Evaluate the feasibility of a solution."""
-        return {
-            "overall_score": 0.85,
-            "technical_feasibility": 0.9,
-            "market_feasibility": 0.8,
-            "financial_feasibility": 0.85,
-            "integration_challenges": ["API_compatibility", "data_migration"],
-            "risk_factors": ["competition", "market_volatility"]
-        }
-
-    async def _analyze_technical_requirements(self, gap: Dict[str, Any], *args, **kwargs) -> Dict[str, Any]:
-        """Analyze technical requirements for a market gap."""
-        # Mock implementation for validation
-        return {
-            "complexity": "moderate",
-            "required_technologies": ["python", "react", "postgresql", "docker"],
-            "integration_points": ["payment_gateway", "email_service", "analytics"],
-            "scalability_requirements": ["horizontal_scaling", "caching", "load_balancing"],
-            "security_requirements": ["encryption", "authentication", "authorization"]
-        }
-    
-    async def _create_solution_prototype(self, gap: Dict[str, Any], target_market: str,
-                                       solution_type: str, budget_range: str, 
-                                       timeline: str, complexity: str) -> SolutionPrototype:
-        """Create a solution prototype for a market gap."""
-        gap_description = gap.get("gap_description", "")
-        market_size = gap.get("market_size", 25000000)
-        
-        # Generate solution name and description
-        solution_name = self._generate_solution_name(gap_description)
-        description = self._generate_solution_description(gap_description, target_market)
-        
-        # Define key features
-        key_features = self._define_key_features(gap_description, solution_type)
-        
-        # Design technical architecture
-        technical_architecture = self._design_technical_architecture(
-            solution_type, complexity, key_features
-        )
-        
-        # Determine implementation approach
-        implementation_approach = self._determine_implementation_approach(
-            complexity, budget_range, timeline
-        )
-        
-        # Estimate development time and cost
-        estimated_time = self._estimate_development_time(key_features, complexity)
-        estimated_cost = self._estimate_development_cost(
-            key_features, complexity, budget_range
-        )
-        
-        # Define MVP scope
-        mvp_scope = self._define_mvp_scope(key_features, timeline)
-        
-        # Create validation plan
-        validation_plan = self._create_validation_plan(solution_name, target_market)
-        
-        # Define success metrics
-        success_metrics = self._define_success_metrics(solution_name, target_market)
-        
-        # Assess risks
-        risk_assessment = self._assess_risks(solution_name, technical_architecture)
-        
-        return SolutionPrototype(
-            solution_name=solution_name,
-            description=description,
-            target_pain_points=[gap_description],
-            key_features=key_features,
-            technical_architecture=technical_architecture,
-            implementation_approach=implementation_approach,
-            estimated_development_time=estimated_time,
-            estimated_cost=estimated_cost,
-            market_size=market_size,
-            mvp_scope=mvp_scope,
-            validation_plan=validation_plan,
-            success_metrics=success_metrics,
-            risk_assessment=risk_assessment
-        )
-    
-    def _generate_solution_name(self, gap_description: str) -> str:
-        """Generate a solution name based on the gap description."""
-        # Handle None or empty gap description
-        if not gap_description:
-            return "SmartSolutionPro"
-            
-        # Simple name generation
-        keywords = self._safe_lower(gap_description).split()
-        key_terms = [word for word in keywords if len(word) > 3][:3]
-        
-        prefixes = ["Easy", "Smart", "Quick", "Pro", "Auto"]
-        suffixes = ["Flow", "Hub", "Pro", "AI", "Sync"]
-        
-        import random
-        prefix = random.choice(prefixes)
-        suffix = random.choice(suffixes)
-        
-        if key_terms:
-            base = "".join(word.capitalize() for word in key_terms[:2])
-            return f"{prefix}{base}{suffix}"
-        else:
-            return f"{prefix}Solution{suffix}"
-    
-    def _generate_solution_description(self, gap_description: str, target_market: str) -> str:
-        """Generate a solution description."""
-        return f"A comprehensive solution addressing {gap_description} for {target_market} businesses."
-    
-    def _define_key_features(self, gap_description: str, solution_type: str) -> List[str]:
-        """Define key features for the solution."""
-        features = {
-            "onboarding_complexity": [
-                "Guided setup wizard",
-                "Template library",
-                "Interactive tutorials",
-                "Progress tracking"
-            ],
-            "integration_challenges": [
-                "Universal API connector",
-                "Pre-built integrations",
-                "Real-time sync",
-                "Data mapping tools"
-            ],
-            "pricing_barriers": [
-                "Flexible pricing tiers",
-                "Usage-based billing",
-                "Free trial period",
-                "ROI calculator"
-            ],
-            "performance_issues": [
-                "Performance monitoring",
-                "Automated optimization",
-                "Caching system",
-                "Load balancing"
-            ],
-            "usability_problems": [
-                "Intuitive interface",
-                "Mobile responsiveness",
-                "Accessibility features",
-                "User feedback system"
-            ]
-        }
-        
-        # Find matching features based on gap description
-        if gap_description:
-            gap_desc_lower = self._safe_lower(gap_description)
-            for key, feature_list in features.items():
-                if key in gap_desc_lower:
-                    return feature_list
-        
-        return ["Core functionality", "User interface", "Integration capabilities", "Reporting"]
-    
-    def _design_technical_architecture(self, solution_type: str, complexity: str, 
-                                     features: List[str]) -> Dict[str, Any]:
-        """Design the technical architecture for the solution."""
-        architectures = {
-            "software": {
-                "frontend": "React/Vue.js",
-                "backend": "Python/FastAPI",
-                "database": "PostgreSQL",
-                "cloud": "AWS/GCP",
-                "apis": "RESTful APIs"
-            },
-            "service": {
-                "delivery": "SaaS platform",
-                "infrastructure": "Cloud-native",
-                "scalability": "Auto-scaling",
-                "security": "Enterprise-grade"
-            },
-            "platform": {
-                "architecture": "Microservices",
-                "integration": "API-first",
-                "extensibility": "Plugin system",
-                "multi-tenant": "Yes"
-            }
-        }
-        
-        base_arch = architectures.get(solution_type, architectures["software"])
-        
-        # Adjust based on complexity
-        if complexity == "high":
-            base_arch.update({
-                "scalability": "Distributed microservices",
-                "performance": "Caching + CDN",
-                "monitoring": "Comprehensive observability"
-            })
-        
-        return base_arch
-    
-    def _determine_implementation_approach(self, complexity: str, budget: str, timeline: str) -> str:
-        """Determine the implementation approach."""
-        approaches = {
-            ("low", "low", "1-3 months"): "Rapid prototyping with existing tools",
-            ("moderate", "moderate", "3-6 months"): "Agile development with MVP focus",
-            ("high", "high", "6-12 months"): "Comprehensive development with full features"
-        }
-        
-        return approaches.get((complexity, budget, timeline), "Iterative development approach")
-    
-    def _estimate_development_time(self, features: List[str], complexity: str) -> str:
-        """Estimate development time based on features and complexity."""
-        base_weeks = len(features) * 2  # 2 weeks per feature
-        
-        complexity_multipliers = {
-            "low": 1.0,
-            "moderate": 1.5,
-            "high": 2.5
-        }
-        
-        total_weeks = int(base_weeks * complexity_multipliers.get(complexity, 1.5))
-        
-        if total_weeks <= 4:
-            return "1 month"
-        elif total_weeks <= 12:
-            return "3 months"
-        elif total_weeks <= 24:
-            return "6 months"
-        else:
-            return "12+ months"
-    
-    def _estimate_development_cost(self, features: List[str], complexity: str, budget: str) -> float:
-        """Estimate development cost based on features, complexity, and budget."""
-        base_cost = len(features) * 10000  # $10K per feature
-        
-        complexity_multipliers = {
-            "low": 1.0,
-            "moderate": 1.5,
-            "high": 3.0
-        }
-        
-        budget_multipliers = {
-            "low": 0.7,
-            "moderate": 1.0,
-            "high": 2.0
-        }
-        
-        total_cost = base_cost * complexity_multipliers.get(complexity, 1.5) * budget_multipliers.get(budget, 1.0)
-        return total_cost
-    
-    def _define_mvp_scope(self, features: List[str], timeline: str) -> List[str]:
-        """Define MVP scope based on timeline."""
-        if timeline == "1-3 months":
-            return features[:2]  # Top 2 features
-        elif timeline == "3-6 months":
-            return features[:4]  # Top 4 features
-        else:
-            return features[:6]  # Top 6 features
-    
-    def _create_validation_plan(self, solution_name: str, target_market: str) -> Dict[str, Any]:
-        """Create a validation plan for the solution."""
-        return {
-            "validation_phases": [
-                "customer_interviews",
-                "prototype_testing",
-                "pilot_program",
-                "market_validation"
-            ],
-            "success_criteria": [
-                "10+ customer interviews",
-                "Prototype usability score >80%",
-                "Pilot program with 5+ users",
-                "Market interest validation"
-            ],
-            "timeline": "4-6 weeks",
-            "budget": "$5,000 - $10,000"
-        }
-    
-    def _define_success_metrics(self, solution_name: str, target_market: str) -> List[str]:
-        """Define success metrics for the solution."""
-        return [
-            "User adoption rate >20% within 6 months",
-            "Customer satisfaction score >4.0/5.0",
-            "Monthly recurring revenue >$10K within 12 months",
-            "Customer acquisition cost <3x lifetime value",
-            "Churn rate <5% monthly"
-        ]
-    
-    def _assess_risks(self, solution_name: str, architecture: Dict[str, Any]) -> Dict[str, Any]:
-        """Assess risks for the solution."""
-        return {
-            "technical_risks": [
-                "Scalability challenges",
-                "Integration complexity",
-                "Performance bottlenecks"
-            ],
-            "market_risks": [
-                "Customer adoption",
-                "Competitive response",
-                "Market timing"
-            ],
-            "business_risks": [
-                "Budget overruns",
-                "Timeline delays",
-                "Resource constraints"
-            ],
-            "mitigation_strategies": [
-                "Start with MVP",
-                "Iterative development",
-                "Regular customer feedback",
-                "Risk monitoring"
-            ]
-        }
-    
-    def _select_best_solution(self, prototypes: List[SolutionPrototype]) -> SolutionPrototype:
-        """Select the best solution prototype from a list of prototypes."""
-        if not prototypes:
-            raise ValueError("No prototypes provided")
-        
-        # Simple scoring based on cost-effectiveness and market opportunity
-        scored_prototypes = []
-        for prototype in prototypes:
-            score = (prototype.market_size / prototype.estimated_cost) * 100
-            scored_prototypes.append((prototype, score))
-        
-        return max(scored_prototypes, key=lambda x: x[1])[0]
-    
-    def _select_recommended_solution(self, prototypes: List[SolutionPrototype]) -> Dict[str, Any]:
-        """Select the recommended solution from prototypes."""
-        if not prototypes:
+            manifest = manifest_manager.get_manifest()
+            gap_finder_act = manifest.get("stages", {}).get("gap_finder_act", {})
+            return gap_finder_act.get("data", {})
+            except Exception as e:
+            self.logger.error(f"Error loading gap finder output: {e}")
             return {}
         
-        recommended = self._select_best_solution(prototypes)
-        
-        # Calculate the score for the recommended solution
-        score = (recommended.market_size / recommended.estimated_cost) * 100
-        
-        return {
-            "solution_name": recommended.solution_name,
-            "score": score,
-            "reason": "Best cost-to-market-size ratio"
-        }
+    def _load_think_stage_data(self, manifest_manager: ManifestManager) -> Dict[str, Any]:
+        """Load think stage data from manifest."""
+            try:
+            manifest = manifest_manager.get_manifest()
+            think_stage = manifest.get("stages", {}).get("builder_think", {})
+            return think_stage.get("data", {})
+            except Exception as e:
+            self.logger.error(f"Error loading think stage data: {e}")
+            return {}
     
-    def _create_implementation_roadmap(self, recommended: Dict[str, Any], timeline: str) -> Dict[str, Any]:
-        """Create an implementation roadmap."""
-        phases = {
-            "1-3 months": [
-                {"phase": "Discovery", "duration": "2 weeks", "tasks": ["Customer interviews", "Market validation"]},
-                {"phase": "Design", "duration": "3 weeks", "tasks": ["UI/UX design", "Technical design"]},
-                {"phase": "MVP Development", "duration": "4 weeks", "tasks": ["Core features", "Testing"]}
-            ],
-            "3-6 months": [
-                {"phase": "Planning", "duration": "2 weeks", "tasks": ["Requirements", "Architecture"]},
-                {"phase": "MVP", "duration": "8 weeks", "tasks": ["Core development", "Testing"]},
-                {"phase": "Enhancement", "duration": "6 weeks", "tasks": ["Additional features", "Optimization"]}
-            ],
-            "6-12 months": [
-                {"phase": "Foundation", "duration": "4 weeks", "tasks": ["Architecture", "Core setup"]},
-                {"phase": "MVP", "duration": "12 weeks", "tasks": ["Core features", "Testing"]},
-                {"phase": "Scale", "duration": "16 weeks", "tasks": ["Advanced features", "Performance"]}
-            ]
-        }
-        
-        return {
-            "timeline": timeline,
-            "phases": phases.get(timeline, phases["3-6 months"]),
-            "milestones": ["MVP launch", "Beta testing", "Market launch"]
-        }
+    def _load_think_prompt(self) -> str:
+        """Load think stage prompt template."""
+        try:
+            prompt_path = Path("scout_agent/prompts/builder_agent/think.prompt")
+            if prompt_path.exists():
+                with open(prompt_path, 'r') as f:
+                    return f.read()
+            else:
+                self.logger.error(f"Think prompt file not found: {prompt_path}")
+                return ""
+        except Exception as e:
+            self.logger.error(f"Error loading think prompt: {e}")
+            return ""
     
-    def _calculate_resource_requirements(self, recommended: Dict[str, Any], solution_type: str) -> Dict[str, Any]:
-        """Calculate resource requirements for implementation."""
-        return {
-            "team": {
-                "developers": 2 if solution_type == "software" else 3,
-                "designers": 1,
-                "product_manager": 1,
-                "qa_engineer": 1
-            },
-            "tools": ["Development environment", "Testing tools", "Deployment platform"],
-            "budget_breakdown": {
-                "development": 0.6,
-                "design": 0.15,
-                "testing": 0.15,
-                "deployment": 0.1
-            }
-        }
-    
-    def _validate_solutions(
-        self,
-        solutions: List[SolutionPrototype],
-        target_market: str
-    ) -> Dict[str, Any]:
-        """Validate solutions against market requirements."""
-        validation_results = []
-        
-        for prototype in solutions:
-            validation = self._validate_single_solution(prototype, target_market)
-            validation_results.append(validation)
-        
-        return {
-            "overall_validity": all(v["is_valid"] for v in validation_results),
-            "individual_results": validation_results,
-            "market_fit_score": sum(v["market_fit_score"] for v in validation_results) / len(validation_results)
-        }
-    
-    def _validate_single_solution(self, prototype: SolutionPrototype, 
-                                      target_market: str) -> Dict[str, Any]:
-        """Validate a single solution against market requirements."""
-        # Mock validation
-        return {
-            "solution_name": prototype.solution_name,
-            "is_valid": True,
-            "market_fit_score": 0.85,
-            "technical_feasibility": 0.9,
-            "business_viability": 0.8,
-            "validation_notes": "Solution addresses key pain points effectively"
-        }
-    
-    def _generate_next_steps(self, recommended: Dict[str, Any], 
-                           validation: Dict[str, Any]) -> List[str]:
-        """Generate next steps for implementation."""
-        return [
-            "Conduct detailed customer interviews",
-            "Create detailed technical specifications",
-            "Set up development environment",
-            "Begin MVP development",
-            "Establish feedback loops with potential customers",
-            "Plan beta testing program"
-        ]
-    
-    def _determine_design_approach(self, input_data: BuilderInput) -> str:
-        """Determine the design approach based on input parameters."""
-        if input_data.technical_complexity == "low" and input_data.budget_range == "low":
-            return "Lean startup approach"
-        elif input_data.technical_complexity == "moderate":
-            return "Agile development approach"
+    def _load_act_prompt(self) -> str:
+        """Load act stage prompt template."""
+        try:
+            prompt_path = Path("scout_agent/prompts/builder_agent/act.prompt")
+            if prompt_path.exists():
+                with open(prompt_path, 'r') as f:
+                    return f.read()
         else:
-            return "Comprehensive development approach"
+                self.logger.error(f"Act prompt file not found: {prompt_path}")
+                return ""
+        except Exception as e:
+            self.logger.error(f"Error loading act prompt: {e}")
+            return ""
     
-    def _assess_mvp_complexity(self, market_gaps: List[Dict[str, Any]]) -> str:
-        """Assess MVP complexity based on market gaps."""
-        if len(market_gaps) <= 2:
-            return "low"
-        elif len(market_gaps) <= 4:
-            return "moderate"
-        else:
-            return "high"
-    
-    def _create_technical_design(self, solution: SolutionPrototype) -> Dict[str, Any]:
-        """Create technical design for the solution."""
-        return {
-            "architecture": solution.technical_architecture,
-            "components": solution.key_features,
-            "implementation_approach": solution.implementation_approach,
-            "estimated_effort": solution.estimated_development_time
-        }
-    
-    def _calculate_cost_analysis(self, solution: SolutionPrototype) -> Dict[str, Any]:
-        """Calculate detailed cost analysis for the solution."""
-        return {
-            "development_cost": solution.estimated_cost,
-            "market_size": solution.market_size,
-            "roi_potential": (solution.market_size / solution.estimated_cost) * 100,
-            "cost_breakdown": {
-                "development": solution.estimated_cost * 0.7,
-                "testing": solution.estimated_cost * 0.2,
-                "deployment": solution.estimated_cost * 0.1
-            }
-        }
-    
-    def _estimate_timeline(self, solution: SolutionPrototype, target_timeline: str) -> Dict[str, Any]:
-        """Estimate implementation timeline for the solution."""
-        return {
-            "estimated_duration": solution.estimated_development_time,
-            "target_timeline": target_timeline,
-            "milestones": solution.mvp_scope,
-            "critical_path": solution.key_features[:3]
-        }
-    
-    def _calculate_feasibility_score(self, solution: SolutionPrototype) -> float:
-        """Calculate feasibility score for the solution."""
-        # Simple scoring based on cost-effectiveness and complexity
-        cost_score = min(100, (1000000 / solution.estimated_cost) * 10)
-        market_score = min(100, (solution.market_size / 10000000) * 100)
-        return (cost_score + market_score) / 2
-    
-    def _assess_risk_factors(self, solution: SolutionPrototype) -> List[Dict[str, Any]]:
-        """Assess risk factors for the solution."""
-        return [
-            {
-                "risk": "Technical complexity",
-                "probability": "medium",
-                "impact": "high",
-                "mitigation": "Prototype key components early"
-            },
-            {
-                "risk": "Market adoption",
-                "probability": "low",
-                "impact": "high",
-                "mitigation": "Conduct user testing"
-            }
-        ]
-    
-    def _define_success_metrics(self, solution: SolutionPrototype, target_market: str) -> List[str]:
-        """Define success metrics for the solution."""
-        return [
-            "User adoption rate > 10%",
-            "Customer satisfaction > 4.0/5.0",
-            "Revenue target achievement",
-            "Market penetration in " + target_market
-        ]
-
-
-# Register the agent - moved to agent_registry.py
-# from .base import register_agent
-# register_agent("builder", BuilderAgent)
-
-
-async def test_builder_agent():
-    """Test BuilderAgent with prompt templates."""
-    import logging
-    from datetime import datetime
-    
-    # Configure logging
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S"
-    )
-    logger = logging.getLogger("builder_agent_test")
-    logger.info("Testing BuilderAgent with prompt templates...")
-    
-    # Sample market gaps data
-    market_gaps = [
-        {
-            "id": "gap1",
-            "description": "Lack of affordable project management tools for small businesses",
-            "pain_point": "Small businesses struggle with project tracking and team coordination",
-            "market_segment": "SMB",
-            "score": 8.5
-        },
-        {
-            "id": "gap2",
-            "description": "Fragmented data analytics solutions for e-commerce",
-            "pain_point": "E-commerce businesses lack integrated analytics for sales and marketing",
-            "market_segment": "E-commerce",
-            "score": 7.8
-        }
-    ]
-    
-    # Create BuilderInput
-    builder_input = BuilderInput(
-        market_gaps=market_gaps,
-        target_market="small businesses",
-        solution_type="software",
-        budget_range="moderate",
-        timeline="3-6 months",
-        technical_complexity="moderate"
-    )
-    
-    # Initialize BuilderAgent
-    agent = BuilderAgent("builder-test")
-    
-    # Initialize LLM Backend
-    from llm.base import LLMConfig, LLMBackendType
-    from llm.manager import LLMManager
-    from llm.backends.ollama import OllamaBackend
-    
-    # Create the LLM configuration for the Ollama backend
-    config = LLMConfig(
-        backend_type=LLMBackendType.OLLAMA,
-        model_name="phi4-mini:latest",  # Using a smaller model for testing
-        base_url="http://localhost:11434",
-        timeout=180  # 3 minute timeout for complex queries
-    )
-    
-    # Create and register the LLM backend
-    llm_manager = LLMManager()
-    backend = OllamaBackend(config)
-    await llm_manager.register_backend(backend)
-    
-    # Assign LLM manager to agent
-    agent._llm_manager = llm_manager
-    
-    # Override preferred backend for testing
-    agent.preferred_backend = "ollama"
-    
-    try:
-        # Execute plan phase
-        logger.info("Running plan phase...")
-        plan_start = datetime.now()
-        plan = await agent.plan(builder_input)
-        plan_time = (datetime.now() - plan_start).total_seconds()
-        logger.info(f"Plan complete: {len(plan.get('phases', []))} phases identified in {plan_time:.2f}s")
-        
-        # Execute think phase
-        logger.info("Running think phase...")
-        think_start = datetime.now()
-        think_result = await agent.think(builder_input)
-        think_time = (datetime.now() - think_start).total_seconds()
-        
-        # Get gap analysis count
-        gap_analysis = think_result.get("gap_analysis", [])
-        if isinstance(gap_analysis, list):
-            analysis_count = len(gap_analysis)
-        else:
-            analysis_count = 0
+    def _store_think_output_to_manifest(self, manifest_manager: ManifestManager, analysis_result: Dict[str, Any]) -> None:
+        """Store think stage output to manifest."""
+        try:
+            # Get the manifest
+            manifest = manifest_manager.get_manifest()
             
-        logger.info(f"Think complete: {analysis_count} gaps analyzed in {think_time:.2f}s")
+            # Ensure stages section exists
+            if "stages" not in manifest:
+                manifest["stages"] = {}
+            
+            # Store the think stage output
+            manifest["stages"]["builder_think"] = {
+                "status": "completed",
+                "updated_at": datetime.now().isoformat(),
+                "data": analysis_result
+            }
+            
+            # Save the manifest
+            manifest_manager._save()
+            self.logger.info("Stored think stage output to manifest")
+            
+        except Exception as e:
+            self.logger.error(f"Error storing think output to manifest: {e}")
+            raise e
+    
+    def _store_act_output_to_manifest(self, manifest_manager: ManifestManager, solutions_result: Dict[str, Any]) -> None:
+        """Store act stage output to manifest."""
+        try:
+            # Get the manifest
+            manifest = manifest_manager.get_manifest()
+            
+            # Ensure stages section exists
+            if "stages" not in manifest:
+                manifest["stages"] = {}
+            
+            # Store the act stage output
+            manifest["stages"]["builder_act"] = {
+                "status": "completed",
+                "updated_at": datetime.now().isoformat(),
+                "data": solutions_result
+            }
+            
+            # Save the manifest
+            manifest_manager._save()
+            self.logger.info("Stored act stage output to manifest")
+            
+        except Exception as e:
+            self.logger.error(f"Error storing act output to manifest: {e}")
+            raise e
+    
+    def _parse_structured_think_text(self, text: str) -> Dict[str, Any]:
+        """Parse structured text response into JSON format for think stage."""
+        import re
+        from datetime import datetime
         
-        # Execute act phase
-        logger.info("Running act phase...")
-        act_start = datetime.now()
-        act_result = await agent.act(builder_input)
-        act_time = (datetime.now() - act_start).total_seconds()
+        try:
+            result = {
+                "business_feasibility_analysis": {
+                    "primary_opportunity": "",
+                    "market_viability": "",
+                    "business_feasibility": "",
+                    "competitive_landscape": ""
+                },
+                "solution_concept": {
+                    "solution_name": "",
+                    "alternative_names": [],
+                    "core_value_proposition": "",
+                    "target_problem": "",
+                    "target_customers": ""
+                },
+                "business_model_design": {
+                    "revenue_model": "",
+                    "pricing_strategy": "",
+                    "cost_structure": "",
+                    "key_partnerships": "",
+                    "customer_acquisition": ""
+                },
+                "competitive_positioning": {
+                    "differentiation": "",
+                    "competitive_advantages": "",
+                    "market_positioning": "",
+                    "barriers_to_entry": ""
+                },
+                "implementation_considerations": {
+                    "development_approach": "",
+                    "technology_considerations": "",
+                    "resource_requirements": "",
+                    "timeline_considerations": "",
+                    "risk_factors": ""
+                }
+            }
+            
+            # Parse Business Feasibility Analysis section
+            feasibility_match = re.search(r'## Business Feasibility Analysis(.*?)(?=## |$)', text, re.DOTALL)
+            if feasibility_match:
+                feasibility_text = feasibility_match.group(1)
+                result["business_feasibility_analysis"]["primary_opportunity"] = self._extract_field(feasibility_text, "Primary Opportunity")
+                result["business_feasibility_analysis"]["market_viability"] = self._extract_field(feasibility_text, "Market Viability")
+                result["business_feasibility_analysis"]["business_feasibility"] = self._extract_field(feasibility_text, "Business Feasibility")
+                result["business_feasibility_analysis"]["competitive_landscape"] = self._extract_field(feasibility_text, "Competitive Landscape")
+            
+            # Parse Solution Concept section
+            concept_match = re.search(r'## Solution Concept(.*?)(?=## |$)', text, re.DOTALL)
+            if concept_match:
+                concept_text = concept_match.group(1)
+                result["solution_concept"]["solution_name"] = self._extract_field(concept_text, "Solution Name")
+                result["solution_concept"]["alternative_names"] = self._extract_list(concept_text, "Alternative Names")
+                result["solution_concept"]["core_value_proposition"] = self._extract_field(concept_text, "Core Value Proposition")
+                result["solution_concept"]["target_problem"] = self._extract_field(concept_text, "Target Problem")
+                result["solution_concept"]["target_customers"] = self._extract_field(concept_text, "Target Customers")
+            
+            # Parse Business Model Design section
+            model_match = re.search(r'## Business Model Design(.*?)(?=## |$)', text, re.DOTALL)
+            if model_match:
+                model_text = model_match.group(1)
+                result["business_model_design"]["revenue_model"] = self._extract_field(model_text, "Revenue Model")
+                result["business_model_design"]["pricing_strategy"] = self._extract_field(model_text, "Pricing Strategy")
+                result["business_model_design"]["cost_structure"] = self._extract_field(model_text, "Cost Structure")
+                result["business_model_design"]["key_partnerships"] = self._extract_field(model_text, "Key Partnerships")
+                result["business_model_design"]["customer_acquisition"] = self._extract_field(model_text, "Customer Acquisition")
+            
+            # Parse Competitive Positioning section
+            positioning_match = re.search(r'## Competitive Positioning(.*?)(?=## |$)', text, re.DOTALL)
+            if positioning_match:
+                positioning_text = positioning_match.group(1)
+                result["competitive_positioning"]["differentiation"] = self._extract_field(positioning_text, "Differentiation")
+                result["competitive_positioning"]["competitive_advantages"] = self._extract_field(positioning_text, "Competitive Advantages")
+                result["competitive_positioning"]["market_positioning"] = self._extract_field(positioning_text, "Market Positioning")
+                result["competitive_positioning"]["barriers_to_entry"] = self._extract_field(positioning_text, "Barriers to Entry")
+            
+            # Parse Implementation Considerations section
+            implementation_match = re.search(r'## Implementation Considerations(.*?)(?=## |$)', text, re.DOTALL)
+            if implementation_match:
+                implementation_text = implementation_match.group(1)
+                result["implementation_considerations"]["development_approach"] = self._extract_field(implementation_text, "Development Approach")
+                result["implementation_considerations"]["technology_considerations"] = self._extract_field(implementation_text, "Technology Considerations")
+                result["implementation_considerations"]["resource_requirements"] = self._extract_field(implementation_text, "Resource Requirements")
+                result["implementation_considerations"]["timeline_considerations"] = self._extract_field(implementation_text, "Timeline Considerations")
+                result["implementation_considerations"]["risk_factors"] = self._extract_field(implementation_text, "Risk Factors")
+            
+            self.logger.info("Successfully parsed structured think text response")
+            return result
+            
+        except Exception as e:
+            self.logger.error(f"Failed to parse structured think text: {e}")
+            return {"error": f"Failed to parse structured think text: {e}"}
+    
+    def _parse_structured_act_text(self, text: str) -> Dict[str, Any]:
+        """Parse structured text response into JSON format for act stage."""
+        import re
+        from datetime import datetime
         
-        # Log results
-        logger.info(f"Act complete: {len(act_result.solution_prototypes)} solution prototypes generated in {act_time:.2f}s")
-        logger.info(f"Solutions:")  
-        for i, solution in enumerate(act_result.solution_prototypes):
-            logger.info(f"  Solution {i+1}: {solution.solution_name} - Est. Cost: ${solution.estimated_cost}")
+        try:
+            result = {
+                "business_solution_summary": {
+                    "solution_name": "",
+                    "business_concept": "",
+                    "target_market": "",
+                    "market_opportunity": "",
+                    "business_model": ""
+                },
+                "product_strategy": {
+                    "core_features": [],
+                    "advanced_features": [],
+                    "user_experience": "",
+                    "design_philosophy": "",
+                    "product_differentiation": ""
+                },
+                "business_model_pricing": {
+                    "revenue_streams": "",
+                    "pricing_strategy": "",
+                    "cost_structure": "",
+                    "unit_economics": "",
+                    "profitability_timeline": ""
+                },
+                "go_to_market_strategy": {
+                    "customer_acquisition": "",
+                    "marketing_strategy": "",
+                    "sales_strategy": "",
+                    "partnership_strategy": "",
+                    "launch_strategy": ""
+                },
+                "growth_scale_strategy": {
+                    "growth_phases": "",
+                    "expansion_strategy": "",
+                    "team_building": "",
+                    "funding_strategy": "",
+                    "exit_strategy": ""
+                },
+                "competitive_strategy": {
+                    "competitive_advantages": "",
+                    "market_positioning": "",
+                    "defensibility": "",
+                    "competitive_response": "",
+                    "market_leadership": ""
+                },
+                "success_metrics_milestones": {
+                    "key_performance_indicators": [],
+                    "milestone_timeline": "",
+                    "success_criteria": "",
+                    "risk_mitigation": "",
+                    "long_term_vision": ""
+                }
+            }
+            
+            # Parse Business Solution Summary section
+            summary_match = re.search(r'## Business Solution Summary(.*?)(?=## |$)', text, re.DOTALL)
+            if summary_match:
+                summary_text = summary_match.group(1)
+                result["business_solution_summary"]["solution_name"] = self._extract_field(summary_text, "Solution Name")
+                result["business_solution_summary"]["business_concept"] = self._extract_field(summary_text, "Business Concept")
+                result["business_solution_summary"]["target_market"] = self._extract_field(summary_text, "Target Market")
+                result["business_solution_summary"]["market_opportunity"] = self._extract_field(summary_text, "Market Opportunity")
+                result["business_solution_summary"]["business_model"] = self._extract_field(summary_text, "Business Model")
+            
+            # Parse Product Strategy section
+            product_match = re.search(r'## Product Strategy(.*?)(?=## |$)', text, re.DOTALL)
+            if product_match:
+                product_text = product_match.group(1)
+                result["product_strategy"]["core_features"] = self._extract_list(product_text, "Core Features")
+                result["product_strategy"]["advanced_features"] = self._extract_list(product_text, "Advanced Features")
+                result["product_strategy"]["user_experience"] = self._extract_field(product_text, "User Experience")
+                result["product_strategy"]["design_philosophy"] = self._extract_field(product_text, "Design Philosophy")
+                result["product_strategy"]["product_differentiation"] = self._extract_field(product_text, "Product Differentiation")
+            
+            # Parse Business Model & Pricing section
+            pricing_match = re.search(r'## Business Model & Pricing(.*?)(?=## |$)', text, re.DOTALL)
+            if pricing_match:
+                pricing_text = pricing_match.group(1)
+                result["business_model_pricing"]["revenue_streams"] = self._extract_field(pricing_text, "Revenue Streams")
+                result["business_model_pricing"]["pricing_strategy"] = self._extract_field(pricing_text, "Pricing Strategy")
+                result["business_model_pricing"]["cost_structure"] = self._extract_field(pricing_text, "Cost Structure")
+                result["business_model_pricing"]["unit_economics"] = self._extract_field(pricing_text, "Unit Economics")
+                result["business_model_pricing"]["profitability_timeline"] = self._extract_field(pricing_text, "Profitability Timeline")
+            
+            # Parse Go-to-Market Strategy section
+            gtm_match = re.search(r'## Go-to-Market Strategy(.*?)(?=## |$)', text, re.DOTALL)
+            if gtm_match:
+                gtm_text = gtm_match.group(1)
+                result["go_to_market_strategy"]["customer_acquisition"] = self._extract_field(gtm_text, "Customer Acquisition")
+                result["go_to_market_strategy"]["marketing_strategy"] = self._extract_field(gtm_text, "Marketing Strategy")
+                result["go_to_market_strategy"]["sales_strategy"] = self._extract_field(gtm_text, "Sales Strategy")
+                result["go_to_market_strategy"]["partnership_strategy"] = self._extract_field(gtm_text, "Partnership Strategy")
+                result["go_to_market_strategy"]["launch_strategy"] = self._extract_field(gtm_text, "Launch Strategy")
+            
+            # Parse Growth & Scale Strategy section
+            growth_match = re.search(r'## Growth & Scale Strategy(.*?)(?=## |$)', text, re.DOTALL)
+            if growth_match:
+                growth_text = growth_match.group(1)
+                result["growth_scale_strategy"]["growth_phases"] = self._extract_field(growth_text, "Growth Phases")
+                result["growth_scale_strategy"]["expansion_strategy"] = self._extract_field(growth_text, "Expansion Strategy")
+                result["growth_scale_strategy"]["team_building"] = self._extract_field(growth_text, "Team Building")
+                result["growth_scale_strategy"]["funding_strategy"] = self._extract_field(growth_text, "Funding Strategy")
+                result["growth_scale_strategy"]["exit_strategy"] = self._extract_field(growth_text, "Exit Strategy")
+            
+            # Parse Competitive Strategy section
+            competitive_match = re.search(r'## Competitive Strategy(.*?)(?=## |$)', text, re.DOTALL)
+            if competitive_match:
+                competitive_text = competitive_match.group(1)
+                result["competitive_strategy"]["competitive_advantages"] = self._extract_field(competitive_text, "Competitive Advantages")
+                result["competitive_strategy"]["market_positioning"] = self._extract_field(competitive_text, "Market Positioning")
+                result["competitive_strategy"]["defensibility"] = self._extract_field(competitive_text, "Defensibility")
+                result["competitive_strategy"]["competitive_response"] = self._extract_field(competitive_text, "Competitive Response")
+                result["competitive_strategy"]["market_leadership"] = self._extract_field(competitive_text, "Market Leadership")
+            
+            # Parse Success Metrics & Milestones section
+            metrics_match = re.search(r'## Success Metrics & Milestones(.*?)(?=## |$)', text, re.DOTALL)
+            if metrics_match:
+                metrics_text = metrics_match.group(1)
+                result["success_metrics_milestones"]["key_performance_indicators"] = self._extract_list(metrics_text, "Key Performance Indicators")
+                result["success_metrics_milestones"]["milestone_timeline"] = self._extract_field(metrics_text, "Milestone Timeline")
+                result["success_metrics_milestones"]["success_criteria"] = self._extract_field(metrics_text, "Success Criteria")
+                result["success_metrics_milestones"]["risk_mitigation"] = self._extract_field(metrics_text, "Risk Mitigation")
+                result["success_metrics_milestones"]["long_term_vision"] = self._extract_field(metrics_text, "Long-term Vision")
+            
+            self.logger.info("Successfully parsed structured act text response")
+            return result
+            
+        except Exception as e:
+            self.logger.error(f"Failed to parse structured act text: {e}")
+            return {"error": f"Failed to parse structured act text: {e}"}
+    
+    def _extract_field(self, text: str, field_name: str) -> str:
+        """Extract a field value from structured text."""
+        import re
         
-        logger.info("\n===== TEST SUCCESSFUL =====\n")
-        logger.info(f"BuilderAgent completed solution generation in {plan_time + think_time + act_time:.2f}s")
+        # Look for the field name followed by a colon and value
+        pattern = rf'- {re.escape(field_name)}:\s*(.+?)(?=\n- |$)'
+        match = re.search(pattern, text, re.DOTALL)
+        if match:
+            return match.group(1).strip()
+        return ""
+    
+    def _extract_list(self, text: str, field_name: str) -> List[str]:
+        """Extract a list field from structured text."""
+        import re
         
-    except Exception as e:
-        logger.error(f"Error testing BuilderAgent: {str(e)}")
-        import traceback
-        logger.error(traceback.format_exc())
-
-
-if __name__ == "__main__":
-    import asyncio
-    asyncio.run(test_builder_agent())
+        # Look for the field name followed by a colon and list items
+        pattern = rf'- {re.escape(field_name)}:\s*(.+?)(?=\n- |$)'
+        match = re.search(pattern, text, re.DOTALL)
+        if match:
+            list_text = match.group(1).strip()
+            # Split by newlines and clean up
+            items = [item.strip('- ').strip() for item in list_text.split('\n') if item.strip()]
+            return [item for item in items if item]
+        return []
+    
+    def _create_fallback_think_result(self, input_data: BuilderInput) -> Dict[str, Any]:
+        """Create a fallback think result when LLM parsing fails."""
+        return {
+            "business_feasibility_analysis": {
+                "primary_opportunity": "SaaS solution for identified market gaps",
+                "market_viability": "High market demand for gap-filling solutions",
+                "business_feasibility": "Viable business opportunity with clear path to profitability",
+                "competitive_landscape": "Moderate competition with opportunities for differentiation"
+            },
+            "solution_concept": {
+                "solution_name": "GapSolver Pro",
+                "alternative_names": ["MarketGap Solutions", "GapBridge Platform"],
+                "core_value_proposition": "Comprehensive solution addressing identified market gaps",
+                "target_problem": "Market gaps identified through analysis",
+                "target_customers": "SMBs and startups seeking gap-filling solutions"
+            },
+            "business_model_design": {
+                "revenue_model": "Subscription-based SaaS",
+                "pricing_strategy": "Freemium with premium tiers",
+                "cost_structure": "Development, infrastructure, and marketing costs",
+                "key_partnerships": "Technology partners and distribution channels",
+                "customer_acquisition": "Digital marketing and content strategy"
+            },
+            "competitive_positioning": {
+                "differentiation": "First-mover advantage in identified gaps",
+                "competitive_advantages": "Comprehensive gap analysis and solution design",
+                "market_positioning": "Premium solution for gap-filling needs",
+                "barriers_to_entry": "Domain expertise and market knowledge"
+            },
+            "implementation_considerations": {
+                "development_approach": "Agile development with iterative releases",
+                "technology_considerations": "Modern web technologies and cloud infrastructure",
+                "resource_requirements": "Development team, design resources, and marketing",
+                "timeline_considerations": "6-12 months for MVP development",
+                "risk_factors": "Market timing and competitive response"
+            }
+        }
+    
+    def _create_fallback_act_result(self, input_data: BuilderInput) -> Dict[str, Any]:
+        """Create a fallback act result when LLM parsing fails."""
+        return {
+            "business_solution_summary": {
+                "solution_name": "GapSolver Pro",
+                "business_concept": "Comprehensive SaaS platform addressing market gaps",
+                "target_market": "SMBs and startups",
+                "market_opportunity": "Significant market opportunity in gap-filling solutions",
+                "business_model": "Subscription-based SaaS with freemium model"
+            },
+            "product_strategy": {
+                "core_features": ["Gap analysis tools", "Solution recommendations", "Market insights"],
+                "advanced_features": ["AI-powered insights", "Custom solutions", "Enterprise features"],
+                "user_experience": "Intuitive, user-friendly interface",
+                "design_philosophy": "Clean, modern design focused on usability",
+                "product_differentiation": "Comprehensive gap analysis and solution design"
+            },
+            "business_model_pricing": {
+                "revenue_streams": "Subscription fees, premium features, enterprise licenses",
+                "pricing_strategy": "Freemium with $29/month starter, $99/month professional",
+                "cost_structure": "Development, infrastructure, marketing, and operations",
+                "unit_economics": "Positive unit economics with scalable pricing",
+                "profitability_timeline": "18-24 months to profitability"
+            },
+            "go_to_market_strategy": {
+                "customer_acquisition": "Content marketing, SEO, and partnerships",
+                "marketing_strategy": "Digital marketing focused on gap-filling solutions",
+                "sales_strategy": "Self-service with enterprise sales team",
+                "partnership_strategy": "Technology and distribution partnerships",
+                "launch_strategy": "Soft launch with beta users, then public launch"
+            },
+            "growth_scale_strategy": {
+                "growth_phases": "MVP launch, feature expansion, market expansion",
+                "expansion_strategy": "New markets and additional gap categories",
+                "team_building": "Development, marketing, and sales teams",
+                "funding_strategy": "Bootstrap initially, then seek Series A funding",
+                "exit_strategy": "Strategic acquisition or IPO in 5-7 years"
+            },
+            "competitive_strategy": {
+                "competitive_advantages": "First-mover advantage and comprehensive solution",
+                "market_positioning": "Premium solution for gap-filling needs",
+                "defensibility": "Network effects and data moats",
+                "competitive_response": "Continuous innovation and customer focus",
+                "market_leadership": "Become the leading gap-filling solution platform"
+            },
+            "success_metrics_milestones": {
+                "key_performance_indicators": ["Monthly recurring revenue", "Customer acquisition cost", "Customer lifetime value"],
+                "milestone_timeline": "6 months MVP, 12 months growth, 24 months scale",
+                "success_criteria": "Profitable growth with strong customer satisfaction",
+                "risk_mitigation": "Diversified revenue streams and strong customer relationships",
+                "long_term_vision": "Leading platform for market gap analysis and solutions"
+            }
+        }
