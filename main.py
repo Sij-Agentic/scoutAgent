@@ -121,6 +121,14 @@ async def run_orchestrated_workflow(
     # Register the GapFinderAgent
     gap_finder_agent = GapFinderAgent(agent_id="gap_finder")
     orchestrator.register_agent("gap_finder", AGENT_STAGE_CONFIGS["gap_finder"], gap_finder_agent)
+
+    # Register the BuilderAgent
+    builder_agent = BuilderAgent(agent_id="builder")
+    orchestrator.register_agent("builder", AGENT_STAGE_CONFIGS["builder"], builder_agent)
+
+    # Register the WriterAgent
+    writer_agent = WriterAgent(agent_id="writer")
+    orchestrator.register_agent("writer", AGENT_STAGE_CONFIGS["writer"], writer_agent)
     
     # Initialize the orchestrator
     await orchestrator.initialize(agent_input)

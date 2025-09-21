@@ -426,6 +426,11 @@ class EnhancedDevelopmentOrchestrator(DevelopmentOrchestrator):
                     # The entire result might be the solution
                     solution = data["result"]
                     logger.info("Using entire result as solution")
+            
+            # Builder act output structure - the entire data is the solution
+            elif any(key in data for key in ["business_solution_summary", "product_strategy", "business_model_pricing", "go_to_market_strategy"]):
+                solution = data
+                logger.info("Using entire builder_act data as solution")
         
         return solution
     
