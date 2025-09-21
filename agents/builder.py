@@ -56,6 +56,11 @@ class BuilderAgent(BaseAgent, LLMAgentMixin):
                 # Handle case where input_data.data might be a dict
                 if isinstance(agent_input.data, dict):
                     gap_finder_output = agent_input.data
+                    builder_input = BuilderInput(
+                        gap_finder_output=gap_finder_output,
+                        market_context=agent_input.context.get("market_context", "") if agent_input.context else "",
+                        analysis_scope=agent_input.context.get("analysis_scope", "focused") if agent_input.context else "focused"
+                    )
                 else:
                     self.logger.error("Invalid input data format")
             return AgentOutput(
@@ -66,12 +71,6 @@ class BuilderAgent(BaseAgent, LLMAgentMixin):
                 success=False,
                         error="Invalid input data format"
                     )
-                
-                builder_input = BuilderInput(
-                    gap_finder_output=gap_finder_output,
-                    market_context=agent_input.context.get("market_context", "") if agent_input.context else "",
-                    analysis_scope=agent_input.context.get("analysis_scope", "focused") if agent_input.context else "focused"
-                )
             else:
                 builder_input = agent_input
             
