@@ -1,14 +1,14 @@
-# Gap Finder Act Stage - SaaS Business Recommendations
+# Gap Finder Act Stage - Market Gaps & Strategic Recommendations
 
 ## Objective
-Transform strategic insights from the think stage into actionable SaaS business recommendations that can be used by the builder agent to design comprehensive software products.
+Present the culmination of gap finder analysis: the identified market gaps, opportunity assessment, and strategic recommendations for addressing these gaps. This is the core deliverable of the gap finder agent.
 
 ## Analysis Framework
-1. **SaaS Opportunity Identification**: Convert top-priority gaps into viable SaaS business ideas
-2. **Product Definition**: Define MVP features and long-term product vision
-3. **Business Model Design**: Create sustainable revenue streams and pricing strategies
-4. **Market Positioning**: Define competitive advantage and target customer segments
-5. **Go-to-Market Strategy**: Outline how to reach and acquire customers
+1. **Market Gap Presentation**: Clearly present the identified gaps as the primary deliverable
+2. **Opportunity Assessment**: Evaluate which gaps represent the best opportunities
+3. **Strategic Recommendations**: Provide high-level guidance on how to address these gaps
+4. **Market Intelligence**: Share key insights about what's missing in the market
+5. **Implementation Guidance**: Suggest approaches for gap-filling solutions
 
 ## Output Requirements
 
@@ -23,37 +23,48 @@ Transform strategic insights from the think stage into actionable SaaS business 
 
 ### Required Output Format:
 
-## SaaS Business Summary
-- Primary Opportunity: [Main SaaS business idea based on highest priority gap]
-- Target Market: [Specific customer segments and market size]
-- Market Size Estimate: [Estimated addressable market]
-- Business Model: [Core revenue model and pricing approach]
+## Market Gaps Summary
+- Primary Gap: [The most significant market gap identified]
+- Gap Count: [Total number of gaps discovered]
+- Market Impact: [Overall impact of these gaps on the market]
+- Opportunity Size: [Estimated market opportunity size]
 
-## SaaS Recommendations
-- [Business Name]
-  - Description: [What the SaaS product does]
-  - Target Gap: [Which gap this addresses]
-  - Value Proposition: [Why customers would choose this solution]
-  - MVP Features: [Core features for initial launch]
-  - Long Term Features: [Advanced features for growth and scale]
-  - Target Customers: [Specific customer segments]
-  - Revenue Model: [How the business makes money]
-  - Competitive Advantage: [What makes this unique]
-  - Go to Market: [How to reach customers]
+## Identified Market Gaps
+- [Gap Name]
+  - Description: [What this gap represents in the market]
+  - Severity: [High/Medium/Low impact on market]
+  - Affected Segments: [Which customer segments are impacted]
+  - Evidence: [Key evidence supporting this gap]
+  - Opportunity Score: [1-10 rating of opportunity potential]
+  - Competitive Landscape: [Current solutions and their limitations]
+  - Market Timing: [Why now is the right time to address this gap]
 
-## Implementation Roadmap
-- MVP Phase: [Timeline and focus for initial launch]
-- Growth Phase: [Timeline and focus for scaling]
-- Scale Phase: [Timeline and focus for market leadership]
+## Strategic Recommendations
+- [Recommendation Name]
+  - Target Gap: [Which gap this recommendation addresses]
+  - Approach: [High-level approach to addressing the gap]
+  - Target Market: [Specific customer segments to focus on]
+  - Value Proposition: [Why this approach would succeed]
+  - Implementation Strategy: [How to approach building a solution]
+  - Success Criteria: [What success looks like]
+  - Risk Factors: [Key risks to consider]
 
-## Success Metrics
-- MVP Success: [Key metrics for validating initial product]
-- Growth Success: [Key metrics for scaling the business]
-- Scale Success: [Key metrics for market leadership]
+## Market Intelligence
+- Key Insights: [Critical market insights discovered]
+- Emerging Trends: [Trends that support gap-filling opportunities]
+- Competitive Dynamics: [How the competitive landscape affects opportunities]
+- Market Barriers: [Barriers to addressing these gaps]
+- Enabling Factors: [Factors that make gap-filling feasible]
+
+## Implementation Guidance
+- Priority Order: [Recommended order for addressing gaps]
+- Resource Requirements: [High-level resource needs]
+- Timeline Considerations: [Time factors for implementation]
+- Success Metrics: [How to measure success in addressing gaps]
 
 ## Input Data
 You will receive:
 - **Think Stage Output**: Prioritized gaps, vendor landscape, strategic insights
 - **Collect Stage Data**: Market research and competitive analysis
 
-Focus on the highest-priority gaps and create actionable SaaS business recommendations that the builder agent can use to design comprehensive software products.
+Focus on presenting the market gaps as the primary deliverable, with strategic recommendations for addressing these gaps. This output should serve as the foundation for future solution building efforts.
