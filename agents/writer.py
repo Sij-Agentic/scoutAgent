@@ -200,7 +200,7 @@ class WriterAgent(BaseAgent, LLMAgentMixin):
             
             self.logger.info("Act stage completed successfully")
             return final_result
-            
+                
         except Exception as e:
             self.logger.error(f"Error in act stage: {e}")
             return {"error": f"Act stage failed: {str(e)}"}
@@ -330,7 +330,7 @@ class WriterAgent(BaseAgent, LLMAgentMixin):
             # Save the manifest
             manifest_manager._save()
             self.logger.info("Stored act stage output to manifest")
-        
+            
         except Exception as e:
             self.logger.error(f"Error storing act output to manifest: {e}")
             raise e
@@ -602,7 +602,7 @@ class WriterAgent(BaseAgent, LLMAgentMixin):
             
             self.logger.info("Successfully parsed structured think text response")
             return result
-            
+        
         except Exception as e:
             self.logger.error(f"Failed to parse structured think text: {e}")
             return {"error": f"Failed to parse structured think text: {e}"}

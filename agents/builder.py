@@ -202,7 +202,7 @@ class BuilderAgent(BaseAgent, LLMAgentMixin):
             
             self.logger.info("Think stage completed successfully")
             return analysis_result
-            
+    
         except Exception as e:
             self.logger.error(f"Error in think stage: {e}")
             return {"error": f"Think stage failed: {str(e)}"}

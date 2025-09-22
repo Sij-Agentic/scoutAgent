@@ -142,7 +142,7 @@ async def reddit_search_and_fetch_threads(
     include_comments: bool = True,
     comment_depth: int = 2,
     comment_limit: int = 50,
-    use_cache: bool = True,
+    use_cache: bool = False,
     test_mode: bool = True,  # New parameter for testing with reduced data
 ) -> Dict[str, Any]:
     """
@@ -212,7 +212,7 @@ async def reddit_api_search_and_fetch_threads(
     include_comments: bool = True,
     comment_depth: int = 2,
     comment_limit: int = 50,
-    use_cache: bool = True,
+    use_cache: bool = False,
     test_mode: bool = False,  # New parameter for testing with reduced data
 ) -> Dict[str, Any]:
     """
