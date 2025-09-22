@@ -2,6 +2,12 @@ tool_servers:
   - id: gap-finder-tools
     url: http://127.0.0.1:8000/sse
     description: "Gap finder tools for search and analysis"
+  - id: reddit-api
+    url: http://127.0.0.1:8001/sse
+    description: "Reddit API tools (public JSON)"
   - id: research-tools
     url: http://127.0.0.1:8002/sse
     description: "Research tools for data collection (Reddit, HN, Google, Twitter, Reviews)"
+  - id: web-search
+    url: http://127.0.0.1:8004/sse
+    description: "Web search tools (Google Search API)"

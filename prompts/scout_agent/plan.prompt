@@ -23,12 +23,14 @@ Respond with a STRICT JSON object (no prose) containing only tool nodes for the 
 # CONSTRAINTS AND DEFAULTS
 - time_window: "12m" (last 12 months)
 - per_query_limit: 15 (per keyword across subreddits)
-- include_comments: true
+- include_comments: True (Python boolean, NOT JavaScript true)
 - comment_depth: 2
 - comment_limit: 50
 - quality filters (optional but recommended): min_num_comments >= 3, min_score >= 1
 - deduplicate threads by id/permalink
 - parallelize collection by keyword
+
+**CRITICAL: Use Python syntax in all code blocks - use True/False (not true/false), use Python dict syntax**
 
 # REQUIRED OUTPUT FIELDS
 {

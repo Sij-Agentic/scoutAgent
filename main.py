@@ -20,8 +20,11 @@ from scout_agent.agents.scout import ScoutAgent
 from scout_agent.agents.screener import ScreenerAgent
 from scout_agent.agents.validator import ValidatorAgent
 from scout_agent.agents.gap_finder import GapFinderAgent
+from scout_agent.agents.builder import BuilderAgent
+from scout_agent.agents.writer import WriterAgent
 from scout_agent.agents.base import AgentInput
 from scout_agent.orchestration import AgentOrchestrator, create_orchestrator, AGENT_STAGE_CONFIGS
+from scout_agent.orchestration.enhanced_main_orchestrator import EnhancedMainOrchestrator
 from scout_agent.custom_logging.logger import get_logger
 
 
@@ -103,30 +106,31 @@ async def run_orchestrated_workflow(
         }
     )
     
-    # Create the orchestrator
-    orchestrator = create_orchestrator(run_id=run_id)
+    # Create the enhanced orchestrator
+    orchestrator = EnhancedMainOrchestrator(run_id=run_id)
     
-    # Register the ScoutAgent
+    # Register agents in dependency order
+    # ScoutAgent (no dependencies)
     scout_agent = ScoutAgent(agent_id="scout")
     orchestrator.register_agent("scout", AGENT_STAGE_CONFIGS["scout"], scout_agent)
     
-    # Register the ScreenerAgent
+    # ScreenerAgent (depends on scout)
     screener_agent = ScreenerAgent(agent_id="screener")
     orchestrator.register_agent("screener", AGENT_STAGE_CONFIGS["screener"], screener_agent)
 
-    # Register the ValidatorAgent
+    # ValidatorAgent (depends on scout)
     validator_agent = ValidatorAgent(agent_id="validator")
     orchestrator.register_agent("validator", AGENT_STAGE_CONFIGS["validator"], validator_agent)
 
-    # Register the GapFinderAgent
+    # GapFinderAgent (depends on scout, screener, validator)
     gap_finder_agent = GapFinderAgent(agent_id="gap_finder")
     orchestrator.register_agent("gap_finder", AGENT_STAGE_CONFIGS["gap_finder"], gap_finder_agent)
 
-    # Register the BuilderAgent
+    # BuilderAgent (depends on gap_finder)
     builder_agent = BuilderAgent(agent_id="builder")
     orchestrator.register_agent("builder", AGENT_STAGE_CONFIGS["builder"], builder_agent)
 
-    # Register the WriterAgent
+    # WriterAgent (depends on builder and gap_finder)
     writer_agent = WriterAgent(agent_id="writer")
     orchestrator.register_agent("writer", AGENT_STAGE_CONFIGS["writer"], writer_agent)
     
@@ -136,10 +140,13 @@ async def run_orchestrated_workflow(
     try:
         # Execute the workflow
         logger.info("Executing workflow...")
-        results = await orchestrator.execute()
+        results = await orchestrator.execute(agent_input)
         
         # Log completion
-        logger.info(f"Workflow completed with status: {results.get('status', 'unknown')}")
+        if hasattr(results, 'status'):
+            logger.info(f"Workflow completed with status: {results.status}")
+        else:
+            logger.info(f"Workflow completed with results type: {type(results)}")
         
         # Return the results
         return results

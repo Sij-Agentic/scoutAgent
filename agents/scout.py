@@ -206,6 +206,28 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
             # Generate plan using LLM (returns string) - no fallback
             llm_text = await self.llm_generate(prompt=prompt_text, task_type="plan")
             plan = self._extract_json(llm_text)
+            
+            # Debug logging
+            self.logger.info(f"DEBUG: _extract_json returned type: {type(plan)}")
+            if isinstance(plan, dict):
+                self.logger.info(f"DEBUG: Plan keys: {list(plan.keys())}")
+            else:
+                self.logger.error(f"DEBUG: Plan content (first 200 chars): {str(plan)[:200]}")
+            
+            # Safety check - ensure plan is a dictionary
+            if not isinstance(plan, dict):
+                self.logger.error(f"LLM response parsing failed, plan type: {type(plan)}")
+                plan = {
+                    "dag": {"nodes": []},
+                    "metadata": {
+                        "target_market": input_data.target_market,
+                        "research_scope": input_data.research_scope,
+                        "sources": input_data.sources,
+                        "keywords": input_data.keywords
+                    },
+                    "error": "Failed to parse LLM response as JSON"
+                }
+            
             # Post-process to preserve LLM-generated code
             plan = self._postprocess_plan(plan, input_data, tools_catalog, tool_names)
             self.logger.info(f"Generated plan with keys: {list(plan.keys())}")
@@ -248,8 +270,12 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
             manifest["run_id"] = plan.get("run_id")
             manifest["dag"] = plan.get("dag") or {}
             stages = manifest.setdefault("stages", {})
+            
+            # Clean up the plan data to fix JSON string issues
+            cleaned_plan = self._clean_plan_data(plan)
+            
             stages["scout_plan"] = {
-                "data": plan,
+                "data": cleaned_plan,
                 "status": "completed",
                 "updated_at": datetime.now().isoformat(),
             }
@@ -260,6 +286,37 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
             self.logger.warning(f"Failed to initialize run_manifest.json: {_e}")
 
         return plan
+    
+    def _clean_plan_data(self, plan: Dict[str, Any]) -> Dict[str, Any]:
+        """Clean plan data to fix JSON string issues and prevent double encoding."""
+        import json
+        import re
+        
+        def clean_value(value):
+            """Recursively clean values that might be JSON strings."""
+            if isinstance(value, str):
+                # Check if this looks like a JSON string that should be parsed
+                stripped = value.strip()
+                if (stripped.startswith('[') and stripped.endswith(']')) or \
+                   (stripped.startswith('{') and stripped.endswith('}')):
+                    try:
+                        # Try to parse as JSON
+                        parsed = json.loads(stripped)
+                        return parsed
+                    except json.JSONDecodeError:
+                        # If parsing fails, return the original string
+                        return value
+                return value
+            elif isinstance(value, dict):
+                # Recursively clean dictionary values
+                return {k: clean_value(v) for k, v in value.items()}
+            elif isinstance(value, list):
+                # Recursively clean list values
+                return [clean_value(item) for item in value]
+            else:
+                return value
+        
+        return clean_value(plan)
     
     async def think(self, agent_input: AgentInput, plan: Dict[str, Any] = None) -> Dict[str, Any]:
         """Analyze collected Reddit data to identify pain points."""
@@ -362,14 +419,32 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
                 self.logger.info(f"Reddit data content: {str(reddit_data)[:200]}...")
             
             # Extract threads and comments from the collected data
+            # First, try to parse JSON strings from content field (MCP tool format)
+            if "sources" in reddit_data and "reddit" in reddit_data["sources"]:
+                reddit_source = reddit_data["sources"]["reddit"]
+                if "content" in reddit_source and isinstance(reddit_source["content"], list):
+                    self.logger.info("Found Reddit data in sources.reddit.content format")
+                    for content_item in reddit_source["content"]:
+                        if isinstance(content_item, dict) and "text" in content_item:
+                            try:
+                                # Parse the JSON string from the text field
+                                parsed_data = json.loads(content_item["text"])
+                                if "threads" in parsed_data:
+                                    threads = parsed_data["threads"]
+                                    self.logger.info(f"Parsed {len(threads)} threads from JSON content")
+                                break
+                            except json.JSONDecodeError as e:
+                                self.logger.warning(f"Failed to parse JSON from content: {e}")
+                                continue
+            
             # Check if data is nested under 'data' key (manifest structure)
-            if "data" in reddit_data and isinstance(reddit_data["data"], dict):
+            if not threads and "data" in reddit_data and isinstance(reddit_data["data"], dict):
                 self.logger.info("Found nested 'data' key in Reddit data")
                 data_content = reddit_data["data"]
                 threads = data_content.get("threads", [])
                 comments = data_content.get("comments", [])
                 self.logger.info(f"Data content keys: {list(data_content.keys())}")
-            else:
+            elif not threads:
                 # Direct access (fallback)
                 threads = reddit_data.get("threads", [])
                 comments = reddit_data.get("comments", [])
@@ -712,15 +787,28 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
         """Extract JSON from text that may contain non-JSON content."""
         import re
         
-        # Default fallback structure
+        # Default fallback structure for plan generation
         fallback = {
-            "per_thread_summaries": [],
-            "pains": [],
-            "themes": [],
-            "error": "Failed to parse JSON",
-            "total_threads_analyzed": 0,
-            "next_steps": ["retry_analysis", "check_data_quality"]
+            "dag": {
+                "nodes": []
+            },
+            "metadata": {
+                "target_market": "unknown",
+                "research_scope": "focused",
+                "sources": [],
+                "keywords": []
+            },
+            "error": "Failed to parse JSON"
         }
+        
+        # Ensure fallback is always a dictionary
+        if not isinstance(fallback, dict):
+            self.logger.error(f"Fallback is not a dictionary: {type(fallback)}")
+            fallback = {
+                "dag": {"nodes": []},
+                "metadata": {"target_market": "unknown", "research_scope": "focused", "sources": [], "keywords": []},
+                "error": "Failed to parse JSON"
+            }
         
         if not text:
             self.logger.error("Empty text provided to _extract_json")
@@ -882,6 +970,17 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
         except Exception as e:
             self.logger.error(f"Error extracting JSON: {str(e)}\n{traceback.format_exc()}\nContent: {content[:200] + '...' if len(content) > 200 else content}")
             return fallback
+        
+        # Final safety check - ensure we always return a dictionary
+        if not isinstance(fallback, dict):
+            self.logger.error(f"_extract_json returned non-dict type: {type(fallback)}")
+            return {
+                "dag": {"nodes": []},
+                "metadata": {"target_market": "unknown", "research_scope": "focused", "sources": [], "keywords": []},
+                "error": "JSON extraction failed"
+            }
+        
+        return fallback
 
     def _postprocess_plan(self, plan: Dict[str, Any], input_data: "ScoutInput", tools_catalog: List[Dict[str, Any]], tool_names: List[str]) -> Dict[str, Any]:
         """Process the LLM-generated plan, preserving tool nodes and code.
@@ -891,18 +990,52 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
         """
         try:
             if not isinstance(plan, dict):
-                self.logger.warning("Plan is not a dictionary, returning empty plan")
+                self.logger.warning(f"Plan is not a dictionary (type: {type(plan)}), returning empty plan")
                 return {"dag": {"nodes": []}}
+            
+            # If "dag" exists but is not a dict, attempt to coerce into a proper DAG
+            dag = plan.get("dag")
+            if dag is not None and not isinstance(dag, dict):
+                self.logger.warning(f"Plan has 'dag' of type {type(dag)}; coercing to empty dag with nodes[]")
+                plan["dag"] = {"nodes": []}
+
+            # If plan appears to be a single node (flat fields), wrap it into dag.nodes
+            candidate_node_keys = {"id", "type", "tool", "params", "code", "language", "outputs"}
+            if ("dag" not in plan or not isinstance(plan.get("dag"), dict) or not isinstance(plan.get("dag", {}).get("nodes", []), list)) and any(k in plan for k in candidate_node_keys):
+                node: Dict[str, Any] = {k: plan[k] for k in candidate_node_keys if k in plan}
+                plan = {
+                    "dag": {
+                        "nodes": [node]
+                    },
+                    "metadata": plan.get("metadata", {
+                        "target_market": input_data.target_market,
+                        "research_scope": input_data.research_scope,
+                        "sources": input_data.sources,
+                        "keywords": input_data.keywords,
+                        "subreddits": getattr(input_data, 'subreddits', [])
+                    })
+                }
+                self.logger.info("Wrapped flat plan into dag.nodes with a single node")
             
             # Check if the plan already has a DAG with nodes
             dag = plan.get("dag", {})
+            if not isinstance(dag, dict):
+                dag = {"nodes": []}
+                plan["dag"] = dag
             nodes = dag.get("nodes", [])
+            if not isinstance(nodes, list):
+                self.logger.warning(f"Plan dag.nodes is not a list (type: {type(nodes)}); resetting to []")
+                nodes = []
+                plan["dag"]["nodes"] = nodes
             
             if not nodes:
                 self.logger.warning("No nodes found in LLM-generated plan")
             else:
                 self.logger.info(f"Found {len(nodes)} nodes in LLM-generated plan")
                 for i, node in enumerate(nodes):
+                    if not isinstance(node, dict):
+                        self.logger.warning(f"Node {i} is not a dict (type: {type(node)}); skipping")
+                        continue
                     node_id = node.get("id", f"node_{i}")
                     node_type = node.get("type", "unknown")
                     node_tool = node.get("tool", "none")
@@ -986,8 +1119,11 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
             dag_nodes = plan.get("dag", {}).get("nodes", [])
             self.logger.info(f"Found {len(dag_nodes)} nodes in dag.nodes")
         
-        # Filter tool nodes
-        tool_nodes = [node for node in dag_nodes if "tool_name" in node]
+        # Filter tool nodes (loosened): accept nodes that declare a tool or contain code
+        tool_nodes = [
+            node for node in dag_nodes
+            if ("tool_name" in node) or ("tool" in node) or ("code" in node)
+        ]
         self.logger.info(f"Found {len(tool_nodes)} tool nodes to execute")
         
         if not tool_nodes:
@@ -995,7 +1131,8 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
             return {"completed": [], "failed": []}
         
         # Initialize MCP client
-        multi_client = MultiMCPClient()
+        server_configs = load_server_configs()
+        multi_client = MultiMCPClient(server_configs)
         try:
             await multi_client.initialize()
         except Exception as e:
@@ -1004,12 +1141,13 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
         
         # Execute each tool node
         manifest_manager = ManifestManager(run_dir_override or "default")
+        aggregated_sources: Dict[str, Any] = {}
         
         for i, node in enumerate(tool_nodes):
             try:
-                node_id = node.get("node_id") or f"tool_node_{i}_{node.get('tool_name', 'unknown')}"
-                tool_name = node.get("tool_name")
-                inputs = node.get("inputs", {})
+                node_id = node.get("node_id") or node.get("id") or f"tool_node_{i}_{node.get('tool', node.get('tool_name', 'unknown'))}"
+                tool_name = node.get("tool_name") or node.get("tool")
+                inputs = node.get("inputs") or node.get("params") or {}
                 
                 self.logger.info(f"Executing tool node: {node_id} with tool: {tool_name}")
                 
@@ -1036,9 +1174,28 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
                     else:
                         result_data = {"raw_result": str(result)}
                     
-                    # Store to manifest
-                    output_key = node.get("output_manifest_key", f"{node_id}_output")
-                    manifest_manager.store_node_output(output_key, result_data)
+                    # Determine outputs and store
+                    declared_outputs = node.get("outputs") or []
+                    if declared_outputs:
+                        for out_key in declared_outputs:
+                            # Standardize scout collect outputs: map stages.research.* → stages.scout_collect.*
+                            if out_key.startswith("stages.research."):
+                                out_key = out_key.replace("stages.research.", "stages.scout_collect.")
+                            # Also aggregate under sources for the collector summary
+                            try:
+                                suffix = out_key.split("stages.scout_collect.", 1)[1]
+                                aggregated_sources[suffix] = result_data
+                            except Exception:
+                                pass
+                            # Best-effort: store as a stage node output entry for downstream template resolution
+                            try:
+                                manifest_manager.store_node_output(out_key, result_data)
+                            except Exception as _e:
+                                self.logger.debug(f"Unable to store output by path {out_key}: {_e}")
+                    else:
+                        # Fallback: store by node id
+                        output_key = node.get("output_manifest_key", f"{node_id}_output")
+                        manifest_manager.store_node_output(output_key, result_data)
                     
                     self.logger.info(f"Successfully executed and stored results for node: {node_id}")
                 else:
@@ -1049,7 +1206,27 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
                 # Continue with other nodes even if one fails
                 continue
         
-        return {"completed": [node.get("node_id", f"node_{i}") for i, node in enumerate(tool_nodes)], "failed": []}
+        # Build normalized summary with aggregated sources for downstream stages
+        summary_completed = [
+            (n.get("node_id") or n.get("id") or f"node_{i}") for i, n in enumerate(tool_nodes)
+        ]
+        collect_summary = {
+            "completed": summary_completed,
+            "failed": [],
+            "sources": aggregated_sources
+        }
+        
+        # Write the collect summary to manifest under stages.scout_collect.data
+        try:
+            manifest = manifest_manager.get_manifest() or {}
+            stages = manifest.get("stages", {})
+            stages.setdefault("scout_collect", {})["data"] = collect_summary
+            manifest["stages"] = stages
+            manifest_manager._write_manifest(manifest)  # use internal write to persist the staged update
+        except Exception as _e:
+            self.logger.debug(f"Unable to persist collect summary to manifest: {_e}")
+        
+        return collect_summary
     
     def _resolve_template_variables(self, inputs: Dict[str, Any], manifest_manager: ManifestManager) -> Dict[str, Any]:
         """Resolve ${...} template variables in tool inputs using manifest data."""
