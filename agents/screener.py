@@ -252,7 +252,15 @@ class ScreenerAgent(BaseAgent, LLMAgentMixin):
                 pain_point["rank"] = i + 1
             
             # Select top K
-            top_k = min(input_data.top_k, len(ranked_pain_points))
+            # Derive top_k robustly from input_data or its context
+            derived_top_k = getattr(input_data, 'top_k', None)
+            if derived_top_k is None:
+                context = getattr(input_data, 'context', None)
+                if isinstance(context, dict):
+                    derived_top_k = context.get('top_k')
+            if derived_top_k is None:
+                derived_top_k = 10
+            top_k = min(int(derived_top_k), len(ranked_pain_points))
             top_pain_points = ranked_pain_points[:top_k]
             
             # Create simplified versions of top pain points for the output
@@ -305,7 +313,15 @@ class ScreenerAgent(BaseAgent, LLMAgentMixin):
         except Exception as e:
             self.logger.error(f"Error in act phase: {str(e)}\n{traceback.format_exc()}")
             # Fallback: generate basic ranking
-            fallback_ranking = self._generate_fallback_ranking(evaluations, input_data.top_k)
+            # Derive top_k for fallback similarly to main path
+            derived_top_k = getattr(input_data, 'top_k', None)
+            if derived_top_k is None:
+                context = getattr(input_data, 'context', None)
+                if isinstance(context, dict):
+                    derived_top_k = context.get('top_k')
+            if derived_top_k is None:
+                derived_top_k = 10
+            fallback_ranking = self._generate_fallback_ranking(evaluations, int(derived_top_k))
             
             # Write fallback ranking to manifest
             self._write_stage_output("act", fallback_ranking)

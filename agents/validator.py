@@ -289,6 +289,7 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
         # Generate the code for the node
         code = (
             "# MCP tool call for comprehensive_research\n"
+            "import json\n"
             "params = {\n"
             f"  \"topic\": \"{pain_point_desc}\",\n"
             f"  \"context\": \"{context}\",\n"
@@ -300,6 +301,8 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
             f"result = mcp_call(\"comprehensive_research\", params)\n"
             f"save_to_manifest(\"{output_path}\", result)\n"
             f"print(f\"DEBUG: Comprehensive research completed for {pain_point_id} ({node_variant})\")\n"
+            "# Print the result as JSON so it can be captured by the execution framework\n"
+            "print(json.dumps(result))\n"
         )
         
         # Create and return the complete node
@@ -550,9 +553,20 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
             await code_executor._initialize(None)
             await code_executor._start()
             
+            # Initialize manifest manager for storing results
+            run_id = dag.get("run_id") or plan.get("run_id")
+            run_dir = run_dir_override or Path(f"data/runs/{run_id}") if run_id else None
+            if run_dir:
+                manifest_path = run_dir / "run_manifest.json"
+                manifest_manager = ManifestManager(manifest_path, create_if_missing=False)
+            else:
+                manifest_manager = None
+                self.logger.warning("No run directory available, tool results won't be persisted")
+            
             # Execute each tool node
             completed_nodes = []
             failed_nodes = []
+            tool_results = {}  # Store actual results for stage persistence
             
             for node in tool_nodes:
                 node_id = node.get("id", "unknown")
@@ -563,10 +577,6 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
                 
                 try:
                     # Execute the code in the sandbox with proper prelude
-                    run_id = dag.get("run_id") or plan.get("run_id")
-                    run_dir = run_dir_override or Path(f"data/runs/{run_id}") if run_id else None
-                    
-                    # Use wrap_and_execute to properly set up the execution environment
                     result = await code_executor.wrap_and_execute(
                         node=node,
                         agent_id="validator",
@@ -583,6 +593,29 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
                     if result.success:
                         self.logger.info(f"Successfully executed tool node {node_id}")
                         completed_nodes.append(node_id)
+                        
+                        # Extract and store the tool result data
+                        if hasattr(result, 'output') and result.output:
+                            try:
+                                # Extract JSON from raw execution output that contains debug logs + JSON
+                                if isinstance(result.output, str):
+                                    result_data = self._extract_json_from_execution_output(result.output)
+                                else:
+                                    result_data = result.output
+                                
+                                # Store result in tool_results for stage persistence
+                                tool_results[node_id] = result_data
+                                
+                                # Note: We don't store individual tool outputs under the declared output paths
+                                # because ManifestManager.store_node_output treats paths like "stages.validator_collect.pp1.q1" 
+                                # as literal keys rather than nested paths. Instead, we accumulate all results
+                                # and store them properly in the nested structure at the end.
+                                
+                                self.logger.info(f"Successfully executed and stored results for node: {node_id}")
+                            except Exception as e:
+                                self.logger.warning(f"Failed to parse/store result for {node_id}: {e}")
+                        else:
+                            self.logger.warning(f"Tool node {node_id} returned no output")
                     else:
                         error = result.error if hasattr(result, 'error') else "Unknown error"
                         self.logger.error(f"Failed to execute tool node {node_id}: {error}")
@@ -590,6 +623,46 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
                 except Exception as e:
                     self.logger.error(f"Error executing tool node {node_id}: {str(e)}")
                     failed_nodes.append(f"{node_id}: {str(e)}")
+            
+            # Store collected tool results in proper nested structure
+            if manifest_manager and tool_results:
+                try:
+                    manifest = manifest_manager.get_manifest()
+                    stages = manifest.setdefault("stages", {})
+                    validator_collect_stage = stages.setdefault("validator_collect", {})
+                    
+                    # Create properly nested structure: pp1: {q1: data, q2: data}, pp2: {q1: data, q2: data}
+                    nested_data = {}
+                    for node_id, result_data in tool_results.items():
+                        # Extract pp and q from node_id like "validator_collect_pp1_q1"
+                        import re
+                        match = re.search(r'pp(\d+)_q(\d+)', node_id)
+                        if match:
+                            pp_num = match.group(1)
+                            q_num = match.group(2)
+                            pp_key = f"pp{pp_num}"
+                            q_key = f"q{q_num}"
+                            
+                            if pp_key not in nested_data:
+                                nested_data[pp_key] = {}
+                            nested_data[pp_key][q_key] = result_data
+                        else:
+                            # Fallback: store under the original node_id
+                            nested_data[node_id] = result_data
+                    
+                    validator_collect_stage["data"] = nested_data
+                    validator_collect_stage["updated_at"] = datetime.now().isoformat()
+                    manifest_manager._save()
+                    
+                    pp_keys = list(nested_data.keys())
+                    self.logger.info(f"Persisted validator_collect data with pain point keys: {pp_keys}")
+                    for pp_key, queries in nested_data.items():
+                        if isinstance(queries, dict):
+                            q_keys = list(queries.keys())
+                            self.logger.info(f"  {pp_key}: {q_keys}")
+                        
+                except Exception as e:
+                    self.logger.error(f"Failed to persist validator_collect stage data: {e}")
             
             # Return the summary
             summary = {
@@ -785,7 +858,14 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
             return {}
             
     def _process_collect_research_data(self, collect_data: Dict[str, Any], strategies: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Process research data from collect stage for each pain point."""
+        """Process research data from collect stage for each pain point.
+
+        Accepts multiple shapes:
+        - { pain_point_id: { query_id: { data: {source: {content: [...]}}}} }
+        - { pain_point_id: [ { data: {...} }, ... ] }
+        - { sources: {reddit|hackernews|google: {content: [...]}} } (aggregate)
+        - Lists of the above
+        """
         processed_results = {}
         
         try:
@@ -794,9 +874,59 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
                 self.logger.warning("No collect data available")
                 return processed_results
                 
-            # The collect_data structure is expected to be:
-            # {pain_point_id: {query_id: {topic, context, keywords, sources_used, depth, data, summary}}}
-            self.logger.info(f"Processing collect data with keys: {list(collect_data.keys())}")
+            # Normalize to iterable of (pain_point_id, queries_like)
+            items_iter: List[Any] = []
+            if isinstance(collect_data, dict):
+                # Check if we have the old flat structure with keys like "validator_collect_pp1_q1"
+                flat_keys = [k for k in collect_data.keys() if k.startswith("validator_collect_")]
+                if flat_keys:
+                    # Convert old flat structure to nested
+                    self.logger.info(f"Converting old flat structure with {len(flat_keys)} tool results to nested format")
+                    nested_data = {}
+                    for flat_key, tool_data in collect_data.items():
+                        if flat_key.startswith("validator_collect_"):
+                            import re
+                            match = re.search(r'pp(\d+)_q(\d+)', flat_key)
+                            if match:
+                                pp_num = match.group(1)
+                                q_num = match.group(2)
+                                pp_key = f"pp{pp_num}"
+                                q_key = f"q{q_num}"
+                                
+                                if pp_key not in nested_data:
+                                    nested_data[pp_key] = {}
+                                nested_data[pp_key][q_key] = tool_data
+                        elif flat_key not in ("completed", "failed"):
+                            # Keep non-tool keys as-is
+                            nested_data[flat_key] = tool_data
+                    
+                    items_iter = list(nested_data.items())
+                # Aggregate form with sources at top level
+                elif "sources" in collect_data and isinstance(collect_data.get("sources"), dict):
+                    items_iter = [("pp_aggregate", {"aggregate": {"data": collect_data}})]
+                # Or nested under data
+                elif "data" in collect_data and isinstance(collect_data.get("data"), dict) \
+                        and "sources" in collect_data["data"] and isinstance(collect_data["data"]["sources"], dict):
+                    items_iter = [("pp_aggregate", {"aggregate": {"data": collect_data["data"]}})]
+                # If we only have bookkeeping keys, there's nothing to process
+                elif set(collect_data.keys()).issubset({"completed", "failed"}):
+                    self.logger.info("Collect data contains only completion bookkeeping; no sources to process")
+                    return processed_results
+                else:
+                    # Assume new nested structure: pp1: {q1: data, q2: data}
+                    items_iter = list(collect_data.items())
+            elif isinstance(collect_data, list):
+                # Treat as a single aggregate list under an implicit pain point
+                items_iter = [("pp_list", collect_data)]
+            else:
+                self.logger.warning(f"Unexpected collect_data type: {type(collect_data)}")
+                return processed_results
+            
+            try:
+                keys_preview = list(collect_data.keys()) if isinstance(collect_data, dict) else [f"len={len(collect_data)}"]
+                self.logger.info(f"Processing collect data with keys: {keys_preview}")
+            except Exception:
+                pass
             
             # Map strategies to pain point IDs for easier lookup
             strategy_map = {}
@@ -806,42 +936,120 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
                     strategy_map[pain_point_id] = strategy
                 
             # Process each pain point in the collect data
-            for pain_point_id, queries in collect_data.items():
+            # At this point, items_iter should contain (pp1, {q1: data, q2: data}) pairs
+            for pain_point_id, queries in items_iter:
+                # Skip bookkeeping keys that may have leaked into iteration
+                if pain_point_id in ("completed", "failed"):
+                    continue
+                
+                # pain_point_id should now be pp1, pp2, etc.
+                actual_pain_point_id = pain_point_id
                 # Get the strategy for this pain point if available
-                strategy = strategy_map.get(pain_point_id)
+                strategy = strategy_map.get(actual_pain_point_id)
                 pain_point_desc = strategy.get("pain_point_description", "") if strategy else ""
                 
                 # Initialize pain point data structure
                 pain_point_data = {
-                    "pain_point_id": pain_point_id,
+                    "pain_point_id": actual_pain_point_id,
                     "pain_point_description": pain_point_desc,
                     "sources": {}
                 }
                 
+                # Helper to add content entries to a source, parsing JSON strings when present
+                def _extend_source(source_name: str, source_payload: Any) -> None:
+                    if source_name not in pain_point_data["sources"]:
+                        pain_point_data["sources"][source_name] = []
+                    if isinstance(source_payload, dict) and "content" in source_payload and isinstance(source_payload["content"], list):
+                        for entry in source_payload["content"]:
+                            if isinstance(entry, dict) and "text" in entry and isinstance(entry["text"], str):
+                                text = entry["text"]
+                                try:
+                                    parsed = json.loads(text)
+                                    # If parsed is a dict containing a list (threads, posts, web_results, reviews), flatten
+                                    flattened = None
+                                    for key in ("threads", "posts", "web_results", "reviews"):
+                                        if isinstance(parsed, dict) and key in parsed and isinstance(parsed[key], list):
+                                            flattened = parsed[key]
+                                            break
+                                    if flattened is not None:
+                                        pain_point_data["sources"][source_name].extend(flattened)
+                                    else:
+                                        pain_point_data["sources"][source_name].append(parsed)
+                                except Exception:
+                                    pain_point_data["sources"][source_name].append(entry)
+                            else:
+                                pain_point_data["sources"][source_name].append(entry)
+                    elif isinstance(source_payload, list):
+                        pain_point_data["sources"][source_name].extend(source_payload)
+                    elif isinstance(source_payload, dict):
+                        pain_point_data["sources"][source_name].append(source_payload)
+                
                 # Process each query for this pain point
-                for query_id, query_data in queries.items():
-                    self.logger.info(f"Processing query {query_id} for pain point {pain_point_id}")
-                    
-                    # Extract data from the query results
-                    if isinstance(query_data, dict) and "data" in query_data:
-                        # The data structure is different from what was expected
-                        # It's directly organized by source type (reddit, twitter, etc.)
-                        for source, source_data in query_data.get("data", {}).items():
-                            if source not in pain_point_data["sources"]:
-                                pain_point_data["sources"][source] = []
-                            
-                            # Extract content from the source data
-                            if isinstance(source_data, dict) and "content" in source_data:
-                                # Add entries from content
-                                pain_point_data["sources"][source].extend(source_data.get("content", []))
+                # queries should now be a dict like {q1: data, q2: data}
+                if isinstance(queries, dict):
+                    query_iter = queries.items()
+                elif isinstance(queries, list):
+                    # fabricate ids for list entries
+                    query_iter = [(f"q{idx+1}", q) for idx, q in enumerate(queries)]
+                else:
+                    query_iter = []
+                
+                for query_id, query_data in query_iter:
+                    # Extract raw_result from the tool output if present
+                    if isinstance(query_data, dict) and "raw_result" in query_data:
+                        raw_result = query_data["raw_result"]
+                        # Try to extract JSON from the raw result
+                        try:
+                            # Look for JSON at the end of the raw result string
+                            import re
+                            json_match = re.search(r'\{.*\}$', raw_result, re.DOTALL)
+                            if json_match:
+                                json_str = json_match.group()
+                                parsed_data = json.loads(json_str)
+                                # Transform to expected format with query_data
+                                query_data = parsed_data
+                            else:
+                                self.logger.warning(f"No JSON found in raw_result for {query_id}")
+                                continue
+                        except Exception as e:
+                            self.logger.warning(f"Failed to parse JSON from raw_result for {query_id}: {e}")
+                            continue
+                    try:
+                        self.logger.info(f"Processing query {query_id} for pain point {actual_pain_point_id}")
+                        if isinstance(query_data, dict):
+                            # Prefer nested data->sources
+                            if "data" in query_data and isinstance(query_data["data"], dict):
+                                for source, source_data in query_data["data"].items():
+                                    _extend_source(source, source_data)
+                            # Or direct sources
+                            elif "sources" in query_data and isinstance(query_data["sources"], dict):
+                                for source, source_data in query_data["sources"].items():
+                                    _extend_source(source, source_data)
+                            # Or aggregate form
+                            elif all(k in query_data for k in ("topic", "context", "keywords")) and "data" in query_data:
+                                data_block = query_data.get("data", {})
+                                if isinstance(data_block, dict):
+                                    for source, source_data in data_block.items():
+                                        _extend_source(source, source_data)
+                        elif isinstance(query_data, list):
+                            for entry in query_data:
+                                if isinstance(entry, dict):
+                                    if "data" in entry and isinstance(entry["data"], dict):
+                                        for source, source_data in entry["data"].items():
+                                            _extend_source(source, source_data)
+                                    elif "sources" in entry and isinstance(entry["sources"], dict):
+                                        for source, source_data in entry["sources"].items():
+                                            _extend_source(source, source_data)
+                    except Exception as _e:
+                        self.logger.warning(f"Skipping malformed query {query_id}: {_e}")
                 
                 # If we found data for this pain point, add it to results
                 if pain_point_data["sources"]:
-                    processed_results[pain_point_id] = pain_point_data
+                    processed_results[actual_pain_point_id] = pain_point_data
                 else:
                     # No data found for this pain point
-                    processed_results[pain_point_id] = {
-                        "pain_point_id": pain_point_id,
+                    processed_results[actual_pain_point_id] = {
+                        "pain_point_id": actual_pain_point_id,
                         "pain_point_description": pain_point_desc,
                         "error": "No research data found for this pain point",
                         "sources": {}
@@ -1604,25 +1812,28 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
                 # Create ManifestManager
                 manifest_manager = ManifestManager(manifest_path)
             
-            # Try to get data from validator_stage_name node
+            # Prefer stages section first (often richer than node output summaries)
             node_id = f"validator_{stage_name}"
-            stage_data = manifest_manager.get_node_output(node_id)
-            
-            if stage_data:
-                self.logger.info(f"Found {stage_name} stage data in manifest node: {node_id}")
-                return stage_data
-            
-            # Try to get data from stages section
             manifest = manifest_manager.get_manifest()
             if "stages" in manifest and node_id in manifest["stages"]:
-                stage_data = manifest["stages"][node_id]
-                if "data" in stage_data:
+                stage_entry = manifest["stages"][node_id]
+                if isinstance(stage_entry, dict) and "data" in stage_entry:
                     self.logger.info(f"Found {stage_name} stage data in manifest stages.{node_id}.data")
-                    return stage_data["data"]
-                else:
-                    # If there's no 'data' field, return the stage_data directly
-                    self.logger.info(f"Found {stage_name} stage data in manifest stages.{node_id}")
-                    return stage_data
+                    return stage_entry["data"]
+                self.logger.info(f"Found {stage_name} stage data in manifest stages.{node_id}")
+                return stage_entry
+
+            # Fallback: node output (may be only completion summary)
+            stage_data = manifest_manager.get_node_output(node_id)
+            if stage_data:
+                self.logger.info(f"Found {stage_name} stage data in manifest node: {node_id}")
+                # If node output looks like bookkeeping-only, try to fetch stages data anyway
+                if isinstance(stage_data, dict) and set(stage_data.keys()).issubset({"completed", "failed"}):
+                    stage_entry = manifest.get("stages", {}).get(node_id)
+                    if isinstance(stage_entry, dict) and "data" in stage_entry:
+                        self.logger.info(f"Node output is summary; using stages.{node_id}.data instead")
+                        return stage_entry["data"]
+                return stage_data
             
             self.logger.warning(f"No {stage_name} stage data found in manifest")
             return None
@@ -1630,6 +1841,93 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
         except Exception as e:
             self.logger.error(f"Error getting {stage_name} output: {e}")
             return None
+
+    def _extract_json_from_execution_output(self, raw_output: str) -> Dict[str, Any]:
+        """Extract JSON data from raw execution output containing debug logs + JSON.
+        
+        The execution output typically contains debug logs followed by the actual JSON result.
+        This method attempts to extract and parse the JSON portion.
+        """
+        try:
+            # Method 1: The Python script should print the JSON result at the end
+            # Look for the actual return value which is the last line after all debug logs
+            lines = raw_output.strip().split('\n')
+            
+            # Try to find a line that contains valid JSON (often the last line)
+            # With our fix, the complete JSON result should be printed as the last line
+            for line in reversed(lines):
+                line = line.strip()
+                if line and line.startswith('{') and line.endswith('}'):
+                    try:
+                        parsed_data = json.loads(line)
+                        if isinstance(parsed_data, dict):
+                            # Prioritize complete results with the data field
+                            if 'topic' in parsed_data and 'data' in parsed_data:
+                                self.logger.debug(f"Successfully extracted complete JSON result with data field")
+                                return parsed_data
+                            elif 'topic' in parsed_data:
+                                self.logger.debug(f"Successfully extracted JSON from line with keys: {list(parsed_data.keys())}")
+                                return parsed_data
+                            elif len(parsed_data) > 2:  # Any substantial result
+                                self.logger.debug(f"Successfully extracted JSON object with {len(parsed_data)} keys")
+                                return parsed_data
+                    except json.JSONDecodeError:
+                        continue
+            
+            # Method 2: Look for complete JSON object at the end of output
+            # Use a more robust pattern that handles nested structures
+            json_match = re.search(r'\{(?:[^{}]|{(?:[^{}]|{[^{}]*})*})*\}$', raw_output, re.DOTALL)
+            if json_match:
+                json_str = json_match.group()
+                try:
+                    parsed_data = json.loads(json_str)
+                    self.logger.debug(f"Successfully extracted JSON with keys: {list(parsed_data.keys()) if isinstance(parsed_data, dict) else 'not dict'}")
+                    return parsed_data
+                except json.JSONDecodeError as e:
+                    self.logger.warning(f"Found JSON-like text but failed to parse: {e}")
+            
+            # Method 3: Look for the last substantial JSON object in the output
+            # This pattern matches balanced braces more accurately
+            json_pattern = r'\{(?:[^{}]|{(?:[^{}]|{[^{}]*})*})*\}'
+            json_matches = re.findall(json_pattern, raw_output, re.DOTALL)
+            
+            # Try matches from the end, looking for ones with substantial content
+            for json_candidate in reversed(json_matches):
+                try:
+                    parsed_data = json.loads(json_candidate)
+                    if isinstance(parsed_data, dict):
+                        # Prefer results that have the expected comprehensive_research structure
+                        if 'topic' in parsed_data and 'data' in parsed_data:
+                            self.logger.debug(f"Found complete comprehensive_research result with data field")
+                            return parsed_data
+                        elif 'topic' in parsed_data:
+                            self.logger.debug(f"Found partial comprehensive_research result (missing data field)")
+                            return parsed_data
+                        elif len(parsed_data) > 3:  # Any substantial JSON object
+                            self.logger.debug(f"Found substantial JSON object with {len(parsed_data)} keys")
+                            return parsed_data
+                except json.JSONDecodeError:
+                    continue
+            
+            # Method 4: Try to extract from any line that looks like JSON
+            for line in lines:
+                line = line.strip()
+                if line.startswith('{') and line.endswith('}'):
+                    try:
+                        parsed_data = json.loads(line)
+                        if isinstance(parsed_data, dict) and len(parsed_data) > 1:
+                            self.logger.debug(f"Extracted JSON from individual line")
+                            return parsed_data
+                    except json.JSONDecodeError:
+                        continue
+            
+            # If no JSON found, return the raw output wrapped
+            self.logger.warning(f"No valid JSON found in execution output, storing raw result")
+            return {"raw_result": raw_output}
+            
+        except Exception as e:
+            self.logger.error(f"Error extracting JSON from execution output: {e}")
+            return {"raw_result": raw_output, "extraction_error": str(e)}
 
     def _load_prompt_template(self, template_name: str) -> str:
         """Load a prompt template from the prompts directory."""
