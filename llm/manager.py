@@ -4,6 +4,7 @@ LLM Manager for handling multiple backends and routing requests.
 
 import asyncio
 from typing import Dict, List, Optional, Any, Union
+import os
 from dataclasses import dataclass
 
 from .base import LLMBackend, LLMRequest, LLMResponse, LLMConfig, LLMBackendType, LLMError
@@ -464,12 +465,23 @@ async def initialize_llm_backends():
     # Initialize DeepSeek backend if API key is available
     if config.api.deepseek_api_key:
         try:
+            # Allow .env overrides for model and timeouts
+            ds_model = os.getenv("SCOUT_LLM_DEFAULT_MODEL", "deepseek-chat")
+            # Optional base URL override
+            ds_base = os.getenv("DEEPSEEK_API_BASE", None)
+            # Timeouts (seconds)
+            try:
+                ds_timeout = float(os.getenv("SCOUT_LLM_HTTP_TIMEOUT", "60"))
+            except Exception:
+                ds_timeout = 60.0
             deepseek_config = LLMConfig(
                 backend_type=LLMBackendType.DEEPSEEK,
-                model_name="deepseek-chat",
+                model_name=ds_model,
                 api_key=config.api.deepseek_api_key,
                 temperature=0.7,
-                max_tokens=4096
+                max_tokens=4096,
+                base_url=ds_base,
+                timeout=ds_timeout,
             )
             deepseek_backend = DeepSeekBackend(deepseek_config)
             await manager.register_backend(deepseek_backend)

@@ -418,6 +418,10 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
             else:
                 self.logger.info(f"Reddit data content: {str(reddit_data)[:200]}...")
             
+            # Initialize variables
+            threads = []
+            comments = []
+            
             # Extract threads and comments from the collected data
             # First, try to parse JSON strings from content field (MCP tool format)
             if "sources" in reddit_data and "reddit" in reddit_data["sources"]:
@@ -432,6 +436,9 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
                                 if "threads" in parsed_data:
                                     threads = parsed_data["threads"]
                                     self.logger.info(f"Parsed {len(threads)} threads from JSON content")
+                                if "comments" in parsed_data:
+                                    comments = parsed_data["comments"]
+                                    self.logger.info(f"Parsed {len(comments)} comments from JSON content")
                                 break
                             except json.JSONDecodeError as e:
                                 self.logger.warning(f"Failed to parse JSON from content: {e}")
@@ -835,6 +842,16 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
             
             # Fix common JSON issues
             content = content.replace(",}", "}").replace(",]", "]")
+            
+            # Check if content is empty or not JSON-like
+            if not content or not content.strip():
+                self.logger.warning("Empty content after extraction")
+                return fallback
+            
+            # Check if content looks like JSON (starts with { or [)
+            if not (content.strip().startswith(('{', '['))):
+                self.logger.warning(f"Content doesn't look like JSON: {content[:100]}...")
+                return fallback
             
             # Try to parse the JSON directly first
             try:
