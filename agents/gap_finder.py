@@ -7,7 +7,7 @@ based on validated pain points and market research.
 
 import asyncio
 import json
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Union
 from datetime import datetime
 from dataclasses import dataclass, asdict
 from pathlib import Path
@@ -146,16 +146,45 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                 error=str(e),
             )
     
-    async def plan(self, input_data: GapFinderInput, run_id: Optional[str] = None) -> Dict[str, Any]:
+    async def plan(self, input_data: Union[GapFinderInput, AgentInput], run_id: Optional[str] = None) -> Dict[str, Any]:
         """Plan the market gap analysis process."""
-        self.logger.info(f"Planning market gap analysis for {len(input_data.validated_pain_points)} pain points")
         
         # Store run_id in state if provided
         if run_id:
             self.state.run_id = run_id
         
+        # Convert AgentInput to GapFinderInput if needed
+        if isinstance(input_data, AgentInput):
+            # Extract all needed fields from AgentInput
+            ctx = input_data.context or {}
+            data = input_data.data or {}
+            validated_pain_points = []
+            
+            if isinstance(data, dict):
+                validated_pain_points = data.get("validated_pain_points") or data.get("pain_points") or []
+            elif isinstance(data, list):
+                # Assume the list itself contains pain points
+                validated_pain_points = data
+            
+            # Convert to proper GapFinderInput object for the rest of the method
+            input_data = GapFinderInput(
+                validated_pain_points=validated_pain_points,
+                market_context=data.get("market_context", "") if isinstance(data, dict) else ctx.get("market_context", ""),
+                analysis_scope=ctx.get("analysis_scope", "comprehensive"),
+                include_competitive_analysis=bool(ctx.get("include_competitive_analysis", True)),
+                include_market_sizing=bool(ctx.get("include_market_sizing", True)),
+                context=ctx,
+                metadata=input_data.metadata or {}
+            )
+            
+            self.logger.info(f"Converted AgentInput to GapFinderInput with {len(validated_pain_points)} pain points")
+            validated_pain_points = input_data.validated_pain_points
+        else:
+            # Already GapFinderInput
+            validated_pain_points = input_data.validated_pain_points
+            self.logger.info(f"Planning market gap analysis for {len(validated_pain_points)} pain points")
+        
         # Step 1: Retrieve data from validator act stage if not provided directly
-        validated_pain_points = input_data.validated_pain_points
         if not validated_pain_points:
             self.logger.info("No pain points provided directly, attempting to retrieve from manifest")
             try:
@@ -823,7 +852,7 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
             }
         }
     
-    async def think(self, input_data, run_id: str = None) -> Dict[str, Any]:
+    async def think(self, input_data: Union[GapFinderInput, AgentInput], run_id: str = None) -> Dict[str, Any]:
         """Analyze aggregate gap analysis data to prioritize opportunities and assess competitive positioning."""
         self.logger.info("Starting gap finder think stage...")
         
@@ -935,7 +964,7 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
             self.logger.error(f"Error in think stage: {e}")
             raise e
     
-    async def act(self, input_data: AgentInput, plan: Optional[Dict[str, Any]] = None, thoughts: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    async def act(self, input_data: Union[GapFinderInput, AgentInput], plan: Optional[Dict[str, Any]] = None, thoughts: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """Execute the act stage - generate SaaS business recommendations."""
         try:
             self.logger.info("Starting gap finder act stage...")
