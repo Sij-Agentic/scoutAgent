@@ -275,8 +275,8 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                     self.logger.warning(f"Could not extract text from pain point: {pain_point}")
                     continue
                 
-                # Default number of queries per category
-                n_queries = 1
+                # Default number of queries per category (align with template example)
+                n_queries = 3
                 
                 # Prepare substitutions for the discovery prompt
                 discovery_substitutions = {
@@ -291,13 +291,18 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                     substitutions=discovery_substitutions
                 )
                 
-                # Generate discovery queries using LLM
+                # Generate discovery queries using LLM with JSON-optimized parameters
                 discovery_response = await self.llm_generate(
                     prompt=discovery_prompt,
-                    task_type="discovery"
+                    task_type="discovery",
+                    temperature=0.1,  # Low temperature for structured JSON output
+                    max_tokens=1000   # Sufficient tokens for 5-category JSON structure
                 )
                 
                 # Extract JSON from LLM response
+                self.logger.info(f"Discovery response for pain point {i+1} (length: {len(discovery_response)})")
+                self.logger.debug(f"Raw discovery response: {discovery_response[:500]}...")
+                
                 queries = self._extract_json(discovery_response)
                 
                 if queries:
@@ -305,6 +310,18 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                     self.logger.info(f"Generated discovery queries for pain point {i+1} in {len(queries)} categories")
                 else:
                     self.logger.warning(f"Failed to generate discovery queries for pain point {i+1}")
+                    # Try to generate fallback queries based on pain point keywords
+                    fallback_queries = self._generate_fallback_discovery_queries(pain_point_text)
+                    if fallback_queries:
+                        discovery_queries[pain_point_text] = fallback_queries
+                        self.logger.info(f"Generated fallback discovery queries for pain point {i+1}")
+                    else:
+                        # Store the error information for debugging
+                        discovery_queries[pain_point_text] = {
+                            "error": f"Failed to parse JSON from LLM response",
+                            "response_preview": discovery_response[:200] if discovery_response else "No response",
+                            "response_length": len(discovery_response) if discovery_response else 0
+                        }
         except Exception as e:
             self.logger.error(f"Error generating discovery queries: {str(e)}")
         
@@ -335,13 +352,40 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
         # Log the input for debugging
         self.logger.debug(f"Extracting JSON from text (first 200 chars): {text[:200]}...")
         
-        # Strategy 1: Direct JSON parsing
+        # Clean text first (remove common LLM response prefixes/suffixes)
+        cleaned_text = text.strip()
+        
+        # Remove common LLM response prefixes
+        prefixes_to_remove = [
+            "Here's the JSON:", "Here is the JSON:", "JSON output:", "The JSON is:",
+            "Based on the pain point, here are the discovery queries:",
+            "```json", "```", "Here are the queries:", "The queries are:",
+            "The discovery queries are:", "Discovery queries:"
+        ]
+        for prefix in prefixes_to_remove:
+            if cleaned_text.lower().startswith(prefix.lower()):
+                cleaned_text = cleaned_text[len(prefix):].strip()
+        
+        # Remove common suffixes
+        suffixes_to_remove = ["```", "```json"]
+        for suffix in suffixes_to_remove:
+            if cleaned_text.lower().endswith(suffix.lower()):
+                cleaned_text = cleaned_text[:-len(suffix)].strip()
+        
+        # Strategy 1: Direct JSON parsing (on cleaned text)
         try:
-            result = json.loads(text.strip())
-            self.logger.debug("Successfully parsed JSON directly")
+            result = json.loads(cleaned_text)
+            self.logger.debug("Successfully parsed cleaned JSON directly")
             return result
         except json.JSONDecodeError as e:
-            self.logger.debug(f"Direct JSON parsing failed: {e}")
+            self.logger.debug(f"Direct JSON parsing failed on cleaned text: {e}")
+            # Try original text as fallback
+            try:
+                result = json.loads(text.strip())
+                self.logger.debug("Successfully parsed original JSON directly")
+                return result
+            except json.JSONDecodeError as e2:
+                self.logger.debug(f"Direct JSON parsing failed on original text: {e2}")
         
         # Strategy 2: Extract from markdown code blocks
         code_block_patterns = [
@@ -374,7 +418,9 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                     result = json.loads(cleaned)
                     self.logger.debug(f"Successfully parsed JSON after cleaning: {pattern}")
                     return result
-                except json.JSONDecodeError:
+                except json.JSONDecodeError as e:
+                    self.logger.debug(f"JSON cleaning failed for pattern {pattern}: {e}")
+                    self.logger.debug(f"Cleaned text that failed: {cleaned[:200]}...")
                     continue
         
         # Strategy 4: Try to extract key-value pairs and reconstruct JSON
@@ -386,25 +432,35 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
         except Exception as e:
             self.logger.debug(f"JSON reconstruction failed: {e}")
         
-        self.logger.warning(f"Failed to extract valid JSON from text. Text preview: {text[:100]}...")
+        self.logger.warning(f"Failed to extract valid JSON from text. Text preview: {text[:200]}...")
+        self.logger.debug(f"Full text that failed JSON extraction: {text}")
         return {}
     
     def _clean_json_string(self, json_str: str) -> str:
         """Clean common JSON formatting issues."""
         import re
         
-        # Remove extra whitespace
-        cleaned = re.sub(r'\s+', ' ', json_str.strip())
+        # Remove extra whitespace but preserve structure
+        cleaned = json_str.strip()
         
-        # Fix trailing commas
+        # Fix trailing commas before } or ]
         cleaned = re.sub(r',\s*([}\]])', r'\1', cleaned)
         
         # Fix missing quotes around keys (common LLM mistake)
         cleaned = re.sub(r'([{,]\s*)([a-zA-Z_][a-zA-Z0-9_]*)\s*:', r'\1"\2":', cleaned)
         
-        # Fix single quotes to double quotes
+        # Fix single quotes to double quotes for keys
         cleaned = re.sub(r"'([^']*)'\s*:", r'"\1":', cleaned)
+        
+        # Fix single quotes to double quotes for values
         cleaned = re.sub(r":\s*'([^']*)'", r': "\1"', cleaned)
+        
+        # Fix array formatting (ensure proper spacing)
+        cleaned = re.sub(r'\[\s*([^\[\]]*?)\s*\]', lambda m: '[' + ', '.join(f'"{item.strip()}"' if not item.strip().startswith('"') else item.strip() for item in m.group(1).split(',') if item.strip()) + ']', cleaned)
+        
+        # Ensure proper spacing around colons and commas
+        cleaned = re.sub(r'\s*:\s*', ': ', cleaned)
+        cleaned = re.sub(r'\s*,\s*', ', ', cleaned)
         
         return cleaned
     
@@ -434,6 +490,48 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                     result[key] = value
         
         return result if result else None
+    
+    def _generate_fallback_discovery_queries(self, pain_point_text: str) -> Dict[str, List[str]]:
+        """Generate fallback discovery queries when LLM fails to produce valid JSON."""
+        import re
+        
+        # Extract key terms from pain point
+        words = re.findall(r'\b[a-zA-Z]{3,}\b', pain_point_text.lower())
+        key_terms = [word for word in words if word not in {'that', 'this', 'with', 'from', 'have', 'they', 'their', 'them', 'than', 'when', 'where', 'what', 'which', 'would', 'could', 'should'}]
+        
+        if len(key_terms) < 2:
+            return {}
+        
+        # Generate simple queries based on the pain point structure
+        primary_terms = key_terms[:3]  # Take first 3 relevant terms
+        
+        return {
+            "category_level": [
+                f"{primary_terms[0]} {primary_terms[1]} tools",
+                f"best {primary_terms[0]} solutions 2025", 
+                f"AI {primary_terms[0]} SaaS"
+            ],
+            "problem_focused": [
+                f"solutions for {primary_terms[0]} {primary_terms[1]}",
+                f"tools to fix {primary_terms[0]}",
+                f"how to solve {primary_terms[0]} problems"
+            ],
+            "alternatives_comparisons": [
+                f"alternatives to {primary_terms[0]} tools",
+                f"best {primary_terms[0]} comparison",
+                f"top {primary_terms[0]} competitors"
+            ],
+            "review_sites": [
+                f"site:g2.com {primary_terms[0]}",
+                f"site:capterra.com {primary_terms[0]} {primary_terms[1]}",
+                f"site:producthunt.com {primary_terms[0]}"
+            ],
+            "trend_recency": [
+                f"new {primary_terms[0]} startups 2025",
+                f"{primary_terms[0]} startup site:techcrunch.com",
+                f"innovative {primary_terms[0]} solutions"
+            ]
+        }
     
     def _generate_dag_metadata(self, validated_pain_points: List[Dict[str, Any]], discovery_queries: Dict[str, Any]) -> Dict[str, Any]:
         """Generate DAG metadata for gap finder stages with proper dependencies and parallelization."""
@@ -1623,14 +1721,14 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
         except Exception as e:
             self.logger.error(f"Error shutting down MCP client: {e}")
     
-    async def _execute_tool_with_retry(self, multi_client, tool_name: str, inputs: Dict[str, Any], node_id: str, max_retries: int = 3, timeout_seconds: int = 300):
+    async def _execute_tool_with_retry(self, multi_client, tool_name: str, inputs: Dict[str, Any], node_id: str, max_retries: int = 5, timeout_seconds: int = 900):
         """Execute tool with timeout and retry logic."""
         import asyncio
         from httpx import ReadTimeout, ConnectTimeout
         
         # Use longer timeout for vendor research operations
         if "vendor_research" in tool_name.lower():
-            timeout_seconds = 3600  # 1 hour for vendor research
+            timeout_seconds = 7200  # 2 hours for vendor research (increased for production)
             self.logger.info(f"Using extended timeout of {timeout_seconds}s for vendor research tool: {tool_name}")
         
         for attempt in range(max_retries):

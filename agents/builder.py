@@ -7,7 +7,7 @@ focusing on building viable SaaS businesses rather than just technical implement
 
 import json
 import re
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Union
 from datetime import datetime
 from pathlib import Path
 
@@ -23,6 +23,23 @@ class BuilderInput:
         self.gap_finder_output = gap_finder_output
         self.market_context = market_context
         self.analysis_scope = analysis_scope
+    
+    @classmethod
+    def from_agent_input(cls, agent_input: AgentInput):
+        """Create BuilderInput from standard AgentInput."""
+        # Extract gap finder output from data field
+        gap_finder_output = agent_input.data if agent_input.data else {}
+        
+        # Extract context fields
+        context = agent_input.context or {}
+        market_context = context.get("market_context", "") or context.get("target_market", "")
+        analysis_scope = context.get("analysis_scope", "focused")
+        
+        return cls(
+            gap_finder_output=gap_finder_output,
+            market_context=market_context,
+            analysis_scope=analysis_scope
+        )
 
 
 class BuilderAgent(BaseAgent, LLMAgentMixin):
@@ -141,10 +158,15 @@ class BuilderAgent(BaseAgent, LLMAgentMixin):
         """Plan phase is not used in BuilderAgent."""
         return {"status": "skipped", "reason": "BuilderAgent uses only think and act phases"}
     
-    async def think(self, input_data: BuilderInput) -> Dict[str, Any]:
+    async def think(self, input_data: Union[BuilderInput, AgentInput]) -> Dict[str, Any]:
         """Analyze market gaps to design business solutions."""
         try:
             self.logger.info("Starting builder think stage...")
+            
+            # Convert AgentInput to BuilderInput if needed
+            if isinstance(input_data, AgentInput):
+                input_data = BuilderInput.from_agent_input(input_data)
+                self.logger.info("Converted AgentInput to BuilderInput for think stage")
             
             # Initialize manifest manager
             run_id = getattr(self.state, 'run_id', None)
@@ -207,10 +229,15 @@ class BuilderAgent(BaseAgent, LLMAgentMixin):
             self.logger.error(f"Error in think stage: {e}")
             return {"error": f"Think stage failed: {str(e)}"}
     
-    async def act(self, input_data: BuilderInput, think_result: Dict[str, Any] = None) -> Dict[str, Any]:
+    async def act(self, input_data: Union[BuilderInput, AgentInput], think_result: Dict[str, Any] = None) -> Dict[str, Any]:
         """Create comprehensive business solutions and go-to-market strategies."""
         try:
             self.logger.info("Starting builder act stage...")
+            
+            # Convert AgentInput to BuilderInput if needed
+            if isinstance(input_data, AgentInput):
+                input_data = BuilderInput.from_agent_input(input_data)
+                self.logger.info("Converted AgentInput to BuilderInput for act stage")
             
             # Initialize manifest manager
             run_id = getattr(self.state, 'run_id', None)

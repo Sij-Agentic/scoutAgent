@@ -416,18 +416,18 @@ class VendorIdentifier:
             )
             loop = asyncio.get_event_loop()
             
-            logger.info(f"[VENDOR_IDENTIFIER] Sending request to LLM with 30s timeout")
+            logger.info(f"[VENDOR_IDENTIFIER] Sending request to LLM with 120s timeout")
             # Add timeout to prevent indefinite waiting
             try:
                 task = loop.create_task(self.llm_manager.generate(llm_request))
-                response_obj = await asyncio.wait_for(task, timeout=30.0)  # 30 second timeout
+                response_obj = await asyncio.wait_for(task, timeout=120.0)  # 2 minute timeout for production
                 response = response_obj.content if response_obj.success else ""
                 logger.info(f"[VENDOR_IDENTIFIER] LLM request completed successfully")
                 logger.debug(f"[VENDOR_IDENTIFIER] Response length: {len(response)} chars")
                 logger.debug(f"[VENDOR_IDENTIFIER] Response preview: {response[:300]}...")
             except asyncio.TimeoutError:
                 logger.error(f"[VENDOR_IDENTIFIER] LLM request timed out for URL: {url}")
-                return {"success": False, "error": "LLM request timed out after 30 seconds"}
+                return {"success": False, "error": "LLM request timed out after 120 seconds"}
             
             if not response_obj.success:
                 error_msg = response_obj.error if hasattr(response_obj, 'error') else 'Unknown error'
@@ -804,7 +804,7 @@ async def vendor_research_batch(
     # TEMPORARY: Limit to 2 vendors to reduce costs during testing
     if len(vendors_list) > 2:
         logger.info(f"[VENDOR_RESEARCH_BATCH] COST LIMITING: Reducing {len(vendors_list)} vendors to 2 for cost control during testing")
-        vendors_list = vendors_list[:10]
+        vendors_list = vendors_list[:3]
         logger.info(f"[VENDOR_RESEARCH_BATCH] Limited vendor list: {vendors_list}")
     
     # Initialize Vendor Research Tool
@@ -927,15 +927,16 @@ async def vendor_research_batch(
     return final_result
 
 
-async def _execute_vendor_research_with_retry(research_tool, tool_input: Dict[str, Any], vendor_name: str, vendor_index: int, max_retries: int = 3, timeout_seconds: int = 480*4):
+async def _execute_vendor_research_with_retry(research_tool, tool_input: Dict[str, Any], vendor_name: str, vendor_index: int, max_retries: int = 5, timeout_seconds: int = 1800):
     """Execute vendor research with enhanced timeout and retry logic.
     
-    Increased timeout from 240s to 480s (8 minutes) to accommodate:
+    Increased timeout to 1800s (30 minutes) for production to accommodate:
     - Web scraping operations (10-30s)
-    - LLM analysis calls (30-90s)
+    - LLM analysis calls (30-120s for large data)
     - Review searches (20-60s)
     - Network latency and retries
     - Complex vendor analysis requiring multiple API calls
+    - Writer stage comprehensive data processing
     """
     import asyncio
     from httpx import ReadTimeout, ConnectTimeout

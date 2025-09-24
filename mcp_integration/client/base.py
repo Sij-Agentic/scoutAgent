@@ -19,7 +19,7 @@ class MCPClient:
     - Handles connection drops and automatic reconnection.
     """
 
-    def __init__(self, server_url: str, max_retries: int = 3, connection_timeout: int = 30, sse_read_timeout: int = 300):
+    def __init__(self, server_url: str, max_retries: int = 5, connection_timeout: int = 120, sse_read_timeout: int = 1800):
         self.server_url = server_url
         self.max_retries = max_retries
         self.connection_timeout = connection_timeout
