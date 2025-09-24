@@ -30,9 +30,9 @@ class LLMConfig:
     base_url: Optional[str] = None
     temperature: float = 0.7
     max_tokens: int = 4096
-    timeout: int = 300  # Increased to 5 minutes to handle larger data payloads
-    retry_attempts: int = 3
-    retry_delay: float = 1.0
+    timeout: int = 600  # Increased to 10 minutes for production (writer stage needs more time)
+    retry_attempts: int = 5
+    retry_delay: float = 2.0
     extra_params: Dict[str, Any] = field(default_factory=dict)
 
 

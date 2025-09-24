@@ -10,11 +10,11 @@ import logging
 import re
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from ..llm.utils import LLMAgentMixin
 from ..memory.manifest_manager import ManifestManager
-from .base import BaseAgent
+from .base import BaseAgent, AgentInput
 
 
 class WriterInput:
@@ -35,6 +35,31 @@ class WriterInput:
         self.validator_output = validator_output
         self.report_style = report_style
         self.include_animations = include_animations
+    
+    @classmethod
+    def from_agent_input(cls, agent_input):
+        """Create WriterInput from standard AgentInput."""
+        # Extract builder output from data field
+        builder_output = agent_input.data if agent_input.data else {}
+        
+        # Extract context fields
+        context = agent_input.context or {}
+        gap_finder_output = context.get("gap_finder_output", {})
+        scout_output = context.get("scout_output", {})
+        screener_output = context.get("screener_output", {})
+        validator_output = context.get("validator_output", {})
+        report_style = context.get("report_style", "professional")
+        include_animations = context.get("include_animations", True)
+        
+        return cls(
+            builder_output=builder_output,
+            gap_finder_output=gap_finder_output,
+            scout_output=scout_output,
+            screener_output=screener_output,
+            validator_output=validator_output,
+            report_style=report_style,
+            include_animations=include_animations
+        )
 
 
 class WriterAgent(BaseAgent, LLMAgentMixin):
@@ -57,10 +82,15 @@ class WriterAgent(BaseAgent, LLMAgentMixin):
         """Plan phase is not used in WriterAgent."""
         return {"status": "skipped", "reason": "WriterAgent uses only think and act phases"}
     
-    async def think(self, input_data: WriterInput) -> Dict[str, Any]:
+    async def think(self, input_data: Union[WriterInput, AgentInput]) -> Dict[str, Any]:
         """Analyze all agent outputs and plan comprehensive HTML report structure."""
         try:
             self.logger.info("Starting writer think stage...")
+            
+            # Convert AgentInput to WriterInput if needed
+            if isinstance(input_data, AgentInput):
+                input_data = WriterInput.from_agent_input(input_data)
+                self.logger.info("Converted AgentInput to WriterInput for think stage")
             
             # Get run_id and initialize manifest manager
             run_id = getattr(self.state, 'run_id', None)
@@ -125,10 +155,15 @@ class WriterAgent(BaseAgent, LLMAgentMixin):
             self.logger.error(f"Error in think stage: {e}")
             return {"error": f"Think stage failed: {str(e)}"}
     
-    async def act(self, input_data: WriterInput, think_result: Dict[str, Any] = None) -> Dict[str, Any]:
+    async def act(self, input_data: Union[WriterInput, AgentInput], think_result: Dict[str, Any] = None) -> Dict[str, Any]:
         """Generate comprehensive HTML report with animations and interactive elements."""
         try:
             self.logger.info("Starting writer act stage...")
+            
+            # Convert AgentInput to WriterInput if needed
+            if isinstance(input_data, AgentInput):
+                input_data = WriterInput.from_agent_input(input_data)
+                self.logger.info("Converted AgentInput to WriterInput for act stage")
             
             # Get run_id and initialize manifest manager
             run_id = getattr(self.state, 'run_id', None)

@@ -471,9 +471,9 @@ async def initialize_llm_backends():
             ds_base = os.getenv("DEEPSEEK_API_BASE", None)
             # Timeouts (seconds)
             try:
-                ds_timeout = float(os.getenv("SCOUT_LLM_HTTP_TIMEOUT", "60"))
+                ds_timeout = float(os.getenv("SCOUT_LLM_HTTP_TIMEOUT", "600"))
             except Exception:
-                ds_timeout = 60.0
+                ds_timeout = 600.0
             deepseek_config = LLMConfig(
                 backend_type=LLMBackendType.DEEPSEEK,
                 model_name=ds_model,

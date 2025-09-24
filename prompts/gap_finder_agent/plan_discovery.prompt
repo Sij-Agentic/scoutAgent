@@ -1,7 +1,7 @@
 Given a validated pain point description: 
 "{{pain_point_description}}"
 
-Your task is to generate {{n_queries}} web search queries for each category to discover existing tools, companies, and competitors that claim to solve this pain point. These queries will be used to find "Who is solving it now, what do they offer, and where are the gaps?"
+Your task is to generate exactly {{n_queries}} web search queries for each of the 5 categories below to discover existing tools, companies, and competitors that claim to solve this pain point. These queries will be used to find "Who is solving it now, what do they offer, and where are the gaps?"
 
 Organize the queries into 5 strategic categories:
 
@@ -25,7 +25,7 @@ Organize the queries into 5 strategic categories:
    - Purpose: Identify emerging solutions and innovation directions
    - Format: "new {domain} startups 2025", "AI {domain} SaaS launched", "{keyword} site:techcrunch.com", "innovative {solution} startups"
 
-Return the queries grouped by category in JSON format. Ensure each query is specific, targeted, and likely to return relevant results about companies and products addressing this pain point:
+Return ONLY the queries grouped by category in valid JSON format (no additional text before or after). Ensure each query is specific, targeted, and likely to return relevant results about companies and products addressing this pain point:
 
 {
   "category_level": [...],
@@ -43,13 +43,10 @@ Important guidelines for query generation:
 5. Ensure queries will return actual companies/products, not just educational content
 
 
-sample pain point
-n_queries - 3
-“Inadequate testing practices with developers neglecting tests and focusing on implementation validation.”
+EXAMPLE (with n_queries = 3):
+Pain point: "Inadequate testing practices with developers neglecting tests and focusing on implementation validation."
 
-
-
-sample output 
+Expected JSON output: 
 {
   "category_level": [
     "AI test generation tools",
