@@ -211,8 +211,33 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
             self.logger.info(f"DEBUG: _extract_json returned type: {type(plan)}")
             if isinstance(plan, dict):
                 self.logger.info(f"DEBUG: Plan keys: {list(plan.keys())}")
+                # Check if DAG structure is valid
+                dag = plan.get("dag", {})
+                if isinstance(dag, dict):
+                    nodes = dag.get("nodes", [])
+                    self.logger.info(f"DEBUG: DAG has {len(nodes)} nodes")
+                    if nodes:
+                        self.logger.info(f"DEBUG: First node keys: {list(nodes[0].keys()) if nodes[0] else 'empty'}")
+                else:
+                    self.logger.error(f"DEBUG: DAG is not a dict, type: {type(dag)}")
             else:
                 self.logger.error(f"DEBUG: Plan content (first 200 chars): {str(plan)[:200]}")
+            
+            # Debug: Log raw LLM response length and save for analysis
+            self.logger.info(f"DEBUG: Raw LLM response length: {len(llm_text) if llm_text else 0}")
+            
+            # Debug: Save raw LLM response for debugging
+            try:
+                debug_dir = Path("debug")
+                debug_dir.mkdir(exist_ok=True)
+                debug_file = debug_dir / f"scout_plan_llm_response_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+                with open(debug_file, "w", encoding="utf-8") as f:
+                    f.write(f"LLM Response Length: {len(llm_text)}\n")
+                    f.write("="*50 + "\n")
+                    f.write(llm_text or "NO RESPONSE")
+                self.logger.info(f"DEBUG: Saved raw LLM response to {debug_file}")
+            except Exception as debug_err:
+                self.logger.warning(f"Failed to save debug LLM response: {debug_err}")
             
             # Safety check - ensure plan is a dictionary
             if not isinstance(plan, dict):
@@ -887,6 +912,33 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
             
             # Fix common JSON issues
             content = content.replace(",}", "}").replace(",]", "]")
+            
+            # CONSERVATIVE JSON fixes - only apply if JSON parsing fails
+            import re
+            
+            # First, try parsing without any fixes
+            try:
+                test_parse = json.loads(content)
+                # If parsing succeeds, don't apply any fixes!
+                self.logger.debug("JSON is already valid, skipping fixes")
+            except json.JSONDecodeError:
+                # Only apply fixes if JSON parsing fails
+                self.logger.debug("JSON parsing failed, applying conservative fixes")
+                
+                # Only fix obvious escape sequence issues, nothing else
+                def conservative_json_fixes(text):
+                    # Only fix clearly broken escape patterns
+                    # Pattern: "word\\" -> "word" (only if it's clearly wrong)
+                    text = re.sub(r'"([^"]*?)\\+"(\s*[,\]}])', r'"\1"\2', text)
+                    
+                    # Fix standalone escaped quotes that are clearly wrong
+                    text = re.sub(r'(?<!\\)\\"(?![\\"])', '"', text)
+                    
+                    return text
+                
+                content = conservative_json_fixes(content)
+            
+            self.logger.debug("Applied JSON escape sequence fixes")
             
             # Check if content is empty or not JSON-like
             if not content or not content.strip():
