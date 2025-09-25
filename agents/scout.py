@@ -272,7 +272,12 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
             stages = manifest.setdefault("stages", {})
             
             # Clean up the plan data to fix JSON string issues
-            cleaned_plan = self._clean_plan_data(plan)
+            try:
+                cleaned_plan = self._clean_plan_data(plan)
+                self.logger.debug("Successfully cleaned plan data")
+            except Exception as clean_err:
+                self.logger.warning(f"Plan cleaning failed: {clean_err}, using original plan")
+                cleaned_plan = plan
             
             stages["scout_plan"] = {
                 "data": cleaned_plan,
@@ -295,17 +300,30 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
         def clean_value(value):
             """Recursively clean values that might be JSON strings."""
             if isinstance(value, str):
-                # Check if this looks like a JSON string that should be parsed
+                # Be more conservative - only try to parse if it's obviously JSON
                 stripped = value.strip()
-                if (stripped.startswith('[') and stripped.endswith(']')) or \
-                   (stripped.startswith('{') and stripped.endswith('}')):
-                    try:
-                        # Try to parse as JSON
-                        parsed = json.loads(stripped)
-                        return parsed
-                    except json.JSONDecodeError:
-                        # If parsing fails, return the original string
-                        return value
+                
+                # Only parse if it looks like complete JSON and has matching brackets
+                if ((stripped.startswith('[') and stripped.endswith(']')) or \
+                   (stripped.startswith('{') and stripped.endswith('}'))):
+                    
+                    # Additional validation - check if brackets are balanced
+                    if stripped.startswith('['):
+                        open_count = stripped.count('[')
+                        close_count = stripped.count(']')
+                    else:
+                        open_count = stripped.count('{')
+                        close_count = stripped.count('}')
+                    
+                    if open_count == close_count and len(stripped) > 2:
+                        try:
+                            # Try to parse as JSON
+                            parsed = json.loads(stripped)
+                            return parsed
+                        except json.JSONDecodeError:
+                            # If parsing fails, return the original string
+                            return value
+                
                 return value
             elif isinstance(value, dict):
                 # Recursively clean dictionary values
@@ -490,9 +508,10 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
             
             # Add the Reddit data to the prompt using a chunked approach to avoid timeouts
             # Limit the data to avoid exceeding token limits
-            max_threads = 5  # Reduced from 10 to process in smaller batches
-            max_comments_per_thread = 10  # Reduced from 20 to limit data size
-            max_threads_total = min(20, len(threads))  # Process up to 20 threads total
+            # TEMPORARY: Moderate cost limiting for testing
+            max_threads = 3  # MODERATE LIMITING: Increase from 2 to 3 threads per batch
+            max_comments_per_thread = 8  # MODERATE LIMITING: Increase from 5 to 8 comments
+            max_threads_total = min(6, len(threads))  # MODERATE LIMITING: Increase from 3 to 6 threads total
             
             # Prepare threads for processing
             all_threads = threads[:max_threads_total]
@@ -826,11 +845,37 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
         try:
             # Extract from markdown code blocks with priority
             if "```json" in text:
-                # Extract content between ```json and ```
-                content = text.split("```json")[1].split("```")[0].strip()
+                # Extract content between ```json and ``` - find proper pair
+                start_marker = text.find("```json")
+                if start_marker != -1:
+                    # Start after ```json and optional newline
+                    start_content = start_marker + 7  # len("```json")
+                    if text[start_content:start_content+1] == "\n":
+                        start_content += 1
+                    
+                    # Find the closing ```
+                    end_marker = text.find("```", start_content)
+                    if end_marker != -1:
+                        content = text[start_content:end_marker].strip()
+                    else:
+                        content = text[start_content:].strip()
             elif "```" in text:
-                # Extract content between ``` and ```
-                content = text.split("```")[1].split("```")[0].strip()
+                # Extract content between ``` and ``` - find proper pair
+                start_marker = text.find("```")
+                if start_marker != -1:
+                    # Find the first newline after ```
+                    start_content = text.find("\n", start_marker)
+                    if start_content == -1:
+                        start_content = start_marker + 3
+                    else:
+                        start_content += 1
+                    
+                    # Find the closing ```
+                    end_marker = text.find("```", start_content)
+                    if end_marker != -1:
+                        content = text[start_content:end_marker].strip()
+                    else:
+                        content = text[start_content:].strip()
             else:
                 # Try to extract JSON directly - find the first { and the last }
                 start = text.find('{')

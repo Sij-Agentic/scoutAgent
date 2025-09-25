@@ -1417,8 +1417,8 @@ class ValidatorAgent(BaseAgent, LLMAgentMixin):
                     context=pain_point_desc,  # Use description as context too
                     keywords=keywords,
                     sources=data_sources,
-                    depth="medium",
-                    max_results_per_source=10
+                    depth="basic",  # COST LIMITING: Reduce from "medium" to "basic"
+                    max_results_per_source=5  # COST LIMITING: Reduce from 10 to 5
                 )
                 
                 # Extract content from response

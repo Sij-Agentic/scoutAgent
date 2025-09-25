@@ -148,7 +148,22 @@ async def run_orchestrated_workflow(
         else:
             logger.info(f"Workflow completed with results type: {type(results)}")
         
-        # Return the results
+        # Convert ExecutionState to dictionary if needed
+        if hasattr(results, '__dict__'):
+            # If it's an ExecutionState object, convert to dict
+            if hasattr(results, 'status') and hasattr(results, 'duration'):
+                results_dict = {
+                    "run_id": run_id,
+                    "status": getattr(results, 'status', 'completed'),
+                    "execution_time": getattr(results, 'duration', 0),
+                    "completed_nodes": getattr(results, 'completed_nodes', 0),
+                    "failed_nodes": getattr(results, 'failed_nodes', 0),
+                    "total_nodes": getattr(results, 'total_nodes', 0),
+                    "progress": getattr(results, 'progress', 0.0)
+                }
+                return results_dict
+        
+        # Return the results (should already be a dict from AgentOrchestrator)
         return results
     except Exception as e:
         logger.error(f"Error executing workflow: {str(e)}", exc_info=True)

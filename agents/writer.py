@@ -200,8 +200,17 @@ class WriterAgent(BaseAgent, LLMAgentMixin):
                 self.logger.error("Failed to load act stage prompt")
                 return {"error": "Failed to load act stage prompt"}
             
+            # Clean synthesis data for JSON serialization
+            cleaned_synthesis_data = self._clean_data_for_serialization(synthesis_data)
+            
+
             # Append the synthesis data to the prompt
-            prompt_content += f"\n\nData to Generate Report From:\n{json.dumps(synthesis_data, indent=2)}"
+            try:
+                prompt_content += f"\n\nData to Generate Report From:\n{json.dumps(cleaned_synthesis_data, indent=2)}"
+            except TypeError as e:
+                self.logger.error(f"Failed to serialize synthesis data: {e}")
+                # Use a simplified version if serialization fails
+                prompt_content += f"\n\nData to Generate Report From:\n(Serialization failed: {str(e)})"
             
             # Generate HTML report using LLM mixin
             html_result = await self.llm_generate(prompt=prompt_content, task_type="act_development")
@@ -214,8 +223,11 @@ class WriterAgent(BaseAgent, LLMAgentMixin):
                 # Extract HTML content from markdown code blocks if present
                 html_content = self._extract_html_from_response(html_result)
                 
+                # Clean synthesis data before passing to report generation
+                cleaned_synthesis_data = self._clean_data_for_serialization(synthesis_data)
+                
                 # Generate comprehensive report files (HTML, CSS, JS)
-                report_metadata = self._generate_comprehensive_report(html_content, run_id, synthesis_data)
+                report_metadata = self._generate_comprehensive_report(html_content, run_id, cleaned_synthesis_data)
                 
                 # Create final result structure
                 final_result = {
@@ -373,33 +385,106 @@ class WriterAgent(BaseAgent, LLMAgentMixin):
     def _extract_html_from_response(self, response: str) -> str:
         """Extract HTML content from LLM response, handling markdown code blocks."""
         try:
-            # Look for HTML in markdown code blocks
             import re
-            html_pattern = r'```(?:html)?\s*\n?(.*?)\n?```'
-            match = re.search(html_pattern, response, re.DOTALL)
             
-            if match:
-                html_content = match.group(1).strip()
-                self.logger.info("Extracted HTML from markdown code block")
-                return html_content
-            else:
-                # Check if the response is already HTML
-                if response.strip().startswith('<!DOCTYPE html>') or response.strip().startswith('<html'):
-                    self.logger.info("Response is already HTML format")
-                    return response.strip()
-                else:
-                    # Try to find HTML content in the response
-                    html_match = re.search(r'<html.*?</html>', response, re.DOTALL | re.IGNORECASE)
-                    if html_match:
-                        self.logger.info("Found HTML content in response")
-                        return html_match.group(0)
-                    else:
-                        self.logger.warning("No HTML content found in response, using raw response")
-                        return response
+            # Strategy 1: Look for HTML in markdown code blocks (most common)
+            html_patterns = [
+                r'```html\s*\n(.*?)\n```',  # ```html ... ```
+                r'```(?:html)?\s*\n?(.*?)\n?```',  # ```html or ``` ... ```
+                r'```\s*\n?<!DOCTYPE html>(.*?)```',  # ``` with DOCTYPE
+                r'```\s*\n?<html[^>]*>(.*?)</html>\s*```',  # ``` with <html>
+            ]
+            
+            for pattern in html_patterns:
+                match = re.search(pattern, response, re.DOTALL | re.IGNORECASE)
+                if match:
+                    html_content = match.group(1).strip()
+                    if html_content and ('<html' in html_content or '<!DOCTYPE' in html_content):
+                        self.logger.info(f"Extracted HTML from markdown code block using pattern: {pattern[:30]}...")
+                        return html_content
+            
+            # Strategy 2: Check if the response is already HTML
+            if response.strip().startswith('<!DOCTYPE html>') or response.strip().startswith('<html'):
+                self.logger.info("Response is already HTML format")
+                return response.strip()
+            
+            # Strategy 3: Try to find HTML document in the response (more flexible)
+            html_patterns_loose = [
+                r'(<!DOCTYPE html.*?</html>)',  # Full HTML document
+                r'(<html[^>]*>.*?</html>)',     # HTML with attributes
+                r'(<html>.*?</html>)',          # Simple HTML tags
+            ]
+            
+            for pattern in html_patterns_loose:
+                html_match = re.search(pattern, response, re.DOTALL | re.IGNORECASE)
+                if html_match:
+                    self.logger.info("Found HTML content in response")
+                    return html_match.group(1)
+            
+            # Strategy 4: Check if response contains substantial HTML-like content
+            if '<html' in response.lower() and '</html>' in response.lower():
+                # Extract from first <html to last </html>
+                start_idx = response.lower().find('<html')
+                end_idx = response.lower().rfind('</html>') + 7
+                if start_idx != -1 and end_idx > start_idx:
+                    html_content = response[start_idx:end_idx]
+                    self.logger.info("Extracted HTML content using start/end markers")
+                    return html_content
+            
+            # Strategy 5: Last resort - log the response preview and use fallback
+            self.logger.warning("No HTML content found in response, using fallback HTML generation")
+            self.logger.debug(f"Response preview (first 500 chars): {response[:500]}...")
+            
+            # Generate a simple fallback HTML
+            return self._generate_fallback_html(response)
                         
         except Exception as e:
             self.logger.error(f"Error extracting HTML from response: {e}")
-            return response
+            return self._generate_fallback_html(response)
+
+    def _generate_fallback_html(self, response: str) -> str:
+        """Generate fallback HTML when extraction fails."""
+        try:
+            # Try to extract key information from the response
+            title = "Business Analysis Report"
+            content = response[:1000] + "..." if len(response) > 1000 else response
+            
+            # Generate basic HTML structure
+            fallback_html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{title}</title>
+    <style>
+        body {{ font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }}
+        .header {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; }}
+        .content {{ background: white; padding: 20px; margin-top: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
+        .warning {{ background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 5px; margin-bottom: 20px; }}
+        pre {{ background: #f8f9fa; padding: 15px; border-radius: 5px; overflow-x: auto; }}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>{title}</h1>
+        <p>Generated by ScoutAgent Writer</p>
+    </div>
+    <div class="content">
+        <div class="warning">
+            <strong>Note:</strong> This is a fallback report. The LLM response could not be parsed as HTML.
+        </div>
+        <h2>Raw Analysis Content</h2>
+        <pre>{content}</pre>
+    </div>
+</body>
+</html>"""
+            
+            self.logger.info("Generated fallback HTML structure")
+            return fallback_html
+            
+        except Exception as e:
+            self.logger.error(f"Error generating fallback HTML: {e}")
+            return "<html><body><h1>Error generating report</h1><p>Unable to process the analysis data.</p></body></html>"
 
     def _generate_comprehensive_report(self, html_content: str, run_id: str, synthesis_data: Dict[str, Any]) -> Dict[str, Any]:
         """Generate comprehensive report with multiple files (HTML, CSS, JS)."""
@@ -453,15 +538,28 @@ class WriterAgent(BaseAgent, LLMAgentMixin):
             filename = f"business_analysis_report_{timestamp}.html"
             file_path = reports_dir / filename
             
+            self.logger.info(f"Generating HTML file: {filename}")
+            self.logger.debug(f"Input HTML content length: {len(html_content)}")
+            self.logger.debug(f"synthesis_data type: {type(synthesis_data)}")
+            
             # If HTML content is minimal, generate comprehensive HTML
             if len(html_content) < 1000 or "```" in html_content:
-                html_content = self._create_comprehensive_html(synthesis_data)
+                self.logger.info("HTML content is minimal, generating comprehensive HTML")
+                try:
+                    html_content = self._create_comprehensive_html(synthesis_data)
+                    self.logger.info(f"Generated comprehensive HTML, length: {len(html_content)}")
+                except Exception as e:
+                    self.logger.error(f"Error in _create_comprehensive_html: {e}")
+                    self.logger.error("Using fallback HTML generation")
+                    html_content = self._generate_fallback_html(str(synthesis_data))
             
             # Save HTML content
             with open(file_path, 'w', encoding='utf-8') as f:
                 f.write(html_content)
             
             file_size = file_path.stat().st_size
+            self.logger.info(f"Successfully saved HTML file: {file_path} ({file_size} bytes)")
+            
             return {
                 "type": "html",
                 "filename": filename,
@@ -472,7 +570,30 @@ class WriterAgent(BaseAgent, LLMAgentMixin):
             
         except Exception as e:
             self.logger.error(f"Error generating HTML file: {e}")
-            return None
+            self.logger.error("Exception details:", exc_info=True)
+            
+            # Create a basic error HTML file so something exists
+            try:
+                filename = f"business_analysis_report_{timestamp}.html"
+                file_path = reports_dir / filename
+                error_html = self._generate_fallback_html(f"Error generating report: {str(e)}")
+                
+                with open(file_path, 'w', encoding='utf-8') as f:
+                    f.write(error_html)
+                
+                file_size = file_path.stat().st_size
+                self.logger.info(f"Generated error fallback HTML: {file_path}")
+                
+                return {
+                    "type": "html",
+                    "filename": filename,
+                    "file_path": str(file_path),
+                    "file_size_bytes": file_size,
+                    "file_size_mb": round(file_size / (1024 * 1024), 2)
+                }
+            except Exception as e2:
+                self.logger.error(f"Failed to generate even error HTML: {e2}")
+                return None
 
     def _generate_css_file(self, reports_dir: Path, timestamp: str, synthesis_data: Dict[str, Any]) -> Dict[str, Any]:
         """Generate comprehensive CSS file."""
@@ -528,8 +649,11 @@ class WriterAgent(BaseAgent, LLMAgentMixin):
             filename = f"analysis_data_{timestamp}.json"
             file_path = reports_dir / filename
             
+            # Clean data for serialization
+            cleaned_data = self._clean_data_for_serialization(synthesis_data)
+            
             with open(file_path, 'w', encoding='utf-8') as f:
-                json.dump(synthesis_data, f, indent=2, ensure_ascii=False)
+                json.dump(cleaned_data, f, indent=2, ensure_ascii=False)
             
             file_size = file_path.stat().st_size
             return {
@@ -1799,8 +1923,74 @@ window.BusinessReport = {
 };
 """
 
+    def _clean_data_for_serialization(self, data: Any) -> Any:
+        """Clean data structure to make it JSON serializable."""
+        from datetime import datetime
+        from scout_agent.dag.engine import ExecutionState
+        
+        if isinstance(data, dict):
+            cleaned = {}
+            for key, value in data.items():
+                cleaned[key] = self._clean_data_for_serialization(value)
+            return cleaned
+        elif isinstance(data, list):
+            return [self._clean_data_for_serialization(item) for item in data]
+        elif isinstance(data, ExecutionState):
+            # Convert ExecutionState to serializable dict
+            return {
+                "workflow_id": data.workflow_id,
+                "start_time": data.start_time.isoformat() if data.start_time else None,
+                "end_time": data.end_time.isoformat() if data.end_time else None,
+                "total_nodes": data.total_nodes,
+                "completed_nodes": data.completed_nodes,
+                "failed_nodes": data.failed_nodes,
+                "skipped_nodes": data.skipped_nodes,
+                "progress": data.progress,
+                "duration": data.duration
+            }
+        elif isinstance(data, datetime):
+            return data.isoformat()
+        elif hasattr(data, '__dict__'):
+            # Generic object serialization
+            try:
+                return self._clean_data_for_serialization(data.__dict__)
+            except Exception:
+                return str(data)
+        else:
+            # Primitive types (str, int, float, bool, None)
+            return data
+
+    def _safe_get_nested(self, data: Any, *keys, default=None) -> Any:
+        """Safely get nested values from data structure, handling both dicts and lists."""
+        current = data
+        for key in keys:
+            if isinstance(current, dict):
+                current = current.get(key, default)
+            elif isinstance(current, list) and isinstance(key, int) and 0 <= key < len(current):
+                current = current[key]
+            else:
+                return default
+            if current is None:
+                return default
+        return current
+
     def _create_readme_content(self, synthesis_data: Dict[str, Any]) -> str:
         """Create comprehensive README content."""
+        
+        # Safely extract values using helper method
+        gap_finder_output = self._safe_get_nested(synthesis_data, 'gap_finder_output', default={})
+        builder_output = self._safe_get_nested(synthesis_data, 'builder_output', default={})
+        
+        identified_gaps = self._safe_get_nested(gap_finder_output, 'identified_market_gaps', default=[])
+        strategic_recs = self._safe_get_nested(gap_finder_output, 'strategic_recommendations', default=[])
+        
+        business_solution = self._safe_get_nested(builder_output, 'business_solution_summary', default={})
+        solution_name = self._safe_get_nested(business_solution, 'solution_name', default='AI Solution')
+        
+        business_model = self._safe_get_nested(builder_output, 'business_model_pricing', default={})
+        target_customers = self._safe_get_nested(business_model, 'target_customers', default='SMBs and developers')
+        pricing_model = self._safe_get_nested(business_model, 'pricing_model', default='Subscription-based SaaS')
+        
         return f"""# Comprehensive Business Analysis Report
 
 ## Overview
@@ -1842,13 +2032,13 @@ This report contains a comprehensive business analysis generated by the ScoutAge
 ## Key Insights
 
 ### Market Gaps Identified
-- {len(synthesis_data.get('gap_finder_output', {}).get('identified_market_gaps', []))} market gaps identified
-- {len(synthesis_data.get('gap_finder_output', {}).get('strategic_recommendations', []))} strategic recommendations
+- {len(identified_gaps) if isinstance(identified_gaps, list) else 0} market gaps identified
+- {len(strategic_recs) if isinstance(strategic_recs, list) else 0} strategic recommendations
 
 ### Business Solution
-- **Solution Name**: {synthesis_data.get('builder_output', {}).get('business_solution_summary', {}).get('solution_name', 'ClearPrice SaaS')}
-- **Target Market**: {synthesis_data.get('builder_output', {}).get('business_model_pricing', {}).get('target_customers', 'SMBs and developers')}
-- **Business Model**: {synthesis_data.get('builder_output', {}).get('business_model_pricing', {}).get('pricing_model', 'Subscription-based SaaS')}
+- **Solution Name**: {solution_name}
+- **Target Market**: {target_customers}
+- **Business Model**: {pricing_model}
 
 ## Technical Details
 
