@@ -259,8 +259,16 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
         # Step 3: Generate discovery queries for each pain point using plan_discovery.prompt
         discovery_queries = {}
         try:
-            for i, pain_point in enumerate(validated_pain_points):
-                self.logger.info(f"Generating discovery queries for pain point {i+1}/{len(validated_pain_points)}")
+            # TEMPORARY: Limit pain points for discovery query generation during testing
+            max_pain_points_for_discovery = 5  # MODERATE LIMITING: Increase from 2 to 5 for better data quality
+            if len(validated_pain_points) > max_pain_points_for_discovery:
+                self.logger.info(f"COST LIMITING: Reducing {len(validated_pain_points)} pain points to {max_pain_points_for_discovery} for discovery query generation")
+                validated_pain_points_limited = validated_pain_points[:max_pain_points_for_discovery]
+            else:
+                validated_pain_points_limited = validated_pain_points
+
+            for i, pain_point in enumerate(validated_pain_points_limited):
+                self.logger.info(f"Generating discovery queries for pain point {i+1}/{len(validated_pain_points_limited)}")
                 
                 # Extract pain point details - handle different possible structures
                 pain_point_text = ""
@@ -329,8 +337,9 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
         if discovery_queries:
             plan["discovery_queries"] = discovery_queries
         
-        # Step 4: Generate DAG metadata for gap finder stages
-        dag_metadata = self._generate_dag_metadata(validated_pain_points, discovery_queries)
+        # Step 4: Generate DAG metadata for gap finder stages (use limited set if applied)
+        pain_points_for_dag = validated_pain_points_limited if 'validated_pain_points_limited' in locals() else validated_pain_points
+        dag_metadata = self._generate_dag_metadata(pain_points_for_dag, discovery_queries)
         plan["dag_metadata"] = dag_metadata
         
         # Step 5: Add execution strategy based on analysis scope and requirements
@@ -567,23 +576,40 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
             # Get queries for this pain point
             queries_for_pain_point = discovery_queries.get(pain_point_text, {})
             all_queries = []
-            for category_queries in queries_for_pain_point.values():
+            
+            # Check if we have valid query lists (not error objects)
+            for category_name, category_queries in queries_for_pain_point.items():
                 if isinstance(category_queries, list):
                     all_queries.extend(category_queries)
+                elif isinstance(category_queries, dict) and "error" in category_queries:
+                    # This category failed - we'll use fallback below
+                    continue
             
-            # If no queries found, use default queries based on pain point
+            # If no valid queries found, use our sophisticated fallback
             if not all_queries:
-                # Generate default search queries from pain point description
-                pain_point_keywords = pain_point_text.lower().replace(',', ' ').split()
-                key_terms = [word for word in pain_point_keywords if len(word) > 3 and word not in ['with', 'from', 'that', 'this', 'they', 'have', 'been', 'will', 'when', 'where', 'what', 'how']]
-                if key_terms:
-                    all_queries = [
-                        f"{' '.join(key_terms[:3])} solutions",
-                        f"{' '.join(key_terms[:2])} tools",
-                        f"{' '.join(key_terms[:2])} problems"
-                    ]
+                self.logger.info(f"Using fallback discovery queries for pain point: {pain_point_text[:50]}...")
+                fallback_queries = self._generate_fallback_discovery_queries(pain_point_text)
+                if fallback_queries:
+                    # Use all queries from all categories
+                    for category_queries in fallback_queries.values():
+                        if isinstance(category_queries, list):
+                            all_queries.extend(category_queries)
+                    self.logger.info(f"Generated {len(all_queries)} fallback queries for pain point {i+1}")
                 else:
-                    all_queries = [f"solutions for {pain_point_text[:30]}"]
+                    # Final fallback if even our sophisticated fallback fails
+                    pain_point_keywords = pain_point_text.lower().replace(',', ' ').split()
+                    key_terms = [word for word in pain_point_keywords if len(word) > 3 and word not in ['with', 'from', 'that', 'this', 'they', 'have', 'been', 'will', 'when', 'where', 'what', 'how']]
+                    if key_terms:
+                        all_queries = [
+                            f"{' '.join(key_terms[:3])} solutions",
+                            f"{' '.join(key_terms[:2])} tools", 
+                            f"{' '.join(key_terms[:2])} problems"
+                        ]
+                    else:
+                        all_queries = [f"solutions for {pain_point_text[:30]}"]
+                    self.logger.warning(f"Using basic keyword fallback for pain point {i+1}")
+            else:
+                self.logger.info(f"Using {len(all_queries)} LLM-generated discovery queries for pain point {i+1}")
                 
             node_id = generate_node_id("search_links", f"_pp{i+1}")
             search_link_nodes.append({

@@ -260,6 +260,12 @@ class ScreenerAgent(BaseAgent, LLMAgentMixin):
                     derived_top_k = context.get('top_k')
             if derived_top_k is None:
                 derived_top_k = 10
+            
+            # TEMPORARY: Override for cost limiting during testing  
+            max_top_k_for_testing = 4  # MODERATE LIMITING: Increase from 2 to 4 for better data quality
+            if derived_top_k > max_top_k_for_testing:
+                self.logger.info(f"COST LIMITING: Reducing top_k from {derived_top_k} to {max_top_k_for_testing} for testing")
+                derived_top_k = max_top_k_for_testing
             top_k = min(int(derived_top_k), len(ranked_pain_points))
             top_pain_points = ranked_pain_points[:top_k]
             
