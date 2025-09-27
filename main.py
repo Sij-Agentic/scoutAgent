@@ -214,11 +214,26 @@ def main():
         debug=args.debug
     ))
     
+    # Convert ExecutionState to dictionary if needed for JSON serialization
+    if hasattr(results, '__dict__'):
+        # If it's an ExecutionState object, convert to dict
+        if hasattr(results, 'status') and hasattr(results, 'duration'):
+            results_dict = {
+                "run_id": getattr(results, 'workflow_id', 'unknown'),
+                "status": getattr(results, 'status', 'completed'),
+                "execution_time": getattr(results, 'duration', 0),
+                "completed_nodes": getattr(results, 'completed_nodes', 0),
+                "failed_nodes": getattr(results, 'failed_nodes', 0),
+                "total_nodes": getattr(results, 'total_nodes', 0),
+                "progress": getattr(results, 'progress', 0.0)
+            }
+            results = results_dict
+    
     # Print results summary
     print(json.dumps(results, indent=2))
     
     # Return exit code based on workflow status
-    return 0 if results.get("status") == "completed" else 1
+    return 0 if (isinstance(results, dict) and results.get("status") == "completed") else 1
 
 
 if __name__ == "__main__":

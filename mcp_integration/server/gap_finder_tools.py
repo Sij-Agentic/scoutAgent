@@ -400,9 +400,9 @@ class VendorIdentifier:
         logger.debug(f"[VENDOR_IDENTIFIER] Ensuring LLM backends are initialized")
         await self._initialize_llm_backends()
         
-        # Prepare input for LLM - use content directly like triage_content
-        input_text = content[:3000]
-        logger.info(f"[VENDOR_IDENTIFIER] Prepared LLM input text length: {len(input_text)} chars (truncated from {len(content)})")
+        # ULTRA-AGGRESSIVE COST LIMITING: Severely truncate content for fast testing
+        input_text = content[:1000]  # ULTRA-AGGRESSIVE: Reduced from 3000 to 1000 chars
+        logger.info(f"[VENDOR_IDENTIFIER] ULTRA-AGGRESSIVE LIMITING: Prepared LLM input text length: {len(input_text)} chars (ultra-truncated from {len(content)})")
         logger.debug(f"[VENDOR_IDENTIFIER] Input text preview: {input_text[:200]}...")
         
         # Call LLM
@@ -801,11 +801,11 @@ async def vendor_research_batch(
         logger.info(f"[VENDOR_RESEARCH_BATCH] Unique vendors: {unique_vendors}")
         vendors_list = unique_vendors
     
-    # TEMPORARY: Aggressive limiting to 2 vendors to reduce costs during testing
-    if len(vendors_list) > 2:
-        logger.info(f"[VENDOR_RESEARCH_BATCH] COST LIMITING: Reducing {len(vendors_list)} vendors to 2 for cost control during testing")
-        vendors_list = vendors_list[:2]  # COST LIMITING: Actually limit to 2 (was incorrectly 3)
-        logger.info(f"[VENDOR_RESEARCH_BATCH] Limited vendor list: {vendors_list}")
+    # TEMPORARY: ULTRA-AGGRESSIVE limiting to 1 vendor to confirm HTML fix quickly
+    if len(vendors_list) > 1:
+        logger.info(f"[VENDOR_RESEARCH_BATCH] ULTRA-AGGRESSIVE COST LIMITING: Reducing {len(vendors_list)} vendors to 1 for quick HTML testing")
+        vendors_list = vendors_list[:1]  # ULTRA-AGGRESSIVE COST LIMITING: Only 1 vendor for fast testing
+        logger.info(f"[VENDOR_RESEARCH_BATCH] Ultra-limited vendor list: {vendors_list}")
     
     # Initialize Vendor Research Tool
     logger.info(f"[VENDOR_RESEARCH_BATCH] Initializing VendorResearchTool")

@@ -45,7 +45,7 @@ class EnhancedMainOrchestrator(AgentOrchestrator):
             "validator": ["scout_act"],  # Depends on scout_act (parallel to screener)
             "gap_finder": ["screener_act", "validator_act"],  # Depends on both screener and validator
             "builder": ["gap_finder_act"],  # Depends on gap_finder_act
-            "writer": ["builder_act"]  # Depends on builder_act
+            "writer": ["builder_act", "gap_finder_act"]  # Depends on both builder_act and gap_finder_act for complete data
         }
         
         # Track extracted data for debugging
@@ -992,13 +992,21 @@ class EnhancedMainOrchestrator(AgentOrchestrator):
     def _process_writer_input(self, input_data: AgentInput, extracted_data: Dict[str, Any]):
         """Process input data for writer agent."""
         builder_act_data = extracted_data.get("builder_act", {})
-        solution = self._extract_solution(builder_act_data)
         
-        if solution:
-            logger.info("Found solution for writer")
-            input_data.data = solution
+        if builder_act_data:
+            logger.info(f"Found builder_act data for writer: {len(str(builder_act_data))} chars")
+            # Pass the full builder_act data as the main data
+            input_data.data = builder_act_data
+            
+            # Also add gap_finder data to context if available
+            gap_finder_data = extracted_data.get("gap_finder_act", {})
+            if gap_finder_data:
+                if not input_data.context:
+                    input_data.context = {}
+                input_data.context["gap_finder_output"] = gap_finder_data
+                logger.info(f"Added gap_finder data to writer context: {len(str(gap_finder_data))} chars")
         else:
-            logger.warning("No solution found for writer")
+            logger.warning("No builder_act data found for writer")
     
     def _extract_pain_points(self, data: Dict[str, Any]) -> List[Dict[str, Any]]:
         """Extract pain points from various data formats."""

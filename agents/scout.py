@@ -199,13 +199,38 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
                 "tool_names_csv": ", ".join(tool_names)
             }
 
-            # Load and render the planning prompt template
-            prompt_text = load_prompt_template(template_name="plan.prompt", agent_name=self.name, substitutions=substitutions)
-
-            # Generate plan using LLM (returns string)
-            # Generate plan using LLM (returns string) - no fallback
-            llm_text = await self.llm_generate(prompt=prompt_text, task_type="plan")
-            plan = self._extract_json(llm_text)
+            # NEW APPROACH: Generate metadata only, then construct DAG programmatically
+            # Phase 1: LLM generates focused metadata (much smaller, no truncation)
+            metadata_prompt = load_prompt_template(template_name="plan_metadata.prompt", agent_name=self.name, substitutions=substitutions)
+            
+            self.logger.info("Phase 1: Generating research metadata with LLM")
+            llm_text = await self.llm_generate(prompt=metadata_prompt, task_type="plan", max_tokens=1000)
+            metadata = self._extract_json(llm_text)
+            
+            # Fallback if metadata extraction fails
+            if not isinstance(metadata, dict):
+                self.logger.warning("Metadata extraction failed, using fallback metadata")
+                metadata = {
+                    "enhanced_keywords": input_data.keywords or ["issue", "problem", "frustration"],
+                    "optimized_subreddits": getattr(input_data, 'subreddits', []) or ["programming", "webdev"],
+                    "research_strategy": {
+                        "primary_focus": "pain point discovery",
+                        "data_sources": input_data.sources or ["reddit"],
+                        "collection_priority": "threads_with_comments"
+                    },
+                    "metadata": {
+                        "target_market": input_data.target_market,
+                        "research_scope": input_data.research_scope,
+                        "max_pain_points": input_data.max_pain_points
+                    }
+                }
+            
+            # Phase 2: Programmatically construct DAG from metadata
+            self.logger.info("Phase 2: Constructing DAG programmatically from metadata")
+            from scout_agent.templates.dag_node_templates import create_dag_from_metadata
+            
+            available_sources = input_data.sources or ["reddit"]
+            plan = create_dag_from_metadata(metadata, available_sources)
             
             # Debug logging
             self.logger.info(f"DEBUG: _extract_json returned type: {type(plan)}")
