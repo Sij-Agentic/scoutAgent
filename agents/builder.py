@@ -177,10 +177,16 @@ class BuilderAgent(BaseAgent, LLMAgentMixin):
             manifest_path = Path("data/runs") / run_id / "run_manifest.json"
             manifest_manager = ManifestManager(manifest_path=manifest_path)
             
-            # Load gap finder output
-            gap_finder_data = self._load_gap_finder_output(manifest_manager)
+            # Load gap finder output - prefer input data over manifest
+            gap_finder_data = input_data.gap_finder_output if hasattr(input_data, 'gap_finder_output') and input_data.gap_finder_output else None
+            
+            # Fallback to manifest if no input data
             if not gap_finder_data:
-                self.logger.error("No gap finder output found")
+                self.logger.info("No gap_finder_output in input data, trying manifest...")
+                gap_finder_data = self._load_gap_finder_output(manifest_manager)
+            
+            if not gap_finder_data:
+                self.logger.error("No gap finder output found in input or manifest")
                 return {"error": "No gap finder output available"}
             
             # Prepare synthesis data
@@ -631,28 +637,42 @@ class BuilderAgent(BaseAgent, LLMAgentMixin):
             return {"error": f"Failed to parse structured act text: {e}"}
     
     def _extract_field(self, text: str, field_name: str) -> str:
-        """Extract a field value from structured text."""
+        """Extract a field value from structured text, handling both regular and bold markdown formats."""
         import re
         
-        # Look for the field name followed by a colon and value
-        pattern = rf'- {re.escape(field_name)}:\s*(.+?)(?=\n- |$)'
-        match = re.search(pattern, text, re.DOTALL)
-        if match:
-            return match.group(1).strip()
+        # Handle both regular and bold markdown formats
+        patterns = [
+            rf'- \*\*{re.escape(field_name)}\*\*:\s*(.+?)(?=\n- |$)',  # Bold markdown: - **Field Name**: value
+            rf'- {re.escape(field_name)}:\s*(.+?)(?=\n- |$)'           # Regular format: - Field Name: value
+        ]
+        
+        for pattern in patterns:
+            match = re.search(pattern, text, re.DOTALL)
+            if match:
+                value = match.group(1).strip()
+                # Clean up any remaining markdown formatting
+                value = re.sub(r'\*\*(.*?)\*\*', r'\1', value)  # Remove **bold**
+                value = re.sub(r'_(.*?)_', r'\1', value)        # Remove _italic_
+                return value.strip()
         return ""
     
     def _extract_list(self, text: str, field_name: str) -> List[str]:
-        """Extract a list field from structured text."""
+        """Extract a list field from structured text, handling both regular and bold markdown formats."""
         import re
         
-        # Look for the field name followed by a colon and list items
-        pattern = rf'- {re.escape(field_name)}:\s*(.+?)(?=\n- |$)'
-        match = re.search(pattern, text, re.DOTALL)
-        if match:
-            list_text = match.group(1).strip()
-            # Split by newlines and clean up
-            items = [item.strip('- ').strip() for item in list_text.split('\n') if item.strip()]
-            return [item for item in items if item]
+        # Handle both regular and bold markdown formats
+        patterns = [
+            rf'- \*\*{re.escape(field_name)}\*\*:\s*(.+?)(?=\n- |$)',  # Bold markdown: - **Field Name**: value
+            rf'- {re.escape(field_name)}:\s*(.+?)(?=\n- |$)'           # Regular format: - Field Name: value
+        ]
+        
+        for pattern in patterns:
+            match = re.search(pattern, text, re.DOTALL)
+            if match:
+                list_text = match.group(1).strip()
+                # Split by newlines and clean up
+                items = [item.strip('- ').strip() for item in list_text.split('\n') if item.strip()]
+                return [item for item in items if item]
         return []
     
     def _create_fallback_think_result(self, input_data: BuilderInput) -> Dict[str, Any]:

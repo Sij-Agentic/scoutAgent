@@ -261,8 +261,8 @@ class ScreenerAgent(BaseAgent, LLMAgentMixin):
             if derived_top_k is None:
                 derived_top_k = 10
             
-            # TEMPORARY: Override for cost limiting during testing  
-            max_top_k_for_testing = 4  # MODERATE LIMITING: Increase from 2 to 4 for better data quality
+            # ULTRA-AGGRESSIVE: Override for ultra-fast HTML testing  
+            max_top_k_for_testing = 1  # ULTRA-AGGRESSIVE LIMITING: Only 1 pain point for fastest testing
             if derived_top_k > max_top_k_for_testing:
                 self.logger.info(f"COST LIMITING: Reducing top_k from {derived_top_k} to {max_top_k_for_testing} for testing")
                 derived_top_k = max_top_k_for_testing

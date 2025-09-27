@@ -111,21 +111,6 @@ class WriterAgent(BaseAgent, LLMAgentMixin):
             self.logger.info(f"Using builder_output: {len(str(builder_output))} chars ({'input data' if input_data.builder_output else 'manifest fallback'})")
             self.logger.info(f"Using gap_finder_output: {len(str(gap_finder_output))} chars ({'input data' if input_data.gap_finder_output else 'manifest fallback'})")
             
-            # CRITICAL FIX: When using input data, populate all_agent_data with the real data
-            # This ensures LLM prompts have consistent access to data regardless of source
-            if input_data.builder_output or input_data.gap_finder_output:
-                self.logger.info("Populating all_agent_data with input data for LLM consistency")
-                if input_data.builder_output:
-                    all_agent_data["builder_act"] = input_data.builder_output
-                if input_data.gap_finder_output:
-                    all_agent_data["gap_finder_act"] = input_data.gap_finder_output
-                if input_data.scout_output:
-                    all_agent_data["scout_act"] = input_data.scout_output
-                if input_data.screener_output:
-                    all_agent_data["screener_act"] = input_data.screener_output
-                if input_data.validator_output:
-                    all_agent_data["validator_act"] = input_data.validator_output
-            
             # Prepare synthesis data
             synthesis_data = {
                 "builder_output": builder_output,
