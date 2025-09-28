@@ -125,6 +125,9 @@ class WriterAgent(BaseAgent, LLMAgentMixin):
                     all_agent_data["screener_act"] = input_data.screener_output
                 if input_data.validator_output:
                     all_agent_data["validator_act"] = input_data.validator_output
+            else:
+                self.logger.warning("No input data available for all_agent_data population - using manifest fallback")
+                self.logger.info(f"Manifest fallback loaded: {len(str(all_agent_data))} chars")
             
             # Prepare synthesis data
             synthesis_data = {
@@ -138,6 +141,8 @@ class WriterAgent(BaseAgent, LLMAgentMixin):
                 "include_animations": input_data.include_animations
             }
             
+            self.logger.info(f"Synthesis data prepared: {len(str(synthesis_data))} chars total")
+            
             # Load think stage prompt
             prompt_content = self._load_think_prompt()
             if not prompt_content:
@@ -148,7 +153,9 @@ class WriterAgent(BaseAgent, LLMAgentMixin):
             prompt_content += f"\n\nData to Analyze:\n{json.dumps(synthesis_data, indent=2)}"
             
             # Generate report analysis using LLM mixin
+            self.logger.info(f"Generating report analysis with LLM (prompt: {len(prompt_content)} chars)")
             analysis_result = await self.llm_generate(prompt=prompt_content, task_type="think_development")
+            self.logger.info(f"LLM analysis complete: {len(analysis_result)} chars")
             
             # Parse the response as structured text
             if isinstance(analysis_result, str):
@@ -170,11 +177,27 @@ class WriterAgent(BaseAgent, LLMAgentMixin):
             # Store the result to manifest
             self._store_think_output_to_manifest(manifest_manager, analysis_result)
             
+            self.logger.critical(f"WRITER DEBUG: Think stage completed - Final result:")
+            if isinstance(analysis_result, dict) and 'report_analysis' in analysis_result:
+                exec_summary = analysis_result['report_analysis'].get('executive_summary', '')
+                self.logger.critical(f"WRITER DEBUG: - Executive summary: {len(exec_summary)} chars - '{exec_summary}'")
+                self.logger.critical(f"WRITER DEBUG: - Primary opportunity: {len(analysis_result['report_analysis'].get('primary_business_opportunity', ''))} chars")
+                self.logger.critical(f"WRITER DEBUG: - Market landscape: {len(analysis_result['report_analysis'].get('market_landscape', ''))} chars")
+                
+                if not exec_summary:
+                    self.logger.critical("WRITER DEBUG: CRITICAL FAILURE - Executive summary is EMPTY!")
+                    self.logger.critical("WRITER DEBUG: This indicates either LLM failure or parsing failure!")
+            else:
+                self.logger.critical(f"WRITER DEBUG: Unexpected result structure: {type(analysis_result)}")
+            
             self.logger.info("Think stage completed successfully")
             return analysis_result
         
         except Exception as e:
-            self.logger.error(f"Error in think stage: {e}")
+            self.logger.critical(f"WRITER DEBUG: EXCEPTION in think stage: {e}")
+            self.logger.critical(f"WRITER DEBUG: Exception type: {type(e)}")
+            import traceback
+            self.logger.critical(f"WRITER DEBUG: Full traceback: {traceback.format_exc()}")
             return {"error": f"Think stage failed: {str(e)}"}
     
     async def act(self, input_data: Union[WriterInput, AgentInput], think_result: Dict[str, Any] = None) -> Dict[str, Any]:
@@ -411,19 +434,36 @@ class WriterAgent(BaseAgent, LLMAgentMixin):
             
             # Strategy 1: Look for HTML in markdown code blocks (most common)
             html_patterns = [
-                r'```html\s*\n(.*?)\n```',  # ```html ... ```
-                r'```(?:html)?\s*\n?(.*?)\n?```',  # ```html or ``` ... ```
-                r'```\s*\n?<!DOCTYPE html>(.*?)```',  # ``` with DOCTYPE
-                r'```\s*\n?<html[^>]*>(.*?)</html>\s*```',  # ``` with <html>
+                r'```html\s*\n(.*?)\n```',  # Standard: ```html ... ```
+                r'```html\s*(.*?)```',  # Compact: ```html...``` 
+                r'```HTML\s*\n(.*?)\n```',  # Uppercase: ```HTML ... ```
+                r'```HTML\s*(.*?)```',  # Uppercase compact
+                r'```html\s*\n(<!DOCTYPE.*?</html>)\s*```',  # Full HTML with html tag
+                r'```\s*\n(<!DOCTYPE.*?</html>)\s*```',  # Generic code block with full HTML
+                r'```\s*(<!DOCTYPE.*?</html>)\s*```',  # Compact generic with full HTML
+                r'```html[^`]*?(<!DOCTYPE.*?</html>)[^`]*?```',  # Flexible html tag matching
+                # Enhanced patterns for LLM responses with prose before HTML
+                r'```html\s*([\s\S]*?)```',  # Greedy match for any content in html blocks
+                r'```\s*([\s\S]*?<!DOCTYPE[\s\S]*?</html>[\s\S]*?)```',  # HTML with surrounding content in generic blocks
+                # Pattern for responses that start with prose then HTML
+                r'```html[^`]*?\n([\s\S]*?)```',  # HTML block with potential leading prose
             ]
             
-            for pattern in html_patterns:
+            for i, pattern in enumerate(html_patterns):
                 match = re.search(pattern, response, re.DOTALL | re.IGNORECASE)
                 if match:
                     html_content = match.group(1).strip()
-                    if html_content and ('<html' in html_content or '<!DOCTYPE' in html_content):
-                        self.logger.info(f"Extracted HTML from markdown code block using pattern: {pattern[:30]}...")
-                        return html_content
+                    # More robust validation of extracted HTML
+                    if html_content and (
+                        ('<!DOCTYPE' in html_content and '</html>' in html_content) or
+                        ('<html' in html_content and '</html>' in html_content)
+                    ):
+                        # Additional check: ensure it's not just prose with HTML fragments
+                        if len(html_content) > 100 and html_content.count('<') > 5:
+                            self.logger.info(f"Extracted valid HTML from markdown code block using pattern {i+1}: {len(html_content)} chars")
+                            return html_content
+                        else:
+                            self.logger.debug(f"Pattern {i+1} matched but content too small or not enough HTML tags: {len(html_content)} chars, {html_content.count('<')} tags")
             
             # Strategy 2: Check if the response is already HTML
             if response.strip().startswith('<!DOCTYPE html>') or response.strip().startswith('<html'):
@@ -454,8 +494,9 @@ class WriterAgent(BaseAgent, LLMAgentMixin):
                     return html_content
             
             # Strategy 5: Last resort - log the response preview and use fallback
-            self.logger.warning("No HTML content found in response, using fallback HTML generation")
-            self.logger.debug(f"Response preview (first 500 chars): {response[:500]}...")
+            self.logger.critical("WRITER DEBUG: No HTML content found in response, using fallback HTML generation")
+            self.logger.critical(f"WRITER DEBUG: LLM response length: {len(response)} chars")
+            self.logger.critical(f"WRITER DEBUG: Response preview (first 1000 chars): {response[:1000]}...")
             
             # Generate a simple fallback HTML
             return self._generate_fallback_html(response)
@@ -726,14 +767,36 @@ class WriterAgent(BaseAgent, LLMAgentMixin):
                 "content_priorities": {}
             }
             
-            # Parse Report Analysis section
-            analysis_match = re.search(r'## Report Analysis(.*?)(?=## |$)', text, re.DOTALL)
-            if analysis_match:
-                analysis_text = analysis_match.group(1)
-                result["report_analysis"]["executive_summary"] = self._extract_field(analysis_text, "Executive Summary")
-                result["report_analysis"]["primary_business_opportunity"] = self._extract_field(analysis_text, "Primary Business Opportunity")
-                result["report_analysis"]["market_landscape"] = self._extract_field(analysis_text, "Market Landscape")
-                result["report_analysis"]["strategic_recommendations"] = self._extract_list(analysis_text, "Strategic Recommendations")
+            # Parse Report Analysis section with multiple robust strategies
+            analysis_text = self._extract_report_analysis_section(text)
+            if analysis_text:
+                self.logger.critical(f"WRITER DEBUG: Found Report Analysis section: {len(analysis_text)} chars")
+                self.logger.critical(f"WRITER DEBUG: Analysis text preview: {analysis_text[:300]}...")
+                
+                exec_summary = self._extract_field_robust(analysis_text, "Executive Summary")
+                primary_opp = self._extract_field_robust(analysis_text, "Primary Business Opportunity")
+                market_land = self._extract_field_robust(analysis_text, "Market Landscape")
+                strategic_recs = self._extract_list_robust(analysis_text, "Strategic Recommendations")
+                
+                self.logger.critical(f"WRITER DEBUG: Extracted executive_summary: {len(exec_summary)} chars - '{exec_summary}'")
+                self.logger.critical(f"WRITER DEBUG: Extracted primary_opportunity: {len(primary_opp)} chars - '{primary_opp[:100]}...'")
+                self.logger.critical(f"WRITER DEBUG: Extracted market_landscape: {len(market_land)} chars - '{market_land[:100]}...'")
+                self.logger.critical(f"WRITER DEBUG: Extracted strategic_recommendations: {len(strategic_recs)} items")
+                
+                result["report_analysis"]["executive_summary"] = exec_summary
+                result["report_analysis"]["primary_business_opportunity"] = primary_opp
+                result["report_analysis"]["market_landscape"] = market_land
+                result["report_analysis"]["strategic_recommendations"] = strategic_recs
+            else:
+                self.logger.critical("WRITER DEBUG: CRITICAL - No Report Analysis section found in LLM response!")
+                self.logger.critical(f"WRITER DEBUG: Full LLM response for analysis: {text[:1000]}...")
+                self.logger.critical("WRITER DEBUG: Attempting fallback parsing strategies...")
+                
+                # Fallback: try to extract fields from entire response
+                exec_summary = self._extract_field_robust(text, "Executive Summary")
+                if exec_summary:
+                    self.logger.critical(f"WRITER DEBUG: Fallback found executive_summary: {len(exec_summary)} chars")
+                    result["report_analysis"]["executive_summary"] = exec_summary
             
             # Parse Content Planning section
             planning_match = re.search(r'## Content Planning(.*?)(?=## |$)', text, re.DOTALL)
@@ -787,6 +850,94 @@ class WriterAgent(BaseAgent, LLMAgentMixin):
         except Exception as e:
             self.logger.error(f"Failed to parse structured think text: {e}")
             return {"error": f"Failed to parse structured think text: {e}"}
+    
+    def _extract_report_analysis_section(self, text: str) -> str:
+        """Extract Report Analysis section using multiple robust strategies."""
+        import re
+        
+        self.logger.critical(f"WRITER DEBUG: Attempting to extract Report Analysis from {len(text)} chars")
+        
+        # Strategy 1: Standard format "## Report Analysis"
+        match = re.search(r'## Report Analysis(.*?)(?=## |$)', text, re.DOTALL)
+        if match:
+            self.logger.critical("WRITER DEBUG: Found Report Analysis using Strategy 1 (## Report Analysis)")
+            return match.group(1)
+        
+        # Strategy 2: Alternative heading formats
+        patterns = [
+            r'## Report Analysis(.*?)(?=## |$)',
+            r'### Report Analysis(.*?)(?=### |## |$)',
+            r'# Report Analysis(.*?)(?=# |$)',
+            r'Report Analysis:?(.*?)(?=## |### |# |$)',
+            r'## Analysis(.*?)(?=## |$)',
+            r'### Analysis(.*?)(?=### |## |$)',
+        ]
+        
+        for i, pattern in enumerate(patterns):
+            match = re.search(pattern, text, re.DOTALL | re.IGNORECASE)
+            if match:
+                self.logger.critical(f"WRITER DEBUG: Found Report Analysis using Strategy {i+2} ({pattern[:20]}...)")
+                return match.group(1)
+        
+        self.logger.critical("WRITER DEBUG: No Report Analysis section found with any strategy")
+        return ""
+    
+    def _extract_field_robust(self, text: str, field_name: str) -> str:
+        """Extract field using multiple robust strategies."""
+        import re
+        
+        self.logger.critical(f"WRITER DEBUG: Extracting field '{field_name}' from {len(text)} chars")
+        
+        # Strategy 1: Standard format "- **Field Name**: content"
+        patterns = [
+            rf'- \*\*{re.escape(field_name)}\*\*:\s*(.+?)(?=\n- \*\*|\n## |\n### |\n$)',
+            rf'- \*\*{re.escape(field_name)}\*\*\s*(.+?)(?=\n- \*\*|\n## |\n### |\n$)',
+            rf'\*\*{re.escape(field_name)}\*\*:\s*(.+?)(?=\n\*\*|\n## |\n### |\n$)',
+            rf'\*\*{re.escape(field_name)}\*\*\s*(.+?)(?=\n\*\*|\n## |\n### |\n$)',
+            rf'{re.escape(field_name)}:\s*(.+?)(?=\n\*\*|\n## |\n### |\n- \*\*|\n$)',
+        ]
+        
+        for i, pattern in enumerate(patterns):
+            match = re.search(pattern, text, re.DOTALL | re.IGNORECASE)
+            if match:
+                value = match.group(1).strip()
+                # Clean up markdown formatting
+                value = re.sub(r'\*\*(.*?)\*\*', r'\1', value)
+                value = re.sub(r'_(.*?)_', r'\1', value)
+                value = value.strip()
+                
+                if value:
+                    self.logger.critical(f"WRITER DEBUG: Extracted '{field_name}' using pattern {i+1}: {len(value)} chars")
+                    return value
+        
+        self.logger.critical(f"WRITER DEBUG: Failed to extract field '{field_name}' with any pattern")
+        return ""
+    
+    def _extract_list_robust(self, text: str, field_name: str) -> List[str]:
+        """Extract list using multiple robust strategies."""
+        import re
+        
+        # First try to extract the field content
+        field_content = self._extract_field_robust(text, field_name)
+        if not field_content:
+            return []
+        
+        # Parse list items from the field content
+        items = []
+        lines = field_content.split('\n')
+        
+        for line in lines:
+            line = line.strip()
+            # Remove common list markers
+            line = re.sub(r'^[-*•]\s*', '', line)
+            line = re.sub(r'^\d+\.\s*', '', line)
+            line = line.strip()
+            
+            if line and len(line) > 3:  # Avoid very short items
+                items.append(line)
+        
+        self.logger.critical(f"WRITER DEBUG: Extracted {len(items)} items from '{field_name}' list")
+        return items
     
     def _extract_field(self, text: str, field_name: str) -> str:
         """Extract a field value from structured text, handling both regular and bold markdown formats."""
@@ -894,12 +1045,25 @@ class WriterAgent(BaseAgent, LLMAgentMixin):
             business_model = {}
             go_to_market = {}
             
-            # Try builder_output first
+            # Try builder_output first - handle both dict and list cases
             if builder_output:
-                business_solution = builder_output.get("business_solution_summary", {})
-                product_strategy = builder_output.get("product_strategy", {})
-                business_model = builder_output.get("business_model_pricing", {})
-                go_to_market = builder_output.get("go_to_market_strategy", {})
+                # Handle case where builder_output might be a list
+                if isinstance(builder_output, list) and len(builder_output) > 0:
+                    # If it's a list, take the first item
+                    builder_data = builder_output[0] if isinstance(builder_output[0], dict) else {}
+                    self.logger.warning(f"Builder output is a list with {len(builder_output)} items, using first item")
+                elif isinstance(builder_output, dict):
+                    builder_data = builder_output
+                else:
+                    self.logger.warning(f"Builder output is unexpected type: {type(builder_output)}")
+                    builder_data = {}
+                
+                if builder_data:
+                    business_solution = builder_data.get("business_solution_summary", {})
+                    product_strategy = builder_data.get("product_strategy", {})
+                    business_model = builder_data.get("business_model_pricing", {})
+                    go_to_market = builder_data.get("go_to_market_strategy", {})
+                    self.logger.info(f"Extracted business solution from builder_data: {len(str(business_solution))} chars")
             # Try all_agent_data.builder_act
             elif synthesis_data.get("all_agent_data", {}).get("builder_act"):
                 builder_act = synthesis_data["all_agent_data"]["builder_act"]
@@ -1187,7 +1351,9 @@ class WriterAgent(BaseAgent, LLMAgentMixin):
             return html_content
             
         except Exception as e:
-            self.logger.error(f"Error creating comprehensive HTML: {e}")
+            self.logger.error(f"Error in _create_comprehensive_html: {e}")
+            import traceback
+            self.logger.error(f"Full traceback: {traceback.format_exc()}")
             return "<html><body><h1>Error generating report</h1></body></html>"
 
     def _generate_market_gaps_html(self, market_gaps: list) -> str:

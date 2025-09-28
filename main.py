@@ -215,19 +215,26 @@ def main():
     ))
     
     # Convert ExecutionState to dictionary if needed for JSON serialization
-    if hasattr(results, '__dict__'):
-        # If it's an ExecutionState object, convert to dict
-        if hasattr(results, 'status') and hasattr(results, 'duration'):
+    try:
+        # Test if results is JSON serializable
+        json.dumps(results)
+    except (TypeError, ValueError) as e:
+        print(f"DEBUG: Converting non-serializable results to dict: {type(results)}")
+        # Convert to a safe dictionary format
+        if hasattr(results, '__dict__'):
             results_dict = {
-                "run_id": getattr(results, 'workflow_id', 'unknown'),
-                "status": getattr(results, 'status', 'completed'),
-                "execution_time": getattr(results, 'duration', 0),
-                "completed_nodes": getattr(results, 'completed_nodes', 0),
-                "failed_nodes": getattr(results, 'failed_nodes', 0),
-                "total_nodes": getattr(results, 'total_nodes', 0),
-                "progress": getattr(results, 'progress', 0.0)
+                "run_id": str(getattr(results, 'workflow_id', getattr(results, 'run_id', 'unknown'))),
+                "status": str(getattr(results, 'status', 'completed')),
+                "execution_time": float(getattr(results, 'duration', getattr(results, 'execution_time', 0))),
+                "completed_nodes": int(getattr(results, 'completed_nodes', 0)),
+                "failed_nodes": int(getattr(results, 'failed_nodes', 0)),
+                "total_nodes": int(getattr(results, 'total_nodes', 0)),
+                "progress": float(getattr(results, 'progress', 0.0)),
+                "type": str(type(results).__name__)
             }
             results = results_dict
+        else:
+            results = {"status": "completed", "message": f"Non-serializable result: {type(results)}"}
     
     # Print results summary
     print(json.dumps(results, indent=2))
