@@ -20,17 +20,16 @@ Analyze all the input data to create a comprehensive report planning strategy. F
 4. **Design Approach**: Determine professional styling and user experience
 
 ## Required Output Format
-Provide a structured analysis using clear section headers and bullet points:
+CRITICAL: You MUST use the EXACT format below. Do not deviate from this structure:
 
 ## Report Analysis
-- **Executive Summary**: [Key business opportunity and market insights]
-- **Primary Business Opportunity**: [Main SaaS solution identified]
-- **Market Landscape**: [Key market trends and competitive dynamics]
-- **Strategic Recommendations**: [Top 3-5 actionable recommendations]
+- **Executive Summary**: [Key business opportunity and market insights in 2-3 sentences]
+- **Primary Business Opportunity**: [Main SaaS solution identified in 1-2 sentences]
+- **Market Landscape**: [Key market trends and competitive dynamics in 2-3 sentences]
+- **Strategic Recommendations**: [Top 3-5 actionable recommendations as bulleted list]
 
 ## Content Planning
-- **Report Sections**: 
-  - [List each major section with brief description]
+- **Report Sections**: [List each major section with brief description]
 - **Narrative Flow**: [How sections connect and build upon each other]
 - **Key Metrics to Highlight**: [Important numbers, percentages, and data points]
 - **Data Visualizations Needed**: [Charts, graphs, and visual elements required]
@@ -61,3 +60,10 @@ Provide a structured analysis using clear section headers and bullet points:
 - **Professional Presentation**: [Executive-level quality and polish]
 
 Focus on creating a report that is both comprehensive in content and impressive in presentation, suitable for executive review and decision-making.
+
+## CRITICAL FORMAT REQUIREMENTS
+1. Start each major section with EXACTLY "## [Section Name]"
+2. Use EXACTLY "- **[Field Name]**: [Content]" for all fields
+3. Do NOT use "###" or other heading formats
+4. Do NOT add extra text before or after the required sections
+5. Ensure each section contains the exact field names specified above
