@@ -67,6 +67,10 @@ COPY scout_agent/ ./scout_agent/
 # Copy startup script
 COPY start_services.sh ./start_services.sh
 
+# Copy API services
+COPY api_service.py ./api_service.py
+COPY worker_service.py ./worker_service.py
+
 # Create directories for output and logs
 RUN mkdir -p /app/output /app/logs /app/temp
 
