@@ -385,6 +385,7 @@ class EnhancedMainOrchestrator(AgentOrchestrator):
         Returns:
             Execution results
         """
+        logger.info("=== DOCKER DEBUG: STARTING ENHANCED ORCHESTRATOR ===")
         logger.info("Starting enhanced orchestrator execution")
         
         # Initialize with proper DAG dependencies
@@ -744,15 +745,45 @@ class EnhancedMainOrchestrator(AgentOrchestrator):
             if node.get("type") == "tool":
                 tool_node_id = node.get("id")
                 if tool_node_id:
-                    # Look for tool result in manifest
+                    # Look for tool result in manifest - try multiple locations
+                    tool_data = None
+                    
+                    # Primary location: stages[tool_node_id].data
                     tool_data = stages.get(tool_node_id, {}).get("data")
+                    
+                    # Fallback 1: Check if data is stored directly in stages[tool_node_id]
+                    if not tool_data:
+                        tool_data = stages.get(tool_node_id)
+                        if tool_data and isinstance(tool_data, dict) and "data" not in tool_data:
+                            # Data is stored directly, not nested under 'data' key
+                            pass
+                        else:
+                            tool_data = None
+                    
+                    # Fallback 2: Check for alternative storage patterns
+                    if not tool_data:
+                        # Try looking for the data in different manifest structures
+                        for stage_name, stage_data in stages.items():
+                            if isinstance(stage_data, dict) and tool_node_id in str(stage_data):
+                                logger.debug(f"Found potential match in stage {stage_name} for {tool_node_id}")
+                                tool_data = stage_data.get("data")
+                                if tool_data:
+                                    break
+                    
+                    # Fallback 3: Debug logging for Docker troubleshooting
+                    if not tool_data:
+                        logger.warning(f"No tool result found in manifest for {tool_node_id}")
+                        logger.debug(f"Available stages: {list(stages.keys())}")
+                        logger.debug(f"Looking for tool_node_id: {tool_node_id}")
+                        logger.debug(f"Stages structure: {json.dumps({k: type(v).__name__ for k, v in stages.items()}, indent=2)}")
+                    
                     if tool_data:
                         if not hasattr(self, '_tool_results'):
                             self._tool_results = {}
                         self._tool_results[tool_node_id] = tool_data
                         logger.info(f"Extracted tool result for direct passing: {tool_node_id}")
                     else:
-                        logger.warning(f"No tool result found in manifest for {tool_node_id}")
+                        logger.warning(f"No tool result found in manifest for {tool_node_id} after all fallback attempts")
         
         logger.info(f"Extracted {len(getattr(self, '_tool_results', {}))} tool results for direct passing")
     
@@ -763,6 +794,7 @@ class EnhancedMainOrchestrator(AgentOrchestrator):
         This method overrides the base implementation to provide robust data extraction
         and agent-specific input processing.
         """
+        logger.info(f"=== DOCKER DEBUG: EXECUTING {agent_id} {stage} STAGE ===")
         logger.info(f"Executing {agent_id} {stage} stage with enhanced data flow")
         
         # Handle different stages with appropriate data flow

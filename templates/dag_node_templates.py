@@ -11,7 +11,7 @@ def create_reddit_search_node(keywords: List[str], subreddits: List[str],
     """Create a Reddit search and fetch tool node."""
     
     # Build the Python code for the node
-    code = f'''# MCP tool call for reddit_search_and_fetch_threads
+    code = f'''# MCP tool call for reddit_api_search_and_fetch_threads
 import json
 from pathlib import Path
 
@@ -31,7 +31,7 @@ params = {{
 print(f"DEBUG: Calling MCP tool with params: {{params}}")
 
 # Call the MCP tool (synchronous wrapper)
-result = mcp_call("reddit_search_and_fetch_threads", params)
+result = mcp_call("reddit_api_search_and_fetch_threads", params)
 
 print(f"DEBUG: MCP call completed, result type: {{type(result)}}")
 print(f"DEBUG: Result keys: {{list(result.keys()) if isinstance(result, dict) else 'not dict'}}")
@@ -49,7 +49,7 @@ if isinstance(result, dict) and 'threads' in result:
     return {
         "id": "scout_collect_reddit",
         "type": "tool", 
-        "tool": "reddit_search_and_fetch_threads",
+        "tool": "reddit_api_search_and_fetch_threads",
         "params": {
             "keywords": keywords,
             "subreddits": subreddits,
@@ -57,7 +57,8 @@ if isinstance(result, dict) and 'threads' in result:
             "include_comments": True,
             "comment_depth": 2,
             "comment_limit": comment_limit,
-            "use_cache": True
+            "use_cache": False,  # Use live API calls for production
+            "test_mode": False   # Disable test mode for production data collection
         },
         "code": code,
         "language": "python",

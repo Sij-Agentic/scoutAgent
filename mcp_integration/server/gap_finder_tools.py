@@ -11,7 +11,7 @@ from mcp.types import TextContent
 from scout_agent.mcp_integration.server.base import MCPServer
 
 from scout_agent.sources.serper_client import SerperApiClient
-from scout_agent.sources.web_content_extractor import WebContentExtractor
+from scout_agent.sources.web_content_extractor_simple import WebContentExtractor
 from scout_agent.data_cache.file_cache import FileCache
 from scout_agent.custom_logging import get_logger
 from scout_agent.config import init_config, get_config
