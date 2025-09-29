@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  scout-agent:
+    build: .
+    container_name: scout-agent-interactive
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}
+    volumes:
+      - ./runs_output:/app/data/runs
+    command: sleep infinity

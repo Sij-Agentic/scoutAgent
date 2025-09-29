@@ -1,0 +1,246 @@
+{
+  "think_analysis": {
+    "report_analysis": {
+      "executive_summary": "The market research analysis reveals limited validated data with fallback pain points identified through automated processes. Further primary research is required to validate market opportunities and confirm business potential in the target market segment.",
+      "primary_business_opportunity": "No specific SaaS solution identified due to insufficient market validation data. The analysis indicates a need for deeper market research to uncover validated business opportunities.",
+      "market_landscape": "Current analysis shows medium-potential pain points with scores ranging from 41-50, but lacks concrete market validation. Research was conducted using Reddit sources with limited confidence in findings.",
+      "strategic_recommendations": [
+        "Conduct primary market research to validate fallback pain points",
+        "Expand research sources beyond Reddit for comprehensive market understanding",
+        "Develop validation framework for pain point assessment",
+        "Establish metrics for market opportunity evaluation",
+        "Create systematic approach for business solution identification"
+      ]
+    },
+    "content_planning": {
+      "report_sections": [
+        "Executive Summary: Overview of findings and limitations",
+        "Methodology: Research approach and data collection process",
+        "Market Analysis: Current state and identified pain points",
+        "Data Limitations: Analysis of confidence scores and validation gaps",
+        "Strategic Recommendations: Actionable next steps",
+        "Technical Appendix: Detailed scoring and ranking methodology"
+      ],
+      "narrative_flow": "Begin with current findings, highlight data limitations, present available insights, and conclude with strategic recommendations for improved research.",
+      "key_metrics_to_highlight": [
+        "Confidence scores (0.0-0.5), pain point scores (41-50), research duration (7.47 seconds), validation processing time (4.64 seconds), score distribution (100% medium potential)"
+      ],
+      "data_visualizations_needed": [
+        "Confidence score indicators, pain point ranking charts, score distribution pie chart, research timeline visualization, validation status dashboard"
+      ]
+    },
+    "design_strategy": {
+      "visual_theme": "Professional blue and gray color scheme with accent colors for data visualization, clean minimalist design with ample white space",
+      "typography": "System fonts (Inter for headings, Roboto for body) with clear hierarchy using font weights and sizes",
+      "layout_approach": "Responsive grid system with card-based sections, mobile-first approach with breakpoints at 768px and 1024px",
+      "interactive_elements": [
+        "Expandable sections for detailed data, hover effects on data points, interactive filtering for pain point categories, click-to-expand methodology details"
+      ]
+    },
+    "animation_plan": {
+      "hero_section": "Fade-in introduction with staggered text animation and confidence score visualization",
+      "scroll_animations": "Sequential reveal of pain point rankings, parallax background for methodology section, fade-up transitions between content blocks",
+      "data_visualizations": "Animated bar charts for pain point scores, growing pie chart for score distribution, timeline animation for research process",
+      "interactive_features": "Hover tooltips on data points, click animations for expanding sections, smooth transitions between metric displays",
+      "loading_transitions": "Progressive content loading with skeleton screens, smooth section transitions with fade effects"
+    },
+    "technical_requirements": {
+      "html_structure": "Semantic HTML5 with proper ARIA labels, section-based organization with clear landmark roles",
+      "css_framework": "Custom CSS with CSS Grid and Flexbox, CSS custom properties for theming, mobile-responsive design patterns",
+      "animation_performance": "CSS transforms and opacity for smooth animations, reduced motion preferences support, optimized asset loading",
+      "browser_compatibility": "Support for modern browsers (Chrome, Firefox, Safari, Edge) with graceful degradation for older versions"
+    },
+    "content_priorities": {
+      "most_important_sections": [
+        "Data limitations and validation gaps, strategic recommendations for improved research, methodology transparency"
+      ],
+      "supporting_data": [
+        "Fallback pain point rankings, confidence score analysis, research process documentation"
+      ],
+      "call_to_actions": [
+        "Recommendations for additional market research, validation framework development, expanded source analysis"
+      ],
+      "professional_presentation": "Executive-level clarity on limitations, transparent methodology documentation, actionable strategic guidance"
+    }
+  },
+  "builder_output": {},
+  "gap_finder_output": {},
+  "scout_output": {},
+  "screener_output": {},
+  "validator_output": {},
+  "all_agent_data": {
+    "builder_act": {
+      "error": "No think stage data available"
+    },
+    "scout_act": {
+      "pain_points": [],
+      "total_discovered": 0,
+      "market_summary": "Consolidated 0 raw pain points into 0 validated pain points",
+      "confidence_score": 0.0,
+      "sources_used": [
+        "reddit"
+      ],
+      "research_duration": 7.468724
+    },
+    "screener_act": {
+      "ranked_pain_points": [
+        {
+          "id": "dummy_0",
+          "description": "Fallback pain point 1",
+          "total_score": 50,
+          "justification": "Automatically generated fallback",
+          "rank": 1
+        },
+        {
+          "id": "dummy_1",
+          "description": "Fallback pain point 2",
+          "total_score": 49,
+          "justification": "Automatically generated fallback",
+          "rank": 2
+        },
+        {
+          "id": "dummy_2",
+          "description": "Fallback pain point 3",
+          "total_score": 48,
+          "justification": "Automatically generated fallback",
+          "rank": 3
+        },
+        {
+          "id": "dummy_3",
+          "description": "Fallback pain point 4",
+          "total_score": 47,
+          "justification": "Automatically generated fallback",
+          "rank": 4
+        },
+        {
+          "id": "dummy_4",
+          "description": "Fallback pain point 5",
+          "total_score": 46,
+          "justification": "Automatically generated fallback",
+          "rank": 5
+        },
+        {
+          "id": "dummy_5",
+          "description": "Fallback pain point 6",
+          "total_score": 45,
+          "justification": "Automatically generated fallback",
+          "rank": 6
+        },
+        {
+          "id": "dummy_6",
+          "description": "Fallback pain point 7",
+          "total_score": 44,
+          "justification": "Automatically generated fallback",
+          "rank": 7
+        },
+        {
+          "id": "dummy_7",
+          "description": "Fallback pain point 8",
+          "total_score": 43,
+          "justification": "Automatically generated fallback",
+          "rank": 8
+        },
+        {
+          "id": "dummy_8",
+          "description": "Fallback pain point 9",
+          "total_score": 42,
+          "justification": "Automatically generated fallback",
+          "rank": 9
+        },
+        {
+          "id": "dummy_9",
+          "description": "Fallback pain point 10",
+          "total_score": 41,
+          "justification": "Automatically generated fallback",
+          "rank": 10
+        }
+      ],
+      "top_pain_points": [
+        {
+          "id": "dummy_0",
+          "description": "Fallback pain point 1",
+          "total_score": 50,
+          "rank": 1
+        },
+        {
+          "id": "dummy_1",
+          "description": "Fallback pain point 2",
+          "total_score": 49,
+          "rank": 2
+        },
+        {
+          "id": "dummy_2",
+          "description": "Fallback pain point 3",
+          "total_score": 48,
+          "rank": 3
+        },
+        {
+          "id": "dummy_3",
+          "description": "Fallback pain point 4",
+          "total_score": 47,
+          "rank": 4
+        },
+        {
+          "id": "dummy_4",
+          "description": "Fallback pain point 5",
+          "total_score": 46,
+          "rank": 5
+        },
+        {
+          "id": "dummy_5",
+          "description": "Fallback pain point 6",
+          "total_score": 45,
+          "rank": 6
+        },
+        {
+          "id": "dummy_6",
+          "description": "Fallback pain point 7",
+          "total_score": 44,
+          "rank": 7
+        },
+        {
+          "id": "dummy_7",
+          "description": "Fallback pain point 8",
+          "total_score": 43,
+          "rank": 8
+        },
+        {
+          "id": "dummy_8",
+          "description": "Fallback pain point 9",
+          "total_score": 42,
+          "rank": 9
+        },
+        {
+          "id": "dummy_9",
+          "description": "Fallback pain point 10",
+          "total_score": 41,
+          "rank": 10
+        }
+      ],
+      "ranking_justification": "Fallback ranking based on total evaluation scores. Selected the top 10 pain points.",
+      "ranking_stats": {
+        "total_evaluated": 10,
+        "highest_score": 50,
+        "lowest_score": 41,
+        "average_score": 45.5,
+        "score_distribution": {
+          "high_potential": 0,
+          "medium_potential": 10,
+          "low_potential": 0
+        }
+      },
+      "confidence_score": 0.5
+    },
+    "validator_act": {
+      "validated_pain_points": [],
+      "validation_summary": "Unable to perform validation analysis due to insufficient data. The pain points array is empty and no condensed evidence has been provided. Without any specific pain points to evaluate and supporting/contradictory evidence to analyze, no validation assessment can be conducted.",
+      "confidence_score": 0.0,
+      "validation_timestamp": "2025-09-28T22:36:02.170209",
+      "processing_time": 4.639215,
+      "pain_points_analyzed": 0,
+      "evidence_sources_used": []
+    }
+  },
+  "report_style": "professional",
+  "include_animations": true
+}

@@ -1,0 +1,432 @@
+2025-09-28 22:30:22 - config - ERROR - openai.py:52 - initialize() - Failed to initialize OpenAI backend: OpenAI connection test failed: Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}
+2025-09-28 22:30:22 - config - ERROR - manager.py:59 - register_backend() - Failed to initialize backend: openai
+2025-09-28 22:30:42 - config - ERROR - screener.py:320 - act() - Error in act phase: No evaluations found in evaluation data
+Traceback (most recent call last):
+  File "/app/scout_agent/agents/screener.py", line 245, in act
+    raise ValueError("No evaluations found in evaluation data")
+ValueError: No evaluations found in evaluation data
+
+2025-09-28 22:30:48 - config - ERROR - validator.py:817 - think() - Error in think phase: No validation strategies found in plan and could not generate from input
+Traceback (most recent call last):
+  File "/app/scout_agent/agents/validator.py", line 720, in think
+    raise ValueError("No validation strategies found in plan and could not generate from input")
+ValueError: No validation strategies found in plan and could not generate from input
+
+2025-09-28 22:30:53 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_plan: Must provide validated pain points for gap analysis
+2025-09-28 22:30:53 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_plan: Must provide validated pain points for gap analysis
+2025-09-28 22:30:53 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_plan: Must provide validated pain points for gap analysis
+2025-09-28 22:30:53 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_plan: Must provide validated pain points for gap analysis
+2025-09-28 22:30:53 - config - ERROR - engine.py:292 - execute() - Node gap_finder_plan failed permanently
+2025-09-28 22:30:53 - config - ERROR - enhanced_main_orchestrator.py:508 - _execute_agent_node() - Self-heal plan generation failed: Must provide validated pain points for gap analysis
+2025-09-28 22:30:53 - config - ERROR - gap_finder.py:1520 - collect() - Error in gap_finder collect stage: 'NoneType' object has no attribute 'keys'
+2025-09-28 22:30:53 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_collect: 'NoneType' object has no attribute 'keys'
+2025-09-28 22:30:53 - config - ERROR - enhanced_main_orchestrator.py:508 - _execute_agent_node() - Self-heal plan generation failed: Must provide validated pain points for gap analysis
+2025-09-28 22:30:53 - config - ERROR - gap_finder.py:1520 - collect() - Error in gap_finder collect stage: 'NoneType' object has no attribute 'keys'
+2025-09-28 22:30:53 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_collect: 'NoneType' object has no attribute 'keys'
+2025-09-28 22:30:53 - config - ERROR - enhanced_main_orchestrator.py:508 - _execute_agent_node() - Self-heal plan generation failed: Must provide validated pain points for gap analysis
+2025-09-28 22:30:53 - config - ERROR - gap_finder.py:1520 - collect() - Error in gap_finder collect stage: 'NoneType' object has no attribute 'keys'
+2025-09-28 22:30:53 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_collect: 'NoneType' object has no attribute 'keys'
+2025-09-28 22:30:53 - config - ERROR - enhanced_main_orchestrator.py:508 - _execute_agent_node() - Self-heal plan generation failed: Must provide validated pain points for gap analysis
+2025-09-28 22:30:53 - config - ERROR - gap_finder.py:1520 - collect() - Error in gap_finder collect stage: 'NoneType' object has no attribute 'keys'
+2025-09-28 22:30:53 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_collect: 'NoneType' object has no attribute 'keys'
+2025-09-28 22:30:53 - config - ERROR - engine.py:292 - execute() - Node gap_finder_collect failed permanently
+2025-09-28 22:30:53 - config - ERROR - gap_finder.py:1088 - think() - Error in think stage: No aggregate gap analysis data found from collect stage
+2025-09-28 22:30:53 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_think: No aggregate gap analysis data found from collect stage
+2025-09-28 22:30:53 - config - ERROR - gap_finder.py:1088 - think() - Error in think stage: No aggregate gap analysis data found from collect stage
+2025-09-28 22:30:53 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_think: No aggregate gap analysis data found from collect stage
+2025-09-28 22:30:53 - config - ERROR - gap_finder.py:1088 - think() - Error in think stage: No aggregate gap analysis data found from collect stage
+2025-09-28 22:30:53 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_think: No aggregate gap analysis data found from collect stage
+2025-09-28 22:30:53 - config - ERROR - gap_finder.py:1088 - think() - Error in think stage: No aggregate gap analysis data found from collect stage
+2025-09-28 22:30:53 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_think: No aggregate gap analysis data found from collect stage
+2025-09-28 22:30:53 - config - ERROR - engine.py:292 - execute() - Node gap_finder_think failed permanently
+2025-09-28 22:30:53 - config - ERROR - gap_finder.py:1201 - act() - Error in act stage: Must provide validated pain points for gap analysis
+2025-09-28 22:30:53 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_act: Must provide validated pain points for gap analysis
+2025-09-28 22:30:53 - config - ERROR - gap_finder.py:1201 - act() - Error in act stage: Must provide validated pain points for gap analysis
+2025-09-28 22:30:53 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_act: Must provide validated pain points for gap analysis
+2025-09-28 22:30:53 - config - ERROR - gap_finder.py:1201 - act() - Error in act stage: Must provide validated pain points for gap analysis
+2025-09-28 22:30:53 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_act: Must provide validated pain points for gap analysis
+2025-09-28 22:30:53 - config - ERROR - gap_finder.py:1201 - act() - Error in act stage: Must provide validated pain points for gap analysis
+2025-09-28 22:30:53 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_act: Must provide validated pain points for gap analysis
+2025-09-28 22:30:53 - config - ERROR - engine.py:292 - execute() - Node gap_finder_act failed permanently
+2025-09-28 22:30:53 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node builder_think: BuilderInput.__init__() got an unexpected keyword argument 'market_gaps'
+2025-09-28 22:30:53 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node builder_think: BuilderInput.__init__() got an unexpected keyword argument 'market_gaps'
+2025-09-28 22:30:53 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node builder_think: BuilderInput.__init__() got an unexpected keyword argument 'market_gaps'
+2025-09-28 22:30:53 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node builder_think: BuilderInput.__init__() got an unexpected keyword argument 'market_gaps'
+2025-09-28 22:30:53 - config - ERROR - engine.py:292 - execute() - Node builder_think failed permanently
+2025-09-28 22:30:53 - config - ERROR - builder.py:260 - act() - No think stage data found
+2025-09-28 22:35:32 - config - ERROR - openai.py:52 - initialize() - Failed to initialize OpenAI backend: OpenAI connection test failed: Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}
+2025-09-28 22:35:32 - config - ERROR - manager.py:59 - register_backend() - Failed to initialize backend: openai
+2025-09-28 22:35:51 - config - ERROR - screener.py:320 - act() - Error in act phase: No evaluations found in evaluation data
+Traceback (most recent call last):
+  File "/app/scout_agent/agents/screener.py", line 245, in act
+    raise ValueError("No evaluations found in evaluation data")
+ValueError: No evaluations found in evaluation data
+
+2025-09-28 22:35:57 - config - ERROR - validator.py:817 - think() - Error in think phase: No validation strategies found in plan and could not generate from input
+Traceback (most recent call last):
+  File "/app/scout_agent/agents/validator.py", line 720, in think
+    raise ValueError("No validation strategies found in plan and could not generate from input")
+ValueError: No validation strategies found in plan and could not generate from input
+
+2025-09-28 22:36:02 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_plan: Must provide validated pain points for gap analysis
+2025-09-28 22:36:02 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_plan: Must provide validated pain points for gap analysis
+2025-09-28 22:36:02 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_plan: Must provide validated pain points for gap analysis
+2025-09-28 22:36:02 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_plan: Must provide validated pain points for gap analysis
+2025-09-28 22:36:02 - config - ERROR - engine.py:292 - execute() - Node gap_finder_plan failed permanently
+2025-09-28 22:36:02 - config - ERROR - enhanced_main_orchestrator.py:508 - _execute_agent_node() - Self-heal plan generation failed: Must provide validated pain points for gap analysis
+2025-09-28 22:36:02 - config - ERROR - gap_finder.py:1520 - collect() - Error in gap_finder collect stage: 'NoneType' object has no attribute 'keys'
+2025-09-28 22:36:02 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_collect: 'NoneType' object has no attribute 'keys'
+2025-09-28 22:36:02 - config - ERROR - enhanced_main_orchestrator.py:508 - _execute_agent_node() - Self-heal plan generation failed: Must provide validated pain points for gap analysis
+2025-09-28 22:36:02 - config - ERROR - gap_finder.py:1520 - collect() - Error in gap_finder collect stage: 'NoneType' object has no attribute 'keys'
+2025-09-28 22:36:02 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_collect: 'NoneType' object has no attribute 'keys'
+2025-09-28 22:36:02 - config - ERROR - enhanced_main_orchestrator.py:508 - _execute_agent_node() - Self-heal plan generation failed: Must provide validated pain points for gap analysis
+2025-09-28 22:36:02 - config - ERROR - gap_finder.py:1520 - collect() - Error in gap_finder collect stage: 'NoneType' object has no attribute 'keys'
+2025-09-28 22:36:02 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_collect: 'NoneType' object has no attribute 'keys'
+2025-09-28 22:36:02 - config - ERROR - enhanced_main_orchestrator.py:508 - _execute_agent_node() - Self-heal plan generation failed: Must provide validated pain points for gap analysis
+2025-09-28 22:36:02 - config - ERROR - gap_finder.py:1520 - collect() - Error in gap_finder collect stage: 'NoneType' object has no attribute 'keys'
+2025-09-28 22:36:02 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_collect: 'NoneType' object has no attribute 'keys'
+2025-09-28 22:36:02 - config - ERROR - engine.py:292 - execute() - Node gap_finder_collect failed permanently
+2025-09-28 22:36:02 - config - ERROR - gap_finder.py:1088 - think() - Error in think stage: No aggregate gap analysis data found from collect stage
+2025-09-28 22:36:02 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_think: No aggregate gap analysis data found from collect stage
+2025-09-28 22:36:02 - config - ERROR - gap_finder.py:1088 - think() - Error in think stage: No aggregate gap analysis data found from collect stage
+2025-09-28 22:36:02 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_think: No aggregate gap analysis data found from collect stage
+2025-09-28 22:36:02 - config - ERROR - gap_finder.py:1088 - think() - Error in think stage: No aggregate gap analysis data found from collect stage
+2025-09-28 22:36:02 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_think: No aggregate gap analysis data found from collect stage
+2025-09-28 22:36:02 - config - ERROR - gap_finder.py:1088 - think() - Error in think stage: No aggregate gap analysis data found from collect stage
+2025-09-28 22:36:02 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_think: No aggregate gap analysis data found from collect stage
+2025-09-28 22:36:02 - config - ERROR - engine.py:292 - execute() - Node gap_finder_think failed permanently
+2025-09-28 22:36:02 - config - ERROR - gap_finder.py:1201 - act() - Error in act stage: Must provide validated pain points for gap analysis
+2025-09-28 22:36:02 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_act: Must provide validated pain points for gap analysis
+2025-09-28 22:36:02 - config - ERROR - gap_finder.py:1201 - act() - Error in act stage: Must provide validated pain points for gap analysis
+2025-09-28 22:36:02 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_act: Must provide validated pain points for gap analysis
+2025-09-28 22:36:02 - config - ERROR - gap_finder.py:1201 - act() - Error in act stage: Must provide validated pain points for gap analysis
+2025-09-28 22:36:02 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_act: Must provide validated pain points for gap analysis
+2025-09-28 22:36:02 - config - ERROR - gap_finder.py:1201 - act() - Error in act stage: Must provide validated pain points for gap analysis
+2025-09-28 22:36:02 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_act: Must provide validated pain points for gap analysis
+2025-09-28 22:36:02 - config - ERROR - engine.py:292 - execute() - Node gap_finder_act failed permanently
+2025-09-28 22:36:02 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node builder_think: BuilderInput.__init__() got an unexpected keyword argument 'market_gaps'
+2025-09-28 22:36:02 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node builder_think: BuilderInput.__init__() got an unexpected keyword argument 'market_gaps'
+2025-09-28 22:36:02 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node builder_think: BuilderInput.__init__() got an unexpected keyword argument 'market_gaps'
+2025-09-28 22:36:02 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node builder_think: BuilderInput.__init__() got an unexpected keyword argument 'market_gaps'
+2025-09-28 22:36:02 - config - ERROR - engine.py:292 - execute() - Node builder_think failed permanently
+2025-09-28 22:36:02 - config - ERROR - builder.py:260 - act() - No think stage data found
+2025-09-28 22:39:21 - config - ERROR - openai.py:52 - initialize() - Failed to initialize OpenAI backend: Invalid OpenAI API key
+2025-09-28 22:39:21 - config - ERROR - manager.py:59 - register_backend() - Failed to initialize backend: openai
+2025-09-28 22:39:21 - config - ERROR - claude.py:52 - initialize() - Failed to initialize Claude backend: Invalid Anthropic API key
+2025-09-28 22:39:21 - config - ERROR - manager.py:59 - register_backend() - Failed to initialize backend: claude
+2025-09-28 22:39:21 - config - ERROR - gemini.py:68 - initialize() - Failed to initialize Gemini backend: Invalid Gemini API key
+2025-09-28 22:39:21 - config - ERROR - manager.py:59 - register_backend() - Failed to initialize backend: gemini
+2025-09-28 22:39:21 - config - ERROR - deepseek.py:55 - initialize() - Failed to initialize DeepSeek backend: Invalid DeepSeek API key
+2025-09-28 22:39:21 - config - ERROR - manager.py:59 - register_backend() - Failed to initialize backend: deepseek
+2025-09-28 22:39:22 - config - ERROR - openai.py:52 - initialize() - Failed to initialize OpenAI backend: Invalid OpenAI API key
+2025-09-28 22:39:22 - config - ERROR - manager.py:59 - register_backend() - Failed to initialize backend: openai
+2025-09-28 22:39:22 - config - ERROR - claude.py:52 - initialize() - Failed to initialize Claude backend: Invalid Anthropic API key
+2025-09-28 22:39:22 - config - ERROR - manager.py:59 - register_backend() - Failed to initialize backend: claude
+2025-09-28 22:39:22 - config - ERROR - gemini.py:68 - initialize() - Failed to initialize Gemini backend: Invalid Gemini API key
+2025-09-28 22:39:22 - config - ERROR - manager.py:59 - register_backend() - Failed to initialize backend: gemini
+2025-09-28 22:39:22 - config - ERROR - deepseek.py:55 - initialize() - Failed to initialize DeepSeek backend: Invalid DeepSeek API key
+2025-09-28 22:39:22 - config - ERROR - manager.py:59 - register_backend() - Failed to initialize backend: deepseek
+2025-09-28 22:39:22 - config - ERROR - openai.py:52 - initialize() - Failed to initialize OpenAI backend: Invalid OpenAI API key
+2025-09-28 22:39:22 - config - ERROR - manager.py:59 - register_backend() - Failed to initialize backend: openai
+2025-09-28 22:39:23 - config - ERROR - claude.py:52 - initialize() - Failed to initialize Claude backend: Invalid Anthropic API key
+2025-09-28 22:39:23 - config - ERROR - manager.py:59 - register_backend() - Failed to initialize backend: claude
+2025-09-28 22:39:23 - config - ERROR - gemini.py:68 - initialize() - Failed to initialize Gemini backend: Invalid Gemini API key
+2025-09-28 22:39:23 - config - ERROR - manager.py:59 - register_backend() - Failed to initialize backend: gemini
+2025-09-28 22:39:23 - config - ERROR - deepseek.py:55 - initialize() - Failed to initialize DeepSeek backend: Invalid DeepSeek API key
+2025-09-28 22:39:23 - config - ERROR - manager.py:59 - register_backend() - Failed to initialize backend: deepseek
+2025-09-28 22:39:23 - config - ERROR - utils.py:259 - llm_generate() - Error in LLM generation: Backend not available: deepseek
+2025-09-28 22:39:23 - config - ERROR - scout.py:285 - plan() - Error in plan phase: Backend not available: deepseek
+Traceback (most recent call last):
+  File "/app/scout_agent/agents/scout.py", line 207, in plan
+    llm_text = await self.llm_generate(prompt=metadata_prompt, task_type="plan", max_tokens=1000)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/scout_agent/llm/utils.py", line 249, in llm_generate
+    response = await self._llm_manager.generate(request, resolved_backend)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/scout_agent/llm/manager.py", line 156, in generate
+    raise LLMError(f"Backend not available: {target_backend}")
+scout_agent.llm.base.LLMError: Backend not available: deepseek
+
+2025-09-28 22:39:23 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node scout_plan: Failed to generate plan: Backend not available: deepseek
+2025-09-28 22:39:23 - config - ERROR - utils.py:259 - llm_generate() - Error in LLM generation: Backend not available: deepseek
+2025-09-28 22:39:23 - config - ERROR - scout.py:285 - plan() - Error in plan phase: Backend not available: deepseek
+Traceback (most recent call last):
+  File "/app/scout_agent/agents/scout.py", line 207, in plan
+    llm_text = await self.llm_generate(prompt=metadata_prompt, task_type="plan", max_tokens=1000)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/scout_agent/llm/utils.py", line 249, in llm_generate
+    response = await self._llm_manager.generate(request, resolved_backend)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/scout_agent/llm/manager.py", line 156, in generate
+    raise LLMError(f"Backend not available: {target_backend}")
+scout_agent.llm.base.LLMError: Backend not available: deepseek
+
+2025-09-28 22:39:23 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node scout_plan: Failed to generate plan: Backend not available: deepseek
+2025-09-28 22:39:23 - config - ERROR - utils.py:259 - llm_generate() - Error in LLM generation: Backend not available: deepseek
+2025-09-28 22:39:23 - config - ERROR - scout.py:285 - plan() - Error in plan phase: Backend not available: deepseek
+Traceback (most recent call last):
+  File "/app/scout_agent/agents/scout.py", line 207, in plan
+    llm_text = await self.llm_generate(prompt=metadata_prompt, task_type="plan", max_tokens=1000)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/scout_agent/llm/utils.py", line 249, in llm_generate
+    response = await self._llm_manager.generate(request, resolved_backend)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/scout_agent/llm/manager.py", line 156, in generate
+    raise LLMError(f"Backend not available: {target_backend}")
+scout_agent.llm.base.LLMError: Backend not available: deepseek
+
+2025-09-28 22:39:23 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node scout_plan: Failed to generate plan: Backend not available: deepseek
+2025-09-28 22:39:24 - config - ERROR - utils.py:259 - llm_generate() - Error in LLM generation: Backend not available: deepseek
+2025-09-28 22:39:24 - config - ERROR - scout.py:285 - plan() - Error in plan phase: Backend not available: deepseek
+Traceback (most recent call last):
+  File "/app/scout_agent/agents/scout.py", line 207, in plan
+    llm_text = await self.llm_generate(prompt=metadata_prompt, task_type="plan", max_tokens=1000)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/scout_agent/llm/utils.py", line 249, in llm_generate
+    response = await self._llm_manager.generate(request, resolved_backend)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/scout_agent/llm/manager.py", line 156, in generate
+    raise LLMError(f"Backend not available: {target_backend}")
+scout_agent.llm.base.LLMError: Backend not available: deepseek
+
+2025-09-28 22:39:24 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node scout_plan: Failed to generate plan: Backend not available: deepseek
+2025-09-28 22:39:24 - config - ERROR - engine.py:292 - execute() - Node scout_plan failed permanently
+2025-09-28 22:39:24 - config - ERROR - utils.py:259 - llm_generate() - Error in LLM generation: Backend not available: deepseek
+2025-09-28 22:39:24 - config - ERROR - scout.py:285 - plan() - Error in plan phase: Backend not available: deepseek
+Traceback (most recent call last):
+  File "/app/scout_agent/agents/scout.py", line 207, in plan
+    llm_text = await self.llm_generate(prompt=metadata_prompt, task_type="plan", max_tokens=1000)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/scout_agent/llm/utils.py", line 249, in llm_generate
+    response = await self._llm_manager.generate(request, resolved_backend)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/scout_agent/llm/manager.py", line 156, in generate
+    raise LLMError(f"Backend not available: {target_backend}")
+scout_agent.llm.base.LLMError: Backend not available: deepseek
+
+2025-09-28 22:39:24 - config - ERROR - enhanced_main_orchestrator.py:508 - _execute_agent_node() - Self-heal plan generation failed: Failed to generate plan: Backend not available: deepseek
+2025-09-28 22:39:24 - config - ERROR - scout.py:1235 - collect() - Collect stage error: Either plan or plan_path must be provided
+Traceback (most recent call last):
+  File "/app/scout_agent/agents/scout.py", line 1215, in collect
+    raise ValueError("Either plan or plan_path must be provided")
+ValueError: Either plan or plan_path must be provided
+
+2025-09-28 22:39:24 - config - ERROR - utils.py:259 - llm_generate() - Error in LLM generation: Backend not available: deepseek
+2025-09-28 22:39:24 - config - ERROR - screener.py:320 - act() - Error in act phase: No evaluations found in evaluation data
+Traceback (most recent call last):
+  File "/app/scout_agent/agents/screener.py", line 245, in act
+    raise ValueError("No evaluations found in evaluation data")
+ValueError: No evaluations found in evaluation data
+
+2025-09-28 22:39:24 - config - ERROR - openai.py:52 - initialize() - Failed to initialize OpenAI backend: Invalid OpenAI API key
+2025-09-28 22:39:24 - config - ERROR - manager.py:59 - register_backend() - Failed to initialize backend: openai
+2025-09-28 22:39:25 - config - ERROR - claude.py:52 - initialize() - Failed to initialize Claude backend: Invalid Anthropic API key
+2025-09-28 22:39:25 - config - ERROR - manager.py:59 - register_backend() - Failed to initialize backend: claude
+2025-09-28 22:39:25 - config - ERROR - gemini.py:68 - initialize() - Failed to initialize Gemini backend: Invalid Gemini API key
+2025-09-28 22:39:25 - config - ERROR - manager.py:59 - register_backend() - Failed to initialize backend: gemini
+2025-09-28 22:39:26 - config - ERROR - deepseek.py:55 - initialize() - Failed to initialize DeepSeek backend: Invalid DeepSeek API key
+2025-09-28 22:39:26 - config - ERROR - manager.py:59 - register_backend() - Failed to initialize backend: deepseek
+2025-09-28 22:39:26 - config - ERROR - utils.py:259 - llm_generate() - Error in LLM generation: Backend not available: deepseek
+2025-09-28 22:39:26 - config - ERROR - validator.py:236 - plan() - Error in plan phase: Backend not available: deepseek
+Traceback (most recent call last):
+  File "/app/scout_agent/agents/validator.py", line 229, in plan
+    llm_text = await self.llm_generate(prompt=prompt_text, task_type="plan")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/scout_agent/llm/utils.py", line 249, in llm_generate
+    response = await self._llm_manager.generate(request, resolved_backend)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/scout_agent/llm/manager.py", line 156, in generate
+    raise LLMError(f"Backend not available: {target_backend}")
+scout_agent.llm.base.LLMError: Backend not available: deepseek
+
+2025-09-28 22:39:26 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node validator_plan: Failed to generate plan: Backend not available: deepseek
+2025-09-28 22:39:27 - config - ERROR - utils.py:259 - llm_generate() - Error in LLM generation: Backend not available: deepseek
+2025-09-28 22:39:27 - config - ERROR - validator.py:236 - plan() - Error in plan phase: Backend not available: deepseek
+Traceback (most recent call last):
+  File "/app/scout_agent/agents/validator.py", line 229, in plan
+    llm_text = await self.llm_generate(prompt=prompt_text, task_type="plan")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/scout_agent/llm/utils.py", line 249, in llm_generate
+    response = await self._llm_manager.generate(request, resolved_backend)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/scout_agent/llm/manager.py", line 156, in generate
+    raise LLMError(f"Backend not available: {target_backend}")
+scout_agent.llm.base.LLMError: Backend not available: deepseek
+
+2025-09-28 22:39:27 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node validator_plan: Failed to generate plan: Backend not available: deepseek
+2025-09-28 22:39:27 - config - ERROR - utils.py:259 - llm_generate() - Error in LLM generation: Backend not available: deepseek
+2025-09-28 22:39:27 - config - ERROR - validator.py:236 - plan() - Error in plan phase: Backend not available: deepseek
+Traceback (most recent call last):
+  File "/app/scout_agent/agents/validator.py", line 229, in plan
+    llm_text = await self.llm_generate(prompt=prompt_text, task_type="plan")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/scout_agent/llm/utils.py", line 249, in llm_generate
+    response = await self._llm_manager.generate(request, resolved_backend)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/scout_agent/llm/manager.py", line 156, in generate
+    raise LLMError(f"Backend not available: {target_backend}")
+scout_agent.llm.base.LLMError: Backend not available: deepseek
+
+2025-09-28 22:39:27 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node validator_plan: Failed to generate plan: Backend not available: deepseek
+2025-09-28 22:39:27 - config - ERROR - utils.py:259 - llm_generate() - Error in LLM generation: Backend not available: deepseek
+2025-09-28 22:39:27 - config - ERROR - validator.py:236 - plan() - Error in plan phase: Backend not available: deepseek
+Traceback (most recent call last):
+  File "/app/scout_agent/agents/validator.py", line 229, in plan
+    llm_text = await self.llm_generate(prompt=prompt_text, task_type="plan")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/scout_agent/llm/utils.py", line 249, in llm_generate
+    response = await self._llm_manager.generate(request, resolved_backend)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/scout_agent/llm/manager.py", line 156, in generate
+    raise LLMError(f"Backend not available: {target_backend}")
+scout_agent.llm.base.LLMError: Backend not available: deepseek
+
+2025-09-28 22:39:27 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node validator_plan: Failed to generate plan: Backend not available: deepseek
+2025-09-28 22:39:27 - config - ERROR - engine.py:292 - execute() - Node validator_plan failed permanently
+2025-09-28 22:39:27 - config - ERROR - utils.py:259 - llm_generate() - Error in LLM generation: Backend not available: deepseek
+2025-09-28 22:39:27 - config - ERROR - validator.py:236 - plan() - Error in plan phase: Backend not available: deepseek
+Traceback (most recent call last):
+  File "/app/scout_agent/agents/validator.py", line 229, in plan
+    llm_text = await self.llm_generate(prompt=prompt_text, task_type="plan")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/scout_agent/llm/utils.py", line 249, in llm_generate
+    response = await self._llm_manager.generate(request, resolved_backend)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/scout_agent/llm/manager.py", line 156, in generate
+    raise LLMError(f"Backend not available: {target_backend}")
+scout_agent.llm.base.LLMError: Backend not available: deepseek
+
+2025-09-28 22:39:27 - config - ERROR - enhanced_main_orchestrator.py:508 - _execute_agent_node() - Self-heal plan generation failed: Failed to generate plan: Backend not available: deepseek
+2025-09-28 22:39:27 - config - ERROR - validator.py:531 - collect() - Collect stage error: Either plan or plan_path must be provided
+Traceback (most recent call last):
+  File "/app/scout_agent/agents/validator.py", line 511, in collect
+    raise ValueError("Either plan or plan_path must be provided")
+ValueError: Either plan or plan_path must be provided
+
+2025-09-28 22:39:27 - config - ERROR - validator.py:817 - think() - Error in think phase: No validation plan available
+Traceback (most recent call last):
+  File "/app/scout_agent/agents/validator.py", line 695, in think
+    raise ValueError("No validation plan available")
+ValueError: No validation plan available
+
+2025-09-28 22:39:27 - config - ERROR - utils.py:259 - llm_generate() - Error in LLM generation: Backend not available: deepseek
+2025-09-28 22:39:27 - config - ERROR - validator.py:1339 - act() - Error in act phase: Backend not available: deepseek
+2025-09-28 22:39:27 - config - ERROR - validator.py:1340 - act() - Traceback (most recent call last):
+  File "/app/scout_agent/agents/validator.py", line 1309, in act
+    response = await self.llm_generate(prompt=prompt, task_type="analysis")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/scout_agent/llm/utils.py", line 249, in llm_generate
+    response = await self._llm_manager.generate(request, resolved_backend)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/scout_agent/llm/manager.py", line 156, in generate
+    raise LLMError(f"Backend not available: {target_backend}")
+scout_agent.llm.base.LLMError: Backend not available: deepseek
+
+2025-09-28 22:39:27 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_plan: Must provide validated pain points for gap analysis
+2025-09-28 22:39:27 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_plan: Must provide validated pain points for gap analysis
+2025-09-28 22:39:27 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_plan: Must provide validated pain points for gap analysis
+2025-09-28 22:39:27 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_plan: Must provide validated pain points for gap analysis
+2025-09-28 22:39:27 - config - ERROR - engine.py:292 - execute() - Node gap_finder_plan failed permanently
+2025-09-28 22:39:27 - config - ERROR - enhanced_main_orchestrator.py:508 - _execute_agent_node() - Self-heal plan generation failed: Must provide validated pain points for gap analysis
+2025-09-28 22:39:27 - config - ERROR - gap_finder.py:1520 - collect() - Error in gap_finder collect stage: 'NoneType' object has no attribute 'keys'
+2025-09-28 22:39:27 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_collect: 'NoneType' object has no attribute 'keys'
+2025-09-28 22:39:27 - config - ERROR - enhanced_main_orchestrator.py:508 - _execute_agent_node() - Self-heal plan generation failed: Must provide validated pain points for gap analysis
+2025-09-28 22:39:27 - config - ERROR - gap_finder.py:1520 - collect() - Error in gap_finder collect stage: 'NoneType' object has no attribute 'keys'
+2025-09-28 22:39:27 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_collect: 'NoneType' object has no attribute 'keys'
+2025-09-28 22:39:27 - config - ERROR - enhanced_main_orchestrator.py:508 - _execute_agent_node() - Self-heal plan generation failed: Must provide validated pain points for gap analysis
+2025-09-28 22:39:27 - config - ERROR - gap_finder.py:1520 - collect() - Error in gap_finder collect stage: 'NoneType' object has no attribute 'keys'
+2025-09-28 22:39:27 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_collect: 'NoneType' object has no attribute 'keys'
+2025-09-28 22:39:27 - config - ERROR - enhanced_main_orchestrator.py:508 - _execute_agent_node() - Self-heal plan generation failed: Must provide validated pain points for gap analysis
+2025-09-28 22:39:27 - config - ERROR - gap_finder.py:1520 - collect() - Error in gap_finder collect stage: 'NoneType' object has no attribute 'keys'
+2025-09-28 22:39:27 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_collect: 'NoneType' object has no attribute 'keys'
+2025-09-28 22:39:27 - config - ERROR - engine.py:292 - execute() - Node gap_finder_collect failed permanently
+2025-09-28 22:39:27 - config - ERROR - gap_finder.py:1088 - think() - Error in think stage: No aggregate gap analysis data found from collect stage
+2025-09-28 22:39:27 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_think: No aggregate gap analysis data found from collect stage
+2025-09-28 22:39:27 - config - ERROR - gap_finder.py:1088 - think() - Error in think stage: No aggregate gap analysis data found from collect stage
+2025-09-28 22:39:27 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_think: No aggregate gap analysis data found from collect stage
+2025-09-28 22:39:27 - config - ERROR - gap_finder.py:1088 - think() - Error in think stage: No aggregate gap analysis data found from collect stage
+2025-09-28 22:39:27 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_think: No aggregate gap analysis data found from collect stage
+2025-09-28 22:39:27 - config - ERROR - gap_finder.py:1088 - think() - Error in think stage: No aggregate gap analysis data found from collect stage
+2025-09-28 22:39:27 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_think: No aggregate gap analysis data found from collect stage
+2025-09-28 22:39:27 - config - ERROR - engine.py:292 - execute() - Node gap_finder_think failed permanently
+2025-09-28 22:39:27 - config - ERROR - gap_finder.py:1201 - act() - Error in act stage: Must provide validated pain points for gap analysis
+2025-09-28 22:39:27 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_act: Must provide validated pain points for gap analysis
+2025-09-28 22:39:27 - config - ERROR - gap_finder.py:1201 - act() - Error in act stage: Must provide validated pain points for gap analysis
+2025-09-28 22:39:27 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_act: Must provide validated pain points for gap analysis
+2025-09-28 22:39:27 - config - ERROR - gap_finder.py:1201 - act() - Error in act stage: Must provide validated pain points for gap analysis
+2025-09-28 22:39:27 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_act: Must provide validated pain points for gap analysis
+2025-09-28 22:39:27 - config - ERROR - gap_finder.py:1201 - act() - Error in act stage: Must provide validated pain points for gap analysis
+2025-09-28 22:39:27 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_act: Must provide validated pain points for gap analysis
+2025-09-28 22:39:27 - config - ERROR - engine.py:292 - execute() - Node gap_finder_act failed permanently
+2025-09-28 22:39:27 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node builder_think: BuilderInput.__init__() got an unexpected keyword argument 'market_gaps'
+2025-09-28 22:39:27 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node builder_think: BuilderInput.__init__() got an unexpected keyword argument 'market_gaps'
+2025-09-28 22:39:27 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node builder_think: BuilderInput.__init__() got an unexpected keyword argument 'market_gaps'
+2025-09-28 22:39:27 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node builder_think: BuilderInput.__init__() got an unexpected keyword argument 'market_gaps'
+2025-09-28 22:39:27 - config - ERROR - engine.py:292 - execute() - Node builder_think failed permanently
+2025-09-28 22:39:27 - config - ERROR - builder.py:260 - act() - No think stage data found
+2025-09-28 22:39:28 - config - ERROR - openai.py:52 - initialize() - Failed to initialize OpenAI backend: Invalid OpenAI API key
+2025-09-28 22:39:28 - config - ERROR - manager.py:59 - register_backend() - Failed to initialize backend: openai
+2025-09-28 22:39:40 - config - ERROR - claude.py:52 - initialize() - Failed to initialize Claude backend: Invalid Anthropic API key
+2025-09-28 22:39:40 - config - ERROR - manager.py:59 - register_backend() - Failed to initialize backend: claude
+2025-09-28 22:39:40 - config - ERROR - gemini.py:68 - initialize() - Failed to initialize Gemini backend: Invalid Gemini API key
+2025-09-28 22:39:40 - config - ERROR - manager.py:59 - register_backend() - Failed to initialize backend: gemini
+2025-09-28 22:39:41 - config - ERROR - deepseek.py:55 - initialize() - Failed to initialize DeepSeek backend: Invalid DeepSeek API key
+2025-09-28 22:39:41 - config - ERROR - manager.py:59 - register_backend() - Failed to initialize backend: deepseek
+2025-09-28 22:39:42 - config - ERROR - utils.py:259 - llm_generate() - Error in LLM generation: Backend not available: deepseek
+2025-09-28 22:39:42 - config - ERROR - utils.py:259 - llm_generate() - Error in LLM generation: Backend not available: deepseek
+2025-09-28 22:42:50 - config - ERROR - openai.py:52 - initialize() - Failed to initialize OpenAI backend: OpenAI connection test failed: Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}
+2025-09-28 22:42:50 - config - ERROR - manager.py:59 - register_backend() - Failed to initialize backend: openai
+2025-09-28 22:43:10 - config - ERROR - screener.py:320 - act() - Error in act phase: No evaluations found in evaluation data
+Traceback (most recent call last):
+  File "/app/scout_agent/agents/screener.py", line 245, in act
+    raise ValueError("No evaluations found in evaluation data")
+ValueError: No evaluations found in evaluation data
+
+2025-09-28 22:43:17 - config - ERROR - validator.py:817 - think() - Error in think phase: No validation strategies found in plan and could not generate from input
+Traceback (most recent call last):
+  File "/app/scout_agent/agents/validator.py", line 720, in think
+    raise ValueError("No validation strategies found in plan and could not generate from input")
+ValueError: No validation strategies found in plan and could not generate from input
+
+2025-09-28 22:43:25 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_plan: Must provide validated pain points for gap analysis
+2025-09-28 22:43:25 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_plan: Must provide validated pain points for gap analysis
+2025-09-28 22:43:25 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_plan: Must provide validated pain points for gap analysis
+2025-09-28 22:43:25 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_plan: Must provide validated pain points for gap analysis
+2025-09-28 22:43:25 - config - ERROR - engine.py:292 - execute() - Node gap_finder_plan failed permanently
+2025-09-28 22:43:25 - config - ERROR - enhanced_main_orchestrator.py:508 - _execute_agent_node() - Self-heal plan generation failed: Must provide validated pain points for gap analysis
+2025-09-28 22:43:25 - config - ERROR - gap_finder.py:1520 - collect() - Error in gap_finder collect stage: 'NoneType' object has no attribute 'keys'
+2025-09-28 22:43:25 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_collect: 'NoneType' object has no attribute 'keys'
+2025-09-28 22:43:25 - config - ERROR - enhanced_main_orchestrator.py:508 - _execute_agent_node() - Self-heal plan generation failed: Must provide validated pain points for gap analysis
+2025-09-28 22:43:25 - config - ERROR - gap_finder.py:1520 - collect() - Error in gap_finder collect stage: 'NoneType' object has no attribute 'keys'
+2025-09-28 22:43:25 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_collect: 'NoneType' object has no attribute 'keys'
+2025-09-28 22:43:25 - config - ERROR - enhanced_main_orchestrator.py:508 - _execute_agent_node() - Self-heal plan generation failed: Must provide validated pain points for gap analysis
+2025-09-28 22:43:25 - config - ERROR - gap_finder.py:1520 - collect() - Error in gap_finder collect stage: 'NoneType' object has no attribute 'keys'
+2025-09-28 22:43:25 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_collect: 'NoneType' object has no attribute 'keys'
+2025-09-28 22:43:25 - config - ERROR - enhanced_main_orchestrator.py:508 - _execute_agent_node() - Self-heal plan generation failed: Must provide validated pain points for gap analysis
+2025-09-28 22:43:25 - config - ERROR - gap_finder.py:1520 - collect() - Error in gap_finder collect stage: 'NoneType' object has no attribute 'keys'
+2025-09-28 22:43:25 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_collect: 'NoneType' object has no attribute 'keys'
+2025-09-28 22:43:25 - config - ERROR - engine.py:292 - execute() - Node gap_finder_collect failed permanently
+2025-09-28 22:43:25 - config - ERROR - gap_finder.py:1088 - think() - Error in think stage: No aggregate gap analysis data found from collect stage
+2025-09-28 22:43:25 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_think: No aggregate gap analysis data found from collect stage
+2025-09-28 22:43:25 - config - ERROR - gap_finder.py:1088 - think() - Error in think stage: No aggregate gap analysis data found from collect stage
+2025-09-28 22:43:25 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_think: No aggregate gap analysis data found from collect stage
+2025-09-28 22:43:25 - config - ERROR - gap_finder.py:1088 - think() - Error in think stage: No aggregate gap analysis data found from collect stage
+2025-09-28 22:43:25 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_think: No aggregate gap analysis data found from collect stage
+2025-09-28 22:43:25 - config - ERROR - gap_finder.py:1088 - think() - Error in think stage: No aggregate gap analysis data found from collect stage
+2025-09-28 22:43:25 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_think: No aggregate gap analysis data found from collect stage
+2025-09-28 22:43:25 - config - ERROR - engine.py:292 - execute() - Node gap_finder_think failed permanently
+2025-09-28 22:43:25 - config - ERROR - gap_finder.py:1201 - act() - Error in act stage: Must provide validated pain points for gap analysis
+2025-09-28 22:43:25 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_act: Must provide validated pain points for gap analysis
+2025-09-28 22:43:25 - config - ERROR - gap_finder.py:1201 - act() - Error in act stage: Must provide validated pain points for gap analysis
+2025-09-28 22:43:25 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_act: Must provide validated pain points for gap analysis
+2025-09-28 22:43:25 - config - ERROR - gap_finder.py:1201 - act() - Error in act stage: Must provide validated pain points for gap analysis
+2025-09-28 22:43:25 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_act: Must provide validated pain points for gap analysis
+2025-09-28 22:43:25 - config - ERROR - gap_finder.py:1201 - act() - Error in act stage: Must provide validated pain points for gap analysis
+2025-09-28 22:43:25 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node gap_finder_act: Must provide validated pain points for gap analysis
+2025-09-28 22:43:25 - config - ERROR - engine.py:292 - execute() - Node gap_finder_act failed permanently
+2025-09-28 22:43:25 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node builder_think: BuilderInput.__init__() got an unexpected keyword argument 'market_gaps'
+2025-09-28 22:43:25 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node builder_think: BuilderInput.__init__() got an unexpected keyword argument 'market_gaps'
+2025-09-28 22:43:25 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node builder_think: BuilderInput.__init__() got an unexpected keyword argument 'market_gaps'
+2025-09-28 22:43:25 - config - ERROR - enhanced_main_orchestrator.py:423 - _execute_node() - Error executing node builder_think: BuilderInput.__init__() got an unexpected keyword argument 'market_gaps'
+2025-09-28 22:43:25 - config - ERROR - engine.py:292 - execute() - Node builder_think failed permanently
+2025-09-28 22:43:25 - config - ERROR - builder.py:260 - act() - No think stage data found
