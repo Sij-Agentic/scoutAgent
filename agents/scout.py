@@ -388,6 +388,7 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
     
     async def think(self, agent_input: AgentInput, plan: Dict[str, Any] = None) -> Dict[str, Any]:
         """Analyze collected Reddit data to identify pain points."""
+        self.logger.info("=== DOCKER DEBUG: SCOUT THINK METHOD CALLED ===")
         self.logger.info("Thinking about discovered pain points from collected Reddit data...")
         
         # Normalize input data
@@ -490,26 +491,78 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
             threads = []
             comments = []
             
+            self.logger.info("=== DOCKER DEBUG: STARTING REDDIT DATA PROCESSING ===")
+            self.logger.info(f"DOCKER DEBUG: Reddit data keys: {list(reddit_data.keys())}")
+            self.logger.info(f"DOCKER DEBUG: Reddit data type: {type(reddit_data)}")
+            
             # Extract threads and comments from the collected data
             # First, try to parse JSON strings from content field (MCP tool format)
             if "sources" in reddit_data and "reddit" in reddit_data["sources"]:
+                self.logger.info(f"DOCKER DEBUG: Found sources.reddit structure")
                 reddit_source = reddit_data["sources"]["reddit"]
+                self.logger.info(f"DOCKER DEBUG: Reddit source keys: {list(reddit_source.keys())}")
                 if "content" in reddit_source and isinstance(reddit_source["content"], list):
                     self.logger.info("Found Reddit data in sources.reddit.content format")
-                    for content_item in reddit_source["content"]:
+                    self.logger.info(f"DOCKER DEBUG: Content list length: {len(reddit_source['content'])}")
+                    for i, content_item in enumerate(reddit_source["content"]):
+                        self.logger.info(f"DOCKER DEBUG: Processing content item {i}: {type(content_item)}")
                         if isinstance(content_item, dict) and "text" in content_item:
+                            self.logger.info(f"DOCKER DEBUG: Found text field in content item {i}")
                             try:
                                 # Parse the JSON string from the text field
-                                parsed_data = json.loads(content_item["text"])
+                                content_text = content_item["text"]
+                                self.logger.info(f"DOCKER DEBUG: Attempting to parse JSON content (length: {len(content_text)})")
+                                self.logger.info(f"DOCKER DEBUG: Content preview: {content_text[:200]}...")
+                                self.logger.info(f"DOCKER DEBUG: Content type: {type(content_text)}")
+                                
+                                parsed_data = json.loads(content_text)
                                 if "threads" in parsed_data:
                                     threads = parsed_data["threads"]
                                     self.logger.info(f"Parsed {len(threads)} threads from JSON content")
+                                    if len(threads) == 0:
+                                        self.logger.warning("DOCKER DEBUG: Reddit tool returned empty threads array - this is the root cause!")
+                                        self.logger.warning("DOCKER DEBUG: The Reddit tool execution found no threads in Docker environment")
                                 if "comments" in parsed_data:
                                     comments = parsed_data["comments"]
                                     self.logger.info(f"Parsed {len(comments)} comments from JSON content")
                                 break
                             except json.JSONDecodeError as e:
-                                self.logger.warning(f"Failed to parse JSON from content: {e}")
+                                self.logger.error(f"Docker Debug: JSON parsing failed: {e}")
+                                self.logger.error(f"Docker Debug: Content type: {type(content_text)}")
+                                self.logger.error(f"Docker Debug: Content length: {len(content_text) if content_text else 'None'}")
+                                self.logger.error(f"Docker Debug: Content sample: {repr(content_text[:500]) if content_text else 'None'}")
+                                
+                                # Docker-specific fallback: try to clean and reparse JSON
+                                try:
+                                    self.logger.info("Docker Debug: Attempting JSON cleanup and reparse...")
+                                    # Remove any potential BOM or encoding issues
+                                    cleaned_text = content_text.strip()
+                                    if cleaned_text.startswith('\ufeff'):
+                                        cleaned_text = cleaned_text[1:]  # Remove BOM
+                                    
+                                    # Try to fix common JSON issues
+                                    if not cleaned_text.startswith('{') and not cleaned_text.startswith('['):
+                                        # Look for JSON-like content within the text
+                                        import re
+                                        json_match = re.search(r'\{.*\}', cleaned_text, re.DOTALL)
+                                        if json_match:
+                                            cleaned_text = json_match.group(0)
+                                            self.logger.info(f"Docker Debug: Extracted JSON from text: {len(cleaned_text)} chars")
+                                    
+                                    # Attempt to parse the cleaned JSON
+                                    parsed_data = json.loads(cleaned_text)
+                                    if "threads" in parsed_data:
+                                        threads = parsed_data["threads"]
+                                        self.logger.info(f"Docker Debug: Successfully parsed {len(threads)} threads after cleanup")
+                                    if "comments" in parsed_data:
+                                        comments = parsed_data["comments"]
+                                        self.logger.info(f"Docker Debug: Successfully parsed {len(comments)} comments after cleanup")
+                                    break
+                                except Exception as cleanup_error:
+                                    self.logger.error(f"Docker Debug: JSON cleanup also failed: {cleanup_error}")
+                                    continue
+                            except Exception as e:
+                                self.logger.error(f"Docker Debug: Unexpected error parsing JSON: {e}")
                                 continue
             
             # Check if data is nested under 'data' key (manifest structure)
@@ -523,6 +576,38 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
                 # Direct access (fallback)
                 threads = reddit_data.get("threads", [])
                 comments = reddit_data.get("comments", [])
+            
+            # Docker-specific fallback: Check for completely different data structure
+            if not threads:
+                self.logger.info("DOCKER DEBUG: No threads found in standard locations, checking for alternative structures...")
+                self.logger.info(f"DOCKER DEBUG: Full reddit_data structure: {json.dumps(reddit_data, indent=2, default=str)[:1000]}...")
+                
+                # Try to find threads in any location within the data
+                def find_threads_recursive(data, path=""):
+                    if isinstance(data, dict):
+                        for key, value in data.items():
+                            if key == "threads" and isinstance(value, list):
+                                self.logger.info(f"DOCKER DEBUG: Found threads at {path}.{key}: {len(value)} items")
+                                return value
+                            elif isinstance(value, (dict, list)):
+                                result = find_threads_recursive(value, f"{path}.{key}" if path else key)
+                                if result:
+                                    return result
+                    elif isinstance(data, list):
+                        for i, item in enumerate(data):
+                            if isinstance(item, dict) and "threads" in item:
+                                self.logger.info(f"DOCKER DEBUG: Found threads in list item {i}: {len(item['threads'])} items")
+                                return item["threads"]
+                            elif isinstance(item, (dict, list)):
+                                result = find_threads_recursive(item, f"{path}[{i}]")
+                                if result:
+                                    return result
+                    return None
+                
+                found_threads = find_threads_recursive(reddit_data)
+                if found_threads:
+                    threads = found_threads
+                    self.logger.info(f"DOCKER DEBUG: Successfully found {len(threads)} threads using recursive search")
             
             # Check if data is nested under 'result' key (common MCP tool pattern)
             if not threads and not comments and "result" in reddit_data:
