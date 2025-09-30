@@ -8,8 +8,8 @@ import time
 import json
 
 # Configuration
-API_URL = "https://scout-agent-api-xxxxx-uc.a.run.app"  # Replace with your actual URL
-BUCKET_NAME = "scout-agent-outputs"  # Replace with your bucket
+API_URL = "https://scout-agent-511946707043.us-central1.run.app"
+BUCKET_NAME = "scout-agent-outputs"
 
 def test_job_creation():
     """Test creating a job"""

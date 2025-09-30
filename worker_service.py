@@ -64,6 +64,34 @@ async def process_job(request: ProcessRequest):
             
             print(f"Running ScoutAgent command: {' '.join(cmd)}")
             result = subprocess.run(cmd, capture_output=True, text=True, timeout=900)
+
+            # Persist worker stdout/stderr for diagnostics
+            log_dir = os.path.join(temp_dir, "worker_logs")
+            os.makedirs(log_dir, exist_ok=True)
+            try:
+                with open(os.path.join(log_dir, "stdout.log"), "w") as f_out:
+                    f_out.write(result.stdout or "")
+                with open(os.path.join(log_dir, "stderr.log"), "w") as f_err:
+                    f_err.write(result.stderr or "")
+            except Exception as write_log_exc:
+                # Best-effort; continue even if we can't write logs to disk
+                print(f"Warning: failed to persist local logs: {write_log_exc}")
+
+            # Emit captured logs to Cloud Run logs as well
+            try:
+                print("===== ScoutAgent STDOUT =====")
+                if result.stdout:
+                    # Print as-is; Cloud Run will capture
+                    print(result.stdout)
+                else:
+                    print("<no stdout>")
+                print("===== ScoutAgent STDERR =====", file=sys.stderr)
+                if result.stderr:
+                    print(result.stderr, file=sys.stderr)
+                else:
+                    print("<no stderr>", file=sys.stderr)
+            except Exception as emit_exc:
+                print(f"Warning: failed to emit logs to Cloud Run: {emit_exc}")
             
             if result.returncode != 0:
                 raise Exception(f"ScoutAgent failed: {result.stderr}")
@@ -92,8 +120,8 @@ async def process_job(request: ProcessRequest):
                     blob.upload_from_filename(local_path)
                     uploaded_files.append(gcs_path)
             
-            # Also upload debug and logs if they exist
-            for folder in ["debug", "logs"]:
+            # Also upload debug and logs (and worker_logs) if they exist
+            for folder in ["debug", "logs", "worker_logs"]:
                 if os.path.exists(folder):
                     for root, dirs, files in os.walk(folder):
                         for file in files:
