@@ -15,6 +15,8 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from google.cloud import storage
 import uuid
+import socket
+import time
 
 app = FastAPI(title="ScoutAgent Worker", version="1.0.0")
 
@@ -53,6 +55,47 @@ async def process_job(request: ProcessRequest):
             os.chdir(temp_dir)
             os.environ["PYTHONPATH"] = "/app"
             
+            # Helper: wait for TCP port
+            def wait_for_port(host: str, port: int, timeout_seconds: int = 60) -> bool:
+                deadline = time.time() + timeout_seconds
+                while time.time() < deadline:
+                    try:
+                        with socket.create_connection((host, port), timeout=2):
+                            return True
+                    except OSError:
+                        time.sleep(1)
+                return False
+
+            # Start MCP servers in background
+            mcp_processes = []
+            try:
+                mcp_defs = [
+                    ("gap_finder_tools", ["python", "-m", "scout_agent.mcp_integration.server.gap_finder_tools"], 8000),
+                    ("reddit_api", ["python", "-m", "scout_agent.mcp_integration.server.reddit_api"], 8001),
+                    ("research_tools", ["python", "-m", "scout_agent.mcp_integration.server.research_tools"], 8002),
+                    ("web_search", ["python", "-m", "scout_agent.mcp_integration.server.web_search"], 8004),
+                ]
+
+                for name, cmd, port in mcp_defs:
+                    print(f"Starting MCP server '{name}' on port {port} with: {' '.join(cmd)}")
+                    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, bufsize=1)
+                    mcp_processes.append((name, port, p))
+
+                # Wait for all ports
+                for name, port, _ in mcp_processes:
+                    print(f"Waiting for MCP server '{name}' to be ready on port {port}...")
+                    if not wait_for_port("127.0.0.1", port, timeout_seconds=90):
+                        raise Exception(f"MCP server '{name}' failed to start on port {port}")
+                print("All MCP servers are up.")
+            except Exception:
+                # If any MCP startup fails, ensure we terminate what we started
+                for _, _, p in mcp_processes:
+                    try:
+                        p.terminate()
+                    except Exception:
+                        pass
+                raise
+
             # Run ScoutAgent workflow
             cmd = [
                 "python", "-m", "scout_agent.main",
@@ -63,38 +106,64 @@ async def process_job(request: ProcessRequest):
             ]
             
             print(f"Running ScoutAgent command: {' '.join(cmd)}")
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=900)
 
-            # Persist worker stdout/stderr for diagnostics
+            # Stream stdout/stderr live to Cloud Run logs and to files
             log_dir = os.path.join(temp_dir, "worker_logs")
             os.makedirs(log_dir, exist_ok=True)
-            try:
-                with open(os.path.join(log_dir, "stdout.log"), "w") as f_out:
-                    f_out.write(result.stdout or "")
-                with open(os.path.join(log_dir, "stderr.log"), "w") as f_err:
-                    f_err.write(result.stderr or "")
-            except Exception as write_log_exc:
-                # Best-effort; continue even if we can't write logs to disk
-                print(f"Warning: failed to persist local logs: {write_log_exc}")
+            stdout_path = os.path.join(log_dir, "stdout.log")
+            stderr_path = os.path.join(log_dir, "stderr.log")
 
-            # Emit captured logs to Cloud Run logs as well
-            try:
-                print("===== ScoutAgent STDOUT =====")
-                if result.stdout:
-                    # Print as-is; Cloud Run will capture
-                    print(result.stdout)
-                else:
-                    print("<no stdout>")
-                print("===== ScoutAgent STDERR =====", file=sys.stderr)
-                if result.stderr:
-                    print(result.stderr, file=sys.stderr)
-                else:
-                    print("<no stderr>", file=sys.stderr)
-            except Exception as emit_exc:
-                print(f"Warning: failed to emit logs to Cloud Run: {emit_exc}")
+            with open(stdout_path, "w") as f_out, open(stderr_path, "w") as f_err:
+                process = subprocess.Popen(
+                    cmd,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True,
+                    bufsize=1,
+                    env={**os.environ, "PYTHONUNBUFFERED": "1"}
+                )
+
+                def _stream(pipe, writer, is_stderr: bool = False):
+                    for line in iter(pipe.readline, ""):
+                        writer.write(line)
+                        writer.flush()
+                        try:
+                            if is_stderr:
+                                print(line, file=sys.stderr, end="")
+                            else:
+                                print(line, end="")
+                        except Exception:
+                            pass
+                    pipe.close()
+
+                # Read stdout and stderr concurrently
+                import threading
+                t_out = threading.Thread(target=_stream, args=(process.stdout, f_out, False))
+                t_err = threading.Thread(target=_stream, args=(process.stderr, f_err, True))
+                t_out.start()
+                t_err.start()
+                return_code = process.wait(timeout=900)
+                t_out.join()
+                t_err.join()
             
-            if result.returncode != 0:
-                raise Exception(f"ScoutAgent failed: {result.stderr}")
+            if return_code != 0:
+                # Read tail of logs for error message context
+                tail_err = ""
+                try:
+                    with open(stderr_path, "r") as f:
+                        lines = f.readlines()
+                        tail_err = "".join(lines[-50:])
+                except Exception:
+                    pass
+                raise Exception(f"ScoutAgent failed (code {return_code}): {tail_err}")
+
+            # Clean up MCP servers
+            for name, port, p in mcp_processes:
+                try:
+                    print(f"Stopping MCP server '{name}' (port {port})")
+                    p.terminate()
+                except Exception:
+                    pass
             
             # Find the output directory (usually data/runs/)
             output_dir = None
