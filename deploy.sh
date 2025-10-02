@@ -53,7 +53,7 @@ gcloud run deploy scout-agent-worker \
     --cpu 2 \
     --max-instances 5 \
     --timeout 3600 \
-    --set-env-vars "GCS_BUCKET=scout-agent-outputs,WORKER_SERVICE_URL=http://scout-agent-worker:8080" \
+    --set-env-vars "GCS_BUCKET=scout-agent-outputs,WORKER_SERVICE_URL=http://scout-agent-worker:8080,VERBOSE_MCP_LOGS=false" \
     --command python \
     --args worker_service.py
 

@@ -73,7 +73,7 @@ gcloud run deploy $SERVICE_NAME_WORKER \
     --max-instances 5 \
     --timeout 3600 \
     --request-timeout 3600 \
-    --set-env-vars "GCS_BUCKET=$BUCKET_NAME,WORKER_SERVICE_URL=http://$SERVICE_NAME_WORKER:8080" \
+    --set-env-vars "GCS_BUCKET=$BUCKET_NAME,WORKER_SERVICE_URL=http://$SERVICE_NAME_WORKER:8080,VERBOSE_MCP_LOGS=false" \
     --command "python" \
     --args "worker_service.py"
 

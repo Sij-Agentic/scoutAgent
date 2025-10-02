@@ -75,6 +75,26 @@ async def get_job_status(job_id: str):
         raise HTTPException(status_code=404, detail="Job not found")
     
     job = jobs_db[job_id]
+    
+    # If job is still running, check GCS to see if output exists (worker completed)
+    if job["status"] == "running":
+        try:
+            from google.cloud import storage
+            bucket_name = os.getenv("GCS_BUCKET", "scout-agent-outputs")
+            client = storage.Client()
+            bucket = client.bucket(bucket_name)
+            
+            # Check if manifest file exists in GCS
+            manifest_blob = bucket.blob(f"scout/jobs/{job_id}/data/runs/{job_id}/run_manifest.json")
+            if manifest_blob.exists():
+                # Job completed, update status
+                job["status"] = "completed"
+                job["gcs_output_path"] = f"gs://{bucket_name}/scout/jobs/{job_id}/"
+                job["completed_at"] = datetime.utcnow().isoformat()
+        except Exception as e:
+            # Ignore GCS check errors, return current status
+            pass
+    
     return JobStatus(
         job_id=job_id,
         status=job["status"],
@@ -85,7 +105,7 @@ async def get_job_status(job_id: str):
     )
 
 async def process_job(job_id: str, job_request: JobRequest):
-    """Process the ScoutAgent job in background"""
+    """Process the ScoutAgent job in background - fire and forget"""
     try:
         # Update status to running
         jobs_db[job_id]["status"] = "running"
@@ -93,29 +113,28 @@ async def process_job(job_id: str, job_request: JobRequest):
         # Get worker service URL (Cloud Run internal)
         worker_url = os.getenv("WORKER_SERVICE_URL", "http://worker-service:8080")
         
-        # Call worker service with extended timeout for long-running jobs
-        async with httpx.AsyncClient(timeout=3600.0) as client:  # 1 hour timeout
-            response = await client.post(f"{worker_url}/process", json={
-                "job_id": job_id,
-                "target_market": job_request.target_market,
-                "keywords": job_request.keywords,
-                "subreddits": job_request.subreddits,
-                "per_query_limit": job_request.per_query_limit
-            })
-            
-            if response.status_code == 200:
-                result = response.json()
-                jobs_db[job_id]["status"] = "completed"
-                jobs_db[job_id]["gcs_output_path"] = result["gcs_output_path"]
-            else:
-                jobs_db[job_id]["status"] = "failed"
-                jobs_db[job_id]["error_message"] = f"Worker service error: {response.text}"
+        # Fire-and-forget: Don't wait for response, let worker run independently
+        # Worker will need to update status via callback or we poll GCS
+        async with httpx.AsyncClient(timeout=httpx.Timeout(5.0, read=None)) as client:
+            try:
+                # Send request but don't wait for completion
+                await client.post(f"{worker_url}/process", json={
+                    "job_id": job_id,
+                    "target_market": job_request.target_market,
+                    "keywords": job_request.keywords,
+                    "subreddits": job_request.subreddits,
+                    "per_query_limit": job_request.per_query_limit
+                }, timeout=10.0)  # Short timeout just to confirm worker received it
+            except httpx.TimeoutException:
+                # Expected - worker is processing, we don't wait
+                pass
+            except httpx.ReadTimeout:
+                # Expected - worker is processing, we don't wait
+                pass
                 
     except Exception as e:
         jobs_db[job_id]["status"] = "failed"
-        jobs_db[job_id]["error_message"] = str(e)
-    
-    finally:
+        jobs_db[job_id]["error_message"] = f"Failed to start job: {str(e)}"
         jobs_db[job_id]["completed_at"] = datetime.utcnow().isoformat()
 
 if __name__ == "__main__":

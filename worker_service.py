@@ -142,18 +142,22 @@ async def process_job(request: ProcessRequest):
                     ("web_search", ["python", "-m", "scout_agent.mcp_integration.server.web_search"], 8004),
                 ]
 
-                # Stream MCP server logs
+                # Stream MCP server logs (controlled by env var)
+                verbose_mcp_logs = os.getenv("VERBOSE_MCP_LOGS", "false").lower() == "true"
+                
                 def _stream_mcp(pipe, writer, prefix: str, is_stderr: bool = False):
                     for line in iter(pipe.readline, ""):
                         writer.write(line)
                         writer.flush()
-                        try:
-                            if is_stderr:
-                                print(f"[{prefix}][STDERR] {line}", file=sys.stderr, end="")
-                            else:
-                                print(f"[{prefix}][STDOUT] {line}", end="")
-                        except Exception:
-                            pass
+                        # Only print to console if verbose mode enabled
+                        if verbose_mcp_logs:
+                            try:
+                                if is_stderr:
+                                    print(f"[{prefix}][STDERR] {line}", file=sys.stderr, end="")
+                                else:
+                                    print(f"[{prefix}][STDOUT] {line}", end="")
+                            except Exception:
+                                pass
                     pipe.close()
 
                 for name, cmd, port in mcp_defs:
@@ -239,17 +243,26 @@ async def process_job(request: ProcessRequest):
                 )
 
                 def _stream(pipe, writer, is_stderr: bool = False):
-                    for line in iter(pipe.readline, ""):
-                        writer.write(line)
-                        writer.flush()
+                    try:
+                        for line in iter(pipe.readline, ""):
+                            try:
+                                writer.write(line)
+                                writer.flush()
+                            except (ValueError, OSError):
+                                # File closed, stop streaming
+                                break
+                            try:
+                                if is_stderr:
+                                    print(line, file=sys.stderr, end="")
+                                else:
+                                    print(line, end="")
+                            except Exception:
+                                pass
+                    finally:
                         try:
-                            if is_stderr:
-                                print(line, file=sys.stderr, end="")
-                            else:
-                                print(line, end="")
+                            pipe.close()
                         except Exception:
                             pass
-                    pipe.close()
 
                 # Read stdout and stderr concurrently
                 import threading
@@ -257,20 +270,33 @@ async def process_job(request: ProcessRequest):
                 t_err = threading.Thread(target=_stream, args=(process.stderr, f_err, True))
                 t_out.start()
                 t_err.start()
-                return_code = process.wait(timeout=900)
+                # Wait for process with extended timeout (1 hour for long jobs)
+                return_code = process.wait(timeout=3600)
                 t_out.join()
                 t_err.join()
             
             if return_code != 0:
                 # Read tail of logs for error message context
                 tail_err = ""
+                tail_out = ""
                 try:
                     with open(stderr_path, "r") as f:
                         lines = f.readlines()
                         tail_err = "".join(lines[-50:])
                 except Exception:
                     pass
-                raise Exception(f"ScoutAgent failed (code {return_code}): {tail_err}")
+                try:
+                    with open(stdout_path, "r") as f:
+                        lines = f.readlines()
+                        tail_out = "".join(lines[-50:])
+                except Exception:
+                    pass
+                
+                error_msg = f"ScoutAgent failed with exit code {return_code}\n"
+                error_msg += f"\n=== STDERR (last 50 lines) ===\n{tail_err}\n"
+                error_msg += f"\n=== STDOUT (last 50 lines) ===\n{tail_out}\n"
+                print(error_msg, file=sys.stderr)
+                raise Exception(f"ScoutAgent failed (code {return_code})")
 
             # Clean up MCP servers
             for item in mcp_processes:
@@ -336,16 +362,25 @@ async def process_job(request: ProcessRequest):
             
             gcs_output_path = f"gs://{bucket_name}/{gcs_prefix}"
             
+            print(f"Job {request.job_id} completed successfully")
+            print(f"Output uploaded to: {gcs_output_path}")
+            print(f"Total files uploaded: {len(uploaded_files)}")
+            
             return ProcessResponse(
                 job_id=request.job_id,
                 status="completed",
                 gcs_output_path=gcs_output_path
             )
             
-    except subprocess.TimeoutExpired:
-        raise HTTPException(status_code=408, detail="Job processing timed out")
+    except subprocess.TimeoutExpired as e:
+        error_msg = f"Job {request.job_id} timed out after {e.timeout}s"
+        print(error_msg, file=sys.stderr)
+        raise HTTPException(status_code=408, detail=error_msg)
     except Exception as e:
-        print(f"Error processing job {request.job_id}: {str(e)}")
+        error_msg = f"Error processing job {request.job_id}: {str(e)}"
+        print(error_msg, file=sys.stderr)
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Job processing failed: {str(e)}")
 
 if __name__ == "__main__":
