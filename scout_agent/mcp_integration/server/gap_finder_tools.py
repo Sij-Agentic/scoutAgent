@@ -11,7 +11,7 @@ from mcp.types import TextContent
 from scout_agent.mcp_integration.server.base import MCPServer
 
 from scout_agent.sources.serper_client import SerperApiClient
-from scout_agent.sources.web_content_extractor_simple import WebContentExtractor
+from scout_agent.sources.web_content_extractor import WebContentExtractor  # Use full version with trafilatura
 from scout_agent.data_cache.file_cache import FileCache
 from scout_agent.custom_logging import get_logger
 from scout_agent.config import init_config, get_config
@@ -49,8 +49,7 @@ async def search_links(
     queries: List[str],
     pain_point_id: str = "pp1",
     pain_point_title: str = "Unknown Pain Point",
-    num_results: int = 2,
-    use_cache: bool = False
+    num_results: int = 2
 ) -> Dict[str, Any]:
     """
     Search for links using the provided search queries.
@@ -60,7 +59,6 @@ async def search_links(
         pain_point_id: ID of the pain point
         pain_point_title: Title of the pain point
         num_results: Number of results to return per query
-        use_cache: Whether to use cached search results
         
     Returns:
         Dictionary with search results
@@ -78,7 +76,7 @@ async def search_links(
     for query in queries:
         # Search for the query
         logger.info(f"Searching Google for '{query}'")
-        raw_results = client.search_google(query=query, num_results=num_results, use_cache=use_cache)
+        raw_results = client.search_google(query=query, num_results=num_results, use_cache=False)
         search_results = client.normalize_search_results(raw_results)[:num_results]
         
         # Add to results
@@ -99,18 +97,16 @@ async def search_links(
 @mcp.tool()
 async def extract_content(
     urls: List[str],
-    use_cache: bool = False,
     include_comments: bool = False,
     include_tables: bool = True,
     include_links: bool = True,
     include_images: bool = False
 ) -> Dict[str, Any]:
     """
-    Extract content from the provided URLs.
+    Extract content from the provided URLs using trafilatura.
     
     Args:
         urls: List of URLs to extract content from
-        use_cache: Whether to use cached content
         include_comments: Whether to include comments in the extracted content
         include_tables: Whether to include tables in the extracted content
         include_links: Whether to include links in the extracted content
@@ -130,7 +126,7 @@ async def extract_content(
         logger.info(f"Extracting content from: {url}")
         content_result = extractor.extract_content(
             url=url,
-            use_cache=use_cache,
+            use_cache=False,  # Always disabled - use live data
             include_comments=include_comments,
             include_tables=include_tables,
             include_links=include_links,

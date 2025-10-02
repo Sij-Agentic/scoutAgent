@@ -623,8 +623,7 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                     "queries": all_queries,
                     "pain_point_id": f"pp{i+1}",
                     "pain_point_title": pain_point_text,
-                    "num_results": 3,
-                    "use_cache": True
+                    "num_results": 3
                 },
                 "config": {
                     "timeout_seconds": 300,
@@ -653,7 +652,6 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                 "dependencies": [search_node["node_id"]],
                 "inputs": {
                     "urls": f"${{{search_node['output_manifest_key']}.query_results[*].results[*].link}}",  # Reference to search output URLs
-                    "use_cache": True,
                     "include_comments": False,
                     "include_tables": True,
                     "include_links": True,
@@ -692,8 +690,7 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                 "tool_name": "triage_content",
                 "dependencies": [extract_node["node_id"]],
                 "inputs": {
-                    "contents": f"${{{extract_node['output_manifest_key']}.content}}",  # Reference to extract output content
-                    "use_cache": True
+                    "contents": f"${{{extract_node['output_manifest_key']}.content}}"  # Reference to extract output content
                 },
                 "config": {
                     "timeout_seconds": 400,
@@ -729,8 +726,7 @@ class GapFinderAgent(BaseAgent, LLMAgentMixin):
                 "tool_name": "identify_vendors",
                 "dependencies": [triage_node["node_id"], extract_node["node_id"]],  # Depend on both triage and extract
                 "inputs": {
-                    "contents": f"${{{extract_node['output_manifest_key']}.content}}",  # Reference to extract_content output with actual content
-                    "use_cache": True
+                    "contents": f"${{{extract_node['output_manifest_key']}.content}}"  # Reference to extract_content output with actual content
                 },
                 "config": {
                     "timeout_seconds": 300,
