@@ -1354,9 +1354,14 @@ class ScoutAgent(BaseAgent, LLMAgentMixin):
             self.logger.warning("No tool nodes found in plan")
             return {"completed": [], "failed": []}
         
-        # Initialize MCP client
+        # Initialize MCP client with extended timeouts for Cloud Run
         server_configs = load_server_configs()
-        multi_client = MultiMCPClient(server_configs)
+        multi_client = MultiMCPClient(
+            server_configs,
+            max_retries=5,
+            connection_timeout=120,
+            sse_read_timeout=3600  # 1 hour for long Reddit API calls
+        )
         try:
             await multi_client.initialize()
         except Exception as e:

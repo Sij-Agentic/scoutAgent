@@ -93,8 +93,8 @@ async def process_job(job_id: str, job_request: JobRequest):
         # Get worker service URL (Cloud Run internal)
         worker_url = os.getenv("WORKER_SERVICE_URL", "http://worker-service:8080")
         
-        # Call worker service
-        async with httpx.AsyncClient(timeout=900.0) as client:  # 15 min timeout
+        # Call worker service with extended timeout for long-running jobs
+        async with httpx.AsyncClient(timeout=3600.0) as client:  # 1 hour timeout
             response = await client.post(f"{worker_url}/process", json={
                 "job_id": job_id,
                 "target_market": job_request.target_market,

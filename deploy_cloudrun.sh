@@ -6,7 +6,7 @@
 set -e
 
 # Configuration
-PROJECT_ID=${GOOGLE_CLOUD_PROJECT:-"your-project-id"}
+PROJECT_ID=${GOOGLE_CLOUD_PROJECT:-"delvelabs-scout-agent"}
 REGION=${GOOGLE_CLOUD_REGION:-"us-central1"}
 SERVICE_NAME_API="scout-agent-api"
 SERVICE_NAME_WORKER="scout-agent-worker"
@@ -52,6 +52,7 @@ gcloud run deploy $SERVICE_NAME_API \
     --memory 512Mi \
     --cpu 1 \
     --max-instances 10 \
+    --timeout 3600 \
     --set-env-vars "GCS_BUCKET=$BUCKET_NAME" \
     --command "python" \
     --args "api_service.py"
@@ -70,7 +71,8 @@ gcloud run deploy $SERVICE_NAME_WORKER \
     --memory 4Gi \
     --cpu 2 \
     --max-instances 5 \
-    --timeout 900 \
+    --timeout 3600 \
+    --request-timeout 3600 \
     --set-env-vars "GCS_BUCKET=$BUCKET_NAME,WORKER_SERVICE_URL=http://$SERVICE_NAME_WORKER:8080" \
     --command "python" \
     --args "worker_service.py"

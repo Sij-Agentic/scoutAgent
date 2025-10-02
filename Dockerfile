@@ -71,8 +71,8 @@ COPY start_services.sh ./start_services.sh
 COPY api_service.py ./api_service.py
 COPY worker_service.py ./worker_service.py
 
-# Create directories for output and logs
-RUN mkdir -p /app/output /app/logs /app/temp
+# Create directories for output, logs, and data
+RUN mkdir -p /app/output /app/logs /app/temp /app/data/runs
 
 # Set environment variables (runtime secrets will be injected by Fargate)
 ENV PYTHONPATH=/app

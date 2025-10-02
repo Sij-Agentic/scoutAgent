@@ -61,6 +61,7 @@ Deploy two services using the Google Cloud Console (recommended for simplicity).
 #### 2) Worker Service (`scout-agent-worker`)
 - Image: same as API
 - Port: `8080`
+- **Request timeout: `3600` (1 hour) - CRITICAL for long Reddit API calls**
 - Allow unauthenticated (or keep authenticated and secure it; API can be updated to call with ID token)
 - Command: `python`
 - Args: `worker_service.py`
@@ -135,6 +136,10 @@ gsutil -m cp -r "gs://scout-agent-outputs/scout/jobs/${JOB_ID}" ./outputs/${JOB_
 ```
 
 ### Troubleshooting
+- **SSE timeout after 4 minutes (`httpcore.ReadTimeout`)**: 
+  - **CAUSE**: Cloud Run's default 240s timeout is too short for Reddit API calls
+  - **FIX**: Set `--timeout 3600` and `--request-timeout 3600` on worker service (already in deploy script)
+  - Verify with: `gcloud run services describe scout-agent-worker --region us-central1 --format="value(spec.template.spec.timeoutSeconds)"`
 - Job status = failed with error mentioning `storage.googleapis.com ... Not Found`:
   - Ensure `GCS_BUCKET` is set to the bucket name only (no URL), e.g. `scout-agent-outputs`.
 - Job status = failed due to permissions:
@@ -142,9 +147,9 @@ gsutil -m cp -r "gs://scout-agent-outputs/scout/jobs/${JOB_ID}" ./outputs/${JOB_
 - LLM backend initialization errors:
   - Verify `SCOUT_*` API keys are present on the worker service.
 - Long jobs timing out:
-  - The worker uses a 15‑minute HTTP timeout. Consider increasing Cloud Run request timeout under service settings if needed.
+  - Worker now uses 1-hour timeout for SSE connections and Cloud Run requests.
 - Worker cannot reach main app MCP servers:
-  - If MCP servers are required, start them within the worker before launching the main process. We can provide a helper if needed.
+  - MCP servers start automatically within the worker. Check worker logs for startup errors.
 
 ### Security Notes
 - For production, move API keys to Secret Manager and reference them in Cloud Run.
