@@ -10,7 +10,7 @@ import subprocess
 import tempfile
 import shutil
 from datetime import datetime
-from typing import Dict, Any
+from typing import Dict, Any, List
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from google.cloud import storage
@@ -18,6 +18,7 @@ import uuid
 import socket
 import time
 import requests
+import threading
 
 app = FastAPI(title="ScoutAgent Worker", version="1.0.0")
 
@@ -81,25 +82,55 @@ PROGRESS LOG
             progress_blob.upload_from_string(initial_log)
             print(f"Progress log created at: gs://{bucket_name}/{progress_log_path}")
             
-            # Helper function to append to progress log
-            def log_to_gcs(message: str):
-                """Append message to GCS progress log"""
+            # Buffered, thread-safe progress logger to avoid GCS rate limit (429) on object mutations
+            log_buffer: List[str] = []
+            last_flush_ts = 0.0
+            flush_interval = float(os.getenv("PROGRESS_FLUSH_INTERVAL", "5.0"))  # seconds
+            max_buffer_lines = int(os.getenv("PROGRESS_MAX_BUFFER", "50"))
+            log_lock = threading.Lock()
+
+            def _flush_progress(force: bool = False):
+                nonlocal last_flush_ts, log_buffer
+                now = time.time()
+                with log_lock:
+                    if not force and (now - last_flush_ts < flush_interval) and len(log_buffer) < max_buffer_lines:
+                        return
+                    if not log_buffer:
+                        return
+                    payload = "\n".join(log_buffer) + "\n"
+                    # Clear buffer before network I/O to minimize lock hold time
+                    log_buffer.clear()
+                    last_flush_ts = now
                 try:
-                    from datetime import datetime
-                    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                    log_entry = f"[{timestamp}] {message}\n"
-                    
-                    # Read current content
                     try:
                         current_content = progress_blob.download_as_string().decode('utf-8')
-                    except:
+                    except Exception:
                         current_content = initial_log
-                    
-                    # Append new entry
-                    updated_content = current_content + log_entry
-                    progress_blob.upload_from_string(updated_content)
+
+                    updated_content = current_content + payload
+
+                    # Retry with exponential backoff on transient errors (e.g., 429/5xx)
+                    backoff = 0.5
+                    for attempt in range(5):
+                        try:
+                            progress_blob.upload_from_string(updated_content)
+                            break
+                        except Exception:
+                            try:
+                                time.sleep(backoff)
+                                backoff = min(backoff * 2, 10.0)
+                            except Exception:
+                                pass
+                    else:
+                        print("Failed to log to GCS after retries", file=sys.stderr)
                 except Exception as e:
                     print(f"Failed to log to GCS: {e}", file=sys.stderr)
+
+            def log_progress(message: str):
+                timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                with log_lock:
+                    log_buffer.append(f"[{timestamp}] {message}")
+                _flush_progress(force=False)
             
             # Masked env var logging for diagnostics
             def _mask_prefix(value: str, prefix_len: int = 3) -> str:
@@ -177,7 +208,7 @@ PROGRESS LOG
                 return False
 
             # Log start
-            log_to_gcs("Starting MCP servers...")
+            log_progress("Starting MCP servers...")
             
             # Start MCP servers in background
             mcp_processes = []
@@ -236,9 +267,9 @@ PROGRESS LOG
                 # Wait for all ports
                 for name, port, *_ in mcp_processes:
                     print(f"Waiting for MCP server '{name}' to be ready on port {port}...")
-                    log_to_gcs(f"Starting MCP server: {name} on port {port}")
+                    log_progress(f"Starting MCP server: {name} on port {port}")
                     if not wait_for_port("127.0.0.1", port, timeout_seconds=120):
-                        log_to_gcs(f"ERROR: MCP server '{name}' failed to start")
+                        log_progress(f"ERROR: MCP server '{name}' failed to start")
                         raise Exception(f"MCP server '{name}' failed to start on port {port}")
 
                     # Basic HTTP health check on root
@@ -252,8 +283,8 @@ PROGRESS LOG
                     print(f"MCP '{name}' health check passed (port {port} is responding)")
 
                 print(f"All MCP servers started successfully")
-                log_to_gcs("All MCP servers ready")
-                log_to_gcs(f"Starting ScoutAgent workflow...")
+                log_progress("All MCP servers ready")
+                log_progress(f"Starting ScoutAgent workflow...")
                 
                 # Run ScoutAgent main.py to let servers fully initialize routes/workers
                 time.sleep(10)
@@ -311,8 +342,9 @@ PROGRESS LOG
                                 
                                 # Log important lines to GCS
                                 line_lower = line.lower()
-                                if any(keyword in line_lower for keyword in ['info', 'starting', 'completed', 'error', 'warning', 'stage']):
-                                    log_to_gcs(line.strip())
+                                # Reduce volume: drop generic 'info' to avoid excessive writes
+                                if any(keyword in line_lower for keyword in ['starting', 'completed', 'error', 'warning', 'stage']):
+                                    log_progress(line.strip())
                             except Exception:
                                 pass
                     finally:
@@ -333,7 +365,7 @@ PROGRESS LOG
                 t_err.join()
             
             if return_code != 0:
-                log_to_gcs(f"ERROR: ScoutAgent failed with exit code {return_code}")
+                log_progress(f"ERROR: ScoutAgent failed with exit code {return_code}")
                 # Read tail of logs for error message context
                 tail_err = ""
                 tail_out = ""
@@ -354,10 +386,15 @@ PROGRESS LOG
                 error_msg += f"\n=== STDERR (last 50 lines) ===\n{tail_err}\n"
                 error_msg += f"\n=== STDOUT (last 50 lines) ===\n{tail_out}\n"
                 print(error_msg, file=sys.stderr)
+                # Ensure any pending progress lines are flushed before raising
+                try:
+                    _flush_progress(force=True)
+                except Exception:
+                    pass
                 raise Exception(f"ScoutAgent failed (code {return_code})")
 
-            log_to_gcs("ScoutAgent workflow completed successfully")
-            log_to_gcs("Uploading results to GCS...")
+            log_progress("ScoutAgent workflow completed successfully")
+            log_progress("Uploading results to GCS...")
             
             # Clean up MCP servers
             for item in mcp_processes:
@@ -427,13 +464,14 @@ PROGRESS LOG
             print(f"Output uploaded to: {gcs_output_path}")
             print(f"Total files uploaded: {len(uploaded_files)}")
             
-            log_to_gcs(f"Upload complete: {len(uploaded_files)} files")
-            log_to_gcs(f"Results available at: {gcs_output_path}")
-            log_to_gcs("Job completed successfully!")
+            log_progress(f"Upload complete: {len(uploaded_files)} files")
+            log_progress(f"Results available at: {gcs_output_path}")
+            log_progress("Job completed successfully!")
+            # Force-flush any buffered logs before writing status
+            _flush_progress(force=True)
             
             # Write status file to GCS for API to detect completion
             import json
-            from datetime import datetime
             status_data = {
                 "job_id": request.job_id,
                 "status": "completed",
@@ -456,10 +494,23 @@ PROGRESS LOG
         error_msg = f"Job {request.job_id} timed out after {e.timeout}s"
         print(error_msg, file=sys.stderr)
         
+        # Flush any buffered progress before writing failure status
+        try:
+            _flush_progress(force=True)
+        except Exception:
+            pass
         # Write failure status to GCS
         try:
+            # Ensure bucket is available even if initialization failed earlier
+            if 'bucket' not in locals() or bucket is None:
+                try:
+                    bucket_name = os.getenv("GCS_BUCKET", "scout-agent-outputs")
+                    client = storage.Client()
+                    bucket = client.bucket(bucket_name)
+                except Exception:
+                    bucket = None
+
             import json
-            from datetime import datetime
             status_data = {
                 "job_id": request.job_id,
                 "status": "failed",
@@ -468,8 +519,9 @@ PROGRESS LOG
                 "error_type": "timeout"
             }
             gcs_prefix = f"scout/jobs/{request.job_id}/"
-            status_blob = bucket.blob(f"{gcs_prefix}job_status.json")
-            status_blob.upload_from_string(json.dumps(status_data, indent=2), content_type="application/json")
+            if bucket is not None:
+                status_blob = bucket.blob(f"{gcs_prefix}job_status.json")
+                status_blob.upload_from_string(json.dumps(status_data, indent=2), content_type="application/json")
         except Exception:
             pass
         
@@ -482,8 +534,16 @@ PROGRESS LOG
         
         # Write failure status to GCS
         try:
+            # Ensure bucket is available even if initialization failed earlier
+            if 'bucket' not in locals() or bucket is None:
+                try:
+                    bucket_name = os.getenv("GCS_BUCKET", "scout-agent-outputs")
+                    client = storage.Client()
+                    bucket = client.bucket(bucket_name)
+                except Exception:
+                    bucket = None
+
             import json
-            from datetime import datetime
             status_data = {
                 "job_id": request.job_id,
                 "status": "failed",
@@ -492,8 +552,9 @@ PROGRESS LOG
                 "error_type": "exception"
             }
             gcs_prefix = f"scout/jobs/{request.job_id}/"
-            status_blob = bucket.blob(f"{gcs_prefix}job_status.json")
-            status_blob.upload_from_string(json.dumps(status_data, indent=2), content_type="application/json")
+            if bucket is not None:
+                status_blob = bucket.blob(f"{gcs_prefix}job_status.json")
+                status_blob.upload_from_string(json.dumps(status_data, indent=2), content_type="application/json")
         except Exception:
             pass
         
