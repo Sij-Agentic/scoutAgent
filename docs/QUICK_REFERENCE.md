@@ -14,18 +14,50 @@ gcloud run services update scout-agent-worker --region us-central1 \
 ```bash
 API_URL="https://scout-agent-511946707043.us-central1.run.app"
 
-curl -X POST "$API_URL/jobs" -H "Content-Type: application/json" -d '{
+RESPONSE=$(curl -s -X POST "$API_URL/jobs" -H "Content-Type: application/json" -d '{
   "target_market": "Knowledge management tools",
   "keywords": "bidirectional links,markdown sync",
   "subreddits": "PKMS,productivity",
   "per_query_limit": 5
-}'
+}')
+
+# Extract info
+JOB_ID=$(echo "$RESPONSE" | jq -r '.job_id')
+PROGRESS_URL=$(echo "$RESPONSE" | jq -r '.progress_url')
+OUTPUT=$(echo "$RESPONSE" | jq -r '.output_location')
+
+echo "Job ID: $JOB_ID"
+echo "Progress: $PROGRESS_URL (public - shareable!)"
+echo "Output: $OUTPUT"
+```
+
+## Watch Progress (Real-Time)
+```bash
+# Use progress URL from submission (PUBLIC - no auth needed!)
+watch -n 5 "curl -s $PROGRESS_URL | jq -r '.progress'"
+
+# Or directly
+watch -n 5 "curl -s $API_URL/jobs/$JOB_ID/progress | jq -r '.progress'"
+
+# Share this URL with your team - they can watch too!
 ```
 
 ## Check Status
 ```bash
-JOB_ID="<from_submission>"
 curl "$API_URL/jobs/$JOB_ID"
+
+# Or poll until complete
+watch -n 10 "curl -s $API_URL/jobs/$JOB_ID | jq"
+```
+
+## Download Results
+```bash
+# Once status is "completed"
+curl "$API_URL/jobs/$JOB_ID/download" -o scout_results.zip
+unzip scout_results.zip
+
+# Or directly from GCS
+gsutil -m cp -r "gs://scout-agent-outputs/scout/jobs/$JOB_ID" ./results/
 ```
 
 ## View Logs

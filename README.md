@@ -1,6 +1,73 @@
-## ScoutAgent on Google Cloud Run
+# ScoutAgent
 
-A containerized, agentic research system (ScoutAgent) deployed on Google Cloud Run with Google Cloud Storage (GCS) for outputs. This guide covers building, deploying, running, testing, and retrieving results without modifying the core `scout_agent/main.py`.
+ScoutAgent is an AI-powered market research tool that analyzes Reddit conversations to identify pain points, validate market opportunities, and discover potential vendors in target markets.
+
+## Quick Start - Testing the Workflow
+
+### Run a Test Job
+```bash
+python3 test_cloudrun.py
+```
+
+### What You'll Get
+When you submit a job, you'll immediately receive:
+
+```
+✅ Job created successfully!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 Job ID: abc-123-def-456-789
+⏱️  Estimated Duration: 5-15 minutes
+
+📊 Watch Progress (Public - Shareable!):
+   https://scout-agent-api.run.app/jobs/abc-123/progress
+
+📁 Final Output Location:
+   gs://scout-agent-outputs/scout/jobs/abc-123/
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 Tip: Share the progress URL with your team to watch together!
+💡 Progress log available for 24 hours
+```
+
+### Watch Progress in Real-Time
+```bash
+# Copy the progress URL from above and watch live updates
+watch -n 5 "curl -s https://scout-agent-api.run.app/jobs/YOUR_JOB_ID/progress | jq -r '.progress'"
+
+# Or open in browser (shows JSON with progress log)
+open https://scout-agent-api.run.app/jobs/YOUR_JOB_ID/progress
+```
+
+**You'll see**:
+- MCP server startup
+- Workflow stages (scout_collect, gap_finder_collect, etc.)
+- Progress updates as job runs
+- Completion status
+
+### Download Results
+When the job completes, you'll see:
+```
+🎉 Job completed successfully!
+
+📁 Download Results:
+   curl "https://scout-agent-api.run.app/jobs/YOUR_JOB_ID/download" -o results.zip
+
+📂 Or access directly from GCS:
+   gsutil -m cp -r "gs://scout-agent-outputs/scout/jobs/YOUR_JOB_ID/" ./results/
+```
+
+### Share with Your Team
+The progress URL is **public** (no authentication needed):
+- Share it in Slack/email
+- Team can watch progress together
+- Available for 24 hours
+- No GCS access required to watch progress
+
+---
+
+## Deployment Guide
+
+### Overview
 
 ### Overview
 - **API service** receives job requests and returns a `job_id` for polling.
@@ -114,46 +181,79 @@ When complete:
 {
   "job_id": "<job_id>",
   "status": "completed",
-  "created_at": "...",
-  "completed_at": "...",
-  "gcs_output_path": "gs://scout-agent-outputs/scout/jobs/<job_id>/"
+  "created_at": "2025-10-03T00:00:00",
+  "completed_at": "2025-10-03T00:15:00",
+  "gcs_output_path": "gs://scout-agent-outputs/scout/jobs/abc-123/",
+  "error_message": null
 }
 ```
 
-### Testing Locally Against Cloud Run
-Use the included script (update API URL inside the file):
+### Download Results
 ```bash
-python test_cloudrun.py
+curl "https://scout-agent-api.run.app/jobs/{job_id}/download" -o results.zip
 ```
-It will create a job, poll every 10 seconds, and print the final `gs://` path.
 
-### Retrieve Outputs from GCS
-- Console: Cloud Storage → your bucket → `scout/jobs/<job_id>/`
-- CLI:
+---
+### Retrieve Outputs
+
+#### Option 1: Download via API (Recommended)
 ```bash
 JOB_ID="<job_id>"
-gsutil -m cp -r "gs://scout-agent-outputs/scout/jobs/${JOB_ID}" ./outputs/${JOB_ID}
+curl "https://scout-agent-api.run.app/jobs/${JOB_ID}/download" -o results.zip
+unzip results.zip
 ```
 
-### Troubleshooting
-- **SSE timeout after 4 minutes (`httpcore.ReadTimeout`)**: 
-  - **CAUSE**: Cloud Run's default 240s timeout is too short for Reddit API calls
-  - **FIX**: Set `--timeout 3600` and `--request-timeout 3600` on worker service (already in deploy script)
-  - Verify with: `gcloud run services describe scout-agent-worker --region us-central1 --format="value(spec.template.spec.timeoutSeconds)"`
-- Job status = failed with error mentioning `storage.googleapis.com ... Not Found`:
-  - Ensure `GCS_BUCKET` is set to the bucket name only (no URL), e.g. `scout-agent-outputs`.
-- Job status = failed due to permissions:
-  - Grant the worker service account write access to the bucket.
-- LLM backend initialization errors:
-  - Verify `SCOUT_*` API keys are present on the worker service.
-- Long jobs timing out:
-  - Worker now uses 1-hour timeout for SSE connections and Cloud Run requests.
-- Worker cannot reach main app MCP servers:
-  - MCP servers start automatically within the worker. Check worker logs for startup errors.
+#### Option 2: Access from GCS
+#### Option 3: View in Console
+Cloud Storage → `scout-agent-outputs` bucket → `scout/jobs/<job_id>/`
 
-### Security Notes
-- For production, move API keys to Secret Manager and reference them in Cloud Run.
-- Restrict the API service or add auth if exposing publicly long term.
+### Troubleshooting
+
+#### Job Shows "Failed" But Still Running
+- **Old issue**: Fixed! Now uses fire-and-forget architecture
+- **Status updates**: Check progress URL for real-time status
+- **Completion detection**: Status updates when job writes to GCS
+
+#### Can't See Progress
+**Check progress URL**:
+```bash
+curl "https://scout-agent-api.run.app/jobs/{job_id}/progress"
+```
+
+**If "not available"**: Job is starting, wait a few seconds
+
+#### Job Actually Failed
+**Check progress log for errors**:
+```bash
+curl "https://scout-agent-api.run.app/jobs/{job_id}/progress" | jq -r '.progress' | grep ERROR
+```
+
+**Check worker logs**:
+```bash
+gcloud run services logs read scout-agent-worker --region us-central1 | grep {job_id}
+```
+
+#### Common Issues
+- **"No LLM backends initialized"**: API keys not set on worker service
+- **Timeout after 1 hour**: Jobs longer than 1 hour need adjustment (reduce `per_query_limit`)
+- **GCS permission errors**: Worker service account needs Storage Object Creator role
+- **Progress log empty**: Job may have crashed during startup, check worker logs
+
+---
+
+## Documentation
+
+Detailed documentation is available in the [`docs/`](docs/) folder:
+
+- **[Quick Reference](docs/QUICK_REFERENCE.md)** - Commands and quick start
+- **[User Experience](docs/USER_EXPERIENCE.md)** - Complete user workflow
+- **[Deployment Guide](docs/CLEAN_DEPLOYMENT.md)** - Full deployment instructions
+- **[Progress Tracking](docs/PROGRESS_TRACKING.md)** - Real-time progress implementation
+- **[All Fixes](docs/DEPLOYMENT_FIXES.md)** - Complete list of fixes applied
+
+See [docs/INDEX.md](docs/INDEX.md) for a complete documentation index.
+
+---
 
 ### License
 MIT (or your preferred license).

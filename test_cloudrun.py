@@ -26,8 +26,20 @@ def test_job_creation():
     
     if response.status_code == 200:
         result = response.json()
-        print(f"✅ Job created: {result['job_id']}")
-        return result['job_id']
+        print(f"\n✅ Job created successfully!")
+        print(f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+        print(f"📋 Job ID: {result['job_id']}")
+        print(f"⏱️  Estimated Duration: {result.get('estimated_duration', '5-15 minutes')}")
+        print(f"")
+        print(f"📊 Watch Progress (Public - Shareable!):")
+        print(f"   {result.get('progress_url', 'N/A')}")
+        print(f"")
+        print(f"📁 Final Output Location:")
+        print(f"   {result.get('output_location', 'N/A')}")
+        print(f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+        print(f"\n💡 Tip: Share the progress URL with your team to watch together!")
+        print(f"💡 Progress log available for 24 hours")
+        return result
     else:
         print(f"❌ Job creation failed: {response.status_code} - {response.text}")
         return None
@@ -56,12 +68,18 @@ def main():
     print()
     
     # Test job creation
-    job_id = test_job_creation()
-    if not job_id:
+    result = test_job_creation()
+    if not result:
         return
+    
+    job_id = result['job_id']
+    progress_url = result.get('progress_url')
+    output_location = result.get('output_location')
     
     print()
     print("⏳ Waiting for job to complete...")
+    if progress_url:
+        print(f"💡 Watch live: watch -n 5 \"curl -s {progress_url} | jq -r '.progress'\"")
     
     # Poll for completion
     max_attempts = 30  # 5 minutes
@@ -74,13 +92,29 @@ def main():
     print()
     if status:
         if status['status'] == 'completed':
+            print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
             print("🎉 Job completed successfully!")
-            print(f"📁 Results: {status.get('gcs_output_path', 'Not available')}")
+            print(f"")
+            print(f"📁 Download Results:")
+            print(f"   curl \"{API_URL}/jobs/{job_id}/download\" -o results.zip")
+            print(f"")
+            print(f"📂 Or access directly from GCS:")
+            print(f"   gsutil -m cp -r \"{status.get('gcs_output_path', output_location)}\" ./results/")
+            print(f"")
+            print(f"📊 View Progress Log:")
+            print(f"   {progress_url}")
+            print(f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
         else:
             print("❌ Job failed")
             print(f"Error: {status.get('error_message', 'Unknown error')}")
+            if progress_url:
+                print(f"\n📊 Check progress log for details:")
+                print(f"   {progress_url}")
     else:
         print("⏰ Job timed out")
+        if progress_url:
+            print(f"\n📊 Check progress log:")
+            print(f"   {progress_url}")
 
 if __name__ == "__main__":
     main()

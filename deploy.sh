@@ -36,11 +36,15 @@ gcloud run deploy scout-agent-api \
     --memory 512Mi \
     --cpu 1 \
     --timeout 3600 \
-    --set-env-vars "GCS_BUCKET=scout-agent-outputs" \
     --command python \
     --args api_service.py
 
 API_URL=$(gcloud run services describe scout-agent-api --region $REGION --format="value(status.url)")
+
+# Update with API_BASE_URL
+gcloud run services update scout-agent-api \
+    --region $REGION \
+    --set-env-vars "GCS_BUCKET=scout-agent-outputs,API_BASE_URL=$API_URL"
 
 echo ""
 echo "⚙️ Deploying Worker Service..."

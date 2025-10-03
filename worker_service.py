@@ -57,6 +57,50 @@ async def process_job(request: ProcessRequest):
             os.environ["PYTHONPATH"] = "/app"
             os.environ["SCOUT_TEMP_DIR"] = temp_dir  # Pass temp dir as env var if needed
             
+            # Create progress log file in GCS
+            gcs_prefix = f"scout/jobs/{request.job_id}/"
+            progress_log_path = f"{gcs_prefix}progress.log"
+            progress_blob = bucket.blob(progress_log_path)
+            
+            # Initialize progress log
+            initial_log = f"""ScoutAgent Job Progress Log
+Job ID: {request.job_id}
+Started: {datetime.now().isoformat()}
+Target Market: {request.target_market}
+Keywords: {request.keywords}
+Subreddits: {request.subreddits}
+Per Query Limit: {request.per_query_limit}
+
+Output will be available at: gs://{bucket_name}/{gcs_prefix}
+
+================================================================================
+PROGRESS LOG
+================================================================================
+
+"""
+            progress_blob.upload_from_string(initial_log)
+            print(f"Progress log created at: gs://{bucket_name}/{progress_log_path}")
+            
+            # Helper function to append to progress log
+            def log_to_gcs(message: str):
+                """Append message to GCS progress log"""
+                try:
+                    from datetime import datetime
+                    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    log_entry = f"[{timestamp}] {message}\n"
+                    
+                    # Read current content
+                    try:
+                        current_content = progress_blob.download_as_string().decode('utf-8')
+                    except:
+                        current_content = initial_log
+                    
+                    # Append new entry
+                    updated_content = current_content + log_entry
+                    progress_blob.upload_from_string(updated_content)
+                except Exception as e:
+                    print(f"Failed to log to GCS: {e}", file=sys.stderr)
+            
             # Masked env var logging for diagnostics
             def _mask_prefix(value: str, prefix_len: int = 3) -> str:
                 if not value:
@@ -132,6 +176,9 @@ async def process_job(request: ProcessRequest):
                         time.sleep(1)
                 return False
 
+            # Log start
+            log_to_gcs("Starting MCP servers...")
+            
             # Start MCP servers in background
             mcp_processes = []
             try:
@@ -189,7 +236,9 @@ async def process_job(request: ProcessRequest):
                 # Wait for all ports
                 for name, port, *_ in mcp_processes:
                     print(f"Waiting for MCP server '{name}' to be ready on port {port}...")
+                    log_to_gcs(f"Starting MCP server: {name} on port {port}")
                     if not wait_for_port("127.0.0.1", port, timeout_seconds=120):
+                        log_to_gcs(f"ERROR: MCP server '{name}' failed to start")
                         raise Exception(f"MCP server '{name}' failed to start on port {port}")
 
                     # Basic HTTP health check on root
@@ -202,10 +251,13 @@ async def process_job(request: ProcessRequest):
                     # Skip SSE health check - SSE endpoints are designed to stream indefinitely
                     print(f"MCP '{name}' health check passed (port {port} is responding)")
 
-                print("All MCP servers responded; warming up...")
-                # Warm-up delay to let servers fully initialize routes/workers
+                print(f"All MCP servers started successfully")
+                log_to_gcs("All MCP servers ready")
+                log_to_gcs(f"Starting ScoutAgent workflow...")
+                
+                # Run ScoutAgent main.py to let servers fully initialize routes/workers
                 time.sleep(10)
-            except Exception:
+            except Exception as e:
                 # If any MCP startup fails, ensure we terminate what we started
                 for item in mcp_processes:
                     p = item[2]
@@ -256,6 +308,11 @@ async def process_job(request: ProcessRequest):
                                     print(line, file=sys.stderr, end="")
                                 else:
                                     print(line, end="")
+                                
+                                # Log important lines to GCS
+                                line_lower = line.lower()
+                                if any(keyword in line_lower for keyword in ['info', 'starting', 'completed', 'error', 'warning', 'stage']):
+                                    log_to_gcs(line.strip())
                             except Exception:
                                 pass
                     finally:
@@ -276,6 +333,7 @@ async def process_job(request: ProcessRequest):
                 t_err.join()
             
             if return_code != 0:
+                log_to_gcs(f"ERROR: ScoutAgent failed with exit code {return_code}")
                 # Read tail of logs for error message context
                 tail_err = ""
                 tail_out = ""
@@ -298,6 +356,9 @@ async def process_job(request: ProcessRequest):
                 print(error_msg, file=sys.stderr)
                 raise Exception(f"ScoutAgent failed (code {return_code})")
 
+            log_to_gcs("ScoutAgent workflow completed successfully")
+            log_to_gcs("Uploading results to GCS...")
+            
             # Clean up MCP servers
             for item in mcp_processes:
                 name, port, p = item[:3]
@@ -366,6 +427,25 @@ async def process_job(request: ProcessRequest):
             print(f"Output uploaded to: {gcs_output_path}")
             print(f"Total files uploaded: {len(uploaded_files)}")
             
+            log_to_gcs(f"Upload complete: {len(uploaded_files)} files")
+            log_to_gcs(f"Results available at: {gcs_output_path}")
+            log_to_gcs("Job completed successfully!")
+            
+            # Write status file to GCS for API to detect completion
+            import json
+            from datetime import datetime
+            status_data = {
+                "job_id": request.job_id,
+                "status": "completed",
+                "completed_at": datetime.utcnow().isoformat(),
+                "gcs_output_path": gcs_output_path,
+                "files_uploaded": len(uploaded_files),
+                "error": None
+            }
+            status_blob = bucket.blob(f"{gcs_prefix}job_status.json")
+            status_blob.upload_from_string(json.dumps(status_data, indent=2), content_type="application/json")
+            print(f"Status file written to: gs://{bucket_name}/{gcs_prefix}job_status.json")
+            
             return ProcessResponse(
                 job_id=request.job_id,
                 status="completed",
@@ -375,12 +455,48 @@ async def process_job(request: ProcessRequest):
     except subprocess.TimeoutExpired as e:
         error_msg = f"Job {request.job_id} timed out after {e.timeout}s"
         print(error_msg, file=sys.stderr)
+        
+        # Write failure status to GCS
+        try:
+            import json
+            from datetime import datetime
+            status_data = {
+                "job_id": request.job_id,
+                "status": "failed",
+                "completed_at": datetime.utcnow().isoformat(),
+                "error": error_msg,
+                "error_type": "timeout"
+            }
+            gcs_prefix = f"scout/jobs/{request.job_id}/"
+            status_blob = bucket.blob(f"{gcs_prefix}job_status.json")
+            status_blob.upload_from_string(json.dumps(status_data, indent=2), content_type="application/json")
+        except Exception:
+            pass
+        
         raise HTTPException(status_code=408, detail=error_msg)
     except Exception as e:
         error_msg = f"Error processing job {request.job_id}: {str(e)}"
         print(error_msg, file=sys.stderr)
         import traceback
         traceback.print_exc()
+        
+        # Write failure status to GCS
+        try:
+            import json
+            from datetime import datetime
+            status_data = {
+                "job_id": request.job_id,
+                "status": "failed",
+                "completed_at": datetime.utcnow().isoformat(),
+                "error": str(e),
+                "error_type": "exception"
+            }
+            gcs_prefix = f"scout/jobs/{request.job_id}/"
+            status_blob = bucket.blob(f"{gcs_prefix}job_status.json")
+            status_blob.upload_from_string(json.dumps(status_data, indent=2), content_type="application/json")
+        except Exception:
+            pass
+        
         raise HTTPException(status_code=500, detail=f"Job processing failed: {str(e)}")
 
 if __name__ == "__main__":
