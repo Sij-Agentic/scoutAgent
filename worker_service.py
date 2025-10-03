@@ -256,7 +256,6 @@ PROGRESS LOG
                     )
 
                     # Start log streaming threads
-                    import threading
                     t_out = threading.Thread(target=_stream_mcp, args=(p.stdout, stdout_file, name, False), daemon=True)
                     t_err = threading.Thread(target=_stream_mcp, args=(p.stderr, stderr_file, name, True), daemon=True)
                     t_out.start()
@@ -285,6 +284,33 @@ PROGRESS LOG
                 print(f"All MCP servers started successfully")
                 log_progress("All MCP servers ready")
                 log_progress(f"Starting ScoutAgent workflow...")
+
+                # Start heartbeat thread to ensure visible progress even when output is sparse
+                stop_event = threading.Event()
+                def _heartbeat():
+                    while not stop_event.wait(30):
+                        try:
+                            log_progress("Heartbeat: job running")
+                        except Exception:
+                            pass
+                hb_thread = threading.Thread(target=_heartbeat, daemon=True)
+                hb_thread.start()
+                
+                # Start periodic flusher to ensure buffers are flushed even if no further logs arrive
+                def _periodic_flush():
+                    while not stop_event.wait(max(1.0, flush_interval)):
+                        try:
+                            _flush_progress(force=True)
+                        except Exception:
+                            pass
+                flush_thread = threading.Thread(target=_periodic_flush, daemon=True)
+                flush_thread.start()
+
+                # Ensure initial logs are visible immediately
+                try:
+                    _flush_progress(force=True)
+                except Exception:
+                    pass
                 
                 # Run ScoutAgent main.py to let servers fully initialize routes/workers
                 time.sleep(10)
@@ -342,8 +368,8 @@ PROGRESS LOG
                                 
                                 # Log important lines to GCS
                                 line_lower = line.lower()
-                                # Reduce volume: drop generic 'info' to avoid excessive writes
-                                if any(keyword in line_lower for keyword in ['starting', 'completed', 'error', 'warning', 'stage']):
+                                # Buffering + flush interval prevents 429; include info lines for visibility
+                                if any(keyword in line_lower for keyword in ['info', 'starting', 'completed', 'error', 'warning', 'stage']):
                                     log_progress(line.strip())
                             except Exception:
                                 pass
@@ -354,7 +380,6 @@ PROGRESS LOG
                             pass
 
                 # Read stdout and stderr concurrently
-                import threading
                 t_out = threading.Thread(target=_stream, args=(process.stdout, f_out, False))
                 t_err = threading.Thread(target=_stream, args=(process.stderr, f_err, True))
                 t_out.start()
@@ -393,6 +418,12 @@ PROGRESS LOG
                     pass
                 raise Exception(f"ScoutAgent failed (code {return_code})")
 
+            # Stop heartbeat
+            try:
+                if 'stop_event' in locals():
+                    stop_event.set()
+            except Exception:
+                pass
             log_progress("ScoutAgent workflow completed successfully")
             log_progress("Uploading results to GCS...")
             
@@ -497,6 +528,12 @@ PROGRESS LOG
         # Flush any buffered progress before writing failure status
         try:
             _flush_progress(force=True)
+        except Exception:
+            pass
+        # Stop heartbeat if running
+        try:
+            if 'stop_event' in locals():
+                stop_event.set()
         except Exception:
             pass
         # Write failure status to GCS

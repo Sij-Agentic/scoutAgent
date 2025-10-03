@@ -38,6 +38,11 @@ watch -n 5 "curl -s https://scout-agent-api.run.app/jobs/YOUR_JOB_ID/progress | 
 open https://scout-agent-api.run.app/jobs/YOUR_JOB_ID/progress
 ```
 
+#### About the Test Script
+- The script `test_cloudrun.py` prints the progress URL and final output location and then exits.
+- It does not poll status or print failure messages while the job runs.
+- Prefer watching the progress URL live and downloading results when complete.
+
 **You'll see**:
 - MCP server startup
 - Workflow stages (scout_collect, gap_finder_collect, etc.)
@@ -82,7 +87,7 @@ The progress URL is **public** (no authentication needed):
 - `Dockerfile` — multi-stage build for the container image.
 - `requirements-docker.txt` — pinned dependencies for container builds.
 - `start_services.sh`, `start_mcp_servers.sh`, `run_workflow.sh` — utilities for local debugging (optional for Cloud Run).
-- `test_cloudrun.py` — simple client to submit a job and poll status.
+- `test_cloudrun.py` — simple client to submit a job and print the progress URL and final output (no status polling).
 - `outputs/` — sample request and example output (to be added separately).
 
 ### Prerequisites
@@ -143,6 +148,11 @@ Deploy two services using the Google Cloud Console (recommended for simplicity).
     - `SCOUT_REDDIT_CLIENT_SECRET`
     - `SCOUT_REDDIT_USER_AGENT`
 
+  - Progress logging (optional tuning):
+    - `PROGRESS_FLUSH_INTERVAL` (seconds, default `5`) — how often to flush progress buffer to GCS
+    - `PROGRESS_MAX_BUFFER` (lines, default `50`) — flush when buffer reaches this many lines
+    - Notes: Progress logging is buffered and retried with backoff to avoid GCS 429s. You may see a slight (seconds) delay in progress updates.
+
 #### Bucket Permissions
 Grant the worker service account permission to write to the bucket:
 - Bucket → Permissions → Grant access
@@ -172,7 +182,7 @@ Response:
 }
 ```
 
-#### Check Job Status
+#### Check Job Status (Optional)
 ```bash
 curl "${API_URL}/jobs/<job_id>"
 ```
@@ -192,6 +202,11 @@ When complete:
 ```bash
 curl "https://scout-agent-api.run.app/jobs/{job_id}/download" -o results.zip
 ```
+
+### Expected Progress Behavior
+- The progress URL is public and updates throughout the run.
+- You may see periodic "Heartbeat: job running" lines to indicate the job is active.
+- Progress is buffered and flushed every few seconds to avoid rate limits; a small delay is expected.
 
 ---
 ### Retrieve Outputs
